@@ -50,7 +50,7 @@ USER stf-build
 RUN set -x && \
     cd /tmp/build && \
     export PATH=$PWD/node_modules/.bin:$PATH && \
-    npm ci --python="/usr/bin/python3"  --loglevel http && \
+    npm install --python="/usr/bin/python3"  --loglevel http && \
     npm pack && \
     tar xzf vk-devicehub-*.tgz --strip-components 1 -C /app && \
     npm prune --production && \
