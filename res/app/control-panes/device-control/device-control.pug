@@ -25,8 +25,9 @@
             a.stf-vnc-device-name.pointer.unselectable(uib-dropdown-toggle)
               p
                 .device-small-image
-                  img(ng-src='/static/app/devices/icon/x24/{{ device.image || "E30HT.jpg" }}')
-                span.device-name-text {{device.manufacturer + ' ' + device.marketName}}
+                  img(ng-src='/static/app/devices/icon/x24/{{ device.image || "_default.jpg" }}')
+                span.device-name-text(ng-if='!device.ios') {{device.manufacturer + ' ' + device.marketName}}
+                span.device-name-text(ng-if='device.ios') {{device.model}}
 
       .as-row.fill-height
         div(ng-controller='DeviceScreenCtrl', ng-if='device').as-cell.fill-height

@@ -1,0 +1,200 @@
+version: "3"
+networks:
+    devicehub:
+
+services:
+  nginx:
+    image: "nginx:bookworm"
+    container_name: devicehub-nginx
+    volumes:
+      - ./scripts/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8082:80"
+    depends_on:
+      - devicehub-app
+      - devicehub-websocket
+      - devicehub-storage-temp
+      - devicehub-storage-plugin-apk
+      - devicehub-storage-plugin-image
+      - devicehub-api
+      - devicehub-auth
+    restart: unless-stopped
+  mongo1:
+    image: mongo:6.0.10
+    hostname: mongo1
+    container_name: mongo1
+    entrypoint: [ "mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1" ]
+  mongo2:
+    image: mongo:6.0.10
+    hostname: mongo2
+    container_name: mongo2
+    entrypoint: [ "mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo2" ]
+  mongo3:
+    image: mongo:6.0.10
+    hostname: mongo3
+    container_name: mongo3
+    entrypoint: [ "mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo3" ]
+  mongosetup:
+    image: mongo:6.0.10
+    container_name: mongosetup
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./scripts/mongo_setup.sh:/scripts/mongo_setup.sh
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh" ]
+  devicehub-migrate:
+    build: .
+    image: devicehub
+    container_name: devicehub-migrate
+    env_file:
+      - scripts/variables.env
+    command: stf migrate
+    depends_on:
+      mongosetup:
+        condition: service_completed_successfully
+  devicehub-app:
+    build: .
+    image: devicehub
+    container_name: devicehub-app
+    env_file:
+      - scripts/variables.env
+    command: stf app --port 3000 --auth-url ${STF_URL}/${AUTH_URL} --websocket-url ${STF_URL}/ --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-auth:
+    build: .
+    image: devicehub
+    container_name: devicehub-auth
+    env_file:
+      - scripts/variables.env
+    command: stf ${AUTH_TYPE} --port 3000 --app-url ${STF_URL} --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-processor001:
+    build: .
+    image: devicehub
+    container_name: devicehub-processor001
+    env_file:
+      - scripts/variables.env
+    command: stf processor --name proc001 --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-reaper:
+    build: .
+    image: devicehub
+    container_name: devicehub-reaper
+    env_file:
+      - scripts/variables.env
+    command: stf reaper --name reaper001 --connect-push tcp://devicehub-triproxy-dev:7270 --connect-sub tcp://devicehub-triproxy-app:7150 --heartbeat-timeout 30000
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-storage-plugin-apk:
+    build: .
+    image: devicehub
+    container_name: devicehub-storage-plugin-apk
+    env_file:
+      - scripts/variables.env
+    command: stf storage-plugin-apk --port 3000 --storage-url ${STF_URL}/ --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-storage-plugin-image:
+    build: .
+    image: devicehub
+    container_name: devicehub-storage-plugin-image
+    env_file:
+      - scripts/variables.env
+    command: stf storage-plugin-image --port 3000 --storage-url ${STF_URL}/ --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-storage-temp:
+    build: .
+    image: devicehub
+    container_name: devicehub-storage-temp
+    env_file:
+      - scripts/variables.env
+    command: stf storage-temp --port 3000 --save-dir /data --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-triproxy-app:
+    build: .
+    image: devicehub
+    container_name: devicehub-triproxy-app
+    env_file:
+      - scripts/variables.env
+    command: stf triproxy app001 --bind-pub "tcp://*:7150" --bind-dealer "tcp://*:7160" --bind-pull "tcp://*:7170"
+    ports:
+      - "7150:7150"
+      - "7160:7160"
+      - "7170:7170"
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-triproxy-dev:
+    build: .
+    image: devicehub
+    container_name: devicehub-triproxy-dev
+    env_file:
+      - scripts/variables.env
+    command: stf triproxy --name dev001 --bind-pub "tcp://*:7250" --bind-dealer "tcp://*:7260" --bind-pull "tcp://*:7270"
+    ports:
+      - "7250:7250"
+      - "7260:7260"
+      - "7270:7270"
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-websocket:
+    build: .
+    image: devicehub
+    container_name: devicehub-websocket
+    env_file:
+      - scripts/variables.env
+    command: stf websocket --port 3000 --storage-url ${STF_URL}/ --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-api:
+    build: .
+    image: devicehub
+    container_name: devicehub-api
+    env_file:
+      - scripts/variables.env
+    command: stf api --port 3000 --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270 --secret=${STF_SECRET}
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  devicehub-api-groups-engine:
+    build: .
+    image: devicehub
+    container_name: devicehub-api-groups-engine
+    env_file:
+      - scripts/variables.env
+    command: stf groups-engine --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
+    depends_on:
+      devicehub-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  devicehub-db-volume:
