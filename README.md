@@ -33,10 +33,6 @@ Note: some features require direct access to the provider instance from the brow
   - Supports a wide range of versions from 2.3.3 (SDK level 10) to 14 (SDK level 34).
   - Compatibility with Wear 5.1 and Fire OS, CyanogenMod, and other Android-based distributions.
   - **No Root Required**: All functionalities work without the need for root access.
-- **iOS**:
-  - Supports physicals devices and simulators.
-  - Compatibility with iOS, iPad OS, TV OS.
-  - **No jailbreak Required**: All functionalities work without the need for jailbreak access.
 
 ### Remote Control and Screen View
 - **Remote Control**: Seamlessly control any device from your browser.
