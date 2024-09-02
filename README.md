@@ -1,5 +1,5 @@
 # Welcome to VK DeviceHub!
-<img src="res/common/logo/exports/devicehub.svg" style="width:300px;height:100px;" alt="VKSTF">
+<img src="res/common/logo/exports/readmeLogo.svg" style="width:300px;height:100px;" alt="VK Devicehub">
 
 ## About Project
 
@@ -9,7 +9,7 @@ If you have ideas, suggestions, or would like to participate in development, we 
 
 You can watch a presentation about our product at the Heisenbug 2024 conference by following this link:
 [Presentation at Heisenbug 2024 conference](https://heisenbug.ru/talks/cee3ec59796e43f6a3d4ae508db157d3/?referer=/schedule/days/)
-<img src="doc/showcase.png" alt="VKSTF">
+<img src="doc/showcase.png" alt="VK Devicehub">
 
 ## How to run
 Run `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` and a local production-like installation of DeviceHub will be launched on your computer on port 8082. See [docker-compose-prod.yaml](./docker-compose-prod.yaml) for more information.
@@ -33,6 +33,10 @@ Note: some features require direct access to the provider instance from the brow
   - Supports a wide range of versions from 2.3.3 (SDK level 10) to 14 (SDK level 34).
   - Compatibility with Wear 5.1 and Fire OS, CyanogenMod, and other Android-based distributions.
   - **No Root Required**: All functionalities work without the need for root access.
+- **iOS**:
+  - Supports physicals devices and simulators.
+  - Compatibility with iOS, iPad OS, TV OS.
+  - **No jailbreak Required**: All functionalities work without the need for jailbreak access.
 
 ### Remote Control and Screen View
 - **Remote Control**: Seamlessly control any device from your browser.
