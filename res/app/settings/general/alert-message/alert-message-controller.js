@@ -22,6 +22,7 @@ module.exports = function AlertMessageCtrl(
   $scope.alertMessageActivationOptions = ['True', 'False']
   $scope.alertMessageLevelOptions = ['Information', 'Warning', 'Critical']
 
+<<<<<<< Updated upstream
   $scope.$watch(
     function() {
       return SettingsService.get('alertMessage')
@@ -33,6 +34,8 @@ module.exports = function AlertMessageCtrl(
     }
   )
 
+=======
+>>>>>>> Stashed changes
   $scope.$on('user.menu.users.updated', function(event, message) {
     if (message.user.privilege === 'admin') {
       $scope.alertMessage = message.user.settings.alertMessage

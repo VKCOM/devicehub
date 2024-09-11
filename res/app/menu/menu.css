@@ -105,6 +105,46 @@
   0% {
    left: 100%;
   }
+<<<<<<< Updated upstream
+=======
+}
+
+.stf-menu .information-level {
+  background-color: #5bc0df;
+}
+
+.stf-menu .warning-level {
+  background-color: #f0ad4f;
+}
+
+.stf-menu .critical-level {
+  background-color: #ff4b2b;
+}
+
+.stf-menu .maintenance-banner {
+  color: #ffffff;
+  padding: 10px;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  height: 44px;
+}
+
+.stf-menu .maintenance-banner p {
+  font-size: 18px;
+  animation: slideBanner 15s linear infinite;
+  white-space: nowrap;
+  position: relative;
+  top: 50%;
+  transform: translate(0%,-50%);
+  line-height: 44px;
+}
+
+@keyframes slideBanner {
+  0% {
+   left: 100%;
+  }
+>>>>>>> Stashed changes
   100% {
    left: -100%;
   }

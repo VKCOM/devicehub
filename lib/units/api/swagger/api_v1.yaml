@@ -783,7 +783,11 @@ paths:
           schema:
             $ref: "#/definitions/UnexpectedErrorResponse"
       security:
+<<<<<<< Updated upstream
         - accessTokenAuth: []
+=======
+        - accessTokenAuth: [ ]
+>>>>>>> Stashed changes
   /users/groupsQuotas:
     x-swagger-router-controller: users
     put:
@@ -2348,6 +2352,33 @@ definitions:
         type: boolean
       description:
         type: string
+<<<<<<< Updated upstream
+=======
+      serviceUserInfo:
+        type: object
+  AlertMessage:
+    type: object
+    properties:
+      activation:
+        description: Enable or disablee the alert message
+        type: string
+      data:
+        description: Alert message text to display
+        type: string
+      level:
+        description: Alert message level
+        type: string
+  AlertMessageResponse:
+    required:
+      - success
+      - description
+      - alertMessage
+    properties:
+      success:
+        type: boolean
+      description:
+        type: string
+>>>>>>> Stashed changes
       alertMessage:
         $ref: '#/definitions/AlertMessage'
   AlertMessagePayload:

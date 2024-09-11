@@ -591,7 +591,11 @@ function DeviceModelCell(options) {
       var image = span.firstChild
       var t = span.nextSibling
       var src = '/static/app/devices/icon/x24/' +
+<<<<<<< Updated upstream
             (device.image || '_default.jpg')
+=======
+            (device.platform || device.image || '_default') + '.svg'
+>>>>>>> Stashed changes
 
       // Only change if necessary so that we don't trigger a download
       if (image.getAttribute('src') !== src) {

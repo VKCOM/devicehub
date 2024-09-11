@@ -48,8 +48,45 @@ module.exports = function EnhanceDeviceServiceFactory($filter, AppState) {
     device.enhancedName = device.marketName || device.name || device.model || device.serial
       || 'Unknown'
     device.enhancedModel = device.model || 'Unknown'
+<<<<<<< Updated upstream
     device.enhancedImage120 = '/static/app/devices/icon/x120/' + (device.image || '_default.jpg')
     device.enhancedImage24 = '/static/app/devices/icon/x24/' + (device.image || '_default.jpg')
+=======
+    device.enhancedImage120 = '/static/app/devices/icon/x120/' + (device.platform || device.image || '_default') + '.jpg'
+    device.enhancedImage24 = '/static/app/devices/icon/x24/' + (device.platform || device.image || '_default') + '.svg'
+    if (device.ios && device.state === 'available' && !device.using) {
+      device.enhancedStateAction = $filter('statusNameAction')('available')
+      device.enhancedStatePassive = $filter('statusNamePassive')('available')
+      return
+    }
+    if (device.ios && device.state === 'available' && device.using) {
+      device.enhancedStateAction = $filter('statusNameAction')('using')
+      device.enhancedStatePassive = $filter('statusNamePassive')('using')
+      return
+    }
+    if (device.ios && device.status === 6 && device.state !== 'present') {
+      device.enhancedStateAction = $filter('statusNameAction')('preparing')
+      device.enhancedStatePassive = $filter('statusNamePassive')('preparing')
+      return
+    }
+    if (device.ios && device.status === 6 && device.state === 'present') {
+      device.status = 3
+      device.state = 'available'
+      device.enhancedStateAction = $filter('statusNameAction')('available')
+      device.enhancedStatePassive = $filter('statusNamePassive')('available')
+      return
+    }
+    if (device.status === 1) {
+      device.enhancedStateAction = $filter('statusNameAction')('offline')
+      device.enhancedStatePassive = $filter('statusNamePassive')('offline')
+      return
+    }
+    if (device.status === 7) {
+      device.enhancedStateAction = $filter('statusNameAction')('unhealthy')
+      device.enhancedStatePassive = $filter('statusNamePassive')('unhealthy')
+      return
+    }
+>>>>>>> Stashed changes
     device.enhancedStateAction = $filter('statusNameAction')(device.state)
     device.enhancedStatePassive = $filter('statusNamePassive')(device.state)
   }

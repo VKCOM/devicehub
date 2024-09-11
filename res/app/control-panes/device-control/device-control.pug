@@ -24,6 +24,7 @@
             a.stf-vnc-device-name.pointer.unselectable(uib-dropdown-toggle)
               p
                 .device-small-image
+<<<<<<< Updated upstream
                   img(ng-src='/static/app/devices/icon/x24/{{ device.image || "E30HT.jpg" }}')
                 span.device-name-text {{ device.enhancedName }}
                 span.caret(ng-show='groupDevices.length > 0')
@@ -39,6 +40,11 @@
                   .pull-right(ng-click='kickDevice(groupDevice); $event.stopPropagation()').kick-device
                     i.fa.fa-times
                   .clearfix
+=======
+                  img(ng-src='/static/app/devices/icon/x24/{{ device.image || "_default.svg" }}')
+                span.device-name-text(ng-if='!device.ios') {{device.manufacturer + ' ' + device.marketName}}
+                span.device-name-text(ng-if='device.ios') {{device.model}}
+>>>>>>> Stashed changes
 
       .as-row.fill-height
         div(ng-controller='DeviceScreenCtrl', ng-if='device').as-cell.fill-height

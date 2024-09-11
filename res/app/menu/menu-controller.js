@@ -74,6 +74,33 @@ module.exports = function MenuCtrl(
     return $scope.alertMessage.level === 'Information'
   }
 
+<<<<<<< Updated upstream
+=======
+  $scope.alertMessage = {
+    activation: 'False'
+  , data: ''
+  , level: ''
+  }
+
+  if (AppState.user.privilege === 'admin' && AppState.user.name === 'administrator') {
+    $scope.alertMessage = SettingsService.get('alertMessage')
+  }
+  else {
+    UsersService.getUsersAlertMessage().then(function(response) {
+      $scope.alertMessage = response.data.alertMessage
+      SettingsService.set('alertMessage', response.data.alertMessage)
+    })
+  }
+
+  $scope.isAlertMessageActive = function() {
+    return $scope.alertMessage.activation === 'True'
+  }
+
+  $scope.isInformationAlert = function() {
+    return $scope.alertMessage.level === 'Information'
+  }
+
+>>>>>>> Stashed changes
   $scope.isWarningAlert = function() {
     return $scope.alertMessage.level === 'Warning'
   }

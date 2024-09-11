@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 <img src="https://raw.githubusercontent.com/DeviceFarmer/stf/master/res/common/logo/exports/STF-128.png" style="width:100px;height:100px;" alt="STF">
+=======
+# Welcome to VK DeviceHub!
+<img src="res/common/logo/exports/readmeLogo.svg" style="width:300px;height:100px;" alt="VK Devicehub">
+>>>>>>> Stashed changes
 
 [![Build Status](https://travis-ci.org/DeviceFarmer/stf.svg?branch=master&status=created)](https://travis-ci.org/github/DeviceFarmer/stf)
 [![Docker Pulls](https://img.shields.io/docker/pulls/devicefarmer/stf.svg)](https://hub.docker.com/r/devicefarmer/stf/)
@@ -8,7 +13,13 @@
 
 ## Overview
 
+<<<<<<< Updated upstream
 ![Close-up of device shelf](https://raw.githubusercontent.com/DeviceFarmer/stf/master/doc/shelf_closeup_790x.jpg)
+=======
+You can watch a presentation about our product at the Heisenbug 2024 conference by following this link:
+[Presentation at Heisenbug 2024 conference](https://heisenbug.ru/talks/cee3ec59796e43f6a3d4ae508db157d3/?referer=/schedule/days/)
+<img src="doc/showcase.png" alt="VK Devicehub">
+>>>>>>> Stashed changes
 
 ![Super short screencast showing usage](https://raw.githubusercontent.com/DeviceFarmer/stf/master/doc/7s_usage.gif)
 

@@ -139,7 +139,11 @@ message UserField {
   required string name = 2;
   required string privilege = 3;
   required UserGroupsField groups = 4;
+<<<<<<< Updated upstream
   required UserSettingsField settings = 5;
+=======
+  optional UserSettingsField settings = 5;
+>>>>>>> Stashed changes
 }
 
 message UserChangeMessage {
