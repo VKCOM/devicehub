@@ -2,6 +2,7 @@
   "name": "vk-devicehub",
   "version": "1.3.2",
   "description": "Smartphone Test Farm",
+  "type": "module",
   "keywords": [
     "adb",
     "android",
@@ -53,7 +54,7 @@
     "aws-sdk": "2.1410.0",
     "basic-auth": "1.1.0",
     "bluebird": "2.11.0",
-    "body-parser": "1.20.2",
+    "body-parser": "^1.20.2",
     "bootstrap": "3.4.1",
     "bufferutil": "4.0.7",
     "chalk": "1.1.3",
@@ -68,6 +69,7 @@
     "epoch-charting": "0.8.4",
     "eventemitter3": "1.2.0",
     "express": "4.18.2",
+    "express-openapi": "^12.1.3",
     "express-rate-limit": "7.3.1",
     "express-validator": "4.3.0",
     "file-saver": "1.3.3",
@@ -126,9 +128,9 @@
     "websocket-stream": "5.5.2",
     "ws": "3.3.3",
     "yaml": "2.4.2",
-    "yargs": "7.1.0",
+    "yargs": "^17.7.2",
     "yauzl": "2.10.0",
-    "zeromq": "5.2.8"
+    "zeromq": "^5.0.0"
   },
   "devDependencies": {
     "angular-mocks": "1.8.3",
@@ -172,6 +174,7 @@
     "protractor": "5.4.4",
     "protractor-html-reporter-2": "1.0.4",
     "raw-loader": "0.5.1",
+    "rethinkdb": "^2.4.2",
     "sass": "^1.63.6",
     "sass-loader": "^13.3.2",
     "script-loader": "0.7.2",

@@ -8,7 +8,7 @@ services:
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
     networks:
       default:
-        ipv4_address: 172.20.0.2
+        ipv4_address: 172.88.0.2
   mongo2:
     image: mongo:6.0.10
     hostname: mongo2
@@ -16,7 +16,7 @@ services:
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo2"]
     networks:
       default:
-        ipv4_address: 172.20.0.3
+        ipv4_address: 172.88.0.3
   mongo3:
     image: mongo:6.0.10
     hostname: mongo3
@@ -24,7 +24,7 @@ services:
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo3"]
     networks:
       default:
-        ipv4_address: 172.20.0.4
+        ipv4_address: 172.88.0.4
   mongosetup:
     image: mongo:6.0.10
     depends_on:
@@ -44,7 +44,7 @@ services:
     privileged: true
     networks:
       default:
-        ipv4_address: 172.20.0.6
+        ipv4_address: 172.88.0.6
   devicehub:
     container_name: devicehub
     build: .
@@ -55,19 +55,19 @@ services:
       - "7400-7500:7400-7500"
     environment:
       - TZ='America/Los_Angeles'
-      - MONGODB_PORT_27017_TCP=mongodb://172.20.0.2:27017
+      - MONGODB_PORT_27017_TCP=mongodb://172.88.0.2:27017
       - STF_ADMIN_EMAIL='test@example.com'
       - STF_ADMIN_NAME='test admin'
     restart: unless-stopped
     command: stf local --adb-host adb --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
     networks:
       default:
-        ipv4_address: 172.20.0.5
+        ipv4_address: 172.88.0.5
 networks:
   default:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
+        - subnet: 172.88.0.0/16
+          gateway: 172.88.0.1

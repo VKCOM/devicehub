@@ -5,26 +5,26 @@ services:
     image: mongo:6.0.10
     hostname: mongo1
     container_name: mongo1
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
       default:
-        ipv4_address: 172.20.0.2
+        ipv4_address: 172.88.0.2
   mongo2:
     image: mongo:6.0.10
     hostname: mongo2
     container_name: mongo2
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo2"]
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
       default:
-        ipv4_address: 172.20.0.3
+        ipv4_address: 172.88.0.3
   mongo3:
     image: mongo:6.0.10
     hostname: mongo3
     container_name: mongo3
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo3"]
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
       default:
-        ipv4_address: 172.20.0.4
+        ipv4_address: 172.88.0.4
   mongosetup:
     image: mongo:6.0.10
     depends_on:
@@ -44,12 +44,12 @@ services:
     privileged: true
     networks:
       default:
-        ipv4_address: 172.20.0.6
+        ipv4_address: 172.88.0.6
 networks:
   default:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
+        - subnet: 172.88.0.0/16
+          gateway: 172.88.0.1

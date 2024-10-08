@@ -1,2 +1,2 @@
-#!/usr/bin/env node
-require('../lib/cli/please')
+#!/usr/bin/env node --experimental-detect-module
+import '../lib/cli/index.js'

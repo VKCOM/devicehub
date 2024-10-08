@@ -5,8 +5,8 @@
 var _ = require('lodash')
 var webpack = require('webpack')
 var ProgressPlugin = require('webpack/lib/ProgressPlugin')
-var pathutil = require('./lib/util/pathutil')
-var log = require('./lib/util/logger').createLogger('webpack:config')
+var pathutil = require('./lib/util/pathutil.cjs')
+// var log = require('./lib/util/logger').createLogger('webpack:config')
 
 module.exports = {
   webpack: {
@@ -86,7 +86,7 @@ module.exports = {
           else {
             msg = progress >= 1 ? 'complete' : 'unknown'
           }
-          log.info('Build progress %d%% (%s)', Math.floor(progress * 100), msg)
+          console.log('Build progress %d%% (%s)', Math.floor(progress * 100), msg)
         }
         , 1000
       ))

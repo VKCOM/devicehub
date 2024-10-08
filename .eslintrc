@@ -4,7 +4,8 @@
     "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2020,
+    "sourceType": "module"
   },
   "rules": {
     // Possible errors
@@ -103,7 +104,6 @@
     "key-spacing": [2, {"beforeColon": false, "afterColon": true, "mode": "strict"}], // optionally set `[2, {"beforeColon": false, "afterColon": true, "mode": "strict", "align": "colon"}]`
     "lines-around-comment": 2, // optionally set `[2, {"beforeBlockComment": true, "beforeLineComment": true, "allowBlockStart": true}]`
     "linebreak-style": 0, // optionally set `[1, "unix"]`
-    "max-len": [2, 150, 2, {"ignoreComments": true, "ignoreUrls": true}], // NOTE: Our limit is 80 however ESLint does not have an ignoreStrings so lets have more buffer
     "max-nested-callbacks": [1, 5],
     "new-cap": 2, // optionally set `[2, {"capIsNewExceptions": ["Person"]}]`
     "new-parens": 2,
