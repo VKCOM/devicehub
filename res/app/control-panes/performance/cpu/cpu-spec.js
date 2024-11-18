@@ -1,17 +1,14 @@
 describe('CpuCtrl', function() {
+    beforeEach(angular.mock.module(require('./index').name))
 
-  beforeEach(angular.mock.module(require('./index').name))
+    var scope, ctrl
 
-  var scope, ctrl
+    beforeEach(inject(function($rootScope, $controller) {
+        scope = $rootScope.$new()
+        ctrl = $controller('CpuCtrl', {$scope: scope})
+    }))
 
-  beforeEach(inject(function($rootScope, $controller) {
-    scope = $rootScope.$new()
-    ctrl = $controller('CpuCtrl', {$scope: scope})
-  }))
-
-  it('should ...', inject(function() {
-    expect(1).toEqual(1)
-
-  }))
-
+    it('should ...', inject(function() {
+        expect(1).toEqual(1)
+    }))
 })

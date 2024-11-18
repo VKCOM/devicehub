@@ -3,11 +3,11 @@
 **/
 
 module.exports = function GeneralCtrl($scope, AppState) {
-  $scope.isAdmin = function() {
-    return AppState.user.privilege === 'admin'
-  }
+    $scope.isAdmin = function() {
+        return AppState.user.privilege === 'admin'
+    }
 
-  $scope.isMainAdmin = function() {
-    return AppState.user.privilege === 'admin' && AppState.user.name === 'administrator'
-  }
+    $scope.isMainAdmin = function() {
+        return AppState.user.privilege === 'admin' && AppState.user.name === 'administrator'
+    }
 }

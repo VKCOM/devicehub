@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "api-tests"
+version = "0.0.1"
+description = ""
+authors = ["Daniil Smirnov <di.smirnov@corp.vk.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.pytest]
+log_cli = true
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "8.3.3"
+openapi-client = "1.1.7"
+openapi-python-client = "0.21.6"
+smartphone-test-farm-client = {path = "smartphone-test-farm-client", develop=true}
+teamcity-messages = "1.32"
+pytest-asyncio = "^0.24.0"
+pytest-check = "^2.4.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

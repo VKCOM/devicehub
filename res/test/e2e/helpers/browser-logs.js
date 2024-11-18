@@ -5,33 +5,34 @@ var chalk = require('chalk')
 // https://github.com/pivotal/jasmine/blob/master/src/console/ConsoleReporter.js
 
 module.exports = function BrowserLogs(opts) {
-  var options = opts || {}
+    var options = opts || {}
 
-  if (typeof options.expectNoLogs === 'undefined') {
-    options.expectNoLogs = false
-  }
-  if (typeof options.outputLogs === 'undefined') {
-    options.outputLogs = true
-  }
+    if (typeof options.expectNoLogs === 'undefined') {
+        options.expectNoLogs = false
+    }
+    if (typeof options.outputLogs === 'undefined') {
+        options.outputLogs = true
+    }
 
-  browser.getCapabilities().then(function(cap) {
-    var browserName = ' ' + cap.browserName + ' log '
-    var browserStyled = chalk.bgBlue.white.bold(browserName) + ' '
+    browser.getCapabilities().then(function(cap) {
+        var browserName = ' ' + cap.browserName + ' log '
+        var browserStyled = chalk.bgBlue.white.bold(browserName) + ' '
 
-    browser.manage().logs().get('browser').then(function(browserLogs) {
-      if (options.expectNoLogs) {
-        expect(browserLogs.length).toEqual(0)
-      }
+        browser.manage().logs().get('browser').then(function(browserLogs) {
+            if (options.expectNoLogs) {
+                expect(browserLogs.length).toEqual(0)
+            }
 
-      if (options.outputLogs && browserLogs.length) {
-        browserLogs.forEach(function(log) {
-          if (log.level.value > 900) {
-            console.error(browserStyled + chalk.white.bold(log.message))
-          } else {
-            console.log(browserStyled + chalk.white.bold(log.message))
-          }
+            if (options.outputLogs && browserLogs.length) {
+                browserLogs.forEach(function(log) {
+                    if (log.level.value > 900) {
+                        console.error(browserStyled + chalk.white.bold(log.message))
+                    }
+                    else {
+                        console.log(browserStyled + chalk.white.bold(log.message))
+                    }
+                })
+            }
         })
-      }
     })
-  })
 }

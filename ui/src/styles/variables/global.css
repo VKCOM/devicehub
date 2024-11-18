@@ -1,0 +1,7 @@
+:root {
+  /* z - Индексы */
+  --header-z-index: 150;
+
+  /* Цвета */
+  --light-gray: #cfcfcf;
+}

@@ -10,7 +10,7 @@ info:
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0
-  version: 2.4.1
+  version: 2.4.3
 servers:
 - url: /api/v1
 tags:
@@ -64,8 +64,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - groups
@@ -99,8 +97,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: group
     delete:
       tags:
@@ -126,7 +122,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -139,8 +135,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: groups
     x-swagger-router-controller: groups
   /groups/{id}:
@@ -180,8 +174,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - groups
@@ -232,8 +224,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: group
     delete:
       tags:
@@ -254,7 +244,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -267,8 +257,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: groups
   /groups/{id}/devices:
     get:
@@ -317,8 +305,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - groups
@@ -371,8 +357,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: devices
     delete:
       tags:
@@ -419,8 +403,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: devices
     x-swagger-router-controller: groups
   /groups/{id}/devices/{serial}:
@@ -466,8 +448,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - groups
@@ -514,8 +494,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - groups
@@ -555,8 +533,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: groups
   /groups/{id}/users:
     get:
@@ -597,8 +573,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - groups
@@ -643,8 +617,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: users
     delete:
       tags:
@@ -690,8 +662,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: users
     x-swagger-router-controller: groups
   /groups/{id}/users/{email}:
@@ -739,8 +709,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - groups
@@ -779,8 +747,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - groups
@@ -820,8 +786,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: groups
   /users:
     get:
@@ -855,8 +819,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -888,7 +850,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -901,8 +863,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: users
     x-swagger-router-controller: users
   /users/alertMessage:
@@ -936,8 +896,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - admin
@@ -971,8 +929,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: alertMessage
     x-swagger-router-controller: users
   /users/groupsQuotas:
@@ -1019,8 +975,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/grantAdmin/{email}:
     post:
@@ -1054,8 +1008,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/revokeAdmin/{email}:
     delete:
@@ -1089,8 +1041,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}:
     get:
@@ -1131,8 +1081,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - admin
@@ -1169,8 +1117,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -1197,7 +1143,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1210,8 +1156,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/service/{email}:
     post:
@@ -1262,8 +1206,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/groupsQuotas:
     put:
@@ -1317,8 +1259,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/devices:
     get:
@@ -1357,8 +1297,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/devices/{serial}:
     get:
@@ -1404,8 +1342,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - admin
@@ -1441,7 +1377,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1454,8 +1390,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -1483,7 +1417,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1496,8 +1430,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/devices/{serial}/remoteConnect:
     post:
@@ -1539,8 +1471,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -1567,7 +1497,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1580,8 +1510,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/accessTokens:
     get:
@@ -1614,8 +1542,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - admin
@@ -1652,8 +1578,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -1673,7 +1597,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1684,8 +1608,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /users/{email}/accessTokens/{id}:
     get:
@@ -1724,8 +1646,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -1751,7 +1671,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1762,8 +1682,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: users
   /user:
     get:
@@ -1786,8 +1704,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/devices:
     get:
@@ -1820,8 +1736,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - user
@@ -1854,8 +1768,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: device
     x-swagger-router-controller: user
   /user/devices/{serial}:
@@ -1896,8 +1808,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - user
@@ -1927,7 +1837,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1940,8 +1850,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - user
@@ -1963,7 +1871,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -1976,8 +1884,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/devices/{serial}/remoteConnect:
     post:
@@ -2013,8 +1919,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - user
@@ -2035,7 +1939,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2048,8 +1952,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/fullAccessTokens:
     get:
@@ -2075,8 +1977,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/accessTokens:
     get:
@@ -2099,8 +1999,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
     post:
       tags:
       - user
@@ -2130,8 +2028,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - user
@@ -2144,7 +2040,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2154,8 +2050,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/accessTokens/{id}:
     get:
@@ -2188,8 +2082,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - user
@@ -2209,7 +2101,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2220,8 +2112,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: user
   /user/adbPublicKeys:
     post:
@@ -2255,8 +2145,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: adb
     delete:
       tags:
@@ -2280,8 +2168,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: fingerprint
     x-swagger-router-controller: user
   /devices:
@@ -2333,8 +2219,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -2388,7 +2272,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2400,15 +2284,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: devices
     x-swagger-router-controller: devices
   /devices/adbRange:
     get:
       tags:
       - devices
-      - admin
       summary: AdbRange
       description: The range whic used to forward adb ports
       operationId: getAdbRange
@@ -2428,8 +2309,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}:
     get:
@@ -2464,8 +2343,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
     put:
       tags:
       - admin
@@ -2493,7 +2370,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2507,8 +2384,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: device
     delete:
       tags:
@@ -2557,7 +2432,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2569,8 +2444,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/updateStorageInfo:
     put:
@@ -2607,7 +2480,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2621,8 +2494,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/size:
     get:
@@ -2711,8 +2582,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: devices
     delete:
       tags:
@@ -2768,8 +2637,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: devices
     x-swagger-router-controller: devices
   /devices/{serial}/adbPort:
@@ -2792,7 +2659,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -2806,8 +2673,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/owner:
     get:
@@ -2877,8 +2742,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/type:
     get:
@@ -2910,8 +2773,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/bookings:
     get:
@@ -2950,8 +2811,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /devices/{serial}/groups/{id}:
     put:
@@ -2995,8 +2854,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - admin
@@ -3038,8 +2895,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: devices
   /autotests:
     get:
@@ -3104,7 +2959,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupListResponse'
+                $ref: '#/components/schemas/AutoTestResponse'
         default:
           description: |
             Unexpected Error:
@@ -3115,8 +2970,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     delete:
       tags:
       - autotests
@@ -3136,7 +2989,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupListResponse'
+                $ref: '#/components/schemas/DefaultResponse'
         default:
           description: |
             Unexpected Error:
@@ -3147,8 +3000,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: autotests
   /autotests/install/{serial}:
     post:
@@ -3193,8 +3044,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: installProperties
     x-swagger-router-controller: autotests
   /autotests/useDevice:
@@ -3226,7 +3075,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupListResponse'
+                $ref: '#/components/schemas/RemoteConnectUserDeviceResponse'
         default:
           description: |
             Unexpected Error:
@@ -3237,8 +3086,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
       x-codegen-request-body-name: serial
     x-swagger-router-controller: autotests
   /stats:
@@ -3294,8 +3141,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-      security:
-      - accessTokenAuth: []
     x-swagger-router-controller: stats
   /swagger.json:
     x-swagger-pipe: swagger_raw
@@ -3312,7 +3157,7 @@ components:
           default: false
         description:
           type: string
-    Response:
+    DefaultResponse:
       required:
       - description
       - success
@@ -3367,6 +3212,252 @@ components:
             name:
               type: string
           description: Owner of the group in conflict
+    Device:
+      type: object
+      properties:
+        _id:
+          type: string
+        present:
+          type: boolean
+        presenceChangedAt:
+          type: string
+          format: date-time
+        provider:
+          type: object
+          properties:
+            channel:
+              type: string
+            name:
+              type: string
+        owner:
+          type: object
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+            group:
+              type: string
+          nullable: true
+        status:
+          type: integer
+        statusChangedAt:
+          type: string
+          format: date-time
+        bookedBefore:
+          type: integer
+        ready:
+          type: boolean
+        reverseForwards:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              devicePort:
+                type: integer
+                minimum: 0
+              targetHost:
+                type: string
+              targetPort:
+                type: integer
+                minimum: 0
+        remoteConnect:
+          type: boolean
+        remoteConnectUrl:
+          type: string
+          nullable: true
+        usage:
+          type: string
+          nullable: true
+        logs_enabled:
+          type: boolean
+        serial:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        group:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            lifeTime:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                stop:
+                  type: string
+                  format: date-time
+            owner:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+            origin:
+              type: string
+            class:
+              type: string
+            repetitions:
+              type: integer
+            originName:
+              type: string
+            lock:
+              type: boolean
+            runUrl:
+              type: string
+              nullable: true
+        adbPort:
+          type: integer
+        network:
+          type: object
+          properties:
+            connected:
+              type: boolean
+            type:
+              type: string
+            subtype:
+              type: string
+            failover:
+              type: boolean
+            roaming:
+              type: boolean
+        display:
+          type: object
+          properties:
+            id:
+              type: integer
+            width:
+              type: integer
+            height:
+              type: integer
+            rotation:
+              type: integer
+            xdpi:
+              type: number
+            ydpi:
+              type: number
+            fps:
+              type: number
+            density:
+              type: number
+            secure:
+              type: boolean
+            url:
+              type: string
+            size:
+              type: number
+        airplaneMode:
+          type: boolean
+        battery:
+          type: object
+          properties:
+            status:
+              type: string
+            health:
+              type: string
+            source:
+              type: string
+            level:
+              type: integer
+            scale:
+              type: integer
+            temp:
+              type: integer
+            voltage:
+              type: integer
+        browser:
+          type: object
+          properties:
+            selected:
+              type: boolean
+            apps:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+                  selected:
+                    type: boolean
+                  system:
+                    type: boolean
+        service:
+          type: object
+          properties:
+            hasHMS:
+              type: boolean
+            hasGMS:
+              type: boolean
+        channel:
+          type: string
+        abi:
+          type: string
+        cpuPlatform:
+          type: string
+        macAddress:
+          type: string
+        manufacturer:
+          type: string
+        marketName:
+          type: string
+        model:
+          type: string
+        openGLESVersion:
+          type: string
+        operator:
+          type: string
+        phone:
+          type: object
+          properties:
+            imei:
+              type: string
+            imsi:
+              type: string
+              nullable: true
+            phoneNumber:
+              type: string
+              nullable: true
+            iccid:
+              type: string
+              nullable: true
+            network:
+              type: string
+              nullable: true
+        platform:
+          type: string
+        ios:
+          type: boolean
+        product:
+          type: string
+        ram:
+          type: string
+        sdk:
+          type: string
+        version:
+          type: string
+        usageChangedAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        place:
+          type: string
+        storageId:
+          type: string
+        using:
+          type: boolean
     ConflictsResponse:
       required:
       - conflicts
@@ -3402,6 +3493,26 @@ components:
           items:
             type: object
             properties: {}
+    AutoTestResponse:
+      required:
+      - description
+      - groups
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        description:
+          type: string
+        group:
+          type: object
+          properties:
+            devices:
+              type: array
+              items:
+                type: object
+                properties: {}
+
     UserListResponse:
       required:
       - description
@@ -3431,7 +3542,115 @@ components:
           type: string
         user:
           type: object
-          properties: {}
+          properties:
+            _id:
+                type: string
+            email:
+                type: string
+            name:
+                type: string
+            ip:
+                type: string
+            group:
+                type: string
+            lastLoggedInAt:
+                type: string
+                format: date-time
+            createdAt:
+                type: string
+                format: date-time
+            forwards:
+                type: array
+                items: {}
+            settings:
+                type: object
+                properties:
+                    lastUsedDevice:
+                        type: string
+                    dateFormat:
+                        type: string
+                    emailAddressSeparator:
+                        type: string
+                    platform:
+                        type: string
+                    groupItemsPerPage:
+                        type: object
+                        properties:
+                            name:
+                                type: string
+                            value:
+                                type: integer
+                    deviceListColumns:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                selected:
+                                    type: boolean
+                    selectedLanguage:
+                        type: string
+                    deviceListSort:
+                        type: object
+                        properties:
+                            fixed:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        name:
+                                            type: string
+                                        order:
+                                            type: string
+                            user:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        name:
+                                            type: string
+                                        order:
+                                            type: string
+            acceptedPolicy:
+                type: boolean
+            privilege:
+                type: string
+            groups:
+                type: object
+                properties:
+                    subscribed:
+                        type: array
+                        items:
+                            type: string
+                    lock:
+                        type: boolean
+                    quotas:
+                        type: object
+                        properties:
+                            allocated:
+                                type: object
+                                properties:
+                                    number:
+                                        type: number
+                                    duration:
+                                        type: number
+                            consumed:
+                                type: object
+                                properties:
+                                    number:
+                                        type: number
+                                    duration:
+                                        type: number
+                            defaultGroupsNumber:
+                                type: number
+                            defaultGroupsDuration:
+                                type: number
+                            defaultGroupsRepetitions:
+                                type: number
+                            repetitions:
+                                type: integer
+
     ServiceUserResponse:
       required:
       - description
@@ -3555,8 +3774,7 @@ components:
         devices:
           type: array
           items:
-            type: object
-            properties: {}
+            $ref: '#/components/schemas/Device'
     SizeResponse:
       required:
       - height
@@ -3596,8 +3814,7 @@ components:
         description:
           type: string
         device:
-          type: object
-          properties: {}
+          $ref: '#/components/schemas/Device'
     RemoteConnectUserDeviceResponse:
       required:
       - description
@@ -3728,9 +3945,4 @@ components:
         url:
           type: string
       description: List of flags for adb install
-  securitySchemes:
-    accessTokenAuth:
-      type: apiKey
-      name: authorization
-      in: header
 x-original-swagger-version: "2.0"

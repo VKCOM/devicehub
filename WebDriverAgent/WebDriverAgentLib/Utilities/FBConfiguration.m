@@ -9,6 +9,10 @@
 
 #import "FBConfiguration.h"
 
+#import "AXSettings.h"
+#import "UIKeyboardImpl.h"
+#import "TIPreferencesController.h"
+
 #include <dlfcn.h>
 #import <UIKit/UIKit.h>
 
@@ -52,6 +56,7 @@ static NSTimeInterval FBWaitForIdleTimeout;
 static NSTimeInterval FBAnimationCoolOffTimeout;
 static BOOL FBShouldUseCompactResponses;
 static NSString *FBElementResponseAttributes;
+static BOOL FBUseClearTextShortcut;
 #if !TARGET_OS_TV
 static UIInterfaceOrientation FBScreenshotOrientation;
 #endif
@@ -434,6 +439,16 @@ static UIInterfaceOrientation FBScreenshotOrientation;
   return FBDismissAlertButtonSelector;
 }
 
++ (void)setUseClearTextShortcut:(BOOL)enabled
+{
+  FBUseClearTextShortcut = enabled;
+}
+
++ (BOOL)useClearTextShortcut
+{
+  return FBUseClearTextShortcut;
+}
+
 #if !TARGET_OS_TV
 + (BOOL)setScreenshotOrientation:(NSString *)orientation error:(NSError **)error
 {
@@ -499,6 +514,7 @@ static UIInterfaceOrientation FBScreenshotOrientation;
   FBAnimationCoolOffTimeout = 2.;
   // 50 should be enough for the majority of the cases. The performance is acceptable for values up to 100.
   FBSetCustomParameterForElementSnapshot(FBSnapshotMaxDepthKey, @50);
+  FBUseClearTextShortcut = YES;
 #if !TARGET_OS_TV
   FBScreenshotOrientation = UIInterfaceOrientationUnknown;
 #endif

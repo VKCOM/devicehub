@@ -8,249 +8,249 @@ var EventEmitter = require('eventemitter3')
 let Promise = require('bluebird')
 
 module.exports = function DeviceServiceFactory($http, socket, EnhanceDeviceService, CommonService) {
-  var deviceService = {}
+    var deviceService = {}
 
-  function Tracker($scope, options) {
-    var devices = []
-    var devicesBySerial = Object.create(null)
-    var scopedSocket = socket.scoped($scope)
-    var digestTimer, lastDigest
+    function Tracker($scope, options) {
+        var devices = []
+        var devicesBySerial = Object.create(null)
+        var scopedSocket = socket.scoped($scope)
+        var digestTimer, lastDigest
 
-    $scope.$on('$destroy', function() {
-      clearTimeout(digestTimer)
-    })
+        $scope.$on('$destroy', function() {
+            clearTimeout(digestTimer)
+        })
 
-    function digest() {
-      // Not great. Consider something else
-      if (!$scope.$$phase) {
-        $scope.$digest()
-      }
+        function digest() {
+            // Not great. Consider something else
+            if (!$scope.$$phase) {
+                $scope.$digest()
+            }
 
-      lastDigest = Date.now()
-      digestTimer = null
-    }
-
-    function notify(event) {
-      if (!options.digest) {
-        return
-      }
-
-      if (event.important) {
-        // Handle important updates immediately.
-        //digest()
-        window.requestAnimationFrame(digest)
-      }
-      else {
-        if (!digestTimer) {
-          var delta = Date.now() - lastDigest
-          if (delta > 1000) {
-            // It's been a while since the last update, so let's just update
-            // right now even though it's low priority.
-            digest()
-          }
-          else {
-            // It hasn't been long since the last update. Let's wait for a
-            // while so that the UI doesn't get stressed out.
-            digestTimer = setTimeout(digest, delta)
-          }
+            lastDigest = Date.now()
+            digestTimer = null
         }
-      }
-    }
 
-    function sync(data) {
-      // usable IF device is physically present AND device is online AND
-      // preparations are ready AND the device has no owner or we are the
-      // owner
-      data.usable = data.present && data.status === 3 && data.ready &&
+        function notify(event) {
+            if (!options.digest) {
+                return
+            }
+
+            if (event.important) {
+                // Handle important updates immediately.
+                // digest()
+                window.requestAnimationFrame(digest)
+            }
+            else {
+                if (!digestTimer) {
+                    var delta = Date.now() - lastDigest
+                    if (delta > 1000) {
+                        // It's been a while since the last update, so let's just update
+                        // right now even though it's low priority.
+                        digest()
+                    }
+                    else {
+                        // It hasn't been long since the last update. Let's wait for a
+                        // while so that the UI doesn't get stressed out.
+                        digestTimer = setTimeout(digest, delta)
+                    }
+                }
+            }
+        }
+
+        function sync(data) {
+            // usable IF device is physically present AND device is online AND
+            // preparations are ready AND the device has no owner or we are the
+            // owner
+            data.usable = data.present && data.status === 3 && data.ready &&
         (!data.owner || data.using)
 
-      // Make sure we don't mistakenly think we still have the device
-      if (!data.usable || !data.owner) {
-        data.using = false
-      }
+            // Make sure we don't mistakenly think we still have the device
+            if (!data.usable || !data.owner) {
+                data.using = false
+            }
 
-      EnhanceDeviceService.enhance(data)
-    }
-
-    function get(data) {
-      return devices[devicesBySerial[data.serial]]
-    }
-
-    var insert = function insert(data) {
-      devicesBySerial[data.serial] = devices.push(data) - 1
-      sync(data)
-      this.emit('add', data)
-    }.bind(this)
-
-    var modify = function modify(data, newData) {
-      _.merge(data, newData, function(a, b) {
-        // New Arrays overwrite old Arrays
-        if (_.isArray(b)) {
-          return b
+            EnhanceDeviceService.enhance(data)
         }
-      })
-      sync(data)
-      this.emit('change', data)
-    }.bind(this)
 
-    var remove = function remove(data) {
-      var index = devicesBySerial[data.serial]
-      if (index >= 0) {
-        devices.splice(index, 1)
-        delete devicesBySerial[data.serial]
-        for (var serial in devicesBySerial) {
-          if (devicesBySerial[serial] > index) {
-            devicesBySerial[serial]--
-          }
+        function get(data) {
+            return devices[devicesBySerial[data.serial]]
         }
-        sync(data)
-        this.emit('remove', data)
-      }
-    }.bind(this)
 
-    function addListener(event) {
-      var device = get(event.data)
-      if (device) {
-        modify(device, event.data)
-        notify(event)
-      }
-      else {
-        if (options.filter(event.data)) {
-          insert(event.data)
-          notify(event)
+        var insert = function insert(data) {
+            devicesBySerial[data.serial] = devices.push(data) - 1
+            sync(data)
+            this.emit('add', data)
+        }.bind(this)
+
+        var modify = function modify(data, newData) {
+            _.merge(data, newData, function(a, b) {
+                // New Arrays overwrite old Arrays
+                if (_.isArray(b)) {
+                    return b
+                }
+            })
+            sync(data)
+            this.emit('change', data)
+        }.bind(this)
+
+        var remove = function remove(data) {
+            var index = devicesBySerial[data.serial]
+            if (index >= 0) {
+                devices.splice(index, 1)
+                delete devicesBySerial[data.serial]
+                for (var serial in devicesBySerial) {
+                    if (devicesBySerial[serial] > index) {
+                        devicesBySerial[serial]--
+                    }
+                }
+                sync(data)
+                this.emit('remove', data)
+            }
+        }.bind(this)
+
+        function addListener(event) {
+            var device = get(event.data)
+            if (device) {
+                modify(device, event.data)
+                notify(event)
+            }
+            else {
+                if (options.filter(event.data)) {
+                    insert(event.data)
+                    notify(event)
+                }
+            }
         }
-      }
+
+        function changeListener(event) {
+            var device = get(event.data)
+            if (device) {
+                modify(device, event.data)
+                if (!options.filter(device)) {
+                    remove(device)
+                }
+                notify(event)
+            }
+        }
+
+        scopedSocket.on('device.add', addListener)
+        scopedSocket.on('device.remove', changeListener)
+        scopedSocket.on('device.change', changeListener)
+
+        this.add = function(device) {
+            addListener({
+                important: true
+                , data: device
+            })
+        }
+
+        this.devices = devices
+
+        function addGroupDevicesListener(event) {
+            return Promise.map(event.devices, function(serial) {
+                return deviceService.load(serial).then(function(device) {
+                    return device
+                })
+            })
+                .then(function(_devices) {
+                    _devices.forEach(function(device) {
+                        if (device && typeof devicesBySerial[device.serial] === 'undefined') {
+                            insert(device)
+                            notify(event)
+                        }
+                    })
+                })
+        }
+
+        function removeGroupDevicesListener(event) {
+            event.devices.forEach(function(serial) {
+                if (typeof devicesBySerial[serial] !== 'undefined') {
+                    remove(devices[devicesBySerial[serial]])
+                    notify(event)
+                }
+            })
+        }
+
+        function updateGroupDeviceListener(event) {
+            let device = get(event.data)
+            if (device) {
+                modify(device, event.data)
+                notify(event)
+            }
+        }
+
+        scopedSocket.on('device.addGroupDevices', addGroupDevicesListener)
+        scopedSocket.on('device.removeGroupDevices', removeGroupDevicesListener)
+        scopedSocket.on('device.updateGroupDevice', updateGroupDeviceListener)
     }
 
-    function changeListener(event) {
-      var device = get(event.data)
-      if (device) {
-        modify(device, event.data)
-        if (!options.filter(device)) {
-          remove(device)
-        }
-        notify(event)
-      }
-    }
+    Tracker.prototype = new EventEmitter()
 
-    scopedSocket.on('device.add', addListener)
-    scopedSocket.on('device.remove', changeListener)
-    scopedSocket.on('device.change', changeListener)
-
-    this.add = function(device) {
-      addListener({
-        important: true
-      , data: device
-      })
-    }
-
-    this.devices = devices
-
-    function addGroupDevicesListener(event) {
-      return Promise.map(event.devices, function(serial) {
-        return deviceService.load(serial).then(function(device) {
-          return device
+    deviceService.trackAll = function($scope) {
+        var tracker = new Tracker($scope, {
+            filter: function() {
+                return true
+            }
+            , digest: false
         })
-      })
-      .then(function(_devices) {
-        _devices.forEach(function(device) {
-          if (device && typeof devicesBySerial[device.serial] === 'undefined') {
-            insert(device)
-            notify(event)
-          }
+        oboe(CommonService.getBaseUrl() + '/api/v1/devices')
+            .node('devices[*]', function(device) {
+                tracker.add(device)
+            })
+
+        return tracker
+    }
+
+    deviceService.trackGroup = function($scope) {
+        var tracker = new Tracker($scope, {
+            filter: function(device) {
+                return device.using
+            }
+            , digest: true
         })
-      })
+
+        oboe(CommonService.getBaseUrl() + '/api/v1/user/devices')
+            .node('devices[*]', function(device) {
+                tracker.add(device)
+            })
+
+        return tracker
     }
 
-    function removeGroupDevicesListener(event) {
-      event.devices.forEach(function(serial) {
-        if (typeof devicesBySerial[serial] !== 'undefined') {
-          remove(devices[devicesBySerial[serial]])
-          notify(event)
-        }
-      })
-    }
-
-    function updateGroupDeviceListener(event) {
-      let device = get(event.data)
-      if (device) {
-        modify(device, event.data)
-        notify(event)
-      }
-    }
-
-    scopedSocket.on('device.addGroupDevices', addGroupDevicesListener)
-    scopedSocket.on('device.removeGroupDevices', removeGroupDevicesListener)
-    scopedSocket.on('device.updateGroupDevice', updateGroupDeviceListener)
-  }
-
-  Tracker.prototype = new EventEmitter()
-
-  deviceService.trackAll = function($scope) {
-    var tracker = new Tracker($scope, {
-      filter: function() {
-        return true
-      }
-    , digest: false
-    })
-    oboe(CommonService.getBaseUrl() + '/api/v1/devices')
-      .node('devices[*]', function(device) {
-        tracker.add(device)
-      })
-
-    return tracker
-  }
-
-  deviceService.trackGroup = function($scope) {
-    var tracker = new Tracker($scope, {
-      filter: function(device) {
-        return device.using
-      }
-    , digest: true
-    })
-
-    oboe(CommonService.getBaseUrl() + '/api/v1/user/devices')
-      .node('devices[*]', function(device) {
-        tracker.add(device)
-      })
-
-    return tracker
-  }
-
-  deviceService.load = function(serial) {
-    return $http.get('/api/v1/devices/' + serial)
-      .then(function(response) {
-        let data = response.data.device
-        data.usable = data.present && data.status === 3 && data.ready &&
+    deviceService.load = function(serial) {
+        return $http.get('/api/v1/devices/' + serial)
+            .then(function(response) {
+                let data = response.data.device
+                data.usable = data.present && data.status === 3 && data.ready &&
           (!data.owner || data.using)
 
-        // Make sure we don't mistakenly think we still have the device
-        if (!data.usable || !data.owner) {
-          data.using = false
-        }
-        return data
-      })
-  }
+                // Make sure we don't mistakenly think we still have the device
+                if (!data.usable || !data.owner) {
+                    data.using = false
+                }
+                return data
+            })
+    }
 
-  deviceService.get = (serial, $scope) => {
-    const tracker = new Tracker($scope, {
-      filter: (device) => device.serial === serial,
-      digest: true,
-    })
+    deviceService.get = (serial, $scope) => {
+        const tracker = new Tracker($scope, {
+            filter: (device) => device.serial === serial
+            , digest: true,
+        })
 
-    return deviceService.load(serial)
-      .then((device) => {
-        tracker.add(device)
-        return device
-      })
-  }
+        return deviceService.load(serial)
+            .then((device) => {
+                tracker.add(device)
+                return device
+            })
+    }
 
-  deviceService.updateNote = function(serial, note) {
-    socket.emit('device.note', {
-      serial: serial,
-      note: note
-    })
-  }
+    deviceService.updateNote = function(serial, note) {
+        socket.emit('device.note', {
+            serial: serial
+            , note: note
+        })
+    }
 
-  return deviceService
+    return deviceService
 }

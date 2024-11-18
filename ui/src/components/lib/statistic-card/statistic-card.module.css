@@ -1,0 +1,9 @@
+.statisticCard {
+  flex: 1;
+
+  min-width: 165px;
+  height: 50px;
+  margin: 10px 0;
+
+  background: var(--vkui--color_background_content);
+}

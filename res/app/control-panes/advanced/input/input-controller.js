@@ -1,68 +1,67 @@
 module.exports = function InputCtrl($scope) {
+    let muteButton = document.getElementById('muteButton')
 
-  let muteButton = document.getElementById('muteButton')
+    muteButton.onclick = function() {
+        if (muteButton.getAttribute('disabled')) {
+            return
+        }
 
-  muteButton.onclick = function() {
-    if (muteButton.getAttribute('disabled')) {
-      return
+        $scope.control.keyPress('mute')
+        muteButton.setAttribute('disabled', 'disabled')
+        muteButton.setAttribute('style', 'cursor: wait;')
+
+        setTimeout(function() {
+            muteButton.removeAttribute('disabled')
+            muteButton.setAttribute('style', 'cursor: pointer;')
+        }, 16000)
     }
 
-    $scope.control.keyPress('mute')
-    muteButton.setAttribute('disabled', 'disabled')
-    muteButton.setAttribute('style', 'cursor: wait;')
+    $scope.press = function(key) {
+        $scope.control.keyPress(key)
+    }
 
-    setTimeout(function() {
-      muteButton.removeAttribute('disabled')
-      muteButton.setAttribute('style', 'cursor: pointer;')
-    }, 16000)
-  }
+    let run = function(cmd) {
+        return $scope.control.shell(cmd)
+            .then(function(result) {
+            })
+    }
 
-  $scope.press = function(key) {
-    $scope.control.keyPress(key)
-  }
+    $scope.unlockDevice = function() {
+        run('input text 1452').then(() => {
+            run('input keyevent 66')
+        })
+    }
 
-  let run = function(cmd) {
-    return $scope.control.shell(cmd)
-      .then(function(result) {
-      })
-  }
+    $scope.setLightTheme = function() {
+        run('cmd uimode night no')
+    }
 
-  $scope.unlockDevice = function() {
-    run('input text 1452').then(() => {
-      run('input keyevent 66')
-    })
-  }
+    $scope.setDarkTheme = function() {
+        run('cmd uimode night yes')
+    }
 
-  $scope.setLightTheme = function() {
-    run('cmd uimode night no')
-  }
+    $scope.enableDKA = function() {
+        run('settings put global always_finish_activities 1')
+    }
 
-  $scope.setDarkTheme = function() {
-    run('cmd uimode night yes')
-  }
+    $scope.disableDKA = function() {
+        run('settings put global always_finish_activities 0')
+    }
 
-  $scope.enableDKA = function() {
-    run('settings put global always_finish_activities 1')
-  }
+    $scope.enableGapps = function() {
+        run('pm enable com.google.android.gms')
+        run('pm enable-user com.google.android.gms')
+    }
 
-  $scope.disableDKA = function() {
-    run('settings put global always_finish_activities 0')
-  }
+    $scope.disableGapps = function() {
+        run('pm disable-user com.google.android.gms')
+    }
 
-  $scope.enableGapps = function () {
-    run('pm enable com.google.android.gms')
-    run('pm enable-user com.google.android.gms')
-  }
+    $scope.fontChange = function(value) {
+        run('settings put system font_scale ' + value)
+    }
 
-  $scope.disableGapps = function () {
-    run('pm disable-user com.google.android.gms')
-  }
-
-  $scope.fontChange = function(value) {
-    run('settings put system font_scale ' + value)
-  }
-
-  $scope.openLanguageChange = function() {
-    run('am start -a android.settings.LOCALE_SETTINGS')
-  }
+    $scope.openLanguageChange = function() {
+        run('am start -a android.settings.LOCALE_SETTINGS')
+    }
 }

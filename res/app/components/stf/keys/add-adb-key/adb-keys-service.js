@@ -1,12 +1,12 @@
 module.exports = function AdbKeysServiceFactory() {
-  var service = {}
+    var service = {}
 
-  service.commentFromKey = function(key) {
-    if (key.match(/.+= (.+)/)) {
-      return key.replace(/.+= (.+)/g, '$1')
+    service.commentFromKey = function(key) {
+        if (key.match(/.+= (.+)/)) {
+            return key.replace(/.+= (.+)/g, '$1')
+        }
+        return ''
     }
-    return ''
-  }
 
-  return service
+    return service
 }

@@ -3,5 +3,5 @@ require('angular-xeditable/dist/css/xeditable.css')
 require('./style.css')
 
 module.exports = {
-  name: 'xeditable'
+    name: 'xeditable'
 }

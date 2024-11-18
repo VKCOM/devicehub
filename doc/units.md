@@ -1,5 +1,70 @@
 # stf
 
+## Connections chart:
+```mermaid
+flowchart LR;
+subgraph triproxy-app
+    triproxy-app-pub(pub)
+    %% 7150
+    triproxy-app-dealer(dealer)
+    %% 7160
+    triproxy-app-pull(pull)
+    %% 7170
+end
+triproxy-app-dealer --> triproxy-app-pub
+triproxy-app-pull --> triproxy-app-dealer
+subgraph triproxy-dev;
+    triproxy-dev-pub(pub)
+    %% 7250
+    triproxy-dev-dealer(dealer)
+    %% 7260
+    triproxy-dev-pull(pull)
+    %% 7270
+end
+triproxy-dev-dealer --> triproxy-dev-pub
+triproxy-dev-pull --> triproxy-dev-dealer
+
+subgraph api
+    api-sub(sub)
+    api-push(push)
+end
+api-sub -- ZMQ 7150 --> triproxy-app-pub;
+api-push -- ZMQ 7170 --> triproxy-app-pull;
+api-sub -- ZMQ 7250 --> triproxy-dev-pub;
+api-push -- ZMQ 7270 --> triproxy-dev-pull;
+
+subgraph processor;
+    processor-app-dealer(app-dealer)
+    processor-dev-dealer(dev-dealer)
+end
+processor-app-dealer -- ZMQ 7160 --> triproxy-app-dealer;
+processor-dev-dealer -- ZMQ 7260 --> triproxy-dev-dealer;
+
+subgraph reaper;
+    reaper-push(push)
+    reaper-sub(sub)
+end;
+reaper-push -- ZMQ 7270 --> triproxy-dev-pull
+reaper-sub -- ZMQ 7150 --> triproxy-app-pub
+
+subgraph storage;
+    storage-push(push)
+    storage-sub(sub)
+end
+
+storage-push -- ZMQ 7270 --> triproxy-dev-pull
+storage-sub -- ZMQ 7150 --> triproxy-app-pub
+
+
+subgraph websocket;
+    websocket-sub(sub)
+    websocket-push(push)
+end
+
+websocket-sub -- ZMQ 7150 --> triproxy-app-pub
+websocket-push -- ZMQ 7170 --> triproxy-app-pull
+```
+
 ## Install
 
 ```sh

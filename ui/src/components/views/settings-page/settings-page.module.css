@@ -1,0 +1,12 @@
+.settingsPageWrapper {
+  margin-top: 25px;
+}
+
+:global(._PanelHeader__in_1h7ym_20) {
+  justify-content: flex-start;
+}
+
+:global(._PanelHeader--vkcom_1h7ym_193 ._PanelHeader__before_1h7ym_43) {
+  flex-grow: 0;
+  padding: 5px;
+}

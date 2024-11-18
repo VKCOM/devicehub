@@ -6,7 +6,7 @@ require('./pagination.css')
 
 module.exports = angular.module('stf.pagination', [
 ])
-  .filter('pagedObjectsFilter', require('./pagination-filter'))
-  .directive('stfPager', require('./pagination-directive'))
-  .factory('ItemsPerPageOptionsService', require('./pagination-service'))
+    .filter('pagedObjectsFilter', require('./pagination-filter'))
+    .directive('stfPager', require('./pagination-directive'))
+    .factory('ItemsPerPageOptionsService', require('./pagination-service'))
   

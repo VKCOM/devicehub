@@ -3,11 +3,11 @@
 **/
 
 module.exports = angular.module('stf.settings.general.date-format', [
-  require('stf/settings').name
+    require('stf/settings').name
 ])
-  .run(['$templateCache', function($templateCache) {
-    $templateCache.put(
-      'settings/general/date-format/date-format.pug', require('./date-format.pug')
-    )
-  }])
-  .controller('DateFormatCtrl', require('./date-format-controller'))
+    .run(['$templateCache', function($templateCache) {
+        $templateCache.put(
+            'settings/general/date-format/date-format.pug', require('./date-format.pug')
+        )
+    }])
+    .controller('DateFormatCtrl', require('./date-format-controller'))

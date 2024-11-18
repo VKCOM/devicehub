@@ -1,11 +1,11 @@
 #!/bin/bash
 stf ios-device \
-    --serial ios-device \
-    --device-name "ios device" \
+    --serial "2BFBC585-B481-450B-914C-640D114BAAC7" \
+    --device-name "iPhone 11" \
     --host localhost \
     --screen-port 7409 \
     --mjpeg-port 9100 \
-    --provider local-provider \
+    --provider m-alzhanov \
     --public-ip localhost \
     --screen-ws-url-pattern "ws://localhost:7409" \
     --storage-url http://localhost:7100/ \

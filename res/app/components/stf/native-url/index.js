@@ -1,4 +1,4 @@
 module.exports = angular.module('stf.native-url', [
 
 ])
-  .factory('NativeUrlService', require('./native-url-service'))
+    .factory('NativeUrlService', require('./native-url-service'))

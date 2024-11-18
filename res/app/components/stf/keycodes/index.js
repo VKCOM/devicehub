@@ -1,9 +1,9 @@
 module.exports = angular.module('stf.keycodes', [
 
 ])
-  .factory('KeycodesMapped', function() {
-    return require('./mapped/index.json')
-  })
+    .factory('KeycodesMapped', function() {
+        return require('./mapped/index.json')
+    })
 
 // Not used for now:
 //

@@ -1,37 +1,37 @@
 module.exports = function InstallCtrl(
-  $scope
-, InstallService
+    $scope
+    , InstallService
 ) {
-  $scope.accordionOpen = true
-  $scope.installation = null
-  $scope.bundleId = ''
-  $scope.onChange = function() {
-    $scope.bundleId = this.bundleId
-  }
-  $scope.clear = function() {
+    $scope.accordionOpen = true
     $scope.installation = null
-    $scope.accordionOpen = false
-  }
+    $scope.bundleId = ''
+    $scope.onChange = function() {
+        $scope.bundleId = this.bundleId
+    }
+    $scope.clear = function() {
+        $scope.installation = null
+        $scope.accordionOpen = false
+    }
 
-  $scope.$on('installation', function(e, installation) {
-    $scope.installation = installation.apply($scope)
-  })
+    $scope.$on('installation', function(e, installation) {
+        $scope.installation = installation.apply($scope)
+    })
 
-  $scope.installUrl = function(url) {
-    return InstallService.installUrl($scope.control, url)
-  }
+    $scope.installUrl = function(url) {
+        return InstallService.installUrl($scope.control, url)
+    }
 
-  $scope.installFile = function($files) {
-      return InstallService.installFile($scope.control, $files)
-  }
+    $scope.installFile = function($files) {
+        return InstallService.installFile($scope.control, $files)
+    }
 
-  $scope.uninstall = function(packageName) {
+    $scope.uninstall = function(packageName) {
     // TODO: After clicking uninstall accordion opens
-    return $scope.control.uninstall(packageName)
-      .then(function() {
-        $scope.$apply(function() {
-          $scope.clear()
-        })
-      })
-  }
+        return $scope.control.uninstall(packageName)
+            .then(function() {
+                $scope.$apply(function() {
+                    $scope.clear()
+                })
+            })
+    }
 }

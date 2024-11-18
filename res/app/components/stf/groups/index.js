@@ -3,6 +3,6 @@
 **/
 
 module.exports = angular.module('stf.groups', [
-  require('stf/util/common').name
+    require('stf/util/common').name
 ])
-.factory('GroupsService', require('./groups-service'))
+    .factory('GroupsService', require('./groups-service'))

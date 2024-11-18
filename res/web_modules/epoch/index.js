@@ -6,5 +6,5 @@ require('epoch-charting/dist/js/epoch.min.js')
 require('ng-epoch')
 
 module.exports = {
-  name: 'ng.epoch'
+    name: 'ng.epoch'
 }

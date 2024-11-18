@@ -1,0 +1,11 @@
+*.tsx
+*.jsx
+*.ts
+*.js
+*.md
+*.svg
+*.png
+
+dist
+coverage
+node_modules

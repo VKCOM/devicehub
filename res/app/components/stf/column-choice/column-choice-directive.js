@@ -3,18 +3,18 @@
 **/
 
 module.exports = function() {
-  return {
-    restrict: 'E',
-    scope: {
-      buttonStyle: '@?',
-      columnData: '=',
-      resetData: '&'
-    },
-    template: require('./column-choice.pug'),
-    link: function (scope) {
-      if (!localStorage.getItem('deviceData')) {
-        scope.resetData()
-      }
+    return {
+        restrict: 'E'
+        , scope: {
+            buttonStyle: '@?'
+            , columnData: '='
+            , resetData: '&'
+        }
+        , template: require('./column-choice.pug')
+        , link: function(scope) {
+            if (!localStorage.getItem('deviceData')) {
+                scope.resetData()
+            }
+        }
     }
-  }
 }

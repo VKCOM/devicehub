@@ -1,6 +1,6 @@
 require('ng-file-upload')
 
 module.exports = angular.module('stf/storage', [
-  'angularFileUpload'
+    'angularFileUpload'
 ])
-  .factory('StorageService', require('./storage-service'))
+    .factory('StorageService', require('./storage-service'))

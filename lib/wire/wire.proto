@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 contains code contributed by Orange SA, authors: Denis Barbaron - Licensed under the Apache license 2.0
+// Copyright © 2024 contains code contributed by V Kontakte LLC, authors: Daniil Smirnov, Egor Platonov, Aleksey Chistov - Licensed under the Apache license 2.0
 //
 
 // Message wrapper
@@ -87,25 +87,19 @@ enum MessageType {
     Applications                      = 85;
     ConnectStartedMessage             = 92;
     ConnectStoppedMessage             = 93;
-    SetIosDeviceDisplay               = 94;
+    SetDeviceDisplay               = 94;
     IosDevicePorts                    = 95;
     StartStreaming                    = 96;
-    TestPush                          = 97;
-    TouchDownIosMessage               = 98;
     TouchMoveIosMessage               = 99;
     DeviceIosIntroductionMessage      = 100;
     ProviderIosMessage                = 101;
-    CheckIosDeviceConnected           = 102;
-    ConnectDeviceViaUSB               = 103;
-    DeleteIosDevice                   = 104;
+    DeleteDevice                   = 104;
     SetAbsentDisconnectedDevices      = 105;
     UninstallIosMessage               = 106;
     SetDeviceApp                      = 107;
-    RotationIosEvent                  = 108;
     GetIosDeviceApps                  = 109;
     TransationGetMessage              = 110;
     UpdateIosDevice                   = 112;
-    BatteryIosEvent                   = 113;
     SdkIosVersion                     = 114;
     SizeIosDevice                     = 115;
     DashboardOpenMessage              = 116;
@@ -397,7 +391,7 @@ message DeviceIntroductionMessage {
   required string serial = 1;
   required DeviceStatus status = 2;
   required ProviderMessage provider = 3;
-  optional DeviceGroupMessage group = 4;
+//   optional DeviceGroupMessage group = 4;
 }
 
 message DeviceIosIntroductionMessage {
@@ -597,10 +591,6 @@ message LeaveGroupMessage {
 message PhysicalIdentifyMessage {
 }
 
-message TouchDownIosMessage {
- required float x = 1;
- required float y = 2;
-}
 
 message TouchDownMessage {
   required uint32 seq = 1;
@@ -865,7 +855,7 @@ message BatteryEvent {
   required uint32 level = 5;
   required uint32 scale = 6;
   required double temp = 7;
-  required double voltage = 8;
+  optional double voltage = 8;
 }
 
 message ConnectivityEvent {
@@ -887,16 +877,11 @@ message PhoneStateEvent {
 message RotationEvent {
   required string serial = 1;
   required int32 rotation = 2;
+  optional int32 width = 3;
+  optional int32 height = 4;
 }
 
-message RotationIosEvent {
-  required string serial = 1;
-  required int32 rotation = 2;
-  required int32 width = 3;
-  required int32 height = 4;
-}
-
-message SetIosDeviceDisplay {
+message SetDeviceDisplay {
   required string serial = 1;
   required string channel = 2;
   required int32 width = 3;
@@ -910,17 +895,7 @@ message StartStreaming {
   required int32 port = 1;
   required string channel = 2;
 }
-message TestPush {
-  required string action = 1;
-}
-message CheckIosDeviceConnected {
-  required string id = 1;
-  required string channel = 2;
-}
-message ConnectDeviceViaUSB {
-  required string id = 1;
-}
-message DeleteIosDevice {
+message DeleteDevice {
   required string serial = 1;
 }
 message  SetAbsentDisconnectedDevices {
@@ -965,15 +940,7 @@ message UpdateIosDevice{
   required string platform = 3;
   required string architect = 4;
 }
-message BatteryIosEvent{
-  required string id = 1;
-  required string health = 2;
-  required string source = 3;
-  required string status = 4;
-  required int32 level = 5;
-  required string temp = 6;
-  required int32 scale = 7;
-}
+
 message SdkIosVersion{
   required string id = 1;
   required string device = 2;

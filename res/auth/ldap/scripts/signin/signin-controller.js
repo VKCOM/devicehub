@@ -3,48 +3,47 @@
 **/
 
 module.exports = function SignInCtrl($scope, $http, CommonService) {
+    $scope.error = null
 
-  $scope.error = null
-
-  $scope.submit = function() {
-    let data = {
-      username: $scope.signin.username.$modelValue
-      , password: $scope.signin.password.$modelValue
-    }
-    $scope.invalid = false
-    $http.post('/auth/api/v1/ldap', data)
-      .then(function(response) {
-        $scope.error = null
-        location.replace(response.data.redirect)
-      })
-      .catch(function(response) {
-        switch (response.data.error) {
-          case 'ValidationError':
-            $scope.error = {
-              $invalid: true
-            }
-            break
-          case 'InvalidCredentialsError':
-            $scope.error = {
-              $incorrect: true
-            }
-            break
-          default:
-            $scope.error = {
-              $server: true
-            }
-            break
+    $scope.submit = function() {
+        let data = {
+            username: $scope.signin.username.$modelValue
+            , password: $scope.signin.password.$modelValue
         }
-      })
-  }
+        $scope.invalid = false
+        $http.post('/auth/api/v1/ldap', data)
+            .then(function(response) {
+                $scope.error = null
+                location.replace(response.data.redirect)
+            })
+            .catch(function(response) {
+                switch (response.data.error) {
+                case 'ValidationError':
+                    $scope.error = {
+                        $invalid: true
+                    }
+                    break
+                case 'InvalidCredentialsError':
+                    $scope.error = {
+                        $incorrect: true
+                    }
+                    break
+                default:
+                    $scope.error = {
+                        $server: true
+                    }
+                    break
+                }
+            })
+    }
 
-  $scope.openSupportLink = function() {
+    $scope.openSupportLink = function() {
+        $http.get('/auth/contact').then(function(response) {
+            window.open(response.data.contactUrl, '_blank').focus()
+        })
+    }
+
     $http.get('/auth/contact').then(function(response) {
-      window.open(response.data.contactUrl, '_blank').focus()
+        $scope.contactUrl = response.data.contactUrl
     })
-  }
-
-  $http.get('/auth/contact').then(function(response) {
-    $scope.contactUrl = response.data.contactUrl
-  })
 }

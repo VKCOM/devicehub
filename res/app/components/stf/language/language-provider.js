@@ -1,24 +1,24 @@
-//var supportedLanguages = require('./../../../../common/lang/langs.json')
+// var supportedLanguages = require('./../../../../common/lang/langs.json')
 
 module.exports = function LanguageProvider(AppStateProvider) {
-  var provider = {
-    selectedLanguage: 'ja' // default
-  }
-
-  var a = AppStateProvider.$get()
-  if (a && a.user && a.user.settings && a.user.settings &&
-    a.user.settings.selectedLanguage) {
-    provider.selectedLanguage = a.user.settings.selectedLanguage
-  }
-
-  return {
-    $get: function() {
-      return provider
+    var provider = {
+        selectedLanguage: 'ja' // default
     }
-  }
+
+    var a = AppStateProvider.$get()
+    if (a && a.user && a.user.settings && a.user.settings &&
+    a.user.settings.selectedLanguage) {
+        provider.selectedLanguage = a.user.settings.selectedLanguage
+    }
+
+    return {
+        $get: function() {
+            return provider
+        }
+    }
 }
 
-//module.exports = function LanguageProvider() {
+// module.exports = function LanguageProvider() {
 //  var LanguageService = {}
 //
 //  function detectLanguage() {
@@ -62,4 +62,4 @@ module.exports = function LanguageProvider(AppStateProvider) {
 //      return LanguageService
 //    }
 //  }
-//}
+// }

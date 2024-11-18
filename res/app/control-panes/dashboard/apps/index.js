@@ -1,12 +1,12 @@
 require('./apps.css')
 
 module.exports = angular.module('stf.apps', [
-  require('stf/common-ui').name,
-  require('stf/app-state').name
+    require('stf/common-ui').name
+    , require('stf/app-state').name
 ])
-  .run(['$templateCache', function($templateCache) {
-    $templateCache.put('control-panes/dashboard/apps/apps.pug',
-      require('./apps.pug')
-    )
-  }])
-  .controller('AppsCtrl', require('./apps-controller'))
+    .run(['$templateCache', function($templateCache) {
+        $templateCache.put('control-panes/dashboard/apps/apps.pug',
+            require('./apps.pug')
+        )
+    }])
+    .controller('AppsCtrl', require('./apps-controller'))

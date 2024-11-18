@@ -1,0 +1,23 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-clean-order"],
+  "rules": {
+    "custom-property-empty-line-before": null,
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
+    "custom-property-pattern": "^([a-z]+(_|-|--)?)*[a-z]+$",
+    "import-notation": "string",
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/components/views/settings-page/settings-page.module.css"],
+      "rules": {
+        "selector-class-pattern": null
+      }
+    }
+  ]
+}

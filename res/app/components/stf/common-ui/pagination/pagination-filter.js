@@ -3,14 +3,14 @@
 **/
 
 module.exports = function() {
-  return function(objects, scope, currentPage, maxItems, searchItems) {
-    scope[searchItems] = objects
-    if (scope[maxItems].value === 0) {
-      return objects
+    return function(objects, scope, currentPage, maxItems, searchItems) {
+        scope[searchItems] = objects
+        if (scope[maxItems].value === 0) {
+            return objects
+        }
+        return objects.slice(
+            (scope[currentPage] - 1) * scope[maxItems].value
+            , scope[currentPage] * scope[maxItems].value
+        )
     }
-    return objects.slice(
-             (scope[currentPage] - 1) * scope[maxItems].value
-           , scope[currentPage] * scope[maxItems].value
-           )
-  }
 }

@@ -1,32 +1,33 @@
 module.exports = function blurElementDirective(
-  $parse,
-  $rootScope,
-  $timeout,
+    $parse,
+    $rootScope,
+    $timeout,
 ) {
-  return {
-    restrict: 'A',
-    link: function(scope, element, attrs) {
-      var model = $parse(attrs.blurElement)
+    return {
+        restrict: 'A'
+        , link: function(scope, element, attrs) {
+            var model = $parse(attrs.blurElement)
 
-      scope.$watch(model, function(value) {
-        if (value === true) {
-          $timeout(function() {
-            element[0].blur()
-          })
-        }
-      })
+            scope.$watch(model, function(value) {
+                if (value === true) {
+                    $timeout(function() {
+                        element[0].blur()
+                    })
+                }
+            })
 
-      element.bind('blur', function() {
-        if(!$rootScope.$$phase) {
-          scope.$apply(() => {
-            model.assign(scope, false)
-          })
-        } else {
-          scope.$applyAsync(() => {
-            model.assign(scope, false)
-          })
+            element.bind('blur', function() {
+                if(!$rootScope.$$phase) {
+                    scope.$apply(() => {
+                        model.assign(scope, false)
+                    })
+                }
+                else {
+                    scope.$applyAsync(() => {
+                        model.assign(scope, false)
+                    })
+                }
+            })
         }
-      })
     }
-  }
 }

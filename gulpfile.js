@@ -2,8 +2,8 @@ import path from 'path'
 import gulp from 'gulp'
 import gutil from 'gulp-util'
 import jsonlint from 'gulp-jsonlint'
-import eslint from 'gulp-eslint'
-import eslintIfFixed from 'gulp-eslint-if-fixed'
+import gulpIf from 'gulp-if'
+import gulpESLintNew from 'gulp-eslint-new'
 import {ESLint} from 'eslint'
 import webpack from 'webpack'
 import webpackConfig from './webpack.config.cjs'
@@ -61,17 +61,19 @@ gulp.task('lint-fix', function() {
         'lib/**/*.js'
         , 'res/**/*.js'
     ])
-        .pipe(eslint({fix: true}))
-        .pipe(eslintIfFixed(file => {
-        isContainsFixes = true
-        return file.base
-    }))
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError()).on('end', function() {
-        if (isContainsFixes) {
-            throw new Error('Eslint repaired code in files (try to re-commit)')
-        }
-    })
+        .pipe(gulpESLintNew({fix: true}))
+        .pipe(gulpIf((file) => (
+            file.eslint !== undefined && file.eslint.fixed
+        ), gulp.dest((file => {
+            isContainsFixes = true
+            return file.base
+        }))))
+        .pipe(gulpESLintNew.format())
+        .pipe(gulpESLintNew.failAfterError()).on('end', function() {
+            if (isContainsFixes) {
+                throw new Error('Eslint repaired code in files (try to re-commit)')
+            }
+        })
 })
 gulp.task('run:checkversion', function() {
     gutil.log('Checking STF version...')
@@ -103,14 +105,14 @@ gulp.task('protractor-explorer', function(callback) {
 gulp.task('protractor', gulp.series('webdriver-update', function(callback) {
     gulp.src(['./res/test/e2e/**/*.js'])
         .pipe(protractor.protractor({
-        configFile: protractorConfig
-        , debug: gutil.env.debug
-        , suite: gutil.env.suite
-    }))
+            configFile: protractorConfig
+            , debug: gutil.env.debug
+            , suite: gutil.env.suite
+        }))
         .on('error', function(e) {
-        console.log(e)
+            console.error(e)
         /* eslint no-console: 0 */
-    })
+        })
         .on('end', callback)
 }))
 // For piping strings
@@ -173,14 +175,14 @@ gulp.task('pug', function() {
         './res/**/*.pug'
     ])
         .pipe(pug({
-        locals: {
+            locals: {
             // So res/views/docs.pug doesn't complain
-            markdownFile: {
-                parseContent: function() {
+                markdownFile: {
+                    parseContent: function() {
+                    }
                 }
             }
-        }
-    }))
+        }))
         .pipe(gulp.dest('./tmp/html/'))
 })
 gulp.task('translate:extract', gulp.series('pug', function() {
@@ -195,8 +197,8 @@ gulp.task('translate:extract', gulp.series('pug', function() {
 gulp.task('translate:compile', function() {
     return gulp.src('./res/common/lang/po/**/*.po')
         .pipe(gettext.compile({
-        format: 'json'
-    }))
+            format: 'json'
+        }))
         .pipe(gulp.dest('./res/common/lang/translations/'))
 })
 gulp.task('translate:push', function() {

@@ -1,4 +1,4 @@
 module.exports = angular.module('stf.timeline', [
 
 ])
-  .factory('TimelineService', require('./timeline-service'))
+    .factory('TimelineService', require('./timeline-service'))

@@ -1,0 +1,11 @@
+@import './reset.css';
+@import './variables/global.css';
+
+.pageWrapper {
+  margin-top: var(--vkui_internal--panel_header_height);
+  padding: 0 10px;
+
+  @media (width <= 767px) {
+    padding: 0;
+  }
+}

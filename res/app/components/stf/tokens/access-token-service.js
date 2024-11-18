@@ -3,37 +3,37 @@
 **/
 
 module.exports = function AccessTokenServiceFactory(
-  $rootScope
-, $http
-, socket
+    $rootScope
+    , $http
+    , socket
 ) {
-  var AccessTokenService = {}
+    var AccessTokenService = {}
 
-  AccessTokenService.getAccessTokens = function() {
-    return $http.get('/api/v1/user/accessTokens')
-  }
+    AccessTokenService.getAccessTokens = function() {
+        return $http.get('/api/v1/user/accessTokens')
+    }
 
-  AccessTokenService.generateAccessToken = function(title) {
-    socket.emit('user.keys.accessToken.generate', {
-      title: title
+    AccessTokenService.generateAccessToken = function(title) {
+        socket.emit('user.keys.accessToken.generate', {
+            title: title
+        })
+    }
+
+    AccessTokenService.removeAccessToken = function(title) {
+        socket.emit('user.keys.accessToken.remove', {
+            title: title
+        })
+    }
+
+    socket.on('user.keys.accessToken.generated', function(token) {
+        $rootScope.$broadcast('user.keys.accessTokens.generated', token)
+        $rootScope.$apply()
     })
-  }
 
-  AccessTokenService.removeAccessToken = function(title) {
-    socket.emit('user.keys.accessToken.remove', {
-      title: title
+    socket.on('user.keys.accessToken.updated', function() {
+        $rootScope.$broadcast('user.keys.accessTokens.updated')
+        $rootScope.$apply()
     })
-  }
 
-  socket.on('user.keys.accessToken.generated', function(token) {
-    $rootScope.$broadcast('user.keys.accessTokens.generated', token)
-    $rootScope.$apply()
-  })
-
-  socket.on('user.keys.accessToken.updated', function() {
-    $rootScope.$broadcast('user.keys.accessTokens.updated')
-    $rootScope.$apply()
-  })
-
-  return AccessTokenService
+    return AccessTokenService
 }

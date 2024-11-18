@@ -54,7 +54,12 @@ RUN set -x && \
     mkdir /app/bundletool && \
     mv /tmp/bundletool/* /app/bundletool && \
     cd /app && \
-    find /tmp -mindepth 1 ! -regex '^/tmp/hsperfdata_root\(/.*\)?' -delete
+    find /tmp -mindepth 1 ! -regex '^/tmp/hsperfdata_root\(/.*\)?' -delete && \
+    ln -s /app/bin/stf.mjs /app/bin/stf &&\
+    cd ui && \
+    npm ci && \
+    npx tsc -b && \
+    npx vite build --mode staging
 
 # Switch to the app user.
 USER stf

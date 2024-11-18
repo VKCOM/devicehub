@@ -3,6 +3,6 @@
 **/
 
 module.exports = angular.module('stf.generic-modal', [
-  require('stf/common-ui/modals/common').name
+    require('stf/common-ui/modals/common').name
 ])
-  .factory('GenericModalService', require('./generic-modal-service'))
+    .factory('GenericModalService', require('./generic-modal-service'))

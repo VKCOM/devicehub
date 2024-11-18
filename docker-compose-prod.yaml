@@ -1,13 +1,12 @@
-version: "3"
 
 networks:
-  default:
+  devicehub:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.19.0.0/16
-          gateway: 172.19.0.1
+        - subnet: 10.211.0.0/16
+          gateway: 10.211.0.1
 
 services:
   nginx:
@@ -26,6 +25,8 @@ services:
       - devicehub-api
       - devicehub-auth
     restart: unless-stopped
+    networks:
+      devicehub:
   mongo1:
     image: mongo:6.0.10
     hostname: mongo1
@@ -34,24 +35,24 @@ services:
       - 27017:27017
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
-      default:
-        ipv4_address: 172.19.0.2
+      devicehub:
+        ipv4_address: 10.211.0.2
   mongo2:
     image: mongo:6.0.10
     hostname: mongo2
     container_name: mongo2
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
-      default:
-        ipv4_address: 172.19.0.3
+      devicehub:
+        ipv4_address: 10.211.0.3
   mongo3:
     image: mongo:6.0.10
     hostname: mongo3
     container_name: mongo3
     entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
     networks:
-      default:
-        ipv4_address: 172.19.0.4
+      devicehub:
+        ipv4_address: 10.211.0.4
   mongosetup:
     image: mongo:6.0.10
     container_name: mongosetup
@@ -63,6 +64,8 @@ services:
       - ./scripts/mongo_setup.sh:/scripts/mongo_setup.sh
     restart: "no"
     entrypoint: ["bash", "/scripts/mongo_setup.sh"]
+    networks:
+      devicehub:
   devicehub-migrate:
     build: .
     image: devicehub
@@ -73,6 +76,8 @@ services:
     depends_on:
       mongosetup:
         condition: service_completed_successfully
+    networks:
+      devicehub:
   devicehub-app:
     build: .
     image: devicehub
@@ -84,6 +89,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-auth:
     build: .
     image: devicehub
@@ -95,6 +102,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-processor001:
     build: .
     image: devicehub
@@ -106,6 +115,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-reaper:
     build: .
     image: devicehub
@@ -117,6 +128,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-storage-plugin-apk:
     build: .
     image: devicehub
@@ -128,6 +141,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-storage-plugin-image:
     build: .
     image: devicehub
@@ -139,6 +154,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-storage-temp:
     build: .
     image: devicehub
@@ -150,6 +167,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-triproxy-app:
     build: .
     image: devicehub
@@ -165,6 +184,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-triproxy-dev:
     build: .
     image: devicehub
@@ -180,6 +201,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-websocket:
     build: .
     image: devicehub
@@ -191,6 +214,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-api:
     build: .
     image: devicehub
@@ -202,6 +227,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
   devicehub-api-groups-engine:
     build: .
     image: devicehub
@@ -213,6 +240,8 @@ services:
       devicehub-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      devicehub:
 
 volumes:
   devicehub-db-volume:

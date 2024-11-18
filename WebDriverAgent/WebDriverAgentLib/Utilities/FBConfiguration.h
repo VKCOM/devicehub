@@ -9,10 +9,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "AXSettings.h"
-#import "UIKeyboardImpl.h"
-#import "TIPreferencesController.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const FBSnapshotMaxDepthKey;
@@ -286,6 +282,15 @@ typedef NS_ENUM(NSInteger, FBConfigurationKeyboardPreference) {
 + (NSString *)acceptAlertButtonSelector;
 + (void)setDismissAlertButtonSelector:(NSString *)classChainSelector;
 + (NSString *)dismissAlertButtonSelector;
+
+/**
+ * Whether to use HIDEvent for text clear.
+ * By default this is enabled and HIDEvent is used for text clear.
+ *
+ * @param enabled Either YES or NO
+ */
++ (void)setUseClearTextShortcut:(BOOL)enabled;
++ (BOOL)useClearTextShortcut;
 
 #if !TARGET_OS_TV
 /**

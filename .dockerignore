@@ -10,5 +10,7 @@ res/build/
 rethinkdb_data/
 temp/
 tmp/
+doc/
 .eslintcache
 scripts/
+.mypy_cache

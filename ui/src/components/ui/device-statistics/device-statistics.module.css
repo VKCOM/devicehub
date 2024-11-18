@@ -1,0 +1,7 @@
+.deviceStatistics {
+  flex: 1 0 auto;
+}
+
+.deviceStatistics + .deviceStatistics {
+  margin-left: 10px;
+}

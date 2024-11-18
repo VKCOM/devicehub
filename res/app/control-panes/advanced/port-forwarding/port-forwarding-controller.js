@@ -6,71 +6,71 @@ var uuid = require('uuid')
 var Promise = require('bluebird')
 
 module.exports = function PortForwardingCtrl(
-  $scope
+    $scope
 ) {
-  function defaults(id) {
-    return {
-      id: id
-    , targetHost: 'localhost'
-    , targetPort: 8080
-    , devicePort: 8080
-    , enabled: false
+    function defaults(id) {
+        return {
+            id: id
+            , targetHost: 'localhost'
+            , targetPort: 8080
+            , devicePort: 8080
+            , enabled: false
+        }
     }
-  }
 
-  $scope.reversePortForwards = [defaults('_default')]
+    $scope.reversePortForwards = [defaults('_default')]
 
-  $scope.$watch('device.reverseForwards', function(newValue) {
-    let map = Object.create(null)
+    $scope.$watch('device.reverseForwards', function(newValue) {
+        let map = Object.create(null)
 
-    if (newValue) {
-      newValue.forEach(function(forward) {
-        map[forward.id] = forward
-      })
+        if (newValue) {
+            newValue.forEach(function(forward) {
+                map[forward.id] = forward
+            })
 
-     $scope.reversePortForwards.forEach(function(forward) {
-       let deviceForward = map[forward.id]
+            $scope.reversePortForwards.forEach(function(forward) {
+                let deviceForward = map[forward.id]
 
-       if (deviceForward) {
-         forward.enabled = !!(deviceForward.id === forward.id &&
+                if (deviceForward) {
+                    forward.enabled = !!(deviceForward.id === forward.id &&
            deviceForward.devicePort === Number(forward.devicePort))
-       }
-       else if (forward.enabled) {
-         $scope.removeRow(forward)
-       }
-     })
-    }
-  })
+                }
+                else if (forward.enabled) {
+                    $scope.removeRow(forward)
+                }
+            })
+        }
+    })
 
-  $scope.applyForward = function(forward) {
-    return forward.enabled ?
-      $scope.control.createForward(forward) :
-      $scope.control.removeForward(forward)
-  }
-
-  $scope.enableForward = function(forward) {
-    if (forward.enabled) {
-      return Promise.resolve()
+    $scope.applyForward = function(forward) {
+        return forward.enabled ?
+            $scope.control.createForward(forward) :
+            $scope.control.removeForward(forward)
     }
 
-    return $scope.control.createForward(forward)
-  }
+    $scope.enableForward = function(forward) {
+        if (forward.enabled) {
+            return Promise.resolve()
+        }
 
-  $scope.disableForward = function(forward) {
-    if (!forward.enabled) {
-      return Promise.resolve()
+        return $scope.control.createForward(forward)
     }
 
-    return $scope.control.removeForward(forward)
-  }
+    $scope.disableForward = function(forward) {
+        if (!forward.enabled) {
+            return Promise.resolve()
+        }
 
-  $scope.addRow = function() {
-    $scope.reversePortForwards.push(defaults(uuid.v4()))
-  }
+        return $scope.control.removeForward(forward)
+    }
 
-  $scope.removeRow = function(forward) {
-    $scope.disableForward(forward)
-    $scope.reversePortForwards.splice(
-      $scope.reversePortForwards.indexOf(forward), 1)
-  }
+    $scope.addRow = function() {
+        $scope.reversePortForwards.push(defaults(uuid.v4()))
+    }
+
+    $scope.removeRow = function(forward) {
+        $scope.disableForward(forward)
+        $scope.reversePortForwards.splice(
+            $scope.reversePortForwards.indexOf(forward), 1)
+    }
 }

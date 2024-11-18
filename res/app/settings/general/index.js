@@ -5,17 +5,17 @@
 require('./general.css')
 
 module.exports = angular.module('stf.settings.general', [
-  require('./language').name,
-  require('./local').name,
-  require('./email-address-separator').name,
-  require('./date-format').name,
-  require('stf/app-state').name,
-  require('./alert-message').name
+    require('./language').name
+    , require('./local').name
+    , require('./email-address-separator').name
+    , require('./date-format').name
+    , require('stf/app-state').name
+    , require('./alert-message').name
 ])
-  .run(['$templateCache', function($templateCache) {
-    $templateCache.put(
-      'settings/general/general.pug'
-      , require('./general.pug')
-    )
-  }])
-  .controller('GeneralCtrl', require('./general-controller'))
+    .run(['$templateCache', function($templateCache) {
+        $templateCache.put(
+            'settings/general/general.pug'
+            , require('./general.pug')
+        )
+    }])
+    .controller('GeneralCtrl', require('./general-controller'))

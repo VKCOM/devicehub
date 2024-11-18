@@ -3,6 +3,6 @@
 **/
 
 module.exports = angular.module('stf.util.common', [
-  require('stf/common-ui').name
+    require('stf/common-ui').name
 ])
-.factory('CommonService', require('./common-service'))
+    .factory('CommonService', require('./common-service'))

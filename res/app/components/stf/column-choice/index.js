@@ -5,8 +5,8 @@
 require('./column-choice.css')
 
 module.exports = angular.module('stf.column-choice', [
-  require('stf/common-ui').name
+    require('stf/common-ui').name
 ])
-  .directive('stfColumnChoice', require('./column-choice-directive'))
+    .directive('stfColumnChoice', require('./column-choice-directive'))
 
 

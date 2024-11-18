@@ -1,6 +1,6 @@
 module.exports = function() {
-  var service = {}
+    var service = {}
 
 
-  return service
+    return service
 }

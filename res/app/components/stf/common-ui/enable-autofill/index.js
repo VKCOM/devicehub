@@ -1,6 +1,6 @@
 require('angular-cookies')
 
 module.exports = angular.module('stf.enable-autofill', [
-  'ngCookies'
+    'ngCookies'
 ])
-  .directive('enableAutofill', require('./enable-autofill-directive'))
+    .directive('enableAutofill', require('./enable-autofill-directive'))

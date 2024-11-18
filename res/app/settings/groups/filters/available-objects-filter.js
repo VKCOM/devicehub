@@ -3,15 +3,15 @@
 **/
 
 module.exports = function() {
-  return function(objects, group, groupKey, objectKey) {
-    const objectList = []
+    return function(objects, group, groupKey, objectKey) {
+        const objectList = []
 
-    objects.forEach(function(object) {
-      if (group[groupKey].indexOf(object[objectKey]) < 0) {
-        objectList.push(object)
-      }
-    })
-    return objectList
-  }
+        objects.forEach(function(object) {
+            if (group[groupKey].indexOf(object[objectKey]) < 0) {
+                objectList.push(object)
+            }
+        })
+        return objectList
+    }
 }
 

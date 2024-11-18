@@ -1,7 +1,7 @@
 function TransactionError(result) {
-  this.code = this.message = result.error
-  this.name = 'TransactionError'
-  Error.captureStackTrace(this, TransactionError)
+    this.code = this.message = result.error
+    this.name = 'TransactionError'
+    Error.captureStackTrace(this, TransactionError)
 }
 
 TransactionError.prototype = Object.create(Error.prototype)

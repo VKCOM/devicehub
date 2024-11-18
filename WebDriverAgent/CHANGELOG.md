@@ -1,3 +1,39 @@
+## [8.11.1](https://github.com/appium/WebDriverAgent/compare/v8.11.0...v8.11.1) (2024-11-11)
+
+### Miscellaneous Chores
+
+* bump appium-ios-device ([#955](https://github.com/appium/WebDriverAgent/issues/955)) ([021f349](https://github.com/appium/WebDriverAgent/commit/021f34901866f4a7870914c00781b83bd0cbddc4))
+
+## [8.11.0](https://github.com/appium/WebDriverAgent/compare/v8.10.1...v8.11.0) (2024-11-11)
+
+### Features
+
+* Add support for excluded_attributes in JSON source hierarchy ([#953](https://github.com/appium/WebDriverAgent/issues/953)) ([6112223](https://github.com/appium/WebDriverAgent/commit/6112223b21026fae5545fe1b1433a09c67ff524b))
+
+## [8.10.1](https://github.com/appium/WebDriverAgent/compare/v8.10.0...v8.10.1) (2024-11-10)
+
+### Miscellaneous Chores
+
+* remove unnecessary lines ([#954](https://github.com/appium/WebDriverAgent/issues/954)) ([940df80](https://github.com/appium/WebDriverAgent/commit/940df80937381b481a2762fbf86b6249804591bd))
+
+## [8.10.0](https://github.com/appium/WebDriverAgent/compare/v8.9.4...v8.10.0) (2024-11-07)
+
+### Features
+
+* add useClearTextShortcut setting ([#952](https://github.com/appium/WebDriverAgent/issues/952)) ([61bc051](https://github.com/appium/WebDriverAgent/commit/61bc051180d691d26233c66a5a76ed20b7fa09d2))
+
+## [8.9.4](https://github.com/appium/WebDriverAgent/compare/v8.9.3...v8.9.4) (2024-10-17)
+
+### Bug Fixes
+
+* Consider transient overlay windows when respectSystemAlerts is enabled ([#946](https://github.com/appium/WebDriverAgent/issues/946)) ([f0bdce7](https://github.com/appium/WebDriverAgent/commit/f0bdce7eb8fdb13d2309d28e936950c77f006b20))
+
+## [8.9.3](https://github.com/appium/WebDriverAgent/compare/v8.9.2...v8.9.3) (2024-10-07)
+
+### Miscellaneous Chores
+
+* remove unused FBBaseActionsParser and cleanup imports in FBConfiguration ([#943](https://github.com/appium/WebDriverAgent/issues/943)) ([a2173d0](https://github.com/appium/WebDriverAgent/commit/a2173d05df8ef831310e805a8e6a8a8d17725201))
+
 ## [8.9.2](https://github.com/appium/WebDriverAgent/compare/v8.9.1...v8.9.2) (2024-09-13)
 
 ### Miscellaneous Chores

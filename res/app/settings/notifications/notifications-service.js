@@ -1,6 +1,6 @@
 module.exports = function NotificationsServiceFactory() {
-  var NotificationsService = {}
+    var NotificationsService = {}
 
 
-  return NotificationsService
+    return NotificationsService
 }

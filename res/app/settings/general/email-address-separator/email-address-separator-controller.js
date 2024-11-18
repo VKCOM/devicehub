@@ -3,25 +3,24 @@
 **/
 
 module.exports = function EmailAddressSeparatorCtrl(
-  $scope
-, SettingsService
+    $scope
+    , SettingsService
 ) {
+    $scope.defaultEmailAddressSeparator = ','
+    SettingsService.bind($scope, {
+        target: 'emailAddressSeparator'
+        , source: 'emailAddressSeparator'
+        , defaultValue: $scope.defaultEmailAddressSeparator
+    })
 
-  $scope.defaultEmailAddressSeparator = ','
-  SettingsService.bind($scope, {
-    target: 'emailAddressSeparator'
-  , source: 'emailAddressSeparator'
-  , defaultValue: $scope.defaultEmailAddressSeparator
-  })
-
-  $scope.$watch(
-    function() {
-      return SettingsService.get('emailAddressSeparator')
-    }
-  , function(newvalue) {
-      if (typeof newvalue === 'undefined') {
-        SettingsService.set('emailAddressSeparator', $scope.defaultEmailAddressSeparator)
-      }
-    }
-  )
+    $scope.$watch(
+        function() {
+            return SettingsService.get('emailAddressSeparator')
+        }
+        , function(newvalue) {
+            if (typeof newvalue === 'undefined') {
+                SettingsService.set('emailAddressSeparator', $scope.defaultEmailAddressSeparator)
+            }
+        }
+    )
 }

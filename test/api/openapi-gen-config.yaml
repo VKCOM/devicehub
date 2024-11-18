@@ -1,0 +1,2 @@
+content_type_overrides:
+  application/octet-stream: text/plain

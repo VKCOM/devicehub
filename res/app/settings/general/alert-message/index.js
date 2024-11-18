@@ -3,12 +3,12 @@
 **/
 
 module.exports = angular.module('stf.settings.general.alert-message', [
-  require('stf/settings').name
+    require('stf/settings').name
 ])
-  .run(['$templateCache', function($templateCache) {
-    $templateCache.put(
-      'settings/general/alert-message/alert-message.pug'
-    , require('./alert-message.pug')
-    )
-  }])
-  .controller('AlertMessageCtrl', require('./alert-message-controller'))
+    .run(['$templateCache', function($templateCache) {
+        $templateCache.put(
+            'settings/general/alert-message/alert-message.pug'
+            , require('./alert-message.pug')
+        )
+    }])
+    .controller('AlertMessageCtrl', require('./alert-message-controller'))

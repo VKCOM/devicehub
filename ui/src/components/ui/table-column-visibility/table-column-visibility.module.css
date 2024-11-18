@@ -1,0 +1,21 @@
+.tableColumnVisibility {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  z-index: var(--vkui--z_index_popout);
+  top: 38px;
+
+  width: 450px;
+  padding: 5px;
+}
+
+.group {
+  width: 220px;
+}
+
+.resetButton {
+  display: block;
+  margin: 0 15px 10px auto;
+}

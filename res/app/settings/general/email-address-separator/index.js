@@ -3,12 +3,12 @@
 **/
 
 module.exports = angular.module('stf.settings.general.email-address-separator', [
-  require('stf/settings').name
+    require('stf/settings').name
 ])
-  .run(['$templateCache', function($templateCache) {
-    $templateCache.put(
-      'settings/general/email-address-separator/email-address-separator.pug'
-    , require('./email-address-separator.pug')
-    )
-  }])
-  .controller('EmailAddressSeparatorCtrl', require('./email-address-separator-controller'))
+    .run(['$templateCache', function($templateCache) {
+        $templateCache.put(
+            'settings/general/email-address-separator/email-address-separator.pug'
+            , require('./email-address-separator.pug')
+        )
+    }])
+    .controller('EmailAddressSeparatorCtrl', require('./email-address-separator-controller'))
