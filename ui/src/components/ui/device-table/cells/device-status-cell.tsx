@@ -35,17 +35,11 @@ export const DeviceStatusCell = memo(
       deviceConnection.stopUsingDevice(serial)
     }
 
-    const onUseDevice = () => {
-      if (!serial) return
-
-      deviceConnection.useDevice(serial)
-    }
-
     if (!!usable && !using) {
       return (
         <>
           {serial && (
-            <Link to={getControlRoute(serial)} onClick={onUseDevice}>
+            <Link to={getControlRoute(serial)}>
               <Button mode='outline' title={deviceState}>
                 {t('Use')}
               </Button>

@@ -34,6 +34,10 @@ export class MobxQuery<
     makeAutoObservable(this)
   }
 
+  fetch(): Promise<TQueryData> {
+    return this.queryClient.fetchQuery(this.defaultQueryOptions)
+  }
+
   get result(): QueryObserverResult<TData, TError> {
     this.atom.reportObserved()
     this.queryObserver.setOptions(this.defaultQueryOptions)

@@ -1,9 +1,12 @@
 :root {
   /* z - Индексы */
   --header-z-index: 150;
+  --screen-input-z-index: 10;
 
   /* Цвета */
   --light-gray: #cfcfcf;
   --slider-mark-outline: #828282;
   --slider-mark-background: #e2e3e6;
+  --finger-background: #7c7c7c;
+  --finger-border-color: #464646;
 }

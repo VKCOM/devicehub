@@ -1,10 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 
-import { controlService } from '@/services/core/control-service'
+import { controlService } from '@/services/core/control-service/control-service'
 import { groupService } from '@/services/group-service'
 import { settingsService } from '@/services/settings-service'
 
 import { deviceListStore } from './device-list-store'
+import { deviceBySerialStore } from './device-by-serial-store'
 
 class DeviceConnection {
   constructor() {
@@ -12,13 +13,13 @@ class DeviceConnection {
   }
 
   async useDevice(serial: string): Promise<void> {
-    const device = deviceListStore.deviceBySerial(serial)
+    const device = await deviceBySerialStore.fetch(serial)
 
-    if (!device) return
+    if (!device?.channel) return
 
     try {
       const connectToDevice = await Promise.all([
-        controlService.startRemoteConnect(device),
+        controlService.startRemoteConnect(device.channel, !!device?.ios),
         groupService.invite(device),
       ])
 
