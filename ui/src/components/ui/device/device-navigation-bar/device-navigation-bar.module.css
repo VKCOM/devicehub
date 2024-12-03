@@ -1,0 +1,9 @@
+.deviceNavigationBar {
+  height: 50px;
+  background: var(--vkui--color_background_content);
+}
+
+.navigationButton {
+  flex: 1;
+  height: 100%;
+}

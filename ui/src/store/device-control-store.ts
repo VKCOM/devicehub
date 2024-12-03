@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 
 import { controlService } from '@/services/core/control-service/control-service'
 
-import { deviceListStore } from './device-list-store'
+import { deviceBySerialStore } from './device-by-serial-store'
 
 import type { EffectiveConnectionType } from '@/vite-env'
 
@@ -19,8 +19,40 @@ class DeviceControlStore {
     this.currentQuality = quality
   }
 
+  goHome(serial: string): void {
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
+
+    if (!device?.channel) return
+
+    controlService.home(device.channel)
+  }
+
+  openMenu(serial: string): void {
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
+
+    if (!device?.channel) return
+
+    controlService.menu(device.channel)
+  }
+
+  openAppSwitch(serial: string): void {
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
+
+    if (!device?.channel) return
+
+    controlService.appSwitch(device.channel)
+  }
+
+  goBack(serial: string): void {
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
+
+    if (!device?.channel) return
+
+    controlService.back(device.channel)
+  }
+
   tryToRotate(serial: string, rotation: 'portrait' | 'landscape'): void {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     if (!device?.channel) return
 
@@ -46,7 +78,7 @@ class DeviceControlStore {
   }
 
   rotateLeft(serial: string): void {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     if (!device?.display?.rotation || !device.channel) return
 
@@ -60,7 +92,7 @@ class DeviceControlStore {
   }
 
   rotateRight(serial: string): void {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     if (!device?.display?.rotation || !device.channel) return
 
@@ -74,7 +106,7 @@ class DeviceControlStore {
   }
 
   changeDeviceQuality(serial: string, quality: number): void {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     if (!device?.channel) return
 
@@ -91,7 +123,7 @@ class DeviceControlStore {
 
     this.currentNetworkType = networkType
 
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     if (!device?.channel) return
 
@@ -128,13 +160,13 @@ class DeviceControlStore {
   }
 
   private isPortrait(serial: string): boolean {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     return device?.display?.rotation === 0 || device?.display?.rotation === 180
   }
 
   private isLandscape(serial: string): boolean {
-    const device = deviceListStore.deviceBySerial(serial)
+    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
 
     return device?.display?.rotation === 90 || device?.display?.rotation === 270
   }

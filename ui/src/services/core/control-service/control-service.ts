@@ -110,19 +110,19 @@ class ControlService {
   }
 
   home(deviceChannel: string): void {
-    return this.keySender(deviceChannel, 'input.keyPress')('home')
+    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'home')
   }
 
   menu(deviceChannel: string): void {
-    return this.keySender(deviceChannel, 'input.keyPress')('menu')
+    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'menu')
   }
 
   back(deviceChannel: string): void {
-    return this.keySender(deviceChannel, 'input.keyPress')('back')
+    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'back')
   }
 
   appSwitch(deviceChannel: string): void {
-    return this.keySender(deviceChannel, 'input.keyPress')('app_switch')
+    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'app_switch')
   }
 
   changeQuality(deviceChannel: string, quality: number): void {
@@ -165,6 +165,12 @@ class ControlService {
         })
       }
     }
+  }
+
+  private fixedKeySender(deviceChannel: string, type: string, fixedKey: string): void {
+    this.sendOneWay(deviceChannel, type, {
+      key: fixedKey,
+    })
   }
 }
 
