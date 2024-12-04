@@ -7,7 +7,7 @@ import { deviceConnection } from '@/store/device-connection'
 
 import { DeviceTopBar } from './device-top-bar'
 import { DeviceScreen } from './device-screen'
-import { DeviceNavigationBar } from './device-navigation-bar'
+import { DeviceNavigationButtons } from './device-navigation-buttons'
 
 export const Device = observer(() => {
   const { serial } = useParams()
@@ -22,7 +22,7 @@ export const Device = observer(() => {
     <Flex direction='column' noWrap>
       <DeviceTopBar />
       <DeviceScreen />
-      <DeviceNavigationBar />
+      <DeviceNavigationButtons />
     </Flex>
   )
 })

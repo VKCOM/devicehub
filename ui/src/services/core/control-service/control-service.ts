@@ -105,26 +105,6 @@ class ControlService {
     return this.keySender(deviceChannel, 'input.keyUp')
   }
 
-  keyPress(deviceChannel: string): (key: string) => void {
-    return this.keySender(deviceChannel, 'input.keyPress')
-  }
-
-  home(deviceChannel: string): void {
-    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'home')
-  }
-
-  menu(deviceChannel: string): void {
-    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'menu')
-  }
-
-  back(deviceChannel: string): void {
-    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'back')
-  }
-
-  appSwitch(deviceChannel: string): void {
-    return this.fixedKeySender(deviceChannel, 'input.keyPress', 'app_switch')
-  }
-
   changeQuality(deviceChannel: string, quality: number): void {
     return this.sendOneWay(deviceChannel, 'quality.change', {
       quality,
@@ -141,6 +121,12 @@ class ControlService {
   startRemoteConnect(deviceChannel: string, isDeviceIos: boolean): Promise<unknown> {
     return this.sendTwoWay({ deviceChannel, isDeviceIos, action: 'connect.start' })
   }
+
+  home = this.keyPress('home')
+  menu = this.keyPress('menu')
+  back = this.keyPress('back')
+  appSwitch = this.keyPress('app_switch')
+  switchCharset = this.keyPress('switch_charset')
 
   private sendOneWay<T>(deviceChannel: string, action: string, data?: T): void {
     socket.emit(action, deviceChannel, data)
@@ -167,10 +153,12 @@ class ControlService {
     }
   }
 
-  private fixedKeySender(deviceChannel: string, type: string, fixedKey: string): void {
-    this.sendOneWay(deviceChannel, type, {
-      key: fixedKey,
-    })
+  private keyPress(key: string): (deviceChannel: string) => void {
+    return (deviceChannel: string) => {
+      this.sendOneWay(deviceChannel, 'input.keyPress', {
+        key,
+      })
+    }
   }
 }
 

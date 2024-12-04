@@ -38,11 +38,11 @@ class KeyboardService {
     return false
   }
 
-  handleSpecialKeys(args: KeyUpListenerArgs): boolean {
+  handleSpecialKeys(deviceChannel: string, args: KeyUpListenerArgs): boolean {
     if (this.isChangeCharsetKey(args)) {
       args.preventDefault()
 
-      controlService.keyPress('switch_charset')
+      controlService.switchCharset(deviceChannel)
 
       return true
     }
@@ -51,7 +51,7 @@ class KeyboardService {
   }
 
   keyUpListener(deviceChannel: string, args: KeyUpListenerArgs): void {
-    if (!this.handleSpecialKeys(args)) {
+    if (!this.handleSpecialKeys(deviceChannel, args)) {
       controlService.keyUp(deviceChannel)(args.key)
     }
   }

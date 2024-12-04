@@ -19,36 +19,20 @@ class DeviceControlStore {
     this.currentQuality = quality
   }
 
-  goHome(serial: string): void {
-    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
-
-    if (!device?.channel) return
-
-    controlService.home(device.channel)
+  goHome(deviceChannel: string): void {
+    controlService.home(deviceChannel)
   }
 
-  openMenu(serial: string): void {
-    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
-
-    if (!device?.channel) return
-
-    controlService.menu(device.channel)
+  openMenu(deviceChannel: string): void {
+    controlService.menu(deviceChannel)
   }
 
-  openAppSwitch(serial: string): void {
-    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
-
-    if (!device?.channel) return
-
-    controlService.appSwitch(device.channel)
+  openAppSwitch(deviceChannel: string): void {
+    controlService.appSwitch(deviceChannel)
   }
 
-  goBack(serial: string): void {
-    const { data: device } = deviceBySerialStore.deviceQueryResult(serial)
-
-    if (!device?.channel) return
-
-    controlService.back(device.channel)
+  goBack(deviceChannel: string): void {
+    controlService.back(deviceChannel)
   }
 
   tryToRotate(serial: string, rotation: 'portrait' | 'landscape'): void {
