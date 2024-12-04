@@ -346,9 +346,14 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/__mocks__/**'],
+    files: ['src/__mocks__/**', 'src/constants/keyboard-keys-map.ts'],
     rules: {
       '@typescript-eslint/naming-convention': 'off',
+    },
+  },
+  {
+    files: ['src/__mocks__/**'],
+    rules: {
       'consistent-return': 'off',
     },
   },
@@ -362,6 +367,18 @@ export default tseslint.config(
     files: ['src/lib/utils/debounce.util.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['src/services/touch-service/touch-service.ts'],
+    rules: {
+      'fp/no-delete': 'off',
+    },
+  },
+  {
+    files: ['src/services/scaling-service/scaling-service.ts'],
+    rules: {
+      'no-else/no-else': 'off',
     },
   }
 )

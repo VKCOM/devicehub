@@ -1,0 +1,22 @@
+.deviceHeader {
+  background-color: var(--vkui--color_background_content);
+}
+
+.deviceName {
+  overflow: hidden;
+  margin-left: 8px;
+
+  .icon {
+    flex-shrink: 0;
+    margin-right: 5px;
+  }
+}
+
+.screenRotationButton {
+  width: 40px;
+  height: 40px;
+}
+
+.landscape {
+  transform: rotate(90deg);
+}

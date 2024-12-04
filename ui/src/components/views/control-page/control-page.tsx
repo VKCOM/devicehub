@@ -1,6 +1,6 @@
 import Split from 'react-split'
 
-import { DeviceScreen } from '@/components/ui/device-screen'
+import { Device } from '@/components/ui/device'
 import { DeviceControlPanel } from '@/components/ui/device-control-panel'
 
 import styles from './control-page.module.css'
@@ -14,7 +14,7 @@ export const ControlPage = () => (
     sizes={[30, 70]}
     snapOffset={10}
   >
-    <DeviceScreen />
+    <Device />
     <DeviceControlPanel />
   </Split>
 )
