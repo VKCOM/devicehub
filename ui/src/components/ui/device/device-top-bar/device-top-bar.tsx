@@ -5,12 +5,12 @@ import { useTranslation } from 'react-i18next'
 import { ButtonGroup, EllipsisText, Flex, Button } from '@vkontakte/vkui'
 import { Icon24VerticalRectangle9x16Outline, Icon28DevicesOutline } from '@vkontakte/icons'
 
+import { ConditionalRender } from '@/components/lib/conditional-render'
+import { ScreenQualitySelector } from '@/components/ui/screen-quality-selector'
+
 import { deviceScreenStore } from '@/store/device-screen-store/device-screen-store'
 import { deviceBySerialStore } from '@/store/device-by-serial-store'
 import { deviceControlStore } from '@/store/device-control-store'
-
-import { ConditionalRender } from '@/components/lib/conditional-render'
-import { ScreenQualitySelector } from '@/components/ui/screen-quality-selector'
 
 import styles from './device-top-bar.module.css'
 
