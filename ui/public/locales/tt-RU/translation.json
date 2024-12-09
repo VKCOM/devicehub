@@ -315,5 +315,7 @@
   "System": "Система",
   "Copy link": "Күчермә сылтама",
   "Extend booking": "Броньны киңәйтегез",
-  "Device booking": "Iceайланма броньлау"
+  "Device booking": "Iceайланма броньлау",
+  "Something went wrong": "Нәрсәдер дөрес булмаган",
+  "Stack trace": "Стек эзе"
 }

@@ -385,5 +385,6 @@
   "Copy link": "Copier le lien",
   "Open link or deeplink": "Lien ouvert ou lien profond",
   "Extend booking": "Prolonger la réservation",
-  "Device booking": "Réservation d'appareil"
+  "Device booking": "Réservation d'appareil",
+  "Stack trace": "Trace de pile"
 }
