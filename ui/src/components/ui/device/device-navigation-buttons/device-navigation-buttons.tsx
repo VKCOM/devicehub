@@ -1,7 +1,7 @@
 import { Flex } from '@vkontakte/vkui'
 import { Icon24SquareOutline, Icon28ArrowUturnLeftOutline, Icon28HomeOutline, Icon28Menu } from '@vkontakte/icons'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { observer } from 'mobx-react-lite'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'

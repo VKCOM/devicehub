@@ -76,25 +76,21 @@ export class KeyboardService {
     clearInput()
   }
 
-  pasteListener({ getClipboardData, preventDefault }: PasteListenerArgs): void {
+  pasteListener({ getClipboardData }: PasteListenerArgs): void {
     /* NOTE: Prevent value change or the input event sees it. This way we get
       the real value instead of any "\n" -> " " conversions we might see
       in the input value. 
     */
-    preventDefault()
-
     this.deviceControlService.paste(getClipboardData())
   }
 
-  copyListener({ setClipboardData, preventDefault }: CopyListenerArgs): void {
+  copyListener({ setClipboardData }: CopyListenerArgs): void {
     /* NOTE: This is asynchronous and by the time it returns we will no longer
       have access to setData(). In other words it doesn't work. Currently
       what happens is that on the first copy, it will attempt to fetch
       the clipboard contents. Only on the second copy will it actually
       copy that to the clipboard. 
     */
-    preventDefault()
-
     this.deviceControlService.copy().then((clipboardContent) => {
       if (clipboardContent && typeof clipboardContent === 'string') {
         setClipboardData(clipboardContent)

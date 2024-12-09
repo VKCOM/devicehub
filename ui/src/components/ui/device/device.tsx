@@ -1,7 +1,10 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { Flex } from '@vkontakte/vkui'
+import { ErrorBoundary } from 'react-error-boundary'
+
+import { ErrorFallback } from '@/components/lib/error-fallback'
 
 import { deviceConnection } from '@/store/device-connection'
 
@@ -20,9 +23,11 @@ export const Device = observer(() => {
 
   return (
     <Flex direction='column' noWrap>
-      <DeviceTopBar />
-      <DeviceScreen />
-      <DeviceNavigationButtons />
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <DeviceTopBar />
+        <DeviceScreen />
+        <DeviceNavigationButtons />
+      </ErrorBoundary>
     </Flex>
   )
 })
