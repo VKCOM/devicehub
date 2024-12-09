@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import cn from 'classnames'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'

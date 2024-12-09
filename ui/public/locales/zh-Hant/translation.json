@@ -287,5 +287,6 @@
   "Open link or deeplink": "打開鏈接或深層鏈接",
   "Executes remote shell commands": "執行遠端 shell 命令",
   "Extend booking": "延長預訂",
-  "Device booking": "設備預訂"
+  "Device booking": "設備預訂",
+  "Stack trace": "堆疊追蹤"
 }

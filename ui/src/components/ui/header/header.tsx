@@ -1,6 +1,6 @@
 import { Button, Tappable, useAppearance } from '@vkontakte/vkui'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import cn from 'classnames'
 import {
   Icon16MailOutline,

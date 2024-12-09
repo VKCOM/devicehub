@@ -315,5 +315,7 @@
   "System": "Жүйе",
   "Copy link": "Сілтемені көшіру",
   "Extend booking": "Брондау мерзімін ұзарту",
-  "Device booking": "Құрылғыны брондау"
+  "Device booking": "Құрылғыны брондау",
+  "Something went wrong": "Бірдеңе дұрыс болмады",
+  "Stack trace": "Стек ізі"
 }

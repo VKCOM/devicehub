@@ -1,4 +1,4 @@
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router/dom'
 import { AdaptivityProvider, AppRoot, ConfigProvider } from '@vkontakte/vkui'
 
 import { useTheme } from '@/lib/hooks/use-theme.hook'

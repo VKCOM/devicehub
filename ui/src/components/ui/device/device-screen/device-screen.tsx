@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import cn from 'classnames'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { observer } from 'mobx-react-lite'
 import { Spinner } from '@vkontakte/vkui'
 
@@ -13,6 +13,7 @@ import { useServiceLocator } from '@/lib/hooks/use-service-locator.hook'
 import { DeviceScreenStore } from '@/store/device-screen-store/device-screen-store'
 import { useScreenAutoQuality } from '@/lib/hooks/use-screen-auto-quality.hook'
 import { useScreenStreaming } from '@/lib/hooks/use-screen-streaming.hook'
+import { useCallbackWithErrorHandling } from '@/lib/hooks/use-callback-with-error-handling.hook'
 
 import styles from './device-screen.module.css'
 
@@ -30,7 +31,7 @@ export const DeviceScreen = observer(() => {
   useScreenStreaming({ canvasRef, canvasWrapperRef, serial })
   useScreenAutoQuality(serial)
 
-  const onMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+  const onMouseDown = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
     if (!serial) return
 
     event.preventDefault()
@@ -44,9 +45,9 @@ export const DeviceScreen = observer(() => {
       isRightButtonPressed: event.button === 2,
       focusInput: () => inputRef.current?.focus(),
     })
-  }
+  })
 
-  const onMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
     if (!serial) return
 
     event.preventDefault()
@@ -58,9 +59,9 @@ export const DeviceScreen = observer(() => {
       isRightButtonPressed: event.button === 2,
       isAltKeyPressed: event.altKey,
     })
-  }
+  })
 
-  const onMouseUp = (event: MouseEvent<HTMLDivElement>) => {
+  const onMouseUp = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
     if (!serial) return
 
     event.preventDefault()
@@ -73,9 +74,9 @@ export const DeviceScreen = observer(() => {
     })
 
     touchService?.mouseUpBugWorkaroundListener(event)
-  }
+  })
 
-  const onTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+  const onTouchEnd = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
     if (!serial) return
 
     touchService?.touchEndListener({
@@ -83,15 +84,15 @@ export const DeviceScreen = observer(() => {
       touches: event.nativeEvent.touches,
       changedTouches: event.nativeEvent.changedTouches,
     })
-  }
+  })
 
-  const onTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+  const onTouchMove = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
     if (!serial) return
 
     touchService?.touchMoveListener({ serial, changedTouches: event.nativeEvent.changedTouches })
-  }
+  })
 
-  const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+  const onTouchStart = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
     if (!serial) return
 
     touchService?.touchStartListener({
@@ -99,9 +100,9 @@ export const DeviceScreen = observer(() => {
       touches: event.nativeEvent.touches,
       changedTouches: event.nativeEvent.changedTouches,
     })
-  }
+  })
 
-  const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = useCallbackWithErrorHandling((event: ChangeEvent<HTMLInputElement>) => {
     keyboardService?.changeListener({
       value: event.target.value,
       clearInput: () => {
@@ -110,38 +111,40 @@ export const DeviceScreen = observer(() => {
         }
       },
     })
-  }
+  })
 
-  const onCopy = (event: ClipboardEvent) => {
+  const onCopy = useCallbackWithErrorHandling((event: ClipboardEvent) => {
+    event.preventDefault()
+
     keyboardService?.copyListener({
-      preventDefault: event.preventDefault,
       setClipboardData: (content) => event.clipboardData.setData('text/plain', content),
     })
-  }
+  })
 
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = useCallbackWithErrorHandling((event: KeyboardEvent<HTMLInputElement>) => {
     keyboardService?.keyDownListener({
       key: event.key,
-      preventDefault: event.preventDefault,
+      preventDefault: event.preventDefault.bind(event),
     })
-  }
+  })
 
-  const onKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onKeyUp = useCallbackWithErrorHandling((event: KeyboardEvent<HTMLInputElement>) => {
     keyboardService?.keyUpListener({
       code: event.code,
       key: event.key,
       keyCode: event.keyCode,
       charCode: event.key.charCodeAt(0),
-      preventDefault: event.preventDefault,
+      preventDefault: event.preventDefault.bind(event),
     })
-  }
+  })
 
-  const onPaste = (event: ClipboardEvent<HTMLInputElement>) => {
+  const onPaste = useCallbackWithErrorHandling((event: ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+
     keyboardService?.pasteListener({
-      preventDefault: event.preventDefault,
       getClipboardData: () => event.clipboardData.getData('text/plain'),
     })
-  }
+  })
 
   return (
     <>

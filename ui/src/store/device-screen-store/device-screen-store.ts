@@ -58,7 +58,9 @@ export class DeviceScreenStore {
 
     const device = await deviceBySerialStore.fetch(serial)
 
-    if (!device?.display?.url) return
+    if (!device?.display?.url) {
+      throw new Error('No display url')
+    }
 
     this.device = device
     this.context = canvas.getContext('bitmaprenderer')

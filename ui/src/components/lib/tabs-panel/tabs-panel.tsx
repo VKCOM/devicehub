@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Group, PanelHeader, Tabs, TabsItem } from '@vkontakte/vkui'
 
@@ -56,7 +56,7 @@ export const TabsPanel = <T extends boolean = false>({
       </PanelHeader>
       {content.map((tab) => (
         <ConditionalRender key={tab.id} conditions={[tab.id === selectedId]}>
-          <Group aria-labelledby={tab.id} id={tab.ariaControls} role='tabpanel'>
+          <Group aria-controls={tab.ariaControls} aria-labelledby={tab.id} id={tab.ariaControls} role='tabpanel'>
             {tab.content}
           </Group>
         </ConditionalRender>

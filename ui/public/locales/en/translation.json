@@ -304,5 +304,6 @@
   "Run the following on your command line to debug the device from your IDE": "Run the following on your command line to debug the device from your IDE",
   "Open link or deeplink": "Open link or deeplink",
   "Extend booking": "Extend booking",
-  "Device booking": "Device booking"
+  "Device booking": "Device booking",
+  "Stack trace": "Stack trace"
 }

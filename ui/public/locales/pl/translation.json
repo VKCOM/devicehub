@@ -218,5 +218,7 @@
   "Reset all browser settings": "Zresetuj wszystkie ustawienia przeglądarki",
   "Open link or deeplink": "Otwórz link lub głęboki link",
   "Extend booking": "Przedłuż rezerwację",
-  "Device booking": "Rezerwacja urządzenia"
+  "Device booking": "Rezerwacja urządzenia",
+  "Reset": "Nastawić",
+  "Stack trace": "Ślad stosu"
 }

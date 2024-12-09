@@ -18,10 +18,8 @@ export type ChangeListenerArgs = {
 
 export type PasteListenerArgs = {
   getClipboardData: () => string
-  preventDefault: () => void
 }
 
 export type CopyListenerArgs = {
   setClipboardData: (content: string) => void
-  preventDefault: () => void
 }
