@@ -26,7 +26,7 @@
     "doc": "cli-docs-generator --cli=stf --pretty_cli_name=stf -o ./units.md"
   },
   "dependencies": {
-    "@devicefarmer/adbkit": "3.2.6",
+    "@u4/adbkit": "4.1.19",
     "@devicefarmer/adbkit-apkreader": "3.2.4",
     "@devicefarmer/adbkit-monkey": "1.2.1",
     "@devicefarmer/minicap-prebuilt": "file:minicap-prebuilt",
