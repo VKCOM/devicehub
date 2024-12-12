@@ -36,7 +36,7 @@ module.exports = {
       , descriptionFiles: ['package.json']
       , extensions: ['.js', '.json']
       , alias: {
-        '@devicefarmer/adbkit': './adbkit'
+        '@u4/adbkit': './adbkit'
         , localforage: 'localforage/dist/localforage.js'
         , 'socket.io': 'socket.io-client'
         , stats: 'stats.js/src/Stats.js'

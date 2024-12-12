@@ -708,6 +708,7 @@ message InstallMessage {
   required bool isApi = 3;
   optional string manifest = 4;
   repeated string installFlags = 5;
+  optional string jwt = 6; // used for storage authorization
 }
 
 message UninstallMessage {
