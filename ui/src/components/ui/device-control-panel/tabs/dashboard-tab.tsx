@@ -14,13 +14,15 @@ import {
 
 import { DeviceControlCard } from '@/components/ui/device-control-panel/device-control-card'
 
+import { DeviceButtonsControl } from './device-buttons-control'
+
 export const DashboardTab = () => {
   const { t } = useTranslation()
 
   return (
     <SimpleGrid columns={2} gap='l'>
       <DeviceControlCard before={<Icon28SettingsOutline height={20} width={20} />} title={t('Device Buttons')}>
-        Stub
+        <DeviceButtonsControl />
       </DeviceControlCard>
       <DeviceControlCard
         after={<Button appearance='neutral' before={<Icon20CopyOutline />} mode='tertiary' />}

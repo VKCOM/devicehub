@@ -38,6 +38,102 @@ export class DeviceControlStore {
     this.deviceControlService.back()
   }
 
+  pressPower(): void {
+    this.deviceControlService.power()
+  }
+
+  unlockDevice(): void {
+    this.deviceControlService.unlockDevice()
+  }
+
+  useCamera(): void {
+    this.deviceControlService.camera()
+  }
+
+  switchCharset(): void {
+    this.deviceControlService.switchCharset()
+  }
+
+  openSearch(): void {
+    this.deviceControlService.search()
+  }
+
+  mute(): void {
+    this.deviceControlService.mute()
+  }
+
+  volumeDown(): void {
+    this.deviceControlService.volumeDown()
+  }
+
+  volumeUp(): void {
+    this.deviceControlService.volumeUp()
+  }
+
+  setLightTheme(): void {
+    this.deviceControlService.setLightTheme()
+  }
+
+  setDarkTheme(): void {
+    this.deviceControlService.setDarkTheme()
+  }
+
+  enableDKA(): void {
+    this.deviceControlService.enableDKA()
+  }
+
+  disableDKA(): void {
+    this.deviceControlService.disableDKA()
+  }
+
+  enableGoogleServices(): void {
+    this.deviceControlService.enableGoogleServices()
+  }
+
+  disableGoogleServices(): void {
+    this.deviceControlService.disableGoogleServices()
+  }
+
+  changeLanguage(): void {
+    this.deviceControlService.openLanguageChange()
+  }
+
+  changeToSmallFont(): void {
+    this.deviceControlService.fontChange(0.85)
+  }
+
+  changeToNormalFont(): void {
+    this.deviceControlService.fontChange(1.0)
+  }
+
+  changeToBigFont(): void {
+    this.deviceControlService.fontChange(1.3)
+  }
+
+  mediaRewind(): void {
+    this.deviceControlService.mediaRewind()
+  }
+
+  mediaPrevious(): void {
+    this.deviceControlService.mediaPrevious()
+  }
+
+  mediaPlayPause(): void {
+    this.deviceControlService.mediaPlayPause()
+  }
+
+  mediaStop(): void {
+    this.deviceControlService.mediaStop()
+  }
+
+  mediaNext(): void {
+    this.deviceControlService.mediaNext()
+  }
+
+  mediaFastForward(): void {
+    this.deviceControlService.mediaFastForward()
+  }
+
   tryToRotate(serial: string, rotation: 'portrait' | 'landscape'): void {
     if (rotation === 'portrait') {
       this.deviceControlService.rotate(0)

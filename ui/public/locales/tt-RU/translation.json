@@ -317,5 +317,16 @@
   "Extend booking": "Броньны киңәйтегез",
   "Device booking": "Iceайланма броньлау",
   "Something went wrong": "Нәрсәдер дөрес булмаган",
-  "Stack trace": "Стек эзе"
+  "Stack trace": "Стек эзе",
+  "Unlock device": "Deviceайланманы ачу",
+  "Special actions": "Махсус чаралар",
+  "Set Light Theme": "Яктылык темасын куегыз",
+  "Set Dark Theme": "Караңгы тема куегыз",
+  "Enable": "Килеш",
+  "Disable": "Сүндер",
+  "Change language": "Телне үзгәртү",
+  "Font size": "Шрифт зурлыгы",
+  "Small": "Кечкенә",
+  "Normal": "Нормаль",
+  "Big": "Зур"
 }

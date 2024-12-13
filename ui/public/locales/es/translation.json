@@ -305,5 +305,19 @@
   "Open link or deeplink": "Abrir enlace o enlace profundo",
   "Extend booking": "Ampliar reserva",
   "Device booking": "Reserva de dispositivos",
-  "Stack trace": "Seguimiento de pila"
+  "Stack trace": "Seguimiento de pila",
+  "Power": "Fuerza",
+  "Unlock device": "Desbloquear dispositivo",
+  "Switch Charset": "Cambiar juego de caracteres",
+  "Special actions": "Acciones especiales",
+  "Set Light Theme": "Establecer tema ligero",
+  "Set Dark Theme": "Establecer tema oscuro",
+  "Enable": "Permitir",
+  "Disable": "Desactivar",
+  "Change language": "Cambiar idioma",
+  "Font size": "Tamaño de fuente",
+  "Small": "Pequeño",
+  "Normal": "Normal",
+  "Big": "Grande",
+  "Rewind": "Rebobinar"
 }
