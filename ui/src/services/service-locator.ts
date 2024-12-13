@@ -24,7 +24,7 @@ class ServiceLocator {
   }
 
   register(key: PropertyKey, instance: unknown): void {
-    if (this.map.has(key)) throw new Error('Service already registered for that symbol.')
+    if (this.map.has(key)) throw new Error(`Service already registered for that symbol: ${key.toString()}`)
 
     this.map.set(key, instance)
   }

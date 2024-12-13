@@ -55,6 +55,10 @@ export class TransactionService {
       this.promise.resolve(message.data)
     }
 
+    if (message.success && !message.data) {
+      this.promise.resolve(true)
+    }
+
     if (!message.success) {
       this.promise.reject(new Error('Failed to complete transaction', { cause: message.data }))
     }

@@ -386,5 +386,16 @@
   "Open link or deeplink": "Lien ouvert ou lien profond",
   "Extend booking": "Prolonger la réservation",
   "Device booking": "Réservation d'appareil",
-  "Stack trace": "Trace de pile"
+  "Stack trace": "Trace de pile",
+  "Unlock device": "Déverrouiller l'appareil",
+  "Special actions": "Actions spéciales",
+  "Set Light Theme": "Définir le thème de la lumière",
+  "Set Dark Theme": "Définir le thème sombre",
+  "Enable": "Activer",
+  "Disable": "Désactiver",
+  "Change language": "Changer de langue",
+  "Font size": "Taille de la police",
+  "Small": "Petit",
+  "Normal": "Normale",
+  "Big": "Grand"
 }

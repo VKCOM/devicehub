@@ -127,6 +127,63 @@ export class DeviceControlService {
   back = this.keyPress('back')
   appSwitch = this.keyPress('app_switch')
   switchCharset = this.keyPress('switch_charset')
+  power = this.keyPress('power')
+  camera = this.keyPress('camera')
+  search = this.keyPress('search')
+  mute = this.keyPress('mute')
+  volumeDown = this.keyPress('volume_down')
+  volumeUp = this.keyPress('volume_up')
+  mediaRewind = this.keyPress('media_rewind')
+  mediaPrevious = this.keyPress('media_previous')
+  mediaPlayPause = this.keyPress('media_play_pause')
+  mediaStop = this.keyPress('media_stop')
+  mediaNext = this.keyPress('media_next')
+  mediaFastForward = this.keyPress('media_fast_forward')
+
+  async unlockDevice(): Promise<void> {
+    await this.shell('input text 1452')
+    await this.shell('input keyevent 66')
+  }
+
+  setLightTheme(): void {
+    this.shell('cmd uimode night no')
+  }
+
+  setDarkTheme(): void {
+    this.shell('cmd uimode night yes')
+  }
+
+  enableDKA(): void {
+    this.shell('settings put global always_finish_activities 1')
+  }
+
+  disableDKA(): void {
+    this.shell('settings put global always_finish_activities 0')
+  }
+
+  enableGoogleServices(): void {
+    this.shell('pm enable com.google.android.gms')
+    this.shell('pm enable-user com.google.android.gms')
+  }
+
+  disableGoogleServices(): void {
+    this.shell('pm disable-user com.google.android.gms')
+  }
+
+  openLanguageChange(): void {
+    this.shell('am start -a android.settings.LOCALE_SETTINGS')
+  }
+
+  fontChange(value: number): void {
+    this.shell(`settings put system font_scale ${value}`)
+  }
+
+  private shell(command: string): Promise<unknown> {
+    return this.sendTwoWay('shell.command', {
+      command,
+      timeout: 10000,
+    })
+  }
 
   private sendOneWay<T>(action: string, data?: T): void {
     socket.emit(action, this.deviceChannel, data)
