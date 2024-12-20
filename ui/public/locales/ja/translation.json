@@ -344,5 +344,6 @@
   "Extend booking": "予約の延長",
   "Device booking": "デバイスの予約",
   "Stack trace": "スタックトレース",
-  "Are you sure? Device will be cleaned": "デバイスを解放してもよろしいですか?\nデバイスはデバイスリストに戻る前にクリアされます。"
+  "Are you sure? Device will be cleaned": "デバイスを解放してもよろしいですか?\nデバイスはデバイスリストに戻る前にクリアされます。",
+  "Booked before": "以前に予約しました"
 }

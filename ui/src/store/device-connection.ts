@@ -6,6 +6,7 @@ import { settingsService } from '@/services/settings-service'
 import { serviceLocator } from '@/services/service-locator'
 import { TouchService } from '@/services/touch-service/touch-service'
 import { KeyboardService } from '@/services/keyboard-service/keyboard-service'
+import { BookingService } from '@/services/booking-service'
 
 import { deviceListStore } from './device-list-store'
 import { deviceBySerialStore } from './device-by-serial-store'
@@ -34,6 +35,7 @@ class DeviceConnection {
       console.info(`adb connect ${connectToDevice[0]}`)
 
       serviceLocator.register(DeviceScreenStore.name, new DeviceScreenStore())
+      serviceLocator.register(BookingService.name, new BookingService(serial))
       serviceLocator.register(DeviceControlStore.name, new DeviceControlStore())
       serviceLocator.register(KeyboardService.name, new KeyboardService())
       serviceLocator.register(TouchService.name, new TouchService())
@@ -51,6 +53,7 @@ class DeviceConnection {
     if (!device) return undefined
 
     serviceLocator.unregister(DeviceControlService.name)
+    serviceLocator.unregister(BookingService.name)
     serviceLocator.unregister(DeviceScreenStore.name)
     serviceLocator.unregister(DeviceControlStore.name)
     serviceLocator.unregister(KeyboardService.name)

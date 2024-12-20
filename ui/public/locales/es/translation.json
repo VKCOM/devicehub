@@ -307,5 +307,6 @@
   "Device booking": "Reserva de dispositivos",
   "Stack trace": "Seguimiento de pila",
   "Are you sure? Device will be cleaned": "¿Estás seguro de que quieres liberar el dispositivo? \nEl dispositivo se borrará antes de volver a la lista de dispositivos.",
-  "Stop Using": "dejar de usar"
+  "Stop Using": "dejar de usar",
+  "Booked before": "Reservado antes"
 }
