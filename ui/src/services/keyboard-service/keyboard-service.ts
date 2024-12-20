@@ -1,5 +1,6 @@
-import { DeviceControlService } from '@/services/core/device-control-service/device-control-service'
 import { serviceLocator } from '@/services/service-locator'
+
+import { DeviceControlStore } from '@/store/device-control-store'
 
 import type {
   ChangeListenerArgs,
@@ -10,10 +11,10 @@ import type {
 } from './types'
 
 export class KeyboardService {
-  private readonly deviceControlService: DeviceControlService
+  private readonly deviceControlStore: DeviceControlStore
 
   constructor() {
-    this.deviceControlService = serviceLocator.get<DeviceControlService>(DeviceControlService.name)
+    this.deviceControlStore = serviceLocator.get<DeviceControlStore>(DeviceControlStore.name)
   }
 
   isChangeCharsetKey({ code, key, keyCode, charCode }: KeyUpListenerArgs): boolean {
@@ -49,7 +50,7 @@ export class KeyboardService {
     if (this.isChangeCharsetKey(args)) {
       args.preventDefault()
 
-      this.deviceControlService.switchCharset()
+      this.deviceControlStore.switchCharset()
 
       return true
     }
@@ -59,7 +60,7 @@ export class KeyboardService {
 
   keyUpListener(args: KeyUpListenerArgs): void {
     if (!this.handleSpecialKeys(args)) {
-      this.deviceControlService.keyUp(args.key)
+      this.deviceControlStore.keyUp(args.key)
     }
   }
 
@@ -67,11 +68,11 @@ export class KeyboardService {
     // NOTE: Prevent tab from switching focus to the next element, we only want that to happen on the device side.
     if (key === 'Tab') preventDefault()
 
-    this.deviceControlService.keyDown(key)
+    this.deviceControlStore.keyDown(key)
   }
 
   changeListener({ value, clearInput }: ChangeListenerArgs): void {
-    this.deviceControlService.type(value)
+    this.deviceControlStore.type(value)
 
     clearInput()
   }
@@ -81,7 +82,7 @@ export class KeyboardService {
       the real value instead of any "\n" -> " " conversions we might see
       in the input value. 
     */
-    this.deviceControlService.paste(getClipboardData())
+    this.deviceControlStore.paste(getClipboardData())
   }
 
   copyListener({ setClipboardData }: CopyListenerArgs): void {
@@ -91,7 +92,7 @@ export class KeyboardService {
       the clipboard contents. Only on the second copy will it actually
       copy that to the clipboard. 
     */
-    this.deviceControlService.copy().then((clipboardContent) => {
+    this.deviceControlStore.copy().then((clipboardContent) => {
       if (clipboardContent && typeof clipboardContent === 'string') {
         setClipboardData(clipboardContent)
       }

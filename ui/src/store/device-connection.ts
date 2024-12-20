@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
 
-import { DeviceControlService } from '@/services/core/device-control-service/device-control-service'
 import { groupService } from '@/services/group-service'
 import { settingsService } from '@/services/settings-service'
 import { serviceLocator } from '@/services/service-locator'
@@ -23,18 +22,14 @@ class DeviceConnection {
     if (!device?.channel) return
 
     try {
-      const deviceControlService = new DeviceControlService(device.channel, !!device.ios)
-      serviceLocator.register(DeviceControlService.name, deviceControlService)
+      const deviceControlStore = new DeviceControlStore(device.channel, !!device.ios)
+      serviceLocator.register(DeviceControlStore.name, deviceControlStore)
 
-      const connectToDevice = await Promise.all([
-        deviceControlService.startRemoteConnect(),
-        groupService.invite(device),
-      ])
+      const connectToDevice = await Promise.all([deviceControlStore.startRemoteConnect(), groupService.invite(device)])
 
       console.info(`adb connect ${connectToDevice[0]}`)
 
       serviceLocator.register(DeviceScreenStore.name, new DeviceScreenStore())
-      serviceLocator.register(DeviceControlStore.name, new DeviceControlStore())
       serviceLocator.register(KeyboardService.name, new KeyboardService())
       serviceLocator.register(TouchService.name, new TouchService())
 
@@ -50,9 +45,8 @@ class DeviceConnection {
 
     if (!device) return undefined
 
-    serviceLocator.unregister(DeviceControlService.name)
-    serviceLocator.unregister(DeviceScreenStore.name)
     serviceLocator.unregister(DeviceControlStore.name)
+    serviceLocator.unregister(DeviceScreenStore.name)
     serviceLocator.unregister(KeyboardService.name)
     serviceLocator.unregister(TouchService.name)
 

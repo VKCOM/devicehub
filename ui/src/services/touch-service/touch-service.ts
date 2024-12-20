@@ -1,11 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 
 import { scalingService } from '@/services/scaling-service/scaling-service'
-import { DeviceControlService } from '@/services/core/device-control-service/device-control-service'
 import { serviceLocator } from '@/services/service-locator'
 
 import { DeviceScreenStore } from '@/store/device-screen-store/device-screen-store'
 import { deviceBySerialStore } from '@/store/device-by-serial-store'
+import { DeviceControlStore } from '@/store/device-control-store'
 
 import type {
   Finger,
@@ -22,7 +22,7 @@ import type { MouseEvent as ReactMouseEvent } from 'react'
 
 export class TouchService {
   private readonly cycle = 100
-  private readonly deviceControlService: DeviceControlService
+  private readonly deviceControlStore: DeviceControlStore
   private readonly deviceScreenStore: DeviceScreenStore
   private prevCoords: { x: number; y: number } = { x: 0, y: 0 }
   private slotted: Record<string, number> = {}
@@ -41,7 +41,7 @@ export class TouchService {
 
   constructor() {
     makeAutoObservable(this)
-    this.deviceControlService = serviceLocator.get<DeviceControlService>(DeviceControlService.name)
+    this.deviceControlStore = serviceLocator.get<DeviceControlStore>(DeviceControlStore.name)
     this.deviceScreenStore = serviceLocator.get<DeviceScreenStore>(DeviceScreenStore.name)
   }
 
@@ -89,7 +89,7 @@ export class TouchService {
 
     const pressure = 0.5
 
-    this.deviceControlService.touchDown({
+    this.deviceControlStore.touchDown({
       seq: this.nextSeq(),
       contact: 0,
       x: scaled.coords.xP,
@@ -98,7 +98,7 @@ export class TouchService {
     })
 
     if (this.fakePinch) {
-      this.deviceControlService.touchDown({
+      this.deviceControlStore.touchDown({
         seq: this.nextSeq(),
         contact: 1,
         x: 1 - scaled.coords.xP,
@@ -107,7 +107,7 @@ export class TouchService {
       })
     }
 
-    this.deviceControlService.touchCommit(this.nextSeq())
+    this.deviceControlStore.touchCommit(this.nextSeq())
 
     this.setFinger({ index: 0, x: scaled.x, y: scaled.y, pressure })
 
@@ -165,7 +165,7 @@ export class TouchService {
         Math.abs(this.prevCoords.y - scaled.coords.yP) >= 0.1) &&
       !!device.ios
     ) {
-      this.deviceControlService.touchMoveIos({
+      this.deviceControlStore.touchMoveIos({
         x: scaled.coords.xP,
         y: scaled.coords.yP,
         pX: this.prevCoords.x,
@@ -176,13 +176,13 @@ export class TouchService {
       })
     }
 
-    this.deviceControlService.touchUp(this.nextSeq(), 0)
+    this.deviceControlStore.touchUp(this.nextSeq(), 0)
 
     if (this.fakePinch) {
-      this.deviceControlService.touchUp(this.nextSeq(), 1)
+      this.deviceControlStore.touchUp(this.nextSeq(), 1)
     }
 
-    this.deviceControlService.touchCommit(this.nextSeq())
+    this.deviceControlStore.touchCommit(this.nextSeq())
 
     this.removeFinger(0)
 
@@ -227,7 +227,7 @@ export class TouchService {
 
     const pressure = 0.5
 
-    this.deviceControlService.touchMove({
+    this.deviceControlStore.touchMove({
       seq: this.nextSeq(),
       contact: 0,
       x: scaled.coords.xP,
@@ -237,11 +237,11 @@ export class TouchService {
 
     if (addGhostFinger && !!device.ios) {
       // TODO: implement touchDownIos
-      // this.deviceControlService.touchDownIos(this.nextSeq(), 1, 1 - scaled.coords.xP, 1 - scaled.coords.yP, pressure)
+      // this.deviceControlStore.touchDownIos(this.nextSeq(), 1, 1 - scaled.coords.xP, 1 - scaled.coords.yP, pressure)
     }
 
     if (addGhostFinger && !device.ios) {
-      this.deviceControlService.touchDown({
+      this.deviceControlStore.touchDown({
         seq: this.nextSeq(),
         contact: 1,
         x: 1 - scaled.coords.xP,
@@ -251,11 +251,11 @@ export class TouchService {
     }
 
     if (!addGhostFinger && deleteGhostFinger) {
-      this.deviceControlService.touchUp(this.nextSeq(), 1)
+      this.deviceControlStore.touchUp(this.nextSeq(), 1)
     }
 
     if (!addGhostFinger && !deleteGhostFinger && this.fakePinch) {
-      this.deviceControlService.touchMove({
+      this.deviceControlStore.touchMove({
         seq: this.nextSeq(),
         contact: 1,
         x: 1 - scaled.coords.xP,
@@ -264,7 +264,7 @@ export class TouchService {
       })
     }
 
-    this.deviceControlService.touchCommit(this.nextSeq())
+    this.deviceControlStore.touchCommit(this.nextSeq())
 
     this.setFinger({ index: 0, x: scaled.x, y: scaled.y, pressure })
 
@@ -318,7 +318,7 @@ export class TouchService {
 
       this.slots.sort().reverse()
 
-      this.deviceControlService.touchReset(this.nextSeq())
+      this.deviceControlStore.touchReset(this.nextSeq())
 
       this.removeAllFingers()
     }
@@ -348,7 +348,7 @@ export class TouchService {
       const pressure = touch.force || 0.5
 
       if (!device.ios) {
-        this.deviceControlService.touchDown({
+        this.deviceControlStore.touchDown({
           seq: this.nextSeq(),
           contact: slot,
           x: scaled.coords.xP,
@@ -360,7 +360,7 @@ export class TouchService {
       this.setFinger({ index: slot, x: scaled.x, y: scaled.y, pressure })
     }
 
-    this.deviceControlService.touchCommit(this.nextSeq())
+    this.deviceControlStore.touchCommit(this.nextSeq())
   }
 
   touchMoveListener({ serial, changedTouches }: TouchMoveListenerArgs): void {
@@ -387,7 +387,7 @@ export class TouchService {
 
       const pressure = touch.force || 0.5
 
-      this.deviceControlService.touchMove({
+      this.deviceControlStore.touchMove({
         seq: this.nextSeq(),
         contact: slot,
         x: scaled.coords.xP,
@@ -398,7 +398,7 @@ export class TouchService {
       this.setFinger({ index: slot, x: scaled.x, y: scaled.y, pressure })
     }
 
-    this.deviceControlService.touchCommit(this.nextSeq())
+    this.deviceControlStore.touchCommit(this.nextSeq())
   }
 
   touchEndListener({ touches, changedTouches }: TouchStartEndListenerArgs): void {
@@ -423,7 +423,7 @@ export class TouchService {
 
       this.slots.push(slot)
 
-      this.deviceControlService.touchUp(this.nextSeq(), slot)
+      this.deviceControlStore.touchUp(this.nextSeq(), slot)
 
       this.removeFinger(slot)
 
@@ -431,7 +431,7 @@ export class TouchService {
     }
 
     if (foundAny) {
-      this.deviceControlService.touchCommit(this.nextSeq())
+      this.deviceControlStore.touchCommit(this.nextSeq())
 
       if (!touches.length) {
         this.stopTouching()
@@ -461,7 +461,7 @@ export class TouchService {
   }
 
   private startMousing(focusInput: () => void): void {
-    this.deviceControlService.gestureStart(this.nextSeq())
+    this.deviceControlStore.gestureStart(this.nextSeq())
 
     focusInput()
   }
@@ -469,7 +469,7 @@ export class TouchService {
   private stopMousing(): void {
     this.removeAllFingers()
 
-    this.deviceControlService.gestureStop(this.nextSeq())
+    this.deviceControlStore.gestureStop(this.nextSeq())
   }
 
   private getScaledCoords({
@@ -501,12 +501,12 @@ export class TouchService {
   }
 
   private startTouching(): void {
-    this.deviceControlService.gestureStart(this.nextSeq())
+    this.deviceControlStore.gestureStart(this.nextSeq())
   }
 
   private stopTouching(): void {
     this.removeAllFingers()
 
-    this.deviceControlService.gestureStop(this.nextSeq())
+    this.deviceControlStore.gestureStop(this.nextSeq())
   }
 }

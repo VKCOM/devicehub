@@ -307,5 +307,19 @@
   "Device booking": "Reserva de dispositivos",
   "Stack trace": "Seguimiento de pila",
   "Are you sure? Device will be cleaned": "¿Estás seguro de que quieres liberar el dispositivo? \nEl dispositivo se borrará antes de volver a la lista de dispositivos.",
-  "Stop Using": "dejar de usar"
+  "Stop Using": "dejar de usar",
+  "Power": "Fuerza",
+  "Unlock device": "Desbloquear dispositivo",
+  "Switch Charset": "Cambiar juego de caracteres",
+  "Special actions": "Acciones especiales",
+  "Set Light Theme": "Establecer tema ligero",
+  "Set Dark Theme": "Establecer tema oscuro",
+  "Enable": "Permitir",
+  "Disable": "Desactivar",
+  "Change language": "Cambiar idioma",
+  "Font size": "Tamaño de fuente",
+  "Small": "Pequeño",
+  "Normal": "Normal",
+  "Big": "Grande",
+  "Rewind": "Rebobinar"
 }

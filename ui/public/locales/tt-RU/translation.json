@@ -318,5 +318,16 @@
   "Device booking": "Iceайланма броньлау",
   "Something went wrong": "Нәрсәдер дөрес булмаган",
   "Stack trace": "Стек эзе",
-  "Warning": "Кисәтү"
+  "Warning": "Кисәтү",
+  "Unlock device": "Deviceайланманы ачу",
+  "Special actions": "Махсус чаралар",
+  "Set Light Theme": "Яктылык темасын куегыз",
+  "Set Dark Theme": "Караңгы тема куегыз",
+  "Enable": "Килеш",
+  "Disable": "Сүндер",
+  "Change language": "Телне үзгәртү",
+  "Font size": "Шрифт зурлыгы",
+  "Small": "Кечкенә",
+  "Normal": "Нормаль",
+  "Big": "Зур"
 }

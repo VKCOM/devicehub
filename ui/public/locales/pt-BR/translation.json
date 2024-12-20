@@ -387,5 +387,16 @@
   "Extend booking": "Estender reserva",
   "Device booking": "Reserva de dispositivos",
   "Stack trace": "Rastreamento de pilha",
-  "Are you sure? Device will be cleaned": "Tem certeza de que deseja liberar o dispositivo? \nO dispositivo será limpo antes de retornar à lista de dispositivos"
+  "Are you sure? Device will be cleaned": "Tem certeza de que deseja liberar o dispositivo? \nO dispositivo será limpo antes de retornar à lista de dispositivos",
+  "Unlock device": "Desbloquear dispositivo",
+  "Special actions": "Ações especiais",
+  "Set Light Theme": "Definir tema claro",
+  "Set Dark Theme": "Definir tema escuro",
+  "Enable": "Habilitar",
+  "Disable": "Desativar",
+  "Change language": "Alterar idioma",
+  "Font size": "Tamanho da fonte",
+  "Small": "Pequeno",
+  "Normal": "Normal",
+  "Big": "Grande"
 }

@@ -387,5 +387,16 @@
   "Extend booking": "Prolonger la réservation",
   "Device booking": "Réservation d'appareil",
   "Stack trace": "Trace de pile",
-  "Are you sure? Device will be cleaned": "Êtes-vous sûr de vouloir libérer l'appareil ? \nL'appareil sera effacé avant de revenir à la liste des appareils"
+  "Are you sure? Device will be cleaned": "Êtes-vous sûr de vouloir libérer l'appareil ? \nL'appareil sera effacé avant de revenir à la liste des appareils",
+  "Unlock device": "Déverrouiller l'appareil",
+  "Special actions": "Actions spéciales",
+  "Set Light Theme": "Définir le thème de la lumière",
+  "Set Dark Theme": "Définir le thème sombre",
+  "Enable": "Activer",
+  "Disable": "Désactiver",
+  "Change language": "Changer de langue",
+  "Font size": "Taille de la police",
+  "Small": "Petit",
+  "Normal": "Normale",
+  "Big": "Grand"
 }

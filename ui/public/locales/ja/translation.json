@@ -344,5 +344,16 @@
   "Extend booking": "予約の延長",
   "Device booking": "デバイスの予約",
   "Stack trace": "スタックトレース",
-  "Are you sure? Device will be cleaned": "デバイスを解放してもよろしいですか?\nデバイスはデバイスリストに戻る前にクリアされます。"
+  "Are you sure? Device will be cleaned": "デバイスを解放してもよろしいですか?\nデバイスはデバイスリストに戻る前にクリアされます。",
+  "Unlock device": "デバイスのロックを解除する",
+  "Special actions": "特殊アクション",
+  "Set Light Theme": "ライトテーマの設定",
+  "Set Dark Theme": "ダークテーマを設定する",
+  "Enable": "有効にする",
+  "Disable": "無効にする",
+  "Change language": "言語を変更する",
+  "Font size": "フォントサイズ",
+  "Small": "小さい",
+  "Normal": "普通",
+  "Big": "大きい"
 }

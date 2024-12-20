@@ -289,5 +289,16 @@
   "Extend booking": "延長預訂",
   "Device booking": "設備預訂",
   "Stack trace": "堆疊追蹤",
-  "Are you sure? Device will be cleaned": "您確定要釋放該設備嗎？\n在返回設備清單之前，設備將被清除"
+  "Are you sure? Device will be cleaned": "您確定要釋放該設備嗎？\n在返回設備清單之前，設備將被清除",
+  "Unlock device": "解鎖裝置",
+  "Special actions": "特別行動",
+  "Set Light Theme": "設定淺色主題",
+  "Set Dark Theme": "設定黑暗主題",
+  "Enable": "使能夠",
+  "Disable": "停用",
+  "Change language": "更改語言",
+  "Font size": "字體大小",
+  "Small": "小的",
+  "Normal": "普通的",
+  "Big": "大的"
 }

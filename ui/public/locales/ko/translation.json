@@ -355,5 +355,16 @@
   "Extend booking": "예약 연장",
   "Device booking": "기기 예약",
   "Stack trace": "스택 추적",
-  "Are you sure? Device will be cleaned": "정말로 장치를 해제하시겠습니까? \n장치 목록으로 돌아가기 전에 장치가 지워집니다."
+  "Are you sure? Device will be cleaned": "정말로 장치를 해제하시겠습니까? \n장치 목록으로 돌아가기 전에 장치가 지워집니다.",
+  "Unlock device": "장치 잠금 해제",
+  "Special actions": "특별 조치",
+  "Set Light Theme": "밝은 테마 설정",
+  "Set Dark Theme": "어두운 테마 설정",
+  "Enable": "할 수 있게 하다",
+  "Disable": "장애를 입히다",
+  "Change language": "언어 변경",
+  "Font size": "글꼴 크기",
+  "Small": "작은",
+  "Normal": "정상",
+  "Big": "큰"
 }

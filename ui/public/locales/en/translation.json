@@ -305,7 +305,21 @@
   "Open link or deeplink": "Open link or deeplink",
   "Extend booking": "Extend booking",
   "Device booking": "Device booking",
-  "Stack trace": "Stack trace",
   "Are you sure? Device will be cleaned": "Are you sure you want to release the device? The device will be cleared before returning to the device list",
-  "Stop Using": "Stop Using"
+  "Stop Using": "Stop Using",
+  "Stack trace": "Stack trace",
+  "Power": "Power",
+  "Unlock device": "Unlock device",
+  "Switch Charset": "Switch Charset",
+  "Special actions": "Special actions",
+  "Set Light Theme": "Set Light Theme",
+  "Set Dark Theme": "Set Dark Theme",
+  "Enable": "Enable",
+  "Disable": "Disable",
+  "Change language": "Change language",
+  "Font size": "Font size",
+  "Small": "Small",
+  "Normal": "Normal",
+  "Big": "Big",
+  "Rewind": "Rewind"
 }

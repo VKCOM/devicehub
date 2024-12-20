@@ -1,0 +1,12 @@
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+
+  .buttonTooltip:not(:first-of-type) {
+    margin-left: 8px;
+  }
+}
+
+.lineThrough {
+  text-decoration: line-through;
+}

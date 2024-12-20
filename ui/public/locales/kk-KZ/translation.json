@@ -318,5 +318,16 @@
   "Device booking": "Құрылғыны брондау",
   "Something went wrong": "Бірдеңе дұрыс болмады",
   "Stack trace": "Стек ізі",
-  "Warning": "Ескерту"
+  "Warning": "Ескерту",
+  "Unlock device": "Құрылғы құлпын ашу",
+  "Special actions": "Арнайы әрекеттер",
+  "Set Light Theme": "Жеңіл тақырыпты орнату",
+  "Set Dark Theme": "Қараңғы тақырыпты орнату",
+  "Enable": "Қосу",
+  "Disable": "Өшіру",
+  "Change language": "Тілді өзгерту",
+  "Font size": "Қаріп өлшемі",
+  "Small": "Кішкентай",
+  "Normal": "Қалыпты",
+  "Big": "Үлкен"
 }

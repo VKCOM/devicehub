@@ -28,7 +28,7 @@ export const DeviceNavigationButtons = observer(() => {
           beforeIcon={<Icon24SquareOutline />}
           title={`${t('Home')}`}
           onClick={() => {
-            deviceControlStore?.goHome()
+            deviceControlStore?.home()
           }}
         />
       </ConditionalRender>
@@ -37,28 +37,28 @@ export const DeviceNavigationButtons = observer(() => {
           beforeIcon={<Icon28Menu />}
           title={`${t('Menu')}`}
           onClick={() => {
-            deviceControlStore?.openMenu()
+            deviceControlStore?.menu()
           }}
         />
         <NavigationButton
           beforeIcon={<Icon28HomeOutline />}
           title={`${t('Home')}`}
           onClick={() => {
-            deviceControlStore?.goHome()
+            deviceControlStore?.home()
           }}
         />
         <NavigationButton
           beforeIcon={<Icon24SquareOutline height={28} width={28} />}
           title={`${t('App switch')}`}
           onClick={() => {
-            deviceControlStore?.openAppSwitch()
+            deviceControlStore?.appSwitch()
           }}
         />
         <NavigationButton
           beforeIcon={<Icon28ArrowUturnLeftOutline />}
           title={`${t('Back')}`}
           onClick={() => {
-            deviceControlStore?.goBack()
+            deviceControlStore?.back()
           }}
         />
       </ConditionalRender>
