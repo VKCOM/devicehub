@@ -307,5 +307,6 @@
   "Device booking": "Device booking",
   "Stack trace": "Stack trace",
   "Are you sure? Device will be cleaned": "Are you sure you want to release the device? The device will be cleared before returning to the device list",
-  "Stop Using": "Stop Using"
+  "Stop Using": "Stop Using",
+  "Booked before": "Booked before"
 }

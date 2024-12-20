@@ -355,5 +355,6 @@
   "Extend booking": "예약 연장",
   "Device booking": "기기 예약",
   "Stack trace": "스택 추적",
-  "Are you sure? Device will be cleaned": "정말로 장치를 해제하시겠습니까? \n장치 목록으로 돌아가기 전에 장치가 지워집니다."
+  "Are you sure? Device will be cleaned": "정말로 장치를 해제하시겠습니까? \n장치 목록으로 돌아가기 전에 장치가 지워집니다.",
+  "Booked before": "이전에 예약됨"
 }

@@ -387,5 +387,6 @@
   "Extend booking": "Estender reserva",
   "Device booking": "Reserva de dispositivos",
   "Stack trace": "Rastreamento de pilha",
-  "Are you sure? Device will be cleaned": "Tem certeza de que deseja liberar o dispositivo? \nO dispositivo será limpo antes de retornar à lista de dispositivos"
+  "Are you sure? Device will be cleaned": "Tem certeza de que deseja liberar o dispositivo? \nO dispositivo será limpo antes de retornar à lista de dispositivos",
+  "Booked before": "Reservado antes"
 }

@@ -11,11 +11,22 @@ import {
   Icon20AddSquareOutline,
   Icon20ChevronRightOutline,
 } from '@vkontakte/icons'
+import { useParams } from 'react-router'
+import { observer } from 'mobx-react-lite'
 
 import { DeviceControlCard } from '@/components/ui/device-control-panel/device-control-card'
 
-export const DashboardTab = () => {
+import { BookingService } from '@/services/booking-service'
+
+import { useServiceLocator } from '@/lib/hooks/use-service-locator.hook'
+
+import { DeviceBookingControl } from './device-booking-control'
+
+export const DashboardTab = observer(() => {
   const { t } = useTranslation()
+  const { serial } = useParams()
+
+  const bookingService = useServiceLocator<BookingService>(BookingService.name)
 
   return (
     <SimpleGrid columns={2} gap='l'>
@@ -58,13 +69,24 @@ export const DashboardTab = () => {
         Stub
       </DeviceControlCard>
       <DeviceControlCard
-        after={<Button appearance='neutral' before={<Icon20AddSquareOutline />} mode='tertiary' />}
         afterTooltipText={t('Extend booking')}
         before={<Icon28StopwatchOutline height={20} width={20} />}
         title={t('Device booking')}
+        after={
+          <Button
+            appearance='neutral'
+            before={<Icon20AddSquareOutline />}
+            mode='tertiary'
+            onClick={() => {
+              if (!serial) return
+
+              bookingService?.reBookDevice(serial)
+            }}
+          />
+        }
       >
-        Stub
+        <DeviceBookingControl />
       </DeviceControlCard>
     </SimpleGrid>
   )
-}
+})

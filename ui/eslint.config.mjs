@@ -25,6 +25,7 @@ export default tseslint.config(
       'vite.config.ts',
       'vitest-setup.ts',
       'orval.config.ts',
+      'test-global-setup.ts',
     ],
   },
   {
