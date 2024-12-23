@@ -1,0 +1,14 @@
+{
+  "development": {
+    "openStfApiHostUrl": "http://localhost:7100",
+    "websocketUrl": "http://localhost:7110"
+  },
+  "staging": {
+    "openStfApiHostUrl": "https://openstf2.mvk.com",
+    "websocketUrl": "https://openstf2.mvk.com"
+  },
+  "production": {
+    "openStfApiHostUrl": "https://openstf.mvk.com",
+    "websocketUrl": "https://openstf.mvk.com"
+  }
+}
