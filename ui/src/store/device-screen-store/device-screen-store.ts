@@ -16,7 +16,6 @@ export class DeviceScreenStore {
   private context: ImageBitmapRenderingContext | null = null
   private canvasWrapper: HTMLDivElement | null = null
   private device: Device | null = null
-  private alwaysUpright = false
   private showScreen = true
   private options = {
     autoScaleForRetina: true,
@@ -274,7 +273,6 @@ export class DeviceScreenStore {
     if (startRegex.test(message.data)) {
       const startData: StartScreenStreamingMessage = JSON.parse(message.data.replace(startRegex, ''))
 
-      this.alwaysUpright = startData.quirks.alwaysUpright
       this.screenRotation = startData.orientation
 
       this.isScreenStreamingJustStarted = true
