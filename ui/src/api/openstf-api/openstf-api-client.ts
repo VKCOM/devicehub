@@ -1,6 +1,8 @@
 import axios from 'axios'
 
+import { variablesConfig } from '@/config/variables-config'
+
 export const openstfApiClient = axios.create({
-  baseURL: `${import.meta.env.VITE_OPENSTF_API_HOST_URL}/api/v1`,
+  baseURL: `${variablesConfig[import.meta.env.MODE].openStfApiHostUrl}/api/v1`,
   withCredentials: true,
 })

@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client'
 
-export const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
+import { variablesConfig } from '@/config/variables-config'
+
+export const socket = io(variablesConfig[import.meta.env.MODE].websocketUrl, {
   autoConnect: true,
   reconnectionAttempts: 3,
   reconnection: true,

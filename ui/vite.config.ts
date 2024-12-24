@@ -9,6 +9,9 @@ export default defineConfig({
   resolve: {
     alias: [{ find: /^@vkontakte\/vkui$/, replacement: '@vkontakte/vkui/dist/cssm' }],
   },
+  preview: {
+    port: 5173,
+  },
   test: {
     globals: true,
     environment: 'jsdom',
