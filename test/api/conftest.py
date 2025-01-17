@@ -2,9 +2,11 @@ import random
 import string
 
 import pytest
-from pytest_check import equal, is_not_none, is_true, is_false, is_in, greater_equal
+from pytest_check import equal, is_not_none, is_true, is_false, is_in, greater_equal, greater, is_none
 
 from smartphone_test_farm_client import AuthenticatedClient
+from smartphone_test_farm_client.api.devices import get_devices
+from smartphone_test_farm_client.api.groups import get_groups
 
 ADMIN_EMAIL = 'administrator@fakedomain.com'
 ADMIN_NAME = 'administrator'
@@ -83,9 +85,9 @@ def random_choice():
 
     return random_func
 
+
 @pytest.fixture(scope="module")
 def fake_device_field_check():
-
     def fake_device_field_check_func(device_dict):
         equal(len(device_dict.values()), 33)
         equal(len(device_dict.get('provider').values()), 2)
@@ -155,3 +157,57 @@ def fake_device_field_check():
         is_false(device_dict.get('using'))
 
     return fake_device_field_check_func
+
+# This checking for request with param fields='present,present,status,serial,group.owner.name,using,somefields'
+@pytest.fixture(scope="module")
+def fake_device_certain_field_check():
+    def fake_device_certain_field_check_func(device_dict):
+        equal(len(device_dict.values()), 6)
+        is_true(device_dict.get('present'))
+        equal(device_dict.get('status'), 3)
+        is_in('fake-', device_dict.get('serial'))
+        equal(device_dict.get('group').get('owner').get('name'), 'administrator')
+        is_false(device_dict.get('using'))
+        is_not_none(device_dict.get('reverseForwards'))
+        equal(device_dict.get('reverseForwards'), [])
+        is_none(device_dict.get('remoteConnect'))
+        is_none(device_dict.get('remoteConnectUrl'))
+
+    return fake_device_certain_field_check_func
+
+
+@pytest.fixture(scope="module")
+def get_common_group_id():
+    def get_common_group_id_func(api_client):
+        response = get_groups.sync_detailed(client=api_client)
+        equal(response.status_code, 200)
+        is_true(response.parsed.success)
+        equal(len(response.parsed.groups), 1)
+        common_group = response.parsed.groups[0]
+        equal(common_group['name'], 'Common')
+        return response.parsed.groups[0]['id']
+
+    return get_common_group_id_func
+
+
+@pytest.fixture(scope="module")
+def get_first_device_id(successful_response_check):
+    def get_first_device_id_func(api_client):
+        response = get_devices.sync_detailed(client=api_client)
+        successful_response_check(response, description='Devices Information')
+        is_not_none(response.parsed.devices)
+        greater(len(response.parsed.devices), 0)
+        return response.parsed.devices[0].serial
+
+    return get_first_device_id_func
+
+
+@pytest.fixture(scope="module")
+def successful_response_check():
+    def successful_response_check_func(response, description=None):
+        equal(response.status_code, 200)
+        is_true(response.parsed.success)
+        if description is not None:
+            equal(response.parsed.description, description)
+
+    return successful_response_check_func

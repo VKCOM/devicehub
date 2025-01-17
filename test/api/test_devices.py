@@ -8,14 +8,12 @@ from smartphone_test_farm_client.models import GetDevicesTarget
 # TODO: add param: GetDevicesTarget.STANDARD, when generator of devices will be ready(add device with standard group)
 # api/v1/devices - list of devices
 @pytest.mark.parametrize("target", [GetDevicesTarget.BOOKABLE, GetDevicesTarget.ORIGIN, GetDevicesTarget.NONE])
-def test_get_devices(api_client, target, fake_device_field_check):
+def test_get_devices(api_client, target, fake_device_field_check, successful_response_check):
     if target == GetDevicesTarget.NONE:
         response = get_devices.sync_detailed(client=api_client)
     else:
         response = get_devices.sync_detailed(client=api_client, target=target)
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    equal(response.parsed.description, 'Devices Information')
+    successful_response_check(response, description='Devices Information')
     is_not_none(response.parsed.devices)
     equal(len(response.parsed.devices), 5)
     for device in response.parsed.devices:
@@ -24,14 +22,12 @@ def test_get_devices(api_client, target, fake_device_field_check):
 
 
 @pytest.mark.parametrize("target", [GetDevicesTarget.BOOKABLE, GetDevicesTarget.ORIGIN, GetDevicesTarget.NONE])
-def test_get_devices_empty_fields(api_client, target, fake_device_field_check):
+def test_get_devices_empty_fields(api_client, target, fake_device_field_check, successful_response_check):
     if target == GetDevicesTarget.NONE:
         response = get_devices.sync_detailed(client=api_client, fields='')
     else:
         response = get_devices.sync_detailed(client=api_client, target=target, fields='')
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    equal(response.parsed.description, 'Devices Information')
+    successful_response_check(response, description='Devices Information')
     is_not_none(response.parsed.devices)
     equal(len(response.parsed.devices), 5)
     for device in response.parsed.devices:
@@ -40,7 +36,7 @@ def test_get_devices_empty_fields(api_client, target, fake_device_field_check):
 
 
 @pytest.mark.parametrize("target", [GetDevicesTarget.BOOKABLE, GetDevicesTarget.ORIGIN, GetDevicesTarget.NONE])
-def test_get_devices_with_fields(api_client, target):
+def test_get_devices_with_fields(api_client, target, successful_response_check, fake_device_certain_field_check):
     if target == GetDevicesTarget.NONE:
         response = get_devices.sync_detailed(
             client=api_client,
@@ -52,41 +48,28 @@ def test_get_devices_with_fields(api_client, target):
             fields='present,present,status,serial,group.owner.name,using,somefields',
             target=target
         )
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    equal(response.parsed.description, 'Devices Information')
+    successful_response_check(response, description='Devices Information')
     is_not_none(response.parsed.devices)
     equal(len(response.parsed.devices), 5)
     for device in response.parsed.devices:
         device_dict = device.to_dict()
-        equal(len(device_dict.values()), 6)
-        is_true(device_dict.get('present'))
-        equal(device_dict.get('status'), 3)
-        is_in('fake-', device_dict.get('serial'))
-        equal(device_dict.get('group').get('owner').get('name'), 'administrator')
-        is_false(device_dict.get('using'))
-        is_not_none(device_dict.get('reverseForwards'))
-        equal(device_dict.get('reverseForwards'), [])
-        is_none(device_dict.get('remoteConnect'))
-        is_none(device_dict.get('remoteConnectUrl'))
+        fake_device_certain_field_check(device_dict)
 
 
 @pytest.mark.parametrize("target", [GetDevicesTarget.BOOKABLE, GetDevicesTarget.ORIGIN, GetDevicesTarget.NONE])
-def test_get_devices_with_wrong_fields(api_client, target):
+def test_get_devices_with_wrong_fields(api_client, target, successful_response_check):
     if target == GetDevicesTarget.NONE:
         response = get_devices.sync_detailed(
             client=api_client,
-            fields='wrong,,,,'
+            fields='wrong,111,!@!$!$, ,'
         )
     else:
         response = get_devices.sync_detailed(
             client=api_client,
-            fields='wrong,,,,',
+            fields='wrong,111,!@!$!$, ,',
             target=target
         )
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    equal(response.parsed.description, 'Devices Information')
+    successful_response_check(response, description='Devices Information')
     is_not_none(response.parsed.devices)
     equal(len(response.parsed.devices), 5)
     for device in response.parsed.devices:
@@ -107,90 +90,68 @@ def test_get_devices_with_wrong_target(api_client):
 
 
 # api/v1/devices/{serial} - list of devices
-def test_get_device_by_serial(api_client, fake_device_field_check):
-    # get first device's serial:
-    response = get_devices.sync_detailed(client=api_client)
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    is_not_none(response.parsed.devices)
-    greater(len(response.parsed.devices), 0)
-    serial = response.parsed.devices[0].serial
+def test_get_device_by_serial(api_client, fake_device_field_check, successful_response_check, get_first_device_id):
+    serial = get_first_device_id(api_client)
 
     response = get_device_by_serial.sync_detailed(client=api_client, serial=serial)
-    equal(response.status_code, 200)
-    equal(response.parsed.description, 'Device Information')
-    is_true(response.parsed.success)
+    print('')
+    print('!!!ALK!!! - test_get_device_by_serial')
+    print(f'{response.parsed.description}')
+    successful_response_check(response, description='Device Information')
     is_not_none(response.parsed.device)
     device_dict = response.parsed.device.to_dict()
     fake_device_field_check(device_dict)
 
 
-def test_get_device_by_serial_empty_fields(api_client, fake_device_field_check):
-    # get first device's serial:
-    response = get_devices.sync_detailed(client=api_client)
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    is_not_none(response.parsed.devices)
-    greater(len(response.parsed.devices), 0)
-    serial = response.parsed.devices[0].serial
+def test_get_device_by_serial_empty_fields(
+    api_client,
+    fake_device_field_check,
+    successful_response_check,
+    get_first_device_id
+):
+    serial = get_first_device_id(api_client)
 
     response = get_device_by_serial.sync_detailed(client=api_client, serial=serial, fields='')
-    equal(response.status_code, 200)
-    equal(response.parsed.description, 'Device Information')
-    is_true(response.parsed.success)
+    successful_response_check(response, description='Device Information')
     is_not_none(response.parsed.device)
     device_dict = response.parsed.device.to_dict()
     fake_device_field_check(device_dict)
 
 
-def test_get_device_by_serial_with_fields(api_client, fake_device_field_check):
-    # get first device's serial:
-    response = get_devices.sync_detailed(client=api_client)
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    is_not_none(response.parsed.devices)
-    greater(len(response.parsed.devices), 0)
-    serial = response.parsed.devices[0].serial
+def test_get_device_by_serial_with_fields(
+    api_client,
+    fake_device_field_check,
+    successful_response_check,
+    get_first_device_id,
+    fake_device_certain_field_check
+):
+    serial = get_first_device_id(api_client)
 
     response = get_device_by_serial.sync_detailed(
         client=api_client,
         serial=serial,
         fields='present,present,status,serial,group.owner.name,using,somefields'
     )
-    equal(response.status_code, 200)
-    equal(response.parsed.description, 'Device Information')
-    is_true(response.parsed.success)
+    successful_response_check(response, description='Device Information')
     is_not_none(response.parsed.device)
     device_dict = response.parsed.device.to_dict()
-    equal(len(device_dict.values()), 6)
-    is_true(device_dict.get('present'))
-    equal(device_dict.get('status'), 3)
-    is_in('fake-', device_dict.get('serial'))
-    equal(device_dict.get('group').get('owner').get('name'), 'administrator')
-    is_false(device_dict.get('using'))
-    is_not_none(device_dict.get('reverseForwards'))
-    equal(device_dict.get('reverseForwards'), [])
-    is_none(device_dict.get('remoteConnect'))
-    is_none(device_dict.get('remoteConnectUrl'))
+    fake_device_certain_field_check(device_dict)
 
 
-def test_get_device_by_serial_with_wrong_fields(api_client, fake_device_field_check):
-    # get first device's serial:
-    response = get_devices.sync_detailed(client=api_client)
-    equal(response.status_code, 200)
-    is_true(response.parsed.success)
-    is_not_none(response.parsed.devices)
-    greater(len(response.parsed.devices), 0)
-    serial = response.parsed.devices[0].serial
+def test_get_device_by_serial_with_wrong_fields(
+    api_client,
+    fake_device_field_check,
+    successful_response_check,
+    get_first_device_id
+):
+    serial = get_first_device_id(api_client)
 
     response = get_device_by_serial.sync_detailed(
         client=api_client,
         serial=serial,
-        fields='wrong,,,,'
+        fields='wrong,111,!@!$!$, ,'
     )
-    equal(response.status_code, 200)
-    equal(response.parsed.description, 'Device Information')
-    is_true(response.parsed.success)
+    successful_response_check(response, description='Device Information')
     is_not_none(response.parsed.device)
     device_dict = response.parsed.device.to_dict()
     equal(len(device_dict.values()), 1)
