@@ -94,9 +94,6 @@ def test_get_device_by_serial(api_client, fake_device_field_check, successful_re
     serial = get_first_device_id(api_client)
 
     response = get_device_by_serial.sync_detailed(client=api_client, serial=serial)
-    print('')
-    print('!!!ALK!!! - test_get_device_by_serial')
-    print(f'{response.parsed.description}')
     successful_response_check(response, description='Device Information')
     is_not_none(response.parsed.device)
     device_dict = response.parsed.device.to_dict()
