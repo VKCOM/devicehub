@@ -13,7 +13,7 @@ You can watch a presentation about our product at the Heisenbug 2024 conference 
 
 ## How to run
 Run `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` and a local production-like installation of DeviceHub will be launched on your computer on port 8082. See [docker-compose-prod.yaml](./docker-compose-prod.yaml) for more information.
-
+And for MacOS you can use `docker compose -f docker-compose-macos.yaml --env-file scripts/variables.env up`. You also need adb server on host
 Note: some features require direct access to the provider instance from the browser, so if you are running the provider on a different machine - make sure you pass accessible url to the --public-ip or configure location properly
 
 If you also want to add an iOS device see [this document](./doc/ios-device.md)
