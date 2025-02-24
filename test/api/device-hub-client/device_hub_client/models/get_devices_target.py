@@ -7,7 +7,7 @@ class GetDevicesTarget(str, Enum):
     STANDARD = "standard"
     STANDARDIZABLE = "standardizable"
     USER = "user"
-    NONE = None
+    NONE = ' '
 
     def __str__(self) -> str:
         return str(self.value)
