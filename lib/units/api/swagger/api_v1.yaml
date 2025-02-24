@@ -1,16 +1,15 @@
 openapi: 3.0.1
 info:
-  title: Smartphone Test Farm
+  title: Devicehub | Smartphone Test Farm
   description: Control and manages real Smartphone devices from browser and restful
     apis
   contact:
-    name: STF Team
-    url: http://openstf.io/
-    email: contact@openstf.io
+    name: Devicehub Team
+    url: https://github.com/VKCOM/devicehub
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0
-  version: 2.4.3
+  version: 1.3.10
 servers:
 - url: /api/v1
 tags:
@@ -2139,7 +2138,10 @@ paths:
       responses:
         "200":
           description: Add adb key response
-          content: {}
+          content:
+              application/json:
+                  schema:
+                      $ref: '#/components/schemas/AdbKeyAddedResponse'
         default:
           description: Unexpected Error
           content:
@@ -2961,7 +2963,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AutoTestResponse'
+                $ref: '#/components/schemas/GroupResponse'
         default:
           description: |
             Unexpected Error:
@@ -3541,26 +3543,16 @@ components:
           items:
             type: object
             properties: {}
-    AutoTestResponse:
-      required:
-      - description
-      - groups
-      - success
-      type: object
-      properties:
-        success:
-          type: boolean
-        description:
-          type: string
-        group:
-          type: object
-          properties:
-            devices:
-              type: array
-              items:
-                type: object
-                properties: {}
-
+    AdbKeyAddedResponse:
+        required:
+        - success
+        - fingerprint
+        type: object
+        properties:
+            success:
+                type: boolean
+            fingerprint:
+                type: string
     UserListResponse:
       required:
       - description
