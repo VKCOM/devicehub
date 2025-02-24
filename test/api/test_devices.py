@@ -1,8 +1,8 @@
 import pytest
 from pytest_check import equal, is_not_none, is_none
 
-from device_hub_client.api.devices import get_devices, get_device_by_serial
-from device_hub_client.models import GetDevicesTarget
+from devicehub_client.api.devices import get_devices, get_device_by_serial
+from devicehub_client.models import GetDevicesTarget
 
 
 # TODO: add param: GetDevicesTarget.STANDARD, when generator of devices will be ready(add device with standard group)

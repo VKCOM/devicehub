@@ -1,10 +1,9 @@
-import pytest
 from pytest_check import greater, equal, is_not_none, is_not_in
 
-from device_hub_client.api.admin import add_origin_group_devices
-from device_hub_client.api.groups import get_groups, get_group_devices, create_group, delete_group, \
+from devicehub_client.api.admin import add_origin_group_devices
+from devicehub_client.api.groups import get_groups, get_group_devices, create_group, delete_group, \
     add_group_device, add_group_user, add_group_devices, remove_group_device, update_group, remove_group_devices
-from device_hub_client.models import GroupPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState
+from devicehub_client.models import GroupPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState
 
 
 def test_get_groups(api_client, successful_response_check):

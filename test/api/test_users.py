@@ -4,11 +4,11 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pytest_check import equal, greater, is_not_none, is_true, is_none, is_in, is_false, between_equal
 
-from device_hub_client.api.admin import update_users_alert_message, create_user, delete_user, \
+from devicehub_client.api.admin import update_users_alert_message, create_user, delete_user, \
     create_service_user
-from device_hub_client.api.users import get_user_by_email, get_users_alert_message
-from device_hub_client.api.users import get_users
-from device_hub_client.models import AlertMessagePayload, AlertMessagePayloadActivation, \
+from devicehub_client.api.users import get_user_by_email, get_users_alert_message
+from devicehub_client.api.users import get_users
+from devicehub_client.models import AlertMessagePayload, AlertMessagePayloadActivation, \
     AlertMessagePayloadLevel
 
 

@@ -1,2 +1,4 @@
 content_type_overrides:
   application/octet-stream: text/plain
+project_name_override: devicehub_client
+package_name_override: devicehub_client

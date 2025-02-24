@@ -29,7 +29,7 @@ T = TypeVar("T", bound="Device")
 class Device:
     """
     Attributes:
-        serial (str):
+        serial (Union[Unset, str]):
         field_id (Union[Unset, str]):
         present (Union[Unset, bool]):
         presence_changed_at (Union[Unset, datetime.datetime]):
@@ -86,7 +86,7 @@ class Device:
         using (Union[Unset, bool]):
     """
 
-    serial: str
+    serial: Union[Unset, str] = UNSET
     field_id: Union[Unset, str] = UNSET
     present: Union[Unset, bool] = UNSET
     presence_changed_at: Union[Unset, datetime.datetime] = UNSET
@@ -311,11 +311,8 @@ class Device:
 
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "serial": serial,
-            }
-        )
+        if serial is not UNSET:
+            field_dict["serial"] = serial
         if field_id is not UNSET:
             field_dict["_id"] = field_id
         if present is not UNSET:
@@ -443,7 +440,7 @@ class Device:
         from ..models.device_service import DeviceService
 
         d = src_dict.copy()
-        serial = d.pop("serial")
+        serial = d.pop("serial", UNSET)
 
         field_id = d.pop("_id", UNSET)
 
