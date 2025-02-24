@@ -83,7 +83,7 @@
     "globals": "^15.9.0",
     "jsdom": "^25.0.1",
     "msw": "^2.6.0",
-    "orval": "^7.3.0",
+    "orval": "7.3.0",
     "plop": "^4.0.1",
     "postcss": "^8.4.47",
     "postcss-preset-env": "^10.0.7",

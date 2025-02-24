@@ -14,7 +14,7 @@ python = "^3.10"
 pytest = "8.3.3"
 openapi-client = "1.1.7"
 openapi-python-client = "0.21.6"
-smartphone-test-farm-client = {path = "smartphone-test-farm-client", develop=true}
+devicehub-smartphone-test-farm-client = {path = "devichub-smartphone-test-farm-client", develop=true}
 teamcity-messages = "1.32"
 pytest-asyncio = "^0.24.0"
 pytest-check = "^2.4.1"
