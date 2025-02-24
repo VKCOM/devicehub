@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Devicehub | Smartphone Test Farm
+  title: DeviceHub
   description: Control and manages real Smartphone devices from browser and restful
     apis
   contact:

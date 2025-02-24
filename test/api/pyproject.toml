@@ -14,10 +14,11 @@ python = "^3.10"
 pytest = "8.3.3"
 openapi-client = "1.1.7"
 openapi-python-client = "0.21.6"
-devicehub-smartphone-test-farm-client = {path = "devichub-smartphone-test-farm-client", develop=true}
+device-hub_client = {path = "device-hub-client", develop=true}
 teamcity-messages = "1.32"
 pytest-asyncio = "^0.24.0"
 pytest-check = "^2.4.1"
+rust-just = "1.39.0"
 
 [build-system]
 requires = ["poetry-core"]

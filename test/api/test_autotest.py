@@ -1,17 +1,12 @@
-import itertools
-import os
-import time
-
-import pytest
 import asyncio
+import itertools
 import random
 
+import pytest
 from pytest_check import equal, is_, is_not_none, is_none
 
-from smartphone_test_farm_client.api.autotests import capture_devices, free_devices, use_and_connect_device
-from smartphone_test_farm_client.api.user import remote_disconnect_user_device_by_serial, delete_user_device_by_serial
-from smartphone_test_farm_client.models import UseAndConnectDeviceBody
-from smartphone_test_farm_client.types import UNSET
+from device_hub_client.api.autotests import capture_devices, free_devices
+from device_hub_client.types import UNSET
 
 
 def raise_multiple(errors):
@@ -79,10 +74,10 @@ def test_create_connect_delete_autotest_group(api_client, random_str):
     is_(response.parsed.success, True)
     equal(response.parsed.description, 'Added (group devices)')
     is_not_none(response.parsed.group)
-    equal(len(response.parsed.group.devices), devices_amount)
+    equal(len(response.parsed.group.additional_properties['devices']), devices_amount)
     autotests_group_id = response.parsed.group.additional_properties['id']
 
-    for device in response.parsed.group.devices:
+    for device in response.parsed.group.additional_properties['devices']:
         is_(device.additional_properties['present'], True)
         is_none(device.additional_properties['owner'])
         equal(device.additional_properties['status'], 3)

@@ -96,6 +96,25 @@ files = [
 ]
 
 [[package]]
+name = "device-hub-client"
+version = "1.3.10"
+description = "A client library for accessing DeviceHub"
+optional = false
+python-versions = "^3.8"
+groups = ["main"]
+files = []
+develop = true
+
+[package.dependencies]
+attrs = ">=21.3.0"
+httpx = ">=0.20.0,<0.28.0"
+python-dateutil = "^2.8.0"
+
+[package.source]
+type = "directory"
+url = "device-hub-client"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
@@ -742,6 +761,31 @@ files = [
 ]
 
 [[package]]
+name = "rust-just"
+version = "1.39.0"
+description = "🤖 Just a command runner"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "rust_just-1.39.0-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:3845ab10254c994ddebcf489b30c53a24c1d11585c9e0eeaf1cb0da422bee87f"},
+    {file = "rust_just-1.39.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:fd5c12118a8d65266ccdacfbc24bab26f77d509caaf263095cb96611ea6ce7e8"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:428d07b1e798777c4e9a8c245539d72743be095558010f0a86823e1c442930f9"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:135a7a65a8641b00a2fe7f3156a97ab7052e4830a922a71e67ca4e38ccd54cd2"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:94eb45e585fda019f7f9cbac198e10e31f81c704371887cbdec9b7a1ae2e0d29"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:de4a8566ca1eb87b5ff2669a6dd9474b16977c5d712534a5a9c7a950271da2d0"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:4e7ecd8fd862729c243498951caa54d778ff480c2524039280ff3ebb9a64299f"},
+    {file = "rust_just-1.39.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:576229024d2ef8fc696d5a049ecd0d8f3d9b920a32e76f65e95840d24d804101"},
+    {file = "rust_just-1.39.0-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:c1cd9240e2c1b352d7ccc6b89ce84fcc0352f15bb9660cdc6bc34802b36251b6"},
+    {file = "rust_just-1.39.0-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:d6eff0461df7e36eba6e7f0addf16ef98563cf8cb483e4c8393be5456d6af5c6"},
+    {file = "rust_just-1.39.0-py3-none-musllinux_1_2_i686.whl", hash = "sha256:0dfcc49a5fa126ba923b58e48921fd117e429660495577a854494c6ced3134c9"},
+    {file = "rust_just-1.39.0-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:826203ad02c869ad8621993a608adb01394ef9c9c9ca6aa7dd7875b1f272aa46"},
+    {file = "rust_just-1.39.0-py3-none-win32.whl", hash = "sha256:dcef0926b287449e853b878f6f34759a797d017cefb83afbcd74820d37259b78"},
+    {file = "rust_just-1.39.0-py3-none-win_amd64.whl", hash = "sha256:3139f3f76434a8ebbf35b213d149e647c4d9546312b438e262df7ec41e7ef7bc"},
+    {file = "rust_just-1.39.0.tar.gz", hash = "sha256:247d0b293924cc8089a73428c9c03a3c2c0627bb8f205addb976ded0681f0dac"},
+]
+
+[[package]]
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
@@ -764,25 +808,6 @@ files = [
     {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
     {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
-
-[[package]]
-name = "smartphone-test-farm-client"
-version = "2.4.3"
-description = "A client library for accessing Smartphone Test Farm"
-optional = false
-python-versions = "^3.8"
-groups = ["main"]
-files = []
-develop = true
-
-[package.dependencies]
-attrs = ">=21.3.0"
-httpx = ">=0.20.0,<0.28.0"
-python-dateutil = "^2.8.0"
-
-[package.source]
-type = "directory"
-url = "smartphone-test-farm-client"
 
 [[package]]
 name = "sniffio"
@@ -902,4 +927,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "d7316b9ed26e10736225840c6dad9e9513f0f60a1357d4cb883233904ee2ab9f"
+content-hash = "492e873c80a247cd9da2547ab322e7e6750b3cb6a34fe55fec885ccb368a27a3"
