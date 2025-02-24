@@ -78,15 +78,15 @@ def test_create_connect_delete_autotest_group(api_client, random_str):
     autotests_group_id = response.parsed.group.additional_properties['id']
 
     for device in response.parsed.group.additional_properties['devices']:
-        is_(device.additional_properties['present'], True)
-        is_none(device.additional_properties['owner'])
-        equal(device.additional_properties['status'], 3)
-        is_(device.additional_properties['ready'], True)
-        is_(device.additional_properties['remoteConnect'], False)
-        is_not_none(device.additional_properties['group'])
-        equal(device.additional_properties['group']['id'], autotests_group_id)
-        equal(device.additional_properties['group']['name'], autotests_group_name)
-        equal(device.additional_properties['abi'], device_abi)
+        is_(device['present'], True)
+        is_none(device['owner'])
+        equal(device['status'], 3)
+        is_(device['ready'], True)
+        is_(device['remoteConnect'], False)
+        is_not_none(device['group'])
+        equal(device['group']['id'], autotests_group_id)
+        equal(device['group']['name'], autotests_group_name)
+        equal(device['abi'], device_abi)
 
     # remove autotests group
     response = free_devices.sync_detailed(client=api_client, group=autotests_group_id)
