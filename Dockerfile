@@ -67,7 +67,7 @@ RUN set -x && \
     cd ui && \
     npm ci && \
     npx tsc -b && \
-    npx vite build --mode staging
+    npx vite build
 
 # Switch to the app user.
 USER stf
