@@ -19,7 +19,7 @@ RUN useradd --system \
       stf-build && \
     apt-get update && \
     apt-get upgrade -yq && \
-    apt-get -y install wget python3 build-essential ca-certificates libzmq3-dev libprotobuf-dev git graphicsmagick openjdk-11-jdk yasm curl nano iputils-ping && \
+    apt-get -y install htop wget python3 build-essential ca-certificates libzmq3-dev libprotobuf-dev git graphicsmagick openjdk-11-jdk yasm curl nano iputils-ping && \
     apt-get clean && \
     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
