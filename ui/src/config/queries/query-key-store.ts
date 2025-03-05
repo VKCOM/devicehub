@@ -15,6 +15,7 @@ import {
   getShellDevices,
   getSettingsUsers,
 } from '@/api/openstf-api'
+import { getAuthUrl } from '@/api/auth'
 
 import type { GroupDevice } from '@/types/group-device.type'
 import type { ParamsWithoutFields } from '@/api/openstf-api/types'
@@ -87,6 +88,10 @@ export const queries = createQueryKeyStore({
     contact: {
       queryKey: null,
       queryFn: () => getAuthContact(),
+    },
+    url: {
+      queryKey: null,
+      queryFn: () => getAuthUrl(),
     },
   },
   s: {

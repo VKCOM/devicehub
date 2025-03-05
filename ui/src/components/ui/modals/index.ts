@@ -1,2 +1,5 @@
 export { ErrorModal } from './error-modal'
 export { WarningModal } from './warning-modal'
+export { SaveLogsModal } from './save-logs-modal'
+export { CreateUserModal } from './create-user-modal'
+export { UpdateGroupQuotaModal } from './update-group-quota-modal'

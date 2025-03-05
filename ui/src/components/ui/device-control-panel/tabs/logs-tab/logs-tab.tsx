@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { useInjection } from 'inversify-react'
 import { Button, Card, Div, Flex, Input } from '@vkontakte/vkui'
 
+import { SaveLogsModal } from '@/components/ui/modals'
 import { ConditionalRender } from '@/components/lib/conditional-render'
-import { SaveLogsModal } from '@/components/ui/modals/save-logs-modal'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { logsTableState } from '@/store/logs-table-state'

@@ -15,3 +15,7 @@ export const getSettingsUsersRoute = () => '/settings/users' as const
 export const getSettingsShellRoute = () => '/settings/shell' as const
 
 export const getGroupsRoute = () => '/groups' as const
+
+export const getAuthRoute = () => '/auth' as const
+export const getMockAuthRoute = () => '/auth/mock' as const
+export const getLdapAuthRoute = () => '/auth/ldap' as const

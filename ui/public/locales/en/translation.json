@@ -219,7 +219,6 @@
   "Shell": "Shell",
   "Show Screen": "Show Screen",
   "Sign In": "Sign In",
-  "Sign Out": "Sign Out",
   "Silent Mode": "Silent Mode",
   "Size": "Size",
   "Socket connection was lost": "Socket connection was lost",
@@ -445,5 +444,9 @@
   "Write an email to the user selection": "Write an email to the user selection",
   "Really grant access to user": "Really grant access to user?",
   "Really revoke access of this user": "Really revoke access of this user?",
-  "User group quota": "User group quota"
+  "User group quota": "User group quota",
+  "Log In": "Log In",
+  "Contact Support": "Contact Support",
+  "Logout": "Logout",
+  "You are authenticated via an automatic login method": "You are authenticated via an automatic login method"
 }

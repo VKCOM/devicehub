@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import { inject, injectable } from 'inversify'
 
 import { socket } from '@/api/socket'
@@ -62,17 +62,19 @@ export class SettingsService {
     const { settings } = await this.currentUserProfileStore.fetch()
     const alertMessage = await this.alertMessageQuery.fetch()
 
-    if (settings?.dateFormat) {
-      this.dateFormat = settings.dateFormat
-    }
+    runInAction(() => {
+      if (settings?.dateFormat) {
+        this.dateFormat = settings.dateFormat
+      }
 
-    if (settings?.emailAddressSeparator) {
-      this.emailSeparator = settings.emailAddressSeparator
-    }
+      if (settings?.emailAddressSeparator) {
+        this.emailSeparator = settings.emailAddressSeparator
+      }
 
-    if (alertMessage) {
-      this.alertMessage = { ...this.alertMessage, ...alertMessage }
-    }
+      if (alertMessage) {
+        this.alertMessage = { ...this.alertMessage, ...alertMessage }
+      }
+    })
   }
 
   addUserSettingsUpdateListeners(): void {

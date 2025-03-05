@@ -1,5 +1,6 @@
 import { Navigate, Route, createHashRouter, createRoutesFromElements } from 'react-router'
 
+import { AuthPage } from '@/components/views/auth-page'
 import { GroupsPage } from '@/components/views/groups-page'
 import { DevicesPage } from '@/components/views/devices-page'
 import { ControlPage } from '@/components/views/control-page'
@@ -12,6 +13,9 @@ import {
   getControlRoute,
   getDevicesRoute,
   getSettingsRoute,
+  getMockAuthRoute,
+  getLdapAuthRoute,
+  getAuthRoute,
 } from '@/constants/route-paths'
 
 import { ErrorBoundaryElement } from './error-boundary-element'
@@ -19,6 +23,10 @@ import { ErrorBoundaryElement } from './error-boundary-element'
 export const appRouter = createHashRouter(
   createRoutesFromElements(
     <Route element={<ErrorBoundaryElement />}>
+      <Route element={<AuthPage />} path={getAuthRoute()} />
+      <Route element={<AuthPage />} path={getMockAuthRoute()} />
+      <Route element={<AuthPage />} path={getLdapAuthRoute()} />
+      {/* <Route element={<RequireAuth />}> */}
       <Route element={<MainLayout />}>
         <Route element={<ErrorBoundaryElement />}>
           <Route element={<DevicesPage />} path={getMainRoute()} />
@@ -39,6 +47,7 @@ export const appRouter = createHashRouter(
           <Route element={<GroupsPage />} path={getGroupsRoute()} />
           <Route element={<Navigate to={getDevicesRoute()} replace />} path='*' />
         </Route>
+        {/* </Route> */}
       </Route>
     </Route>
   )

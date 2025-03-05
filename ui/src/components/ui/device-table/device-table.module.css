@@ -21,7 +21,7 @@
   }
 
   tr:not(:last-of-type) {
-    box-shadow: 0 1px 0 var(--light-gray);
+    box-shadow: 0 1px 0 var(--vkui--color_field_border_alpha);
   }
 
   td {

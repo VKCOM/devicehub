@@ -191,7 +191,6 @@
   "Settings": "設定",
   "Show Screen": "顯示畫面",
   "Sign In": "登入",
-  "Sign Out": "登出",
   "Silent Mode": "靜音模式",
   "SIM": "SIM",
   "Size": "尺寸",
@@ -429,5 +428,9 @@
   "Write an email to the user selection": "將電子郵件寫給用戶選擇",
   "Really grant access to user": "真正授予對用戶的訪問權限",
   "Really revoke access of this user": "真正撤銷了此用戶的訪問權限",
-  "User group quota": "用戶組配額"
+  "User group quota": "用戶組配額",
+  "Log In": "登入",
+  "Contact Support": "聯繫支持",
+  "Logout": "註銷",
+  "You are authenticated via an automatic login method": "您通過自動登錄方法對您進行身份驗證"
 }

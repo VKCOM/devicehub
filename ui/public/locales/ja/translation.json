@@ -248,7 +248,6 @@
   "Shell": "シェル",
   "Show Screen": "画面を表示する",
   "Sign In": "サインイン",
-  "Sign Out": "サインアウト",
   "Silent Mode": "マナーモード",
   "SIM": "SIM",
   "Size": "サイズ",
@@ -459,5 +458,9 @@
   "Write an email to the user selection": "ユーザーの選択にメールを書きます",
   "Really grant access to user": "本当にユーザーへのアクセスを許可します",
   "Really revoke access of this user": "このユーザーのアクセスを本当に取り消します",
-  "User group quota": "ユーザーグループクォータ"
+  "User group quota": "ユーザーグループクォータ",
+  "Log In": "ログイン",
+  "Contact Support": "お問い合わせサポート",
+  "Logout": "ログアウト",
+  "You are authenticated via an automatic login method": "自動ログインメソッドを介して認証されます"
 }

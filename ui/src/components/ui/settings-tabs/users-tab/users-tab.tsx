@@ -8,14 +8,13 @@ import { Icon16MailOutline, Icon20FilterOutline, Icon20GearOutline, Icon20UserOu
 import { ListHeader } from '@/components/lib/list-header'
 import { ConditionalRender } from '@/components/lib/conditional-render'
 import { YesNoAnyRadioGroup } from '@/components/lib/yes-no-any-radio-group'
+import { CreateUserModal, UpdateGroupQuotaModal } from '@/components/ui/modals'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { useRemoveUsers } from '@/lib/hooks/use-remove-users.hook'
 import { useUpdateDefaultUserGroupsQuota } from '@/lib/hooks/use-update-default-user-groups-quota.hook'
 
 import { UserList } from './user-list'
-import { CreateUserModal } from './create-user-modal'
-import { UpdateGroupQuotaModal } from './update-group-quota-modal'
 
 import styles from './users-tab.module.css'
 

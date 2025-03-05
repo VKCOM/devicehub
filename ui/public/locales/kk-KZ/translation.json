@@ -222,7 +222,6 @@
   "Change to low quality": "Орнықтыруды төменгі сапалыға ауыстыру",
   "Change to high quality": "Орнықтыруды жоғары сапалыға ауыстыру",
   "Sign In": "Кіру",
-  "Sign Out": "Шығу",
   "Silent Mode": "Тиін режимі",
   "Size": "Өлшем",
   "Socket connection was lost": "Сокеттік қосылу жоғалтылды",
@@ -297,7 +296,7 @@
   "Yes": "Иә",
   "You (or someone else) kicked the device": "Сіз (немесе кім біреу) құрылғыны шығардыңыз",
   "DeviceHub Support": "Құрылғы фермасын қолдау",
-  "Logout": "Шығу",
+  "Logout": "Кіру",
   "Log In": "Кіру",
   "Empty": "Бос",
   "Booked before": "Бұрын брондалған",
@@ -453,5 +452,7 @@
   "Write an email to the user selection": "Пайдаланушыны таңдау үшін электрондық поштаны жазыңыз",
   "Really grant access to user": "Пайдаланушыға шынымен рұқсат беру?",
   "Really revoke access of this user": "Бұл пайдаланушының кіруіне шынымен де қайтарып алыңыз?",
-  "User group quota": "Пайдаланушы тобының квотасы"
+  "User group quota": "Пайдаланушы тобының квотасы",
+  "Contact Support": "Байланыс қолдауы",
+  "You are authenticated via an automatic login method": "Автоматты кіру әдісі арқылы аутентификацияланасыз"
 }

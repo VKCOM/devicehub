@@ -222,7 +222,6 @@
   "Change to low quality": "Переключить на низкое качество",
   "Change to high quality": "Переключить на высокое качество",
   "Sign In": "Войти",
-  "Sign Out": "Выйти",
   "Silent Mode": "Тихий режим",
   "Size": "Размер",
   "Socket connection was lost": "Подключение потеряно",
@@ -297,7 +296,7 @@
   "Yes": "Да",
   "You (or someone else) kicked the device": "Вы (или кто-то еще) отключили устройство",
   "DeviceHub Support": "Поддержка фермы",
-  "Logout": "Выйти из аккаунта",
+  "Logout": "Выход",
   "Log In": "Войти",
   "Empty": "Пусто",
   "Something went wrong": "Что-то пошло не так",
@@ -453,5 +452,7 @@
   "Write an email to the user selection": "Напишите электронное письмо на выбор пользователя",
   "Really grant access to user": "Действительно предоставит доступ пользователю?",
   "Really revoke access of this user": "Действительно отмените доступ этого пользователя?",
-  "User group quota": "Квота группы пользователей"
+  "User group quota": "Квота группы пользователей",
+  "Contact Support": "Контактная поддержка",
+  "You are authenticated via an automatic login method": "Вы авторизованы через способ, когда вход происходит автоматически"
 }

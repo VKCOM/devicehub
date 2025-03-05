@@ -90,9 +90,7 @@ export const ListItem = observer(
           isOpen={isConfirmationOpen}
           title={t('Warning')}
           onClose={() => setIsConfirmationOpen(false)}
-          onOk={async () => {
-            onRemove?.()
-          }}
+          onOk={async () => onRemove?.()}
         />
       </div>
     )

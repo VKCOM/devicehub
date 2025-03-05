@@ -6,15 +6,13 @@ import { Button, ButtonGroup } from '@vkontakte/vkui'
 import { Icon20GearOutline, Icon24CancelCircleOutline, Icon24CrownOutline } from '@vkontakte/icons'
 
 import { ListItem } from '@/components/lib/list-item'
-import { WarningModal } from '@/components/ui/modals'
+import { WarningModal, UpdateGroupQuotaModal } from '@/components/ui/modals'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { useRemoveUser } from '@/lib/hooks/use-remove-user.hook'
 import { useGrantAdmin } from '@/lib/hooks/use-grant-admin.hook'
 import { useRevokeAdmin } from '@/lib/hooks/use-revoke-admin.hook'
 import { useUpdateUserGroupQuota } from '@/lib/hooks/use-update-user-group-quota.hook'
-
-import { UpdateGroupQuotaModal } from '../update-group-quota-modal'
 
 import type { DeleteUsersParams } from '@/generated/types'
 import type { SettingsUser } from '@/types/settings-user.type'

@@ -255,7 +255,6 @@
   "Shell": "Shell脚本",
   "Show Screen": "显示屏幕",
   "Sign In": "登录",
-  "Sign Out": "注销",
   "Silent Mode": "静音模式",
   "SIM": "SIM",
   "Size": "大小",
@@ -496,5 +495,9 @@
   "Write an email to the user selection": "将电子邮件写给用户选择",
   "Really grant access to user": "真正授予对用户的访问权限",
   "Really revoke access of this user": "真正撤销了此用户的访问权限",
-  "User group quota": "用户组配额"
+  "User group quota": "用户组配额",
+  "Log In": "登录",
+  "Contact Support": "联系支持",
+  "Logout": "注销",
+  "You are authenticated via an automatic login method": "您通过自动登录方法对您进行身份验证"
 }

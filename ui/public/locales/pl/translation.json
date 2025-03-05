@@ -381,5 +381,9 @@
   "Write an email to the user selection": "Napisz wiadomość e -mail do wyboru użytkownika",
   "Really grant access to user": "Naprawdę przyznać dostęp do użytkownika?",
   "Really revoke access of this user": "Naprawdę odwołać dostęp do tego użytkownika?",
-  "User group quota": "Kwota grupy użytkowników"
+  "User group quota": "Kwota grupy użytkowników",
+  "Log In": "Zaloguj się",
+  "Contact Support": "Kontakt z obsługą",
+  "Logout": "Logout",
+  "You are authenticated via an automatic login method": "Jesteś uwierzytelniony za pomocą automatycznej metody logowania"
 }

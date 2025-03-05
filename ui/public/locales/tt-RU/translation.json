@@ -222,7 +222,6 @@
   "Change to low quality": "Биклек качествогә өйрәнү",
   "Change to high quality": "Юҡа качествогә өйрәнү",
   "Sign In": "Киреһеҙ",
-  "Sign Out": "Кире алырға",
   "Silent Mode": "Тихий режим",
   "Size": "Өлчәм",
   "Socket connection was lost": "Соккет бүленеүе",
@@ -297,7 +296,7 @@
   "Yes": "Әйе",
   "You (or someone else) kicked the device": "Сез (яки тагын берәрсе) җайланманы сүндердегез",
   "Devicehub Support": "фермага ярдәм",
-  "Logout": "аккаунттан чыгарга",
+  "Logout": "чыгарга",
   "Log In": "Керергә",
   "Empty": "Буш",
   "Booked before": "Элегрәк броньланган",
@@ -453,5 +452,7 @@
   "Write an email to the user selection": "Кулланучының сайлау өчен электрон почта языгыз",
   "Really grant access to user": "Кулланучыга чыннан да рөхсәт бирегез?",
   "Really revoke access of this user": "Бу кулланучыга чыннан да кире кайтыгыз?",
-  "User group quota": "Кулланучының квотасы"
+  "User group quota": "Кулланучының квотасы",
+  "Contact Support": "Контакт ярдәме",
+  "You are authenticated via an automatic login method": "Сез Системага керүнең автоматик ысулы ярдәмендә аутентификация узасыз"
 }

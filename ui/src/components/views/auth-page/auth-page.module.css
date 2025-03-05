@@ -1,0 +1,27 @@
+.authPage {
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%; */
+
+  height: 100%;
+  padding: 15px;
+  background: var(--vkui--color_background_content);
+}
+
+.form {
+  min-width: 250px;
+  max-width: 450px;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.logo {
+  display: block;
+  margin: 40px auto;
+}
+
+.contactButton {
+  display: block;
+  margin: 0 auto;
+}

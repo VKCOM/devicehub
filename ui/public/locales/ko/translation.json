@@ -244,7 +244,6 @@
   "Shell": "셸",
   "Show Screen": "화면 표시",
   "Sign In": "로그인",
-  "Sign Out": "로그아웃",
   "Silent Mode": "음소거",
   "SIM": "SIM",
   "Size": "크기",
@@ -471,5 +470,9 @@
   "Write an email to the user selection": "사용자 선택에 이메일을 작성하십시오",
   "Really grant access to user": "실제로 사용자에게 액세스 권한을 부여하십시오",
   "Really revoke access of this user": "이 사용자의 액세스를 실제로 취소하십시오",
-  "User group quota": "사용자 그룹 할당량"
+  "User group quota": "사용자 그룹 할당량",
+  "Log In": "로그인하십시오",
+  "Contact Support": "연락처 지원",
+  "Logout": "로그 아웃",
+  "You are authenticated via an automatic login method": "자동 로그인 방법을 통해 인증됩니다"
 }

@@ -62,9 +62,7 @@ export const DeviceTopBar = observer(() => {
           disabled={!deviceScreenStore.isScreenRotated}
           mode='tertiary'
           title={`${t('Portrait')} (${currentRotation})`}
-          onClick={() => {
-            deviceControlStore.tryToRotate('portrait')
-          }}
+          onClick={() => deviceControlStore.tryToRotate('portrait')}
         />
         <Button
           appearance='neutral'
@@ -74,9 +72,7 @@ export const DeviceTopBar = observer(() => {
           disabled={deviceScreenStore.isScreenRotated}
           mode='tertiary'
           title={`${t('Landscape')} (${currentRotation})`}
-          onClick={() => {
-            deviceControlStore.tryToRotate('landscape')
-          }}
+          onClick={() => deviceControlStore.tryToRotate('landscape')}
         />
         <ConditionalRender conditions={[!device?.ios]}>
           <ScreenQualitySelector />
@@ -88,18 +84,14 @@ export const DeviceTopBar = observer(() => {
           className={styles.topButton}
           mode='tertiary'
           title={t('Stop Using')}
-          onClick={() => {
-            setIsConfirmationOpen(true)
-          }}
+          onClick={() => setIsConfirmationOpen(true)}
         />
       </ButtonGroup>
       <WarningModal
         description={t('Are you sure? Device will be cleaned')}
         isOpen={isConfirmationOpen}
         title={t('Warning')}
-        onClose={() => {
-          setIsConfirmationOpen(false)
-        }}
+        onClose={() => setIsConfirmationOpen(false)}
         onOk={async () => {
           if (!device?.channel) return
 

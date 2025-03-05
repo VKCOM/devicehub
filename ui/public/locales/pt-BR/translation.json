@@ -257,7 +257,6 @@
   "Shell": "Shell",
   "Show Screen": "Mostrar Tela",
   "Sign In": "Entrar",
-  "Sign Out": "Sair",
   "Silent Mode": "Modo Silencioso",
   "Size": "Tamanho",
   "Socket connection was lost": "Conexão Socket foi perdida",
@@ -501,5 +500,9 @@
   "Write an email to the user selection": "Escreva um email para a seleção do usuário",
   "Really grant access to user": "Realmente conceda acesso ao usuário?",
   "Really revoke access of this user": "Realmente revoga o acesso deste usuário?",
-  "User group quota": "Cota do grupo de usuários"
+  "User group quota": "Cota do grupo de usuários",
+  "Log In": "Conecte-se",
+  "Contact Support": "Suporte de contato",
+  "Logout": "Logout",
+  "You are authenticated via an automatic login method": "Você é autenticado por meio de um método de login automático"
 }
