@@ -1,43 +1,33 @@
 services:
-  mongo1:
-    image: mongo:6.0.10
-    hostname: mongo1
-    container_name: mongo1
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
-    networks:
-      default:
-        ipv4_address: 10.211.0.2
-  mongo2:
-    image: mongo:6.0.10
-    hostname: mongo2
-    container_name: mongo2
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
-    networks:
-      default:
-        ipv4_address: 10.211.0.3
-  mongo3:
-    image: mongo:6.0.10
-    hostname: mongo3
-    container_name: mongo3
-    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip_all"]
-    networks:
-      default:
-        ipv4_address: 10.211.0.4
-  mongosetup:
-    image: mongo:6.0.10
-    depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
-    volumes:
-      - ./scripts/mongo_setup.sh:/scripts/mongo_setup.sh
-    restart: "no"
-    entrypoint: ["bash", "/scripts/mongo_setup.sh"]
+    devicehub-mongo:
+        image: mongo:7.0
+        hostname: devicehub-mongo
+        container_name: devicehub-mongo
+        ports:
+            - 27017:27017
+        entrypoint: ["mongod", "--replSet", "devicehub-rs", "--bind_ip_all"]
+        healthcheck:
+            test: echo "rs.status()" | mongosh --port 27017 --quiet
+            interval: 5s
+            timeout: 30s
+            start_period: 0s
+            start_interval: 1s
+            retries: 30
+        networks:
+            - devicehub
+    devicehub-mongosetup:
+        image: mongo:7.0
+        container_name: devicehub-mongosetup
+        depends_on:
+            devicehub-mongo:
+                condition: service_healthy
+        volumes:
+            - ./scripts/mongo_setup.sh:/scripts/mongo_setup.sh
+        restart: "no"
+        entrypoint: ["bash", "/scripts/mongo_setup.sh"]
+        networks:
+            devicehub:
+
 networks:
-  default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.211.0.0/16
-          gateway: 10.211.0.1
+    devicehub:
+        driver: bridge

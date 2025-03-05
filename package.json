@@ -36,6 +36,7 @@
     "@devicefarmer/stf-syrup": "1.0.2",
     "@devicefarmer/stf-wiki": "1.0.0",
     "@irdk/adbkit": "^4.1.19",
+    "@irdk/usbmux": "^0.2.2",
     "@julusian/jpeg-turbo": "2.1.0",
     "@sentry/node": "^8.34.0",
     "angular": "1.8.3",
@@ -143,6 +144,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.13.0",
+    "@types/bluebird": "^3.5.42",
     "angular-mocks": "1.8.3",
     "async": "2.6.4",
     "chai": "3.5.0",
