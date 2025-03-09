@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import { DisplayTitle } from '@vkontakte/vkui'
+import { DisplayTitle, useColorScheme } from '@vkontakte/vkui'
 
 import styles from './marquee.module.css'
 
@@ -17,13 +17,17 @@ type MarqueeProps = {
   variant: MarqueeVariant
 }
 
-export const Marquee = ({ children, variant }: MarqueeProps) => (
-  <div className={cn(styles.marquee, MARQUEE_COLOR_MAP[variant])}>
-    <DisplayTitle className={styles.text} level='3'>
-      {children}
-    </DisplayTitle>
-    <DisplayTitle className={styles.text} level='3'>
-      {children}
-    </DisplayTitle>
-  </div>
-)
+export const Marquee = ({ children, variant }: MarqueeProps) => {
+  const colorScheme = useColorScheme()
+
+  return (
+    <div className={cn(styles.marquee, MARQUEE_COLOR_MAP[variant])}>
+      <DisplayTitle className={cn(styles.text, { [styles.lightColor]: colorScheme === 'light' })} level='3'>
+        {children}
+      </DisplayTitle>
+      <DisplayTitle className={cn(styles.text, { [styles.lightColor]: colorScheme === 'light' })} level='3'>
+        {children}
+      </DisplayTitle>
+    </div>
+  )
+}

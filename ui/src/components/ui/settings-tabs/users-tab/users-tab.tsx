@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useInjection } from 'inversify-react'
-import { Button, FormItem, FormLayoutGroup, Separator, Spacing, Tooltip } from '@vkontakte/vkui'
+import { Button, FormItem, FormLayoutGroup, Separator, Spacing, Tooltip, useColorScheme } from '@vkontakte/vkui'
 import { Icon16MailOutline, Icon20FilterOutline, Icon20GearOutline, Icon20UserOutline } from '@vkontakte/icons'
 
 import { ListHeader } from '@/components/lib/list-header'
@@ -22,6 +22,7 @@ import type { DeleteUsersParams } from '@/generated/types'
 
 export const UsersTab = observer(() => {
   const { t } = useTranslation()
+  const colorScheme = useColorScheme()
   const { mutate: removeUsers } = useRemoveUsers()
   const { mutate: updateDefaultQuota } = useUpdateDefaultUserGroupsQuota()
   const [isUpdateQuotaModalOpen, setIsUpdateQuotaModalOpen] = useState(false)
@@ -96,7 +97,7 @@ export const UsersTab = observer(() => {
           <Tooltip appearance='accent' description={t('Set groups quota for new users')}>
             <Button
               activated={isUpdateQuotaModalOpen}
-              before={<Icon20GearOutline />}
+              before={<Icon20GearOutline color={colorScheme === 'light' ? '#000' : '#fff'} />}
               mode='tertiary'
               size='s'
               onClick={() => setIsUpdateQuotaModalOpen(true)}

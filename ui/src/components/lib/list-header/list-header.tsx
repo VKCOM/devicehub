@@ -185,7 +185,13 @@ export const ListHeader = observer(
             {Array(5)
               .fill({})
               .map((_, index) => (
-                <Skeleton key={index} height={skeletonHeight} width='100%' />
+                <Skeleton
+                  key={index}
+                  colorFrom='var(--vkui--color_background_tertiary_alpha)'
+                  colorTo='var(--vkui--color_skeleton_to)'
+                  height={skeletonHeight}
+                  width='100%'
+                />
               ))}
           </Flex>
         </ConditionalRender>

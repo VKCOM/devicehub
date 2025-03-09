@@ -23,11 +23,11 @@
     z-index: 1;
     top: 0;
 
-    background-color: var(--vkui--color_background_tertiary);
+    background-color: var(--vkui--color_background_accent_themed_alpha);
   }
 
   tr:not(:last-of-type) {
-    box-shadow: 0 1px 0 var(--table-row-separator-color);
+    box-shadow: 0 1px 0 var(--vkui--color_field_border_alpha);
   }
 
   td {
