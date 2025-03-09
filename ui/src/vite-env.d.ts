@@ -43,6 +43,14 @@ declare global {
   interface WorkerNavigator {
     readonly connection?: NetworkInformation
   }
+
+  interface Element {
+    _save_scroll?: number
+  }
+
+  interface Window {
+    _save_scroll?: number
+  }
 }
 
 // http://wicg.github.io/netinfo/#connection-types

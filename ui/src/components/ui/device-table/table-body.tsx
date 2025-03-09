@@ -20,7 +20,7 @@ export const TableBody = ({ rows }: TableBodyProps) => {
   const virtualizer = useWindowVirtualizer({
     count: rows.length,
     estimateSize: () => ROW_HEIGHT,
-    overscan: 7,
+    overscan: 5,
     scrollMargin: 0,
   })
 
@@ -42,7 +42,14 @@ export const TableBody = ({ rows }: TableBodyProps) => {
             }}
           >
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+              <td
+                key={cell.id}
+                style={{
+                  width: `${cell.column.getSize()}px`,
+                }}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
             ))}
           </tr>
         )

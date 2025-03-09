@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button, FormItem, FormLayoutGroup, Popover, Textarea } from '@vkontakte/vkui'
+import { Button, EllipsisText, FormItem, FormLayoutGroup, Popover, Textarea } from '@vkontakte/vkui'
 import { Icon16PenOutline } from '@vkontakte/icons'
 
 import { socket } from '@/api/socket'
@@ -44,8 +44,8 @@ export const NotesCell = memo(({ notes, serial }: NotesCellProps) => {
         </FormLayoutGroup>
       )}
     >
-      <Button after={<Icon16PenOutline />} id='notes-dialog' mode='link' size='m'>
-        {notes ? notes : t('Empty')}
+      <Button after={<Icon16PenOutline />} align='left' id='notes-dialog' mode='link' size='m'>
+        {notes ? <EllipsisText maxLines={3}>{notes}</EllipsisText> : t('Empty')}
       </Button>
     </Popover>
   )

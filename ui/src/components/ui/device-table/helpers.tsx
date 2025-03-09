@@ -57,12 +57,14 @@ export const textColumnDef = ({
   columnId,
   columnName,
   columnGroup,
+  size,
   filterFn = startsWithFilter,
   sortingFn = 'basic',
 }: {
   columnId: DeviceTableColumnIds
   columnName: string
   columnGroup: ColumnGroup
+  size?: number
   filterFn?: FilterFnOption<ListDevice>
   sortingFn?: SortingFnOption<ListDevice>
 }): DisplayColumnDef<ListDevice, string> => ({
@@ -72,6 +74,7 @@ export const textColumnDef = ({
     columnName,
     columnGroup,
   },
+  size,
   filterFn,
   sortingFn,
   cell: ({ getValue }) => <TextCell textValue={getValue()} />,

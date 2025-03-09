@@ -9,9 +9,5 @@ type BookedBeforeCellProps = {
 export const BookedBeforeCell = memo(({ formattedDate }: BookedBeforeCellProps) => {
   const { t } = useTranslation()
 
-  return (
-    <EllipsisText maxLines={3} maxWidth={200}>
-      {formattedDate ? formattedDate : t('Not booked')}
-    </EllipsisText>
-  )
+  return <EllipsisText maxLines={3}>{formattedDate ? formattedDate : t('Not booked')}</EllipsisText>
 })

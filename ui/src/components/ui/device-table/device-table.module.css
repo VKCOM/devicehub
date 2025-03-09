@@ -4,9 +4,9 @@
 }
 
 .table {
-  table-layout: auto;
+  table-layout: fixed;
   border-collapse: collapse;
-  width: 100%;
+  width: min-content;
 
   th {
     cursor: pointer;

@@ -1,4 +1,4 @@
-export { BrowserCell } from './browser-cell/browser-cell'
+export { BrowserCell } from './browser-cell'
 export { ModelCell } from './model-cell/model-cell'
 export { TextCell } from './text-cell/text-cell'
 export { BookedBeforeCell } from './booked-before-cell'

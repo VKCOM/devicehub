@@ -1,8 +1,10 @@
 import { Link } from 'react-router'
-import { Button } from '@vkontakte/vkui'
+import { Button, EllipsisText } from '@vkontakte/vkui'
 import { memo } from 'react'
 
 import { getControlRoute } from '@/constants/route-paths'
+
+import { CellWithEmptyValue } from './cell-with-empty-value'
 
 import type { ListDevice } from '@/types/list-device.type'
 
@@ -13,13 +15,11 @@ type ProductCellProps = {
 }
 
 export const ProductCell = memo(({ product, serial, isDisabled = false }: ProductCellProps) => (
-  <>
-    {serial && (
-      <Link to={getControlRoute(serial)}>
-        <Button disabled={isDisabled} mode='link' size='m'>
-          {product}
-        </Button>
-      </Link>
-    )}
-  </>
+  <CellWithEmptyValue value={product}>
+    <Link to={getControlRoute(serial)}>
+      <Button align='left' disabled={isDisabled} mode='link' size='m'>
+        <EllipsisText maxLines={3}>{product}</EllipsisText>
+      </Button>
+    </Link>
+  </CellWithEmptyValue>
 ))

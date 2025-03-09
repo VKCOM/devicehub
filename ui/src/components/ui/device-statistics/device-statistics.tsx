@@ -20,11 +20,13 @@ export const DeviceStatistics = observer(() => {
     <Flex align='center' justify='space-between'>
       <StatisticCard
         className={styles.deviceStatistics}
+        color='var(--vkui--color_accent_azure)'
         icon={StatisticCardIcon.DEVICES_OUTLINE}
         text={t('Total Devices').toUpperCase()}
         value={deviceListStore.totalNumberDevices}
       />
       <StatisticCard
+        appearance='accent-green'
         className={styles.deviceStatistics}
         icon={StatisticCardIcon.CHECK_CIRCLE_DEVICE_OUTLINE}
         text={t('Usable Devices').toUpperCase()}
@@ -32,11 +34,13 @@ export const DeviceStatistics = observer(() => {
       />
       <StatisticCard
         className={styles.deviceStatistics}
+        color='var(--vkui--color_accent_orange)'
         icon={StatisticCardIcon.USERS_OUTLINE}
         text={t('Busy Devices').toUpperCase()}
         value={deviceListStore.busyDevicesCount}
       />
       <StatisticCard
+        appearance='neutral'
         className={styles.deviceStatistics}
         icon={StatisticCardIcon.USER_CIRCLE_OUTLINE}
         text={profileQueryResult.data?.name?.toUpperCase()}

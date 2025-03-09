@@ -13,6 +13,7 @@ import {
 } from '@tanstack/react-table'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
+import { TableWithStickyHeader } from '@/components/lib/table-with-sticky-header'
 
 import { resolveTableFilterValue } from '@/lib/utils/resolve-table-filter-value.util'
 import { deviceTableState } from '@/store/device-table-state'
@@ -101,42 +102,47 @@ export const DeviceTable = observer(({ data, isSuccess, isLoading, isError }: De
 
   return (
     <div className={styles.tableWrapper}>
-      <div style={{ height: `${rows.length * ROW_HEIGHT + ROW_HEIGHT}px` }}>
-        <table className={styles.table}>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    role='button'
-                    className={cn({
-                      [styles.asc]: header.column.getIsSorted() === 'asc',
-                      [styles.desc]: header.column.getIsSorted() === 'desc',
-                      [styles.activeSort]: header.column.getIsSorted(),
-                    })}
-                    title={
-                      header.column.getCanSort()
-                        ? header.column.getNextSortingOrder() === 'asc'
-                          ? 'Sort ascending'
-                          : header.column.getNextSortingOrder() === 'desc'
-                            ? 'Sort descending'
-                            : 'Clear sort'
-                        : undefined
-                    }
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <ConditionalRender conditions={[(isSuccess || isLoading) && rows.length > 0]}>
-            <TableBody rows={rows} />
-          </ConditionalRender>
-        </table>
-      </div>
+      <TableWithStickyHeader
+        className={styles.table}
+        offsetTop={45}
+        tableHeight={`${rows.length * ROW_HEIGHT + ROW_HEIGHT}px`}
+      >
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  role='button'
+                  className={cn({
+                    [styles.asc]: header.column.getIsSorted() === 'asc',
+                    [styles.desc]: header.column.getIsSorted() === 'desc',
+                    [styles.activeSort]: header.column.getIsSorted(),
+                  })}
+                  style={{
+                    width: `${header.column.getSize()}px`,
+                  }}
+                  title={
+                    header.column.getCanSort()
+                      ? header.column.getNextSortingOrder() === 'asc'
+                        ? 'Sort ascending'
+                        : header.column.getNextSortingOrder() === 'desc'
+                          ? 'Sort descending'
+                          : 'Clear sort'
+                      : undefined
+                  }
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <ConditionalRender conditions={[(isSuccess || isLoading) && rows.length > 0]}>
+          <TableBody rows={rows} />
+        </ConditionalRender>
+      </TableWithStickyHeader>
       <ConditionalRender conditions={[isSuccess && rows.length === 0]}>
         <Placeholder icon={<Icon56InboxOutline />}>{t('No devices connected')}</Placeholder>
       </ConditionalRender>

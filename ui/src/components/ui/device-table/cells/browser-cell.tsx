@@ -3,6 +3,8 @@ import { Flex, Image } from '@vkontakte/vkui'
 
 import { BROWSER_ICON_MAP } from '@/constants/browser-icon-map'
 
+import { CellWithEmptyValue } from './cell-with-empty-value'
+
 import type { DeviceBrowserAppsItem } from '@/generated/types'
 
 type BrowserCellProps = {
@@ -10,9 +12,11 @@ type BrowserCellProps = {
 }
 
 export const BrowserCell = memo(({ apps }: BrowserCellProps) => (
-  <Flex>
-    {apps?.map(({ id, type }) => (
-      <Image key={id} alt={type} size={24} src={type && BROWSER_ICON_MAP[type]} title={type} noBorder />
-    ))}
-  </Flex>
+  <CellWithEmptyValue value={apps?.length}>
+    <Flex>
+      {apps?.map(({ id, type }) => (
+        <Image key={id} alt={type} size={24} src={type && BROWSER_ICON_MAP[type]} title={type} noBorder />
+      ))}
+    </Flex>
+  </CellWithEmptyValue>
 ))

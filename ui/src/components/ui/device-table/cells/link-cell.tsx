@@ -1,6 +1,8 @@
 import { memo } from 'react'
 import { Link } from 'react-router'
-import { Button } from '@vkontakte/vkui'
+import { Button, EllipsisText } from '@vkontakte/vkui'
+
+import { CellWithEmptyValue } from './cell-with-empty-value'
 
 type LinkCellProps = {
   url?: string | null
@@ -8,9 +10,11 @@ type LinkCellProps = {
 }
 
 export const LinkCell = memo(({ url, text }: LinkCellProps) => (
-  <Link to={url || ''}>
-    <Button disabled={!url} mode='link' size='m'>
-      {text}
-    </Button>
-  </Link>
+  <CellWithEmptyValue value={text}>
+    <Link to={url || ''}>
+      <Button align='left' disabled={!url} mode='link' size='m'>
+        <EllipsisText maxLines={3}>{text}</EllipsisText>
+      </Button>
+    </Link>
+  </CellWithEmptyValue>
 ))

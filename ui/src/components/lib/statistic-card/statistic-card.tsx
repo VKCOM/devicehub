@@ -24,6 +24,8 @@ type StatisticCardProps = {
   icon?: StatisticCardIcon
   text?: string
   value?: string | number
+  color?: string
+  appearance?: 'accent' | 'neutral' | 'accent-green' | 'accent-red' | 'custom'
   className?: string
 }
 
@@ -31,6 +33,8 @@ export const StatisticCard = ({
   text,
   value,
   className,
+  color,
+  appearance = 'custom',
   icon = StatisticCardIcon.DEVICES_OUTLINE,
 }: StatisticCardProps) => (
   <ContentBadge
@@ -48,7 +52,7 @@ export const StatisticCard = ({
     </ConditionalRender>
     <Spacing />
     <ConditionalRender conditions={[value !== undefined]}>
-      <Counter appearance='neutral' mode='primary' size='s'>
+      <Counter appearance={appearance} color={color} mode='primary' size='s'>
         {value}
       </Counter>
     </ConditionalRender>

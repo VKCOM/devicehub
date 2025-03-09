@@ -1,6 +1,8 @@
 import { memo } from 'react'
-import { EllipsisText } from '@vkontakte/vkui'
+import { EllipsisText, Flex } from '@vkontakte/vkui'
 import { Icon56AndroidDeviceOutline, Icon56AppleDeviceOutline, Icon56DevicesOutline } from '@vkontakte/icons'
+
+import { CellWithEmptyValue } from '../cell-with-empty-value'
 
 import styles from './model-cell.module.css'
 
@@ -25,10 +27,10 @@ type ModelCellProps = {
 }
 
 export const ModelCell = memo(({ model, platform }: ModelCellProps) => (
-  <div className={styles.modelCell}>
-    {platform && PLATFORM_ICON_MAP[platform]}
-    <EllipsisText maxLines={3} maxWidth={150}>
-      {model}
-    </EllipsisText>
-  </div>
+  <Flex align='center' justify='start' noWrap>
+    <CellWithEmptyValue value={model}>
+      <span>{platform && PLATFORM_ICON_MAP[platform]}</span>
+      <EllipsisText maxLines={3}>{model}</EllipsisText>
+    </CellWithEmptyValue>
+  </Flex>
 ))

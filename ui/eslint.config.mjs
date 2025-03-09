@@ -360,6 +360,7 @@ export default tseslint.config(
       'src/constants/network-sub-type-map.ts',
       'src/constants/battery-health-map.ts',
       'src/constants/battery-status-map.ts',
+      'src/vite-env.d.ts',
     ],
     rules: {
       '@typescript-eslint/naming-convention': 'off',
@@ -398,7 +399,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/services/scaling-service/scaling-service.ts'],
+    files: ['src/services/scaling-service/scaling-service.ts', 'src/services/sticky-table-header.ts'],
     rules: {
       'no-else/no-else': 'off',
     },
@@ -420,6 +421,12 @@ export default tseslint.config(
     ],
     rules: {
       'jsx-a11y/no-autofocus': 'off',
+    },
+  },
+  {
+    files: ['src/services/sticky-table-header.ts'],
+    rules: {
+      'no-param-reassign': 'off',
     },
   }
 )
