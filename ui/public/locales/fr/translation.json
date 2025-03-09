@@ -3,7 +3,7 @@
   "A new version of STF is available": "Une nouvelle version de STF est disponible",
   "A package is already installed with the same name.": "Un paquet est déjà installé avec le même nom",
   "A previously installed package of the same name has a different signature than the new package (and the old package's data was not removed).": "Un paquet précédemment installée du même nom a une signature numérique différente (et les données de l'ancien paquet n'ont pas été supprimées).",
-  !!"A secure container mount point couldn't be accessed on external media.": "Un conteneur sécurisé équipé ne peut pas être accessible sur un support externe.",
+  "A secure container mount point couldn't be accessed on external media.": "Un conteneur sécurisé équipé ne peut pas être accessible sur un support externe.",
   "AC": "AC",
   "ADB Keys": "Clés ADB",
   "Access Tokens": "Jetons d'Accès",

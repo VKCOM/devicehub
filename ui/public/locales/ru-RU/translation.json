@@ -452,7 +452,7 @@
   "Write an email to the user selection": "Напишите email выбранному пользователю",
   "Really grant access to user": "Действительно предоставить доступ пользователю?",
   "Really revoke access of this user": "Действительно отмените доступ этого пользователя?",
-  "User group quota": "Квота пользователя на использования групп"
+  "User group quota": "Квота пользователя на использования групп",
   "Contact Support": "Связаться с поддержкой",
   "You are authenticated via an automatic login method": "Вы авторизованы через способ, когда вход происходит автоматически"
 }
