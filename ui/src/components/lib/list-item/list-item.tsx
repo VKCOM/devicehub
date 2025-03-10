@@ -65,6 +65,7 @@ export const ListItem = observer(
     return (
       <div className={styles.listItem}>
         <Cell
+          activated={isOpen}
           after={after}
           before={onIsSelectedChange && <Checkbox checked={isSelected} onChange={onIsSelectedChange} />}
           extraSubtitle={extraSubtitle}

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Icon56SettingsOutline } from '@vkontakte/icons'
-import { Button, FormItem, FormLayoutGroup, Input } from '@vkontakte/vkui'
+import { Button, FormItem, FormLayoutGroup, Input, Spacing } from '@vkontakte/vkui'
 
 import { BaseModal } from '@/components/lib/base-modal'
 
+import type { FormEvent } from 'react'
 import type { UpdateUserGroupsQuotasParams } from '@/generated/types'
 
 type UpdateGroupQuotaModalProps = {
@@ -21,7 +22,9 @@ export const UpdateGroupQuotaModal = observer(
     const { t } = useTranslation()
     const [quota, setQuota] = useState<UpdateUserGroupsQuotasParams>(defaultQuota)
 
-    const onSave = () => {
+    const onSave = (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault()
+
       onUpdateQuota(quota)
 
       onClose()
@@ -32,25 +35,8 @@ export const UpdateGroupQuotaModal = observer(
     }, [defaultQuota])
 
     return (
-      <BaseModal
-        icon={<Icon56SettingsOutline />}
-        isOpen={isOpen}
-        title={title}
-        actions={
-          <Button
-            disabled={!quota.number || !quota.duration || !quota.repetitions}
-            mode='primary'
-            size='l'
-            type='submit'
-            stretched
-            onClick={onSave}
-          >
-            {t('Save')}
-          </Button>
-        }
-        onClose={onClose}
-      >
-        <form>
+      <BaseModal icon={<Icon56SettingsOutline />} isOpen={isOpen} title={title} onClose={onClose}>
+        <form onSubmit={onSave}>
           <FormLayoutGroup>
             <FormItem top={t('Number of groups')}>
               <Input
@@ -81,6 +67,18 @@ export const UpdateGroupQuotaModal = observer(
                 required
                 onChange={(event) => setQuota((prev) => ({ ...prev, repetitions: event.target.valueAsNumber }))}
               />
+            </FormItem>
+            <Spacing />
+            <FormItem>
+              <Button
+                disabled={!quota.number || !quota.duration || !quota.repetitions}
+                mode='primary'
+                size='l'
+                type='submit'
+                stretched
+              >
+                {t('Save')}
+              </Button>
             </FormItem>
           </FormLayoutGroup>
         </form>

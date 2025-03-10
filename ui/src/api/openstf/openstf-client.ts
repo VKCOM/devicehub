@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import { variablesConfig } from '@/config/variables.config'
 
-import { attachTokenOnRequest, logoutOnErrorResponse } from '../interceptor'
+import { attachTokenOnRequest, extractMessageOnErrorResponse, logoutOnErrorResponse } from '../interceptors'
 
 export const openstfClient = axios.create({
   baseURL: variablesConfig[import.meta.env.MODE].openStfApiHostUrl,
@@ -11,3 +11,7 @@ export const openstfClient = axios.create({
 
 openstfClient.interceptors.request.use((config) => attachTokenOnRequest(config))
 openstfClient.interceptors.response.use((response) => response, logoutOnErrorResponse)
+openstfClient.interceptors.response.use(
+  (response) => response,
+  (error) => extractMessageOnErrorResponse(error)
+)
