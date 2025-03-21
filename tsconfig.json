@@ -17,6 +17,6 @@
     "moduleResolution": "node",
     "outDir": "dist"
   },
-  "include": ["./lib/**/*.js"],
+  "include": ["./lib/**/*.js", "./lib/types/**/*.d.ts", "./lib/**/*.ts"],
   "verbose": true
 }
