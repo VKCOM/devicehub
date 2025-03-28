@@ -1,0 +1,4682 @@
+[
+  {
+    "full_name": "iPhone (Original/1st Gen/EDGE)",
+    "introduced": "January 9, 2007*",
+    "discontinued": "June 9, 2008**",
+    "model": "A1203 (EMC N/A)",
+    "device_id": "iPhone1,1",
+    "order": "MA712LL/A*",
+    "full_family": "iPhone (Original)"
+  },
+  {
+    "full_name": "iPhone 3G",
+    "introduced": "June 9, 2008",
+    "discontinued": "June 7, 2010*",
+    "model": "A1241 (EMC 2347*)",
+    "device_id": "iPhone1,2",
+    "order": "MB046LL/A*",
+    "full_family": "iPhone 3G"
+  },
+  {
+    "full_name": "iPhone 3GS",
+    "introduced": "June 8, 2009*",
+    "discontinued": "September 12, 2012*",
+    "model": "A1303 (EMC 2315*)",
+    "device_id": "iPhone2,1",
+    "order": "MB715LL/A*",
+    "full_family": "iPhone 3GS"
+  },
+  {
+    "full_name": "iPhone 3G (China/No Wi-Fi)",
+    "introduced": "October 30, 2009*",
+    "discontinued": "August 9, 2010",
+    "model": "A1324 (EMC N/A)",
+    "device_id": "iPhone1,2*",
+    "order": "MC176CH/A",
+    "full_family": "iPhone 3G (China)"
+  },
+  {
+    "full_name": "iPhone 3GS (China/No Wi-Fi)",
+    "introduced": "October 30, 2009*",
+    "discontinued": "August 9, 2010",
+    "model": "A1325 (EMC N/A)",
+    "device_id": "iPhone2,1*",
+    "order": "N/A",
+    "full_family": "iPhone 3GS (China)"
+  },
+  {
+    "full_name": "iPhone 4 (GSM)",
+    "introduced": "June 7, 2010*",
+    "discontinued": "October 4, 2011",
+    "model": "A1332 (EMC 380A/380B*)",
+    "device_id": "iPhone3,1",
+    "order": "MC318LL/A*",
+    "full_family": "iPhone 4"
+  },
+  {
+    "full_name": "iPhone 4 (GSM, Revision A)",
+    "introduced": "October 4, 2011*",
+    "discontinued": "September 10, 2013*",
+    "model": "A1332 (EMC 380A/380B*)",
+    "device_id": "iPhone3,2",
+    "order": "MD126LL/A*",
+    "full_family": "iPhone 4"
+  },
+  {
+    "full_name": "iPhone 4 (CDMA/Verizon/Sprint)",
+    "introduced": "January 11, 2011*",
+    "discontinued": "September 10, 2013*",
+    "model": "A1349 (EMC 2422)",
+    "device_id": "iPhone3,3",
+    "order": "MC676LL/A*",
+    "full_family": "iPhone 4 CDMA"
+  },
+  {
+    "full_name": "iPhone 4S (4s*)",
+    "introduced": "October 4, 2011*",
+    "discontinued": "September 9, 2014*",
+    "model": "A1387 (EMC 2430)",
+    "device_id": "iPhone4,1",
+    "order": "MC918LL/A*",
+    "full_family": "iPhone 4S (4s)"
+  },
+  {
+    "full_name": "iPhone 4S (GSM China/WAPI)",
+    "introduced": "January 13, 2012*",
+    "discontinued": "September 9, 2014*",
+    "model": "A1431 (EMC N/A)",
+    "device_id": "iPhone4,1*",
+    "order": "MD235CH/A*",
+    "full_family": "iPhone 4S (GSM China)"
+  },
+  {
+    "full_name": "iPhone 5 (GSM/LTE 4, 17/North America)",
+    "introduced": "September 12, 2012",
+    "discontinued": "April 12, 2013*",
+    "model": "A1428 (EMC N/A)",
+    "device_id": "iPhone5,1",
+    "order": "MD634LL/A*",
+    "full_family": "iPhone 5"
+  },
+  {
+    "full_name": "iPhone 5 (CDMA/LTE, Sprint/Verizon/KDDI)",
+    "introduced": "September 12, 2012",
+    "discontinued": "September 10, 2013",
+    "model": "A1429 (EMC N/A)",
+    "device_id": "iPhone5,2",
+    "order": "MD656LL/A*",
+    "full_family": "iPhone 5"
+  },
+  {
+    "full_name": "iPhone 5 (GSM/LTE 1, 3, 5/International)",
+    "introduced": "September 12, 2012",
+    "discontinued": "September 10, 2013",
+    "model": "A1429 (EMC 2610*)",
+    "device_id": "iPhone5,1",
+    "order": "MD297B/A*",
+    "full_family": "iPhone 5"
+  },
+  {
+    "full_name": "iPhone 5 (CDMA China/UIM/WAPI)",
+    "introduced": "December 14, 2012*",
+    "discontinued": "September 10, 2013",
+    "model": "A1442 (EMC N/A)",
+    "device_id": "iPhone5,2",
+    "order": "ME039CH/A*",
+    "full_family": "iPhone 5 (CDMA China)"
+  },
+  {
+    "full_name": "iPhone 5 (GSM/LTE/AWS/North America)",
+    "introduced": "March 26, 2013*",
+    "discontinued": "September 10, 2013",
+    "model": "A1428 (EMC N/A)",
+    "device_id": "iPhone5,1",
+    "order": "ME486LL/A*",
+    "full_family": "iPhone 5 (AWS**)"
+  },
+  {
+    "full_name": "iPhone 5c (GSM/North America/A1532)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1532 (EMC 2644*)",
+    "device_id": "iPhone5,3",
+    "order": "ME505LL/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (CDMA/Verizon/A1532)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1532 (EMC 2644*)",
+    "device_id": "iPhone5,3",
+    "order": "ME553LL/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (CDMA/China Telecom/A1532)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1532 (EMC 2644*)",
+    "device_id": "iPhone5,3",
+    "order": "MF364CH/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (CDMA/US/Japan/A1456)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1456 (EMC 2644*)",
+    "device_id": "iPhone5,3",
+    "order": "ME565LL/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (UK/Europe/Middle East/A1507)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1507 (EMC 2694*)",
+    "device_id": "iPhone5,4",
+    "order": "ME499B/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (China Unicom/A1526)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1526 (EMC N/A)",
+    "device_id": "iPhone5,4",
+    "order": "ME679CH/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (Asia Pacific/A1529)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1529 (EMC 2694*)",
+    "device_id": "iPhone5,4",
+    "order": "MF321X/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5c (China Mobile/A1516)",
+    "introduced": "December 22, 2013*",
+    "discontinued": "September 9, 2015",
+    "model": "A1516 (EMC N/A*)",
+    "device_id": "iPhone5,4",
+    "order": "N/A*",
+    "full_family": "iPhone 5c"
+  },
+  {
+    "full_name": "iPhone 5s (GSM/North America/A1533)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1533 (EMC 2642*)",
+    "device_id": "iPhone6,1",
+    "order": "ME305LL/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (CDMA/Verizon/A1533)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1533 (EMC 2642*)",
+    "device_id": "iPhone6,1",
+    "order": "ME341LL/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (CDMA/China Telecom/A1533)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1533 (EMC 2642*)",
+    "device_id": "iPhone6,1",
+    "order": "MF381CH/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (CDMA/US/Japan/A1453)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1453 (EMC 2642*)",
+    "device_id": "iPhone6,1",
+    "order": "ME350LL/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (UK/Europe/Middle East/A1457)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1457 (EMC 2643*)",
+    "device_id": "iPhone6,2",
+    "order": "ME432B/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (China Unicom/A1528)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1528 (EMC N/A)",
+    "device_id": "iPhone6,2",
+    "order": "ME450CH/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (Asia Pacific/A1530)",
+    "introduced": "September 10, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1530 (EMC 2643*)",
+    "device_id": "iPhone6,2",
+    "order": "MF352X/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 5s (China Mobile/A1518)",
+    "introduced": "December 22, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1518 (EMC N/A*)",
+    "device_id": "iPhone6,2",
+    "order": "MF341CH/A*",
+    "full_family": "iPhone 5s"
+  },
+  {
+    "full_name": "iPhone 6 (GSM/North America/A1549)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1549 (EMC 2816*)",
+    "device_id": "iPhone7,2",
+    "order": "MG4P2LL/A*",
+    "full_family": "iPhone 6"
+  },
+  {
+    "full_name": "iPhone 6 (CDMA/Verizon/A1549)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1549 (EMC 2816*)",
+    "device_id": "iPhone7,2",
+    "order": "MG5X2LL/A*",
+    "full_family": "iPhone 6"
+  },
+  {
+    "full_name": "iPhone 6 (Global/Sprint/A1586)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1586 (EMC 2816*)",
+    "device_id": "iPhone7,2",
+    "order": "MG6A2LL/A*",
+    "full_family": "iPhone 6"
+  },
+  {
+    "full_name": "iPhone 6 (China Mobile/A1589)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1589 (EMC 2816*)",
+    "device_id": "iPhone7,2",
+    "order": "N/A*",
+    "full_family": "iPhone 6"
+  },
+  {
+    "full_name": "iPhone 6 Plus (GSM/North America/A1522)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1522 (EMC 2817*)",
+    "device_id": "iPhone7,1",
+    "order": "MGAM2LL/A*",
+    "full_family": "iPhone 6 Plus"
+  },
+  {
+    "full_name": "iPhone 6 Plus (CDMA/Verizon/A1522)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1522 (EMC 2817*)",
+    "device_id": "iPhone7,1",
+    "order": "MGCL2LL/A*",
+    "full_family": "iPhone 6 Plus"
+  },
+  {
+    "full_name": "iPhone 6 Plus (Global/Sprint/A1524)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1524 (EMC 2817*)",
+    "device_id": "iPhone7,1",
+    "order": "MGCW2LL/A*",
+    "full_family": "iPhone 6 Plus"
+  },
+  {
+    "full_name": "iPhone 6 Plus (China Mobile/A1593)",
+    "introduced": "September 9, 2014*",
+    "discontinued": "September 7, 2016*",
+    "model": "A1593 (EMC 2817*)",
+    "device_id": "iPhone7,1",
+    "order": "N/A*",
+    "full_family": "iPhone 6 Plus"
+  },
+  {
+    "full_name": "iPhone 6s (AT&T/SIM Free/A1633)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1633 (EMC 2946*)",
+    "device_id": "iPhone8,1",
+    "order": "MKQ62LL/A*",
+    "full_family": "iPhone 6s"
+  },
+  {
+    "full_name": "iPhone 6s (Global/A1688)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1688 (EMC 2946*)",
+    "device_id": "iPhone8,1",
+    "order": "MKT82LL/A*",
+    "full_family": "iPhone 6s"
+  },
+  {
+    "full_name": "iPhone 6s (Mainland China/A1700)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1700 (EMC 2946*)",
+    "device_id": "iPhone8,1",
+    "order": "ML7D2CH/A*",
+    "full_family": "iPhone 6s"
+  },
+  {
+    "full_name": "iPhone 6s (China Mobile/A1691)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1691 (EMC 2946*)",
+    "device_id": "iPhone8,1",
+    "order": "N/A*",
+    "full_family": "iPhone 6s"
+  },
+  {
+    "full_name": "iPhone 6s Plus (AT&T/SIM Free/A1634)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1634 (EMC 2944*)",
+    "device_id": "iPhone8,2",
+    "order": "MKTM2LL/A*",
+    "full_family": "iPhone 6s Plus"
+  },
+  {
+    "full_name": "iPhone 6s Plus (Global/A1687)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1687 (EMC 2944*)",
+    "device_id": "iPhone8,2",
+    "order": "MKVP2LL/A*",
+    "full_family": "iPhone 6s Plus"
+  },
+  {
+    "full_name": "iPhone 6s Plus (Mainland China/A1699)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1699 (EMC 2944*)",
+    "device_id": "iPhone8,2",
+    "order": "ML6C2CH/A*",
+    "full_family": "iPhone 6s Plus"
+  },
+  {
+    "full_name": "iPhone 6s Plus (China Mobile/A1690)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1690 (EMC 2944*)",
+    "device_id": "iPhone8,2",
+    "order": "N/A*",
+    "full_family": "iPhone 6s Plus"
+  },
+  {
+    "full_name": "iPhone SE (United States/A1662)",
+    "introduced": "March 21, 2016*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1662 (EMC 3042*)",
+    "device_id": "iPhone8,4",
+    "order": "MLLX2LL/A*",
+    "full_family": "iPhone SE"
+  },
+  {
+    "full_name": "iPhone SE (Global/Sprint/A1723)",
+    "introduced": "March 21, 2016*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1723 (EMC 3042*)",
+    "device_id": "iPhone8,4",
+    "order": "MLM32LL/A*",
+    "full_family": "iPhone SE"
+  },
+  {
+    "full_name": "iPhone SE (China Mobile/A1724)",
+    "introduced": "March 21, 2016*",
+    "discontinued": "September 12, 2018*",
+    "model": "A1724 (EMC 3042*)",
+    "device_id": "iPhone8,4",
+    "order": "MLLP2CH/A*",
+    "full_family": "iPhone SE"
+  },
+  {
+    "full_name": "iPhone 7 (Verizon/Sprint/China/A1660)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1660 (EMC 3091*)",
+    "device_id": "iPhone9,1",
+    "order": "MNAD2LL/A*",
+    "full_family": "iPhone 7"
+  },
+  {
+    "full_name": "iPhone 7 (AT&T/T-Mobile/Global/A1778)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1778 (EMC 3091*)",
+    "device_id": "iPhone9,3",
+    "order": "MN9E2LL/A*",
+    "full_family": "iPhone 7"
+  },
+  {
+    "full_name": "iPhone 7 (Japan/A1779)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1779 (EMC 3091*)",
+    "device_id": "iPhone9,1",
+    "order": "MNCF2J/A*",
+    "full_family": "iPhone 7"
+  },
+  {
+    "full_name": "iPhone 7 (China Mobile/A1780)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1780 (EMC 3091*)",
+    "device_id": "iPhone9,1",
+    "order": "N/A*",
+    "full_family": "iPhone 7"
+  },
+  {
+    "full_name": "iPhone 7 Plus (Verizon/Sprint/China/A1661)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1661 (EMC 3092*)",
+    "device_id": "iPhone9,2",
+    "order": "MNR22LL/A*",
+    "full_family": "iPhone 7 Plus"
+  },
+  {
+    "full_name": "iPhone 7 Plus (AT&T/T-Mobile/Global/A1784)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1784 (EMC 3092*)",
+    "device_id": "iPhone9,4",
+    "order": "MNQT2LL/A*",
+    "full_family": "iPhone 7 Plus"
+  },
+  {
+    "full_name": "iPhone 7 Plus (Japan/A1785)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1785 (EMC 3092*)",
+    "device_id": "iPhone9,2",
+    "order": "MNRA2J/A*",
+    "full_family": "iPhone 7 Plus"
+  },
+  {
+    "full_name": "iPhone 7 Plus (China Mobile/A1786)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 10, 2019",
+    "model": "A1786 (EMC 3092*)",
+    "device_id": "iPhone9,2",
+    "order": "N/A*",
+    "full_family": "iPhone 7 Plus"
+  },
+  {
+    "full_name": "iPhone 8 (Verizon/Sprint/China/A1863)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1863* (EMC 3159*)",
+    "device_id": "iPhone10,1",
+    "order": "MQ742LL/A*",
+    "full_family": "iPhone 8"
+  },
+  {
+    "full_name": "iPhone 8 (AT&T/T-Mobile/Global/A1905)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1905* (EMC 3172*)",
+    "device_id": "iPhone10,4",
+    "order": "MQ6X2LL/A*",
+    "full_family": "iPhone 8"
+  },
+  {
+    "full_name": "iPhone 8 (Japan/A1906)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1906* (EMC 3171*)",
+    "device_id": "iPhone10,1",
+    "order": "MQ7A2J/A*",
+    "full_family": "iPhone 8"
+  },
+  {
+    "full_name": "iPhone 8 (China Mobile/A1907)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1907* (EMC N/A*)",
+    "device_id": "iPhone10,1",
+    "order": "N/A*",
+    "full_family": "iPhone 8"
+  },
+  {
+    "full_name": "iPhone 8 Plus (Verizon/Sprint/China/A1864)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1864* (EMC 3160*)",
+    "device_id": "iPhone10,2",
+    "order": "MQ982LL/A*",
+    "full_family": "iPhone 8 Plus"
+  },
+  {
+    "full_name": "iPhone 8 Plus (AT&T/T-Mobile/Global/A1897)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1897* (EMC 3174*)",
+    "device_id": "iPhone10,5",
+    "order": "MQ8V2LL/A*",
+    "full_family": "iPhone 8 Plus"
+  },
+  {
+    "full_name": "iPhone 8 Plus (Japan/A1898)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1898* (EMC 3173*)",
+    "device_id": "iPhone10,2",
+    "order": "MQ9M2J/A*",
+    "full_family": "iPhone 8 Plus"
+  },
+  {
+    "full_name": "iPhone 8 Plus (China Mobile/A1899)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "April 15, 2020",
+    "model": "A1899* (EMC N/A*)",
+    "device_id": "iPhone10,2",
+    "order": "N/A*",
+    "full_family": "iPhone 8 Plus"
+  },
+  {
+    "full_name": "iPhone X (Verizon/Sprint/China/A1865)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "September 12, 2018",
+    "model": "A1865* (EMC 3161*)",
+    "device_id": "iPhone10,3",
+    "order": "MQCK2LL/A*",
+    "full_family": "iPhone X"
+  },
+  {
+    "full_name": "iPhone X (AT&T/T-Mobile/Global/A1901)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "September 12, 2018",
+    "model": "A1901* (EMC 3175*)",
+    "device_id": "iPhone10,6",
+    "order": "MQAJ2LL/A*",
+    "full_family": "iPhone X"
+  },
+  {
+    "full_name": "iPhone X (Japan/A1902)",
+    "introduced": "September 12, 2017*",
+    "discontinued": "September 12, 2018",
+    "model": "A1902* (EMC 3176*)",
+    "device_id": "iPhone10,3",
+    "order": "MQAX2J/A*",
+    "full_family": "iPhone X"
+  },
+  {
+    "full_name": "iPhone Xs (US/Canada/Hong Kong/A1920)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1920* (EMC 3218*)",
+    "device_id": "iPhone11,2",
+    "order": "MT952LL/A*",
+    "full_family": "iPhone Xs"
+  },
+  {
+    "full_name": "iPhone Xs (Global/A2097)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2097* (EMC 3232*)",
+    "device_id": "iPhone11,2",
+    "order": "MT9F2B/A*",
+    "full_family": "iPhone Xs"
+  },
+  {
+    "full_name": "iPhone Xs (Japan/A2098)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2098* (EMC 3233*)",
+    "device_id": "iPhone11,2",
+    "order": "MTAX2J/A*",
+    "full_family": "iPhone Xs"
+  },
+  {
+    "full_name": "iPhone Xs (China/A2100)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2100* (EMC 3262*)",
+    "device_id": "iPhone11,2",
+    "order": "MT9Q2CH/A*",
+    "full_family": "iPhone Xs"
+  },
+  {
+    "full_name": "iPhone Xs Max (US/Canada/A1921)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1921* (EMC 3219*)",
+    "device_id": "iPhone11,6",
+    "order": "MT5A2LL/A*",
+    "full_family": "iPhone Xs Max"
+  },
+  {
+    "full_name": "iPhone Xs Max (Global/A2101)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2101* (EMC 3234*)",
+    "device_id": "iPhone11,6",
+    "order": "MT512B/A*",
+    "full_family": "iPhone Xs Max"
+  },
+  {
+    "full_name": "iPhone Xs Max (Japan/A2102)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2102* (EMC 3235*)",
+    "device_id": "iPhone11,6",
+    "order": "MT6R2J/A*",
+    "full_family": "iPhone Xs Max"
+  },
+  {
+    "full_name": "iPhone Xs Max (China/Hong Kong/A2104)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2104* (EMC 3261*)",
+    "device_id": "iPhone11,6",
+    "order": "MT722CH/A*",
+    "full_family": "iPhone Xs Max"
+  },
+  {
+    "full_name": "iPhone XR (US/Canada/A1984)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 14, 2021",
+    "model": "A1984* (EMC 3220*)",
+    "device_id": "iPhone11,8",
+    "order": "MT3L2LL/A*",
+    "full_family": "iPhone XR"
+  },
+  {
+    "full_name": "iPhone XR (Global/A2105)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 14, 2021",
+    "model": "A2105* (EMC 3227*)",
+    "device_id": "iPhone11,8",
+    "order": "MRY52B/A*",
+    "full_family": "iPhone XR"
+  },
+  {
+    "full_name": "iPhone XR (Japan/A2106)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 14, 2021",
+    "model": "A2106* (EMC 3238*)",
+    "device_id": "iPhone11,8",
+    "order": "MT032J/A*",
+    "full_family": "iPhone XR"
+  },
+  {
+    "full_name": "iPhone XR (China/Hong Kong/A2108)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 14, 2021",
+    "model": "A2108* (EMC 3260*)",
+    "device_id": "iPhone11,8",
+    "order": "MT132CH/A*",
+    "full_family": "iPhone XR"
+  },
+  {
+    "full_name": "iPhone 11 (US/Canada/A2111)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 7, 2022",
+    "model": "A2111* (EMC 3309*)",
+    "device_id": "iPhone12,1",
+    "order": "MWHU2LL/A*",
+    "full_family": "iPhone 11"
+  },
+  {
+    "full_name": "iPhone 11 (Global/A2221)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 7, 2022",
+    "model": "A2221* (EMC 3304*)",
+    "device_id": "iPhone12,1",
+    "order": "MWLU2B/A*",
+    "full_family": "iPhone 11"
+  },
+  {
+    "full_name": "iPhone 11 (China/Hong Kong/A2223)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 7, 2022",
+    "model": "A2223* (EMC 3309*)",
+    "device_id": "iPhone12,1",
+    "order": "MWN12ZA/A*",
+    "full_family": "iPhone 11"
+  },
+  {
+    "full_name": "iPhone 11 Pro (US/Canada/A2160)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2160* (EMC 3305*)",
+    "device_id": "iPhone12,3",
+    "order": "MW9E2LL/A*",
+    "full_family": "iPhone 11 Pro"
+  },
+  {
+    "full_name": "iPhone 11 Pro (Global/A2215)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2215* (EMC 3307*)",
+    "device_id": "iPhone12,3",
+    "order": "MWC52B/A*",
+    "full_family": "iPhone 11 Pro"
+  },
+  {
+    "full_name": "iPhone 11 Pro (China/Hong Kong/A2217)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2217* (EMC 3305*)",
+    "device_id": "iPhone12,3",
+    "order": "MWDC2ZA/A*",
+    "full_family": "iPhone 11 Pro"
+  },
+  {
+    "full_name": "iPhone 11 Pro Max (US/CA/A2161)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2161* (EMC 3306*)",
+    "device_id": "iPhone12,5",
+    "order": "MWFC2LL/A*",
+    "full_family": "iPhone 11 Pro Max"
+  },
+  {
+    "full_name": "iPhone 11 Pro Max (Global/A2218)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2218* (EMC 3308*)",
+    "device_id": "iPhone12,5",
+    "order": "MWHG2B/A*",
+    "full_family": "iPhone 11 Pro Max"
+  },
+  {
+    "full_name": "iPhone 11 Pro Max (CN/HK/A2220)",
+    "introduced": "September 10, 2019",
+    "discontinued": "October 13, 2020",
+    "model": "A2220* (EMC 3306*)",
+    "device_id": "iPhone12,5",
+    "order": "MWEX2ZA/A*",
+    "full_family": "iPhone 11 Pro Max"
+  },
+  {
+    "full_name": "iPhone SE (2 - 4.7\" 2020 US/CA A2275)",
+    "introduced": "April 15, 2020",
+    "discontinued": "March 8, 2022",
+    "model": "A2275* (EMC 3500*)",
+    "device_id": "iPhone12,8",
+    "order": "MX9A2LL/A*",
+    "full_family": "iPhone SE (2nd Gen)"
+  },
+  {
+    "full_name": "iPhone SE (2 - 4.7\" 2020 Global A2296)",
+    "introduced": "April 15, 2020",
+    "discontinued": "March 8, 2022",
+    "model": "A2296* (EMC 3500*)",
+    "device_id": "iPhone12,8",
+    "order": "MX9T2B/A*",
+    "full_family": "iPhone SE (2nd Gen)"
+  },
+  {
+    "full_name": "iPhone SE (2 - 4.7\" 2020 China A2298)",
+    "introduced": "April 15, 2020",
+    "discontinued": "March 8, 2022",
+    "model": "A2298* (EMC 3500*)",
+    "device_id": "iPhone12,8",
+    "order": "MXAN2CH/A*",
+    "full_family": "iPhone SE (2nd Gen)"
+  },
+  {
+    "full_name": "iPhone 12 mini (US/A2176)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 7, 2022",
+    "model": "A2176* (EMC 3539*)",
+    "device_id": "iPhone13,1",
+    "order": "MG633LL/A*",
+    "full_family": "iPhone 12 mini"
+  },
+  {
+    "full_name": "iPhone 12 mini (Canada/Japan/A2398)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 7, 2022",
+    "model": "A2398* (EMC 3540*)",
+    "device_id": "iPhone13,1",
+    "order": "MGAP3VC/A*",
+    "full_family": "iPhone 12 mini"
+  },
+  {
+    "full_name": "iPhone 12 mini (Global/A2399)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 7, 2022",
+    "model": "A2399* (EMC 3541*)",
+    "device_id": "iPhone13,1",
+    "order": "MGE13B/A*",
+    "full_family": "iPhone 12 mini"
+  },
+  {
+    "full_name": "iPhone 12 mini (China/A2400)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 7, 2022",
+    "model": "A2400* (EMC 3541*)",
+    "device_id": "iPhone13,1",
+    "order": "MG823CH/A*",
+    "full_family": "iPhone 12 mini"
+  },
+  {
+    "full_name": "iPhone 12 (US/A2172)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 12, 2023",
+    "model": "A2172* (EMC 3542*)",
+    "device_id": "iPhone13,2",
+    "order": "MGEK3LL/A*",
+    "full_family": "iPhone 12"
+  },
+  {
+    "full_name": "iPhone 12 (Canada/Japan/A2402)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 12, 2023",
+    "model": "A2402* (EMC 3543*)",
+    "device_id": "iPhone13,2",
+    "order": "MGHR3VC/A*",
+    "full_family": "iPhone 12"
+  },
+  {
+    "full_name": "iPhone 12 (Global/A2403)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 12, 2023",
+    "model": "A2403* (EMC 3544*)",
+    "device_id": "iPhone13,2",
+    "order": "MGJ83B/A*",
+    "full_family": "iPhone 12"
+  },
+  {
+    "full_name": "iPhone 12 (China/A2404)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 12, 2023",
+    "model": "A2404* (EMC 3544*)",
+    "device_id": "iPhone13,2",
+    "order": "MGGQ3CH/A*",
+    "full_family": "iPhone 12"
+  },
+  {
+    "full_name": "iPhone 12 Pro (US/A2341)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2341* (EMC 3545*)",
+    "device_id": "iPhone13,3",
+    "order": "MGJQ3LL/A*",
+    "full_family": "iPhone 12 Pro"
+  },
+  {
+    "full_name": "iPhone 12 Pro (Canada/Japan/A2406)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2406* (EMC 3546*)",
+    "device_id": "iPhone13,3",
+    "order": "MGM83VC/A*",
+    "full_family": "iPhone 12 Pro"
+  },
+  {
+    "full_name": "iPhone 12 Pro (Global/A2407)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2407* (EMC 3547*)",
+    "device_id": "iPhone13,3",
+    "order": "MGMN3B/A*",
+    "full_family": "iPhone 12 Pro"
+  },
+  {
+    "full_name": "iPhone 12 Pro (China/A2408)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2408* (EMC 3547*)",
+    "device_id": "iPhone13,3",
+    "order": "MGLD3CH/A*",
+    "full_family": "iPhone 12 Pro"
+  },
+  {
+    "full_name": "iPhone 12 Pro Max (US/A2342)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2342* (EMC 3548*)",
+    "device_id": "iPhone13,4",
+    "order": "MG913LL/A*",
+    "full_family": "iPhone 12 Pro Max"
+  },
+  {
+    "full_name": "iPhone 12 Pro Max (Canada/Japan/A2410)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2410* (EMC 3549*)",
+    "device_id": "iPhone13,4",
+    "order": "MGCX3VC/A*",
+    "full_family": "iPhone 12 Pro Max"
+  },
+  {
+    "full_name": "iPhone 12 Pro Max (Global/A2411)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2411* (EMC 3550*)",
+    "device_id": "iPhone13,4",
+    "order": "MGDA3B/A*",
+    "full_family": "iPhone 12 Pro Max"
+  },
+  {
+    "full_name": "iPhone 12 Pro Max (China/A2412)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "September 14, 2021",
+    "model": "A2412* (EMC 3550*)",
+    "device_id": "iPhone13,4",
+    "order": "MGC33CH/A*",
+    "full_family": "iPhone 12 Pro Max"
+  },
+  {
+    "full_name": "iPhone 13 mini (US/A2481)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 12, 2023",
+    "model": "A2481* (EMC 3994*)",
+    "device_id": "iPhone14,4",
+    "order": "MLHP3LL/A*",
+    "full_family": "iPhone 13 mini"
+  },
+  {
+    "full_name": "iPhone 13 mini (CA/MX/JP/SA/A2626)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 12, 2023",
+    "model": "A2626* (EMC 3996*)",
+    "device_id": "iPhone14,4",
+    "order": "MLJF3VC/A*",
+    "full_family": "iPhone 13 mini"
+  },
+  {
+    "full_name": "iPhone 13 mini (Global/A2628)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 12, 2023",
+    "model": "A2628* (EMC 4029*)",
+    "device_id": "iPhone14,4",
+    "order": "MLK23B/A*",
+    "full_family": "iPhone 13 mini"
+  },
+  {
+    "full_name": "iPhone 13 mini (China/A2629)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 12, 2023",
+    "model": "A2629* (EMC 4030*)",
+    "device_id": "iPhone14,4",
+    "order": "MLDE3CH/A*",
+    "full_family": "iPhone 13 mini"
+  },
+  {
+    "full_name": "iPhone 13 mini (Russia/A2630)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 12, 2023",
+    "model": "A2630* (EMC 4030*)",
+    "device_id": "iPhone14,4",
+    "order": "MLLX3RU/A*",
+    "full_family": "iPhone 13 mini"
+  },
+  {
+    "full_name": "iPhone 13 (US/A2482)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 9, 2024",
+    "model": "A2482* (EMC 3997*)",
+    "device_id": "iPhone14,5",
+    "order": "MLMN3LL/A*",
+    "full_family": "iPhone 13"
+  },
+  {
+    "full_name": "iPhone 13 (CA/MX/JP/SA/A2631)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 9, 2024",
+    "model": "A2631* (EMC 3999*)",
+    "device_id": "iPhone14,5",
+    "order": "MLNE3VC/A*",
+    "full_family": "iPhone 13"
+  },
+  {
+    "full_name": "iPhone 13 (Global/A2633)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 9, 2024",
+    "model": "A2633* (EMC 4031*)",
+    "device_id": "iPhone14,5",
+    "order": "MLPH3B/A*",
+    "full_family": "iPhone 13"
+  },
+  {
+    "full_name": "iPhone 13 (China/A2634)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 9, 2024",
+    "model": "A2634* (EMC 4032*)",
+    "device_id": "iPhone14,5",
+    "order": "MLDW3CH/A*",
+    "full_family": "iPhone 13"
+  },
+  {
+    "full_name": "iPhone 13 (Russia/A2635)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 9, 2024",
+    "model": "A2635* (EMC 4032*)",
+    "device_id": "iPhone14,5",
+    "order": "MLNY3RU/A*",
+    "full_family": "iPhone 13"
+  },
+  {
+    "full_name": "iPhone 13 Pro (US/A2483)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2483* (EMC 4000*)",
+    "device_id": "iPhone14,2",
+    "order": "MLTT3LL/A*",
+    "full_family": "iPhone 13 Pro"
+  },
+  {
+    "full_name": "iPhone 13 Pro (CA/MX/JP/SA/A2636)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2636* (EMC 4002*)",
+    "device_id": "iPhone14,2",
+    "order": "MLUK3VC/A*",
+    "full_family": "iPhone 13 Pro"
+  },
+  {
+    "full_name": "iPhone 13 Pro (Global/A2638)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2638* (EMC 4033*)",
+    "device_id": "iPhone14,2",
+    "order": "MLVD3B/A*",
+    "full_family": "iPhone 13 Pro"
+  },
+  {
+    "full_name": "iPhone 13 Pro (China/A2639)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2639* (EMC 4034*)",
+    "device_id": "iPhone14,2",
+    "order": "MLT83CH/A*",
+    "full_family": "iPhone 13 Pro"
+  },
+  {
+    "full_name": "iPhone 13 Pro (Russia/A2640)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2640* (EMC 4034*)",
+    "device_id": "iPhone14,2",
+    "order": "MLW43RU/A*",
+    "full_family": "iPhone 13 Pro"
+  },
+  {
+    "full_name": "iPhone 13 Pro Max (US/A2484)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2484* (EMC 4003*)",
+    "device_id": "iPhone14,3",
+    "order": "MLKP3LL/A*",
+    "full_family": "iPhone 13 Pro Max"
+  },
+  {
+    "full_name": "iPhone 13 Pro Max (CA/MX/JP/SA/A2641)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2641* (EMC 4005*)",
+    "device_id": "iPhone14,3",
+    "order": "MLJ73VC/A*",
+    "full_family": "iPhone 13 Pro Max"
+  },
+  {
+    "full_name": "iPhone 13 Pro Max (Global/A2643)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2643* (EMC 4035*)",
+    "device_id": "iPhone14,3",
+    "order": "MLL93B/A*",
+    "full_family": "iPhone 13 Pro Max"
+  },
+  {
+    "full_name": "iPhone 13 Pro Max (China/A2644)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2644* (EMC 4036*)",
+    "device_id": "iPhone14,3",
+    "order": "MLH73CH/A*",
+    "full_family": "iPhone 13 Pro Max"
+  },
+  {
+    "full_name": "iPhone 13 Pro Max (Russia/A2645)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2645* (EMC 4036*)",
+    "device_id": "iPhone14,3",
+    "order": "MLLU3RU/A*",
+    "full_family": "iPhone 13 Pro Max"
+  },
+  {
+    "full_name": "iPhone SE (3 - 4.7\" 2022 US/CA A2595)",
+    "introduced": "March 8, 2022",
+    "discontinued": "February 19, 2025",
+    "model": "A2595* (EMC 4082*)",
+    "device_id": "iPhone14,6",
+    "order": "MMX63LL/A*",
+    "full_family": "iPhone SE (3rd Gen)"
+  },
+  {
+    "full_name": "iPhone SE (3 - 4.7\" 2022 Japan A2782)",
+    "introduced": "March 8, 2022",
+    "discontinued": "February 19, 2025",
+    "model": "A2782* (EMC 8064*)",
+    "device_id": "iPhone14,6",
+    "order": "MMYD3J/A*",
+    "full_family": "iPhone SE (3rd Gen)"
+  },
+  {
+    "full_name": "iPhone SE (3 - 4.7\" 2022 Global A2783)",
+    "introduced": "March 8, 2022",
+    "discontinued": "February 19, 2025",
+    "model": "A2783* (EMC 4083*)",
+    "device_id": "iPhone14,6",
+    "order": "MMXG3B/A*",
+    "full_family": "iPhone SE (3rd Gen)"
+  },
+  {
+    "full_name": "iPhone SE (3 - 4.7\" 2022 China A2785)",
+    "introduced": "March 8, 2022",
+    "discontinued": "February 19, 2025",
+    "model": "A2785* (EMC 8076*)",
+    "device_id": "iPhone14,6",
+    "order": "MMWW3CH/A*",
+    "full_family": "iPhone SE (3rd Gen)"
+  },
+  {
+    "full_name": "iPhone 14 (US/A2649)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2649* (EMC 8138*)",
+    "device_id": "iPhone14,7",
+    "order": "MPVH3LL/A*",
+    "full_family": "iPhone 14"
+  },
+  {
+    "full_name": "iPhone 14 (CA/MX/JP/SA/A2881)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2881* (EMC 8142*)",
+    "device_id": "iPhone14,7",
+    "order": "MPVJ3VC/A*",
+    "full_family": "iPhone 14"
+  },
+  {
+    "full_name": "iPhone 14 (Global/A2882)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2882* (EMC 8143*)",
+    "device_id": "iPhone14,7",
+    "order": "MPVN3ZD/A*",
+    "full_family": "iPhone 14"
+  },
+  {
+    "full_name": "iPhone 14 (China/A2884)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2884* (EMC 8144*)",
+    "device_id": "iPhone14,7",
+    "order": "MPVG3ZA/A*",
+    "full_family": "iPhone 14"
+  },
+  {
+    "full_name": "iPhone 14 (Russia/A2883)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2883* (EMC 8144*)",
+    "device_id": "iPhone14,7",
+    "order": "MPVQ3RU/A*",
+    "full_family": "iPhone 14"
+  },
+  {
+    "full_name": "iPhone 14 Plus (US/A2632)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2632* (EMC 8139*)",
+    "device_id": "iPhone14,8",
+    "order": "MQ3W3LL/A*",
+    "full_family": "iPhone 14 Plus"
+  },
+  {
+    "full_name": "iPhone 14 Plus (CA/MX/JP/SA/A2885)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2885* (EMC 8146*)",
+    "device_id": "iPhone14,8",
+    "order": "MQ4H3VC/A*",
+    "full_family": "iPhone 14 Plus"
+  },
+  {
+    "full_name": "iPhone 14 Plus (Global/A2886)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2886* (EMC 8147*)",
+    "device_id": "iPhone14,8",
+    "order": "MQ523ZD/A*",
+    "full_family": "iPhone 14 Plus"
+  },
+  {
+    "full_name": "iPhone 14 Plus (China/A2888)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2888* (EMC 8148*)",
+    "device_id": "iPhone14,8",
+    "order": "MQ3A3ZA/A*",
+    "full_family": "iPhone 14 Plus"
+  },
+  {
+    "full_name": "iPhone 14 Plus (Russia/A2887)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "February 19, 2025",
+    "model": "A2887* (EMC 8148*)",
+    "device_id": "iPhone14,8",
+    "order": "MQ5N3RU/A*",
+    "full_family": "iPhone 14 Plus"
+  },
+  {
+    "full_name": "iPhone 14 Pro (US/A2650)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2650* (EMC 8140*)",
+    "device_id": "iPhone15,2",
+    "order": "MQ0E3LL/A*",
+    "full_family": "iPhone 14 Pro"
+  },
+  {
+    "full_name": "iPhone 14 Pro (CA/MX/JP/SA/A2889)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2889* (EMC 8150*)",
+    "device_id": "iPhone15,2",
+    "order": "MQ0F3VC/A*",
+    "full_family": "iPhone 14 Pro"
+  },
+  {
+    "full_name": "iPhone 14 Pro (Global/A2890)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2890* (EMC 8151*)",
+    "device_id": "iPhone15,2",
+    "order": "MQ0G3ZD/A*",
+    "full_family": "iPhone 14 Pro"
+  },
+  {
+    "full_name": "iPhone 14 Pro (China/A2892)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2892* (EMC 8152*)",
+    "device_id": "iPhone15,2",
+    "order": "MQ0D3ZA/A*",
+    "full_family": "iPhone 14 Pro"
+  },
+  {
+    "full_name": "iPhone 14 Pro (Russia/A2891)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2891* (EMC 8152*)",
+    "device_id": "iPhone15,2",
+    "order": "MQ0H3RU/A*",
+    "full_family": "iPhone 14 Pro"
+  },
+  {
+    "full_name": "iPhone 14 Pro Max (US/A2651)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2651* (EMC 8141*)",
+    "device_id": "iPhone15,3",
+    "order": "MQ8R3LL/A*",
+    "full_family": "iPhone 14 Pro Max"
+  },
+  {
+    "full_name": "iPhone 14 Pro Max (CA/MX/JP/SA/A2893)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2893* (EMC 8154*)",
+    "device_id": "iPhone15,3",
+    "order": "MQ993VC/A*",
+    "full_family": "iPhone 14 Pro Max"
+  },
+  {
+    "full_name": "iPhone 14 Pro Max (Global/A2894)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2894* (EMC 8155*)",
+    "device_id": "iPhone15,3",
+    "order": "MQ9T3ZD/A*",
+    "full_family": "iPhone 14 Pro Max"
+  },
+  {
+    "full_name": "iPhone 14 Pro Max (China/A2896)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2896* (EMC 8156*)",
+    "device_id": "iPhone15,3",
+    "order": "MQ863ZA/A*",
+    "full_family": "iPhone 14 Pro Max"
+  },
+  {
+    "full_name": "iPhone 14 Pro Max (Russia/A2895)",
+    "introduced": "September 7, 2022*",
+    "discontinued": "September 12, 2023",
+    "model": "A2895* (EMC 8156*)",
+    "device_id": "iPhone15,3",
+    "order": "MQC93RU/A*",
+    "full_family": "iPhone 14 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 (US/A2846)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A2846* (EMC 8427*)",
+    "device_id": "iPhone15,4",
+    "order": "MTLY3LL/A*",
+    "full_family": "iPhone 15"
+  },
+  {
+    "full_name": "iPhone 15 (CA/MX/JP/SA/A3089)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3089* (EMC 8428*)",
+    "device_id": "iPhone15,4",
+    "order": "MTML3VC/A*",
+    "full_family": "iPhone 15"
+  },
+  {
+    "full_name": "iPhone 15 (Global/A3090)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3090* (EMC 8429*)",
+    "device_id": "iPhone15,4",
+    "order": "MTP43ZD/A*",
+    "full_family": "iPhone 15"
+  },
+  {
+    "full_name": "iPhone 15 (China/A3092)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3092* (EMC 8430*)",
+    "device_id": "iPhone15,4",
+    "order": "MTLG3CH/A*",
+    "full_family": "iPhone 15"
+  },
+  {
+    "full_name": "iPhone 15 Plus (US/A2847)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A2847* (EMC 8431*)",
+    "device_id": "iPhone15,5",
+    "order": "MTXV3LL/A*",
+    "full_family": "iPhone 15 Plus"
+  },
+  {
+    "full_name": "iPhone 15 Plus (CA/MX/JP/SA/A3093)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3093* (EMC 8432*)",
+    "device_id": "iPhone15,5",
+    "order": "MU0D3VC/A*",
+    "full_family": "iPhone 15 Plus"
+  },
+  {
+    "full_name": "iPhone 15 Plus (Global/A3094)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3094* (EMC 8433*)",
+    "device_id": "iPhone15,5",
+    "order": "MU163ZD/A*",
+    "full_family": "iPhone 15 Plus"
+  },
+  {
+    "full_name": "iPhone 15 Plus (China/A3096)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "N/A",
+    "model": "A3096* (EMC 8434*)",
+    "device_id": "iPhone15,5",
+    "order": "MTXD3CH/A*",
+    "full_family": "iPhone 15 Plus"
+  },
+  {
+    "full_name": "iPhone 15 Pro (US/A2848)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A2848* (EMC 8435*)",
+    "device_id": "iPhone16,1",
+    "order": "MTQP3LL/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (CA/MX/JP/SA/A3101)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3101* (EMC 8436*)",
+    "device_id": "iPhone16,1",
+    "order": "MTU93VC/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (Global/A3102)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3102* (EMC 8437*)",
+    "device_id": "iPhone16,1",
+    "order": "MTUX3ZD/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (China/A3104)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3104* (EMC 8438*)",
+    "device_id": "iPhone16,1",
+    "order": "MTQ63CH/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (US/A2849)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A2849* (EMC 8439*)",
+    "device_id": "iPhone16,2",
+    "order": "MU683LL/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (CA/MX/JP/SA/A3105)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3105* (EMC 8440*)",
+    "device_id": "iPhone16,2",
+    "order": "MU6R3VC/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (Global/A3106)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3106* (EMC 8441*)",
+    "device_id": "iPhone16,2",
+    "order": "MU793ZD/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (China/A3108)",
+    "introduced": "September 12, 2023*",
+    "discontinued": "September 9, 2024",
+    "model": "A3108* (EMC 8442*)",
+    "device_id": "iPhone16,2",
+    "order": "MU2Q3CH/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 (US/A3081)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3081* (EMC 8688*)",
+    "device_id": "iPhone17,3",
+    "order": "MYAT3LL/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (CA/MX/JP/SA/A3286)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3286* (EMC 8689*)",
+    "device_id": "iPhone17,3",
+    "order": "MYDU3VC/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (Global/A3287)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3287* (EMC 8690*)",
+    "device_id": "iPhone17,3",
+    "order": "MYEC3QN/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (China/A3288)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3288* (EMC 8691*)",
+    "device_id": "iPhone17,3",
+    "order": "MYEY3CH/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 Plus (US/A3082)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3082* (EMC 8692*)",
+    "device_id": "iPhone17,4",
+    "order": "MXUW3LL/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (CA/MX/JP/SA/A3289)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3289* (EMC 8693*)",
+    "device_id": "iPhone17,4",
+    "order": "MXVE3VC/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (Global/A3290)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3290* (EMC 8694*)",
+    "device_id": "iPhone17,4",
+    "order": "MXVX3QN/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (China/A3291)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3291* (EMC 8695*)",
+    "device_id": "iPhone17,4",
+    "order": "MXUD3CH/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Pro (US/A3083)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3083* (EMC 8666*)",
+    "device_id": "iPhone17,1",
+    "order": "MYMC3LL/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (CA/MX/JP/SA/A3292)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3292* (EMC 8667*)",
+    "device_id": "iPhone17,1",
+    "order": "MYMX3VC/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (Global/A3293)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3293* (EMC 8668*)",
+    "device_id": "iPhone17,1",
+    "order": "MYNF3QN/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (China/A3294)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3294* (EMC 8683*)",
+    "device_id": "iPhone17,1",
+    "order": "MYLQ3CH/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (US/A3084)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3084* (EMC 8684*)",
+    "device_id": "iPhone17,2",
+    "order": "MYW53LL/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (CA/MX/JP/SA/A3295)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3295* (EMC 8685*)",
+    "device_id": "iPhone17,2",
+    "order": "MYWJ3VC/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (Global/A3296)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3296* (EMC 8686*)",
+    "device_id": "iPhone17,2",
+    "order": "MYWX3QN/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (China/A3297)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3297* (EMC 8687*)",
+    "device_id": "iPhone17,2",
+    "order": "MYTP3CH/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16e (US/A3212)",
+    "introduced": "February 19, 2025",
+    "discontinued": "N/A",
+    "model": "A3212* (EMC 8725*)",
+    "device_id": "iPhone17,5",
+    "order": "MD0E4LL/A*",
+    "full_family": "iPhone 16e"
+  },
+  {
+    "full_name": "iPhone 16e (CA/MX/SA/A3408)",
+    "introduced": "February 19, 2025",
+    "discontinued": "N/A",
+    "model": "A3408* (EMC 8726*)",
+    "device_id": "iPhone17,5",
+    "order": "MD1G4VC/A*",
+    "full_family": "iPhone 16e"
+  },
+  {
+    "full_name": "iPhone 16e (Global/A3409)",
+    "introduced": "February 19, 2025",
+    "discontinued": "N/A",
+    "model": "A3409* (EMC 8727*)",
+    "device_id": "iPhone17,5",
+    "order": "MD1R4QN/A*",
+    "full_family": "iPhone 16e"
+  },
+  {
+    "full_name": "iPhone 16e (China/A3410)",
+    "introduced": "February 19, 2025",
+    "discontinued": "N/A",
+    "model": "A3410* (EMC 8728*)",
+    "device_id": "iPhone17,5",
+    "order": "MD2C4CH/A*",
+    "full_family": "iPhone 16e"
+  },
+  {
+    "full_name": "iPad Wi-Fi (Original/1st Gen)",
+    "introduced": "January 27, 2010*",
+    "discontinued": "March 2, 2011",
+    "model": "A1219 (EMC 2311)",
+    "device_id": "iPad1,1",
+    "order": "MB292LL/A*",
+    "full_family": "iPad (Original)"
+  },
+  {
+    "full_name": "iPad Wi-Fi/3G/GPS (Original/1st Gen)",
+    "introduced": "January 27, 2010*",
+    "discontinued": "March 2, 2011",
+    "model": "A1337 (EMC 2328)",
+    "device_id": "iPad1,1",
+    "order": "MC349LL/A*",
+    "full_family": "iPad 3G (Original)"
+  },
+  {
+    "full_name": "iPad 2 (Wi-Fi Only)",
+    "introduced": "March 2, 2011*",
+    "discontinued": "March 18, 2014**",
+    "model": "A1395 (EMC 2415)",
+    "device_id": "iPad2,1",
+    "order": "MC769LL/A*",
+    "full_family": "iPad 2"
+  },
+  {
+    "full_name": "iPad 2 (Wi-Fi/GSM/GPS)",
+    "introduced": "March 2, 2011*",
+    "discontinued": "March 18, 2014**",
+    "model": "A1396 (EMC 2416)",
+    "device_id": "iPad2,2",
+    "order": "MC773LL/A*",
+    "full_family": "iPad 2 3G (AT&T)"
+  },
+  {
+    "full_name": "iPad 2 (Wi-Fi/CDMA/GPS)",
+    "introduced": "March 2, 2011*",
+    "discontinued": "March 18, 2014**",
+    "model": "A1397 (EMC 2424)",
+    "device_id": "iPad2,3",
+    "order": "MC755LL/A*",
+    "full_family": "iPad 2 3G (Verizon)"
+  },
+  {
+    "full_name": "iPad 2 (Wi-Fi Only, iPad2,4)",
+    "introduced": "March 25, 2012*",
+    "discontinued": "March 18, 2014",
+    "model": "A1395 (EMC 2560)",
+    "device_id": "iPad2,4",
+    "order": "MC769LL/A*",
+    "full_family": "iPad 2"
+  },
+  {
+    "full_name": "iPad 3rd Gen (Wi-Fi Only)",
+    "introduced": "March 7, 2012*",
+    "discontinued": "October 23, 2012",
+    "model": "A1416 (EMC 2498)",
+    "device_id": "iPad3,1",
+    "order": "MC705LL/A*",
+    "full_family": "iPad 3rd Gen"
+  },
+  {
+    "full_name": "iPad 3rd Gen (Wi-Fi/Cellular AT&T/GPS)",
+    "introduced": "March 7, 2012*",
+    "discontinued": "October 23, 2012",
+    "model": "A1430 (EMC 2578)",
+    "device_id": "iPad3,3",
+    "order": "MD366LL/A*",
+    "full_family": "iPad 3rd Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 3rd Gen (Wi-Fi/Cellular Verizon/GPS)",
+    "introduced": "March 7, 2012*",
+    "discontinued": "October 23, 2012",
+    "model": "A1403 (EMC 2499)",
+    "device_id": "iPad3,2",
+    "order": "MC733LL/A*",
+    "full_family": "iPad 3rd Gen (Wi-Fi + Cellular VZ)"
+  },
+  {
+    "full_name": "iPad 4th Gen (Wi-Fi Only)",
+    "introduced": "October 23, 2012*",
+    "discontinued": "October 16, 2014**",
+    "model": "A1458 (EMC 2604*)",
+    "device_id": "iPad3,4",
+    "order": "MD510LL/A*",
+    "full_family": "iPad 4th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 4th Gen (Wi-Fi/AT&T/GPS)",
+    "introduced": "October 23, 2012*",
+    "discontinued": "October 16, 2014**",
+    "model": "A1459 (EMC 2605*)",
+    "device_id": "iPad3,5",
+    "order": "MD516LL/A*",
+    "full_family": "iPad 4th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 4th Gen (Wi-Fi/Verizon & Sprint/GPS)",
+    "introduced": "October 23, 2012*",
+    "discontinued": "October 16, 2014**",
+    "model": "A1460 (EMC 2606*)",
+    "device_id": "iPad3,6",
+    "order": "MD522LL/A*",
+    "full_family": "iPad 4th Gen (Wi-Fi + Cellular MM)"
+  },
+  {
+    "full_name": "iPad mini Wi-Fi Only/1st Gen",
+    "introduced": "October 23, 2012*",
+    "discontinued": "June 19, 2015**",
+    "model": "A1432 (EMC 2607*)",
+    "device_id": "iPad2,5",
+    "order": "MD528LL/A*",
+    "full_family": "iPad mini (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini Wi-Fi/AT&T/GPS - 1st Gen",
+    "introduced": "October 23, 2012*",
+    "discontinued": "June 19, 2015**",
+    "model": "A1454 (EMC 2608*)",
+    "device_id": "iPad2,6",
+    "order": "MD534LL/A*",
+    "full_family": "iPad mini (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini Wi-Fi/VZ & Sprint/GPS - 1st Gen",
+    "introduced": "October 23, 2012*",
+    "discontinued": "June 19, 2015**",
+    "model": "A1455 (EMC 2609*)",
+    "device_id": "iPad2,7",
+    "order": "MD540LL/A*",
+    "full_family": "iPad mini (Wi-Fi + Cellular MM)"
+  },
+  {
+    "full_name": "iPad Air Wi-Fi Only",
+    "introduced": "October 22, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1474 (EMC 2646*)",
+    "device_id": "iPad4,1",
+    "order": "MD785LL/A*",
+    "full_family": "iPad Air (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air Wi-Fi/Cellular",
+    "introduced": "October 22, 2013*",
+    "discontinued": "March 21, 2016**",
+    "model": "A1475 (EMC 2647*)",
+    "device_id": "iPad4,2",
+    "order": "ME991LL/A*",
+    "full_family": "iPad Air (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Air Wi-Fi/TD-LTE - China",
+    "introduced": "April 1, 2014",
+    "discontinued": "March 21, 2016**",
+    "model": "A1476 (EMC N/A)",
+    "device_id": "iPad4,3",
+    "order": "MD785CH/A*",
+    "full_family": "iPad Air (Wi-Fi + Cellular CN)"
+  },
+  {
+    "full_name": "iPad mini 2 (Retina/2nd Gen, Wi-Fi Only)",
+    "introduced": "October 22, 2013*",
+    "discontinued": "March 21, 2017*",
+    "model": "A1489 (EMC 2695*)",
+    "device_id": "iPad4,4",
+    "order": "ME276LL/A*",
+    "full_family": "iPad mini Retina (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini 2 (Retina/2nd Gen, Wi-Fi/Cellular)",
+    "introduced": "October 22, 2013*",
+    "discontinued": "March 21, 2017*",
+    "model": "A1490 (EMC 2696*)",
+    "device_id": "iPad4,5",
+    "order": "MF066LL/A*",
+    "full_family": "iPad mini Retina (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 2 (Retina/2nd Gen, China)",
+    "introduced": "April 1, 2014",
+    "discontinued": "March 21, 2017*",
+    "model": "A1491 (EMC 2696*)",
+    "device_id": "iPad4,6",
+    "order": "MF247CH/A*",
+    "full_family": "iPad mini Retina (Wi-Fi + Cellular CN)"
+  },
+  {
+    "full_name": "iPad Air 2 (Wi-Fi Only)",
+    "introduced": "October 16, 2014",
+    "discontinued": "March 21, 2017*",
+    "model": "A1566 (EMC 2822*)",
+    "device_id": "iPad5,3",
+    "order": "MGLW2LL/A*",
+    "full_family": "iPad Air 2 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air 2 (Wi-Fi/Cellular)",
+    "introduced": "October 16, 2014",
+    "discontinued": "March 21, 2017*",
+    "model": "A1567 (EMC 2823*)",
+    "device_id": "iPad5,4",
+    "order": "MH2V2LL/A*",
+    "full_family": "iPad Air 2 (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 3 (Wi-Fi Only)",
+    "introduced": "October 16, 2014",
+    "discontinued": "September 9, 2015",
+    "model": "A1599 (EMC 2848*)",
+    "device_id": "iPad4,7",
+    "order": "MGNV2LL/A*",
+    "full_family": "iPad mini 3 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini 3 (Wi-Fi/Cellular)",
+    "introduced": "October 16, 2014",
+    "discontinued": "September 9, 2015",
+    "model": "A1600 (EMC 2849*)",
+    "device_id": "iPad4,8",
+    "order": "MH3F2LL/A*",
+    "full_family": "iPad mini 3 (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 3 (Wi-Fi/Cellular, China)",
+    "introduced": "October 16, 2014*",
+    "discontinued": "September 9, 2015",
+    "model": "A1601 (EMC 2849*)",
+    "device_id": "iPad4,9",
+    "order": "MGPW2CH/A*",
+    "full_family": "iPad mini 3 (Wi-Fi + Cellular, China)"
+  },
+  {
+    "full_name": "iPad mini 4 (Wi-Fi Only)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "March 18, 2019*",
+    "model": "A1538 (EMC 2824*)",
+    "device_id": "iPad5,1",
+    "order": "MK6K2LL/A*",
+    "full_family": "iPad mini 4 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini 4 (Wi-Fi/Cellular)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "March 18, 2019*",
+    "model": "A1550 (EMC 2825*)",
+    "device_id": "iPad5,2",
+    "order": "MK872LL/A*",
+    "full_family": "iPad mini 4 (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "June 5, 2017",
+    "model": "A1584 (EMC 2838)",
+    "device_id": "iPad6,7",
+    "order": "ML0G2LL/A*",
+    "full_family": "iPad Pro (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cellular)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "June 5, 2017",
+    "model": "A1652 (EMC 2827)",
+    "device_id": "iPad6,8",
+    "order": "ML3N2LL/A*",
+    "full_family": "iPad Pro (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 9.7\" (Wi-Fi Only)",
+    "introduced": "March 21, 2016*",
+    "discontinued": "June 5, 2017",
+    "model": "A1673 (EMC 2976)",
+    "device_id": "iPad6,3",
+    "order": "MLMP2LL/A*",
+    "full_family": "iPad Pro 9.7\" Wi-Fi"
+  },
+  {
+    "full_name": "iPad Pro 9.7\" (Wi-Fi/Cellular)",
+    "introduced": "March 21, 2016*",
+    "discontinued": "June 5, 2017",
+    "model": "A1674 (EMC 2977)",
+    "device_id": "iPad6,4",
+    "order": "MLPX2LL/A*",
+    "full_family": "iPad Pro 9.7\" Wi-Fi + Cellular"
+  },
+  {
+    "full_name": "iPad 9.7\" 5th Gen (Wi-Fi Only)",
+    "introduced": "March 21, 2017*",
+    "discontinued": "March 27, 2018",
+    "model": "A1822 (EMC 3017*)",
+    "device_id": "iPad6,11",
+    "order": "MP2G2LL/A*",
+    "full_family": "iPad 5th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 9.7\" 5th Gen (Wi-Fi/Cellular)",
+    "introduced": "March 21, 2017*",
+    "discontinued": "March 27, 2018",
+    "model": "A1823 (EMC 3108*)",
+    "device_id": "iPad6,12",
+    "order": "MP252LL/A*",
+    "full_family": "iPad 5th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 10.5\" (Wi-Fi Only)",
+    "introduced": "June 5, 2017*",
+    "discontinued": "March 18, 2019",
+    "model": "A1701 (EMC 3140*)",
+    "device_id": "iPad7,3",
+    "order": "MQDW2LL/A*",
+    "full_family": "iPad Pro 10.5\" (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 10.5\" (Wi-Fi/Cellular)",
+    "introduced": "June 5, 2017*",
+    "discontinued": "March 18, 2019",
+    "model": "A1709 (EMC 3141*)",
+    "device_id": "iPad7,4",
+    "order": "MQF02LL/A*",
+    "full_family": "iPad Pro 10.5\" (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 2nd Gen)",
+    "introduced": "June 5, 2017*",
+    "discontinued": "October 30, 2018",
+    "model": "A1670 (EMC 3149*)",
+    "device_id": "iPad7,1",
+    "order": "MQDC2LL/A*",
+    "full_family": "iPad Pro 12.9\" (2nd Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell - 2nd Gen)",
+    "introduced": "June 5, 2017*",
+    "discontinued": "October 30, 2018",
+    "model": "A1671 (EMC 3150*)",
+    "device_id": "iPad7,2",
+    "order": "MQEE2LL/A*",
+    "full_family": "iPad Pro 12.9\" (2nd Gen - Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad 9.7\" 6th Gen (Wi-Fi Only)",
+    "introduced": "March 27, 2018",
+    "discontinued": "September 10, 2019",
+    "model": "A1893 (EMC 3210*)",
+    "device_id": "iPad7,5",
+    "order": "MR7G2LL/A*",
+    "full_family": "iPad 6th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 9.7\" 6th Gen (Wi-Fi/Cellular)",
+    "introduced": "March 27, 2018",
+    "discontinued": "September 10, 2019",
+    "model": "A1954 (EMC 3211*)",
+    "device_id": "iPad7,6",
+    "order": "MR702LL/A*",
+    "full_family": "iPad 6th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi Only)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1980 (EMC 3221*)",
+    "device_id": "iPad8,1, iPad8,2**",
+    "order": "MTXP2LL/A*",
+    "full_family": "iPad Pro 11\" (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - US/CA)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A2013 (EMC 3222*)",
+    "device_id": "iPad8,3, iPad8,4**",
+    "order": "MU0Y2LL/A*",
+    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - Global)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1934 (EMC 3222*)",
+    "device_id": "iPad8,3, iPad8,4**",
+    "order": "MU0U2B/A*",
+    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - China)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1979 (EMC 3222*)",
+    "device_id": "iPad8,3, iPad8,4**",
+    "order": "MU0X2CH/A*",
+    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 3rd Gen)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1876 (EMC 3223*)",
+    "device_id": "iPad8,5, iPad8,6**",
+    "order": "MTEM2LL/A*",
+    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell US/CA - 3rd Gen)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A2014 (EMC 3224*)",
+    "device_id": "iPad8,7, iPad8,8**",
+    "order": "MTHU2LL/A*",
+    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell Global - 3rd Gen)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1895 (EMC 3224*)",
+    "device_id": "iPad8,7, iPad8,8**",
+    "order": "MTHP2B/A*",
+    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell China - 3rd Gen)",
+    "introduced": "October 30, 2018*",
+    "discontinued": "March 18, 2020",
+    "model": "A1983 (EMC 3224*)",
+    "device_id": "iPad8,7, iPad8,8**",
+    "order": "MTHT2CH/A*",
+    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Air 3rd Gen (Wi-Fi Only)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2152 (EMC 3315*)",
+    "device_id": "iPad11,3",
+    "order": "MUUK2LL/A*",
+    "full_family": "iPad Air 3rd Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air 3rd Gen (Wi-Fi+Cell US/CA)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2153 (EMC 3316*)",
+    "device_id": "iPad11,4",
+    "order": "MV162LL/A*",
+    "full_family": "iPad Air 3rd Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Air 3rd Gen (Wi-Fi+Cell Global)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2123 (EMC 3316*)",
+    "device_id": "iPad11,4",
+    "order": "MV0E2B/A*",
+    "full_family": "iPad Air 3rd Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad Air 3rd Gen (Wi-Fi+Cell China)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2154 (EMC 3316*)",
+    "device_id": "iPad11,4",
+    "order": "MV0U2CH/A*",
+    "full_family": "iPad Air 3rd Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 5th Gen (Wi-Fi Only)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 14, 2021",
+    "model": "A2133 (EMC 3313*)",
+    "device_id": "iPad11,1",
+    "order": "MUQX2LL/A*",
+    "full_family": "iPad mini 5th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini 5th Gen (Wi-Fi+Cell US/CA)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 14, 2021",
+    "model": "A2126 (EMC 3314*)",
+    "device_id": "iPad11,2",
+    "order": "MUXG2LL/A*",
+    "full_family": "iPad mini 5th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 5th Gen (Wi-Fi+Cell Global)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 14, 2021",
+    "model": "A2124 (EMC 3314*)",
+    "device_id": "iPad11,2",
+    "order": "MUX62B/A*",
+    "full_family": "iPad mini 5th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad mini 5th Gen (Wi-Fi+Cell China)",
+    "introduced": "March 18, 2019",
+    "discontinued": "September 14, 2021",
+    "model": "A2125 (EMC 3314*)",
+    "device_id": "iPad11,2",
+    "order": "MUXR2CH/A*",
+    "full_family": "iPad mini 5th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi Only)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2197 (EMC 3323*)",
+    "device_id": "iPad7,11",
+    "order": "MW752LL/A*",
+    "full_family": "iPad 7th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, US/CA)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2200 (EMC 3324*)",
+    "device_id": "iPad7,12",
+    "order": "MW6X2LL/A*",
+    "full_family": "iPad 7th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, Global)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2198 (EMC 3324*)",
+    "device_id": "iPad7,12",
+    "order": "MW6C2B/A*",
+    "full_family": "iPad 7th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, China)",
+    "introduced": "September 10, 2019",
+    "discontinued": "September 15, 2020",
+    "model": "A2199 (EMC 3324*)",
+    "device_id": "iPad7,12",
+    "order": "MW6Q2CH/A*",
+    "full_family": "iPad 7th Gen (Wi-Fi + Cellular, CN)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi Only - 2nd Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2228 (EMC 3349)",
+    "device_id": "iPad8,9",
+    "order": "MY252LL/A*",
+    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US/CA - 2nd Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2068 (EMC 3350)",
+    "device_id": "iPad8,10",
+    "order": "MY342LL/A*",
+    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 2nd Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2230 (EMC 3350)",
+    "device_id": "iPad8,10",
+    "order": "MY2W2ZP/A*",
+    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 2nd Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2231 (EMC 3350)",
+    "device_id": "iPad8,10",
+    "order": "MY322CH/A*",
+    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 4th Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2229 (EMC 3353)",
+    "device_id": "iPad8,11",
+    "order": "MY2J2LL/A*",
+    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US/CA - 4th Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2069 (EMC 3354)",
+    "device_id": "iPad8,12",
+    "order": "MY3K2LL/A*",
+    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 4th Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2232 (EMC 3354)",
+    "device_id": "iPad8,12",
+    "order": "MY3D2ZP/A*",
+    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 4th Gen)",
+    "introduced": "March 18, 2020",
+    "discontinued": "April 20, 2021",
+    "model": "A2233 (EMC 3354)",
+    "device_id": "iPad8,12",
+    "order": "MY3H2CH/A*",
+    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi Only)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 14, 2021",
+    "model": "A2270 (EMC 3574*)",
+    "device_id": "iPad11,6",
+    "order": "MYLA2LL/A*",
+    "full_family": "iPad 8th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, US/CA)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 14, 2021",
+    "model": "A2428 (EMC 3575*)",
+    "device_id": "iPad11,7",
+    "order": "MYN52LL/A*",
+    "full_family": "iPad 8th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, Global)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 14, 2021",
+    "model": "A2429 (EMC 3575*)",
+    "device_id": "iPad11,7",
+    "order": "MYMJ2B/A*",
+    "full_family": "iPad 8th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, China)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 14, 2021",
+    "model": "A2430 (EMC 3575*)",
+    "device_id": "iPad11,7",
+    "order": "MYMX2CH/A*",
+    "full_family": "iPad 8th Gen (Wi-Fi + Cellular, CN)"
+  },
+  {
+    "full_name": "iPad Air 4th Gen (Wi-Fi Only)",
+    "introduced": "September 15, 2020*",
+    "discontinued": "March 8, 2022",
+    "model": "A2316 (EMC 3570*)",
+    "device_id": "iPad13,1",
+    "order": "MYFN2LL/A*",
+    "full_family": "iPad Air 4th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air 4th Gen (Wi-Fi+Cell US/CA)",
+    "introduced": "September 15, 2020*",
+    "discontinued": "March 8, 2022",
+    "model": "A2324 (EMC 3571*)",
+    "device_id": "iPad13,2",
+    "order": "MYHY2LL/A*",
+    "full_family": "iPad Air 4th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air 4th Gen (Wi-Fi+Cell Global)",
+    "introduced": "September 15, 2020*",
+    "discontinued": "March 8, 2022",
+    "model": "A2072 (EMC 3571*)",
+    "device_id": "iPad13,2",
+    "order": "MYGX2ZP/A*",
+    "full_family": "iPad Air 4th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air 4th Gen (Wi-Fi+Cell China)",
+    "introduced": "September 15, 2020*",
+    "discontinued": "March 8, 2022",
+    "model": "A2325 (EMC 3571*)",
+    "device_id": "iPad13,2",
+    "order": "MYHM2CH/A*",
+    "full_family": "iPad Air 4th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi Only - 3rd Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2377 (EMC 3681)",
+    "device_id": "iPad13,4",
+    "order": "MHQT3LL/A*",
+    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US - 3rd Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2301 (EMC 3682)",
+    "device_id": "iPad13,5",
+    "order": "MHMU3LL/A*",
+    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 3rd Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2459 (EMC 3683)",
+    "device_id": "iPad13,6",
+    "order": "MHW63X/A*",
+    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 3rd Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2460 (EMC 3684)",
+    "device_id": "iPad13,7",
+    "order": "MHWH3CH/A*",
+    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 5th Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2378 (EMC 3689)",
+    "device_id": "iPad13,8",
+    "order": "MHNG3LL/A*",
+    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US - 5th Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2379 (EMC 3686)",
+    "device_id": "iPad13,9",
+    "order": "MHNT3LL/A*",
+    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 5th Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2461 (EMC 3687)",
+    "device_id": "iPad13,10",
+    "order": "MHR53X/A*",
+    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 5th Gen)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2462 (EMC 3688)",
+    "device_id": "iPad13,11",
+    "order": "MHRG3CH/A*",
+    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi Only)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "May 7, 2024",
+    "model": "A2602 (EMC 4045*)",
+    "device_id": "iPad12,1",
+    "order": "MK2L3LL/A*",
+    "full_family": "iPad 9th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, US/CA)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "May 7, 2024",
+    "model": "A2603 (EMC 4046*)",
+    "device_id": "iPad12,2",
+    "order": "MK673LL/A*",
+    "full_family": "iPad 9th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, Global)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "May 7, 2024",
+    "model": "A2604 (EMC 4046*)",
+    "device_id": "iPad12,2",
+    "order": "MK493B/A*",
+    "full_family": "iPad 9th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, China)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "May 7, 2024",
+    "model": "A2605 (EMC 4046*)",
+    "device_id": "iPad12,2",
+    "order": "MK613CH/A*",
+    "full_family": "iPad 9th Gen (Wi-Fi + Cellular, CN)"
+  },
+  {
+    "full_name": "iPad mini 6th Gen (Wi-Fi Only)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "October 15, 2024",
+    "model": "A2567 (EMC 4043*)",
+    "device_id": "iPad14,1",
+    "order": "MK7M3LL/A*",
+    "full_family": "iPad mini 6th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini 6th Gen (Wi-Fi/Cell US/Global)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "October 15, 2024",
+    "model": "A2568 (EMC 4044*)",
+    "device_id": "iPad14,2",
+    "order": "MK893LL/A*",
+    "full_family": "iPad mini 6th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad mini 6th Gen (Wi-Fi/Cell China)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "October 15, 2024",
+    "model": "A2569 (EMC 4044*)",
+    "device_id": "iPad14,2",
+    "order": "MK8Y3CH/A*",
+    "full_family": "iPad mini 6th Gen (Wi-Fi+Cell CN)"
+  },
+  {
+    "full_name": "iPad Air 5th Gen (Wi-Fi Only)",
+    "introduced": "March 8, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2588 (EMC 4041*)",
+    "device_id": "iPad13,16",
+    "order": "MM9C3LL/A*",
+    "full_family": "iPad Air 5th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air 5th Gen (Wi-Fi+Cell A2589)",
+    "introduced": "March 8, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2589 (EMC 4042*)",
+    "device_id": "iPad13,17",
+    "order": "MM6R3LL/A*",
+    "full_family": "iPad Air 5th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air 5th Gen (Wi-Fi+Cell China)",
+    "introduced": "March 8, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2591 (EMC 4042*)",
+    "device_id": "iPad13,17",
+    "order": "MM753CH/A*",
+    "full_family": "iPad Air 5th Gen (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi Only)",
+    "introduced": "October 18, 2022",
+    "discontinued": "March 4, 2025",
+    "model": "A2696 (EMC 8137*)",
+    "device_id": "iPad13,18",
+    "order": "MPQ03LL/A*",
+    "full_family": "iPad 10th Gen (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi/Cellular)",
+    "introduced": "October 18, 2022",
+    "discontinued": "March 4, 2025",
+    "model": "A2757 (EMC 8135*)",
+    "device_id": "iPad13,19",
+    "order": "MQ6J3LL/A*",
+    "full_family": "iPad 10th Gen (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi/Cellular, China)",
+    "introduced": "October 18, 2022",
+    "discontinued": "March 4, 2025",
+    "model": "A2777 (EMC 8135*)",
+    "device_id": "iPad13,19",
+    "order": "MQ6X3CH/A*",
+    "full_family": "iPad 10th Gen (Wi-Fi + Cell, CN)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi Only - 4th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2759 (EMC 8166*)",
+    "device_id": "iPad14,3",
+    "order": "MNXE3LL/A*",
+    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US - 4th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2435 (EMC 8167*)",
+    "device_id": "iPad14,4",
+    "order": "MP563LL/A*",
+    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 4th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2761 (EMC 8168*)",
+    "device_id": "iPad14,4",
+    "order": "MNYD3B/A*",
+    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 4th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2762 (EMC 8168*)",
+    "device_id": "iPad14,4",
+    "order": "MNYP3CH/A*",
+    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 6th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2436 (EMC 8169*)",
+    "device_id": "iPad14,5",
+    "order": "MNXQ3LL/A*",
+    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US - 6th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2764 (EMC 8176*)",
+    "device_id": "iPad14,6",
+    "order": "MP5Y3LL/A*",
+    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 6th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2437 (EMC 8177*)",
+    "device_id": "iPad14,6",
+    "order": "MP1Y3B/A*",
+    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 6th Gen)",
+    "introduced": "October 18, 2022",
+    "discontinued": "May 7, 2024",
+    "model": "A2766 (EMC 8177*)",
+    "device_id": "iPad14,6",
+    "order": "MP293CH/A*",
+    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+  },
+  {
+    "full_name": "iPad Air M2 11\" (Wi-Fi Only)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2902 (EMC 8392*)",
+    "device_id": "iPad14,8",
+    "order": "MUWD3LL/A*",
+    "full_family": "iPad Air 11\" M2 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air M2 11\" (Wi-Fi+Cell)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2903 (EMC 8393*)",
+    "device_id": "iPad14,9",
+    "order": "MUXE3LL/A*",
+    "full_family": "iPad Air 11\" M2 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air M2 11\" (Wi-Fi+Cell China)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2904 (EMC 8393*)",
+    "device_id": "iPad14,9",
+    "order": "MUXX3CH/A*",
+    "full_family": "iPad Air 11\" M2 (China)"
+  },
+  {
+    "full_name": "iPad Air M2 13\" (Wi-Fi Only)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2898 (EMC 8394*)",
+    "device_id": "iPad14,10",
+    "order": "MV283LL/A*",
+    "full_family": "iPad Air 13\" M2 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air M2 13\" (Wi-Fi+Cell)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2899 (EMC 8395*)",
+    "device_id": "iPad14,11",
+    "order": "MV6R3LL/A*",
+    "full_family": "iPad Air 13\" M2 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air M2 13\" (Wi-Fi+Cell China)",
+    "introduced": "May 7, 2024",
+    "discontinued": "March 4, 2025",
+    "model": "A2900 (EMC 8395*)",
+    "device_id": "iPad14,11",
+    "order": "MV793CH/A*",
+    "full_family": "iPad Air 13\" M2 (China)"
+  },
+  {
+    "full_name": "iPad Pro M4 11\" (Wi-Fi Only)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2836 (EMC 8472*)",
+    "device_id": "iPad16,3",
+    "order": "MVV93LL/A*",
+    "full_family": "iPad Pro 11\" M4 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro M4 11\" (Wi-Fi+Cell)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2837 (EMC 8473*)",
+    "device_id": "iPad16,4",
+    "order": "MVW23LL/A*",
+    "full_family": "iPad Pro 11\" M4 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Pro M4 11\" (Wi-Fi+Cell China)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A3006 (EMC 8473*)",
+    "device_id": "iPad16,4",
+    "order": "MVWA3CH/A*",
+    "full_family": "iPad Pro 11\" M4 (China)"
+  },
+  {
+    "full_name": "iPad Pro M4 13\" (Wi-Fi Only)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2925 (EMC 8474*)",
+    "device_id": "iPad16,5",
+    "order": "MVX33LL/A*",
+    "full_family": "iPad Pro 13\" M4 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Pro M4 13\" (Wi-Fi+Cell)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2926 (EMC 8475*)",
+    "device_id": "iPad16,6",
+    "order": "MVXT3LL/A*",
+    "full_family": "iPad Pro 13\" M4 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Pro M4 13\" (Wi-Fi+Cell China)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A3007 (EMC 8475*)",
+    "device_id": "iPad16,6",
+    "order": "MVY23CH/A*",
+    "full_family": "iPad Pro 13\" M4 (China)"
+  },
+  {
+    "full_name": "iPad mini A17 Pro - 7th Gen (Wi-Fi Only)",
+    "introduced": "October 15, 2024*",
+    "discontinued": "N/A",
+    "model": "A2993 (EMC 8470*)",
+    "device_id": "iPad16,1",
+    "order": "MXN73LL/A*",
+    "full_family": "iPad mini A17 Pro (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad mini A17 Pro - 7th Gen (Wi-Fi/Cell)",
+    "introduced": "October 15, 2024*",
+    "discontinued": "N/A",
+    "model": "A2995 (EMC 8471*)",
+    "device_id": "iPad16,2",
+    "order": "MXPP3LL/A*",
+    "full_family": "iPad mini A17 Pro (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad mini A17 Pro - 7th Gen (Wi-Fi/Cell China)",
+    "introduced": "October 15, 2024*",
+    "discontinued": "N/A",
+    "model": "A2996 (EMC 8471*)",
+    "device_id": "iPad16,2",
+    "order": "MXQ13CH/A*",
+    "full_family": "iPad mini A17 Pro (Wi-Fi+Cell CN)"
+  },
+  {
+    "full_name": "iPad A16 - 11th Gen (Wi-Fi Only)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3354 (EMC 8805*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad A16 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad A16 - 11th Gen (Wi-Fi/Cell)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3355 (EMC 8806*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad A16 (Wi-Fi + Cellular)"
+  },
+  {
+    "full_name": "iPad A16 - 11th Gen (Wi-Fi/Cell, China)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3356 (EMC 8806*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad A16 (Wi-Fi + Cellular, China)"
+  },
+  {
+    "full_name": "iPad Air M3 11\" (Wi-Fi Only)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3266 (EMC 8776*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 11\" M3 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air M3 11\" (Wi-Fi+Cell)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3267 (EMC 8777*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 11\" M3 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air M3 11\" (Wi-Fi+Cell, China)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3270 (EMC 8777*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 11\" M3 (China)"
+  },
+  {
+    "full_name": "iPad Air M3 13\" (Wi-Fi Only)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3268 (EMC 8778*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 13\" M3 (Wi-Fi)"
+  },
+  {
+    "full_name": "iPad Air M3 13\" (Wi-Fi+Cell)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3269 (EMC 8779*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 13\" M3 (Wi-Fi+Cell)"
+  },
+  {
+    "full_name": "iPad Air M3 13\" (Wi-Fi+Cell, China)",
+    "introduced": "March 4, 2025",
+    "discontinued": "N/A",
+    "model": "A3271 (EMC 8779*)",
+    "device_id": "Pending",
+    "order": "Pending",
+    "full_family": "iPad Air 13\" M3 (China)"
+  },
+  {
+    "full_name": "Apple TV (Original/1st Gen)",
+    "introduced": "January 9, 2007*",
+    "discontinued": "September 1, 2010*",
+    "model": "A1218 (EMC 2123)",
+    "device_id": "AppleTV1,1",
+    "order": "MA711LL/A*",
+    "full_family": "Apple TV"
+  },
+  {
+    "full_name": "Apple TV (2nd Generation)",
+    "introduced": "September 1, 2010*",
+    "discontinued": "March 7, 2012",
+    "model": "A1378 (EMC 2411)",
+    "device_id": "AppleTV2,1",
+    "order": "MC572LL/A",
+    "full_family": "2nd Gen"
+  },
+  {
+    "full_name": "Apple TV (3rd Generation, Early 2012)",
+    "introduced": "March 7, 2012*",
+    "discontinued": "March 10, 2013*",
+    "model": "A1427 (EMC 2528)",
+    "device_id": "AppleTV3,1",
+    "order": "MD199LL/A",
+    "full_family": "3rd Gen"
+  },
+  {
+    "full_name": "Apple TV (3rd Generation, Early 2013)",
+    "introduced": "January 29, 2013*",
+    "discontinued": "October 3, 2016**",
+    "model": "A1469 (EMC 2633)",
+    "device_id": "AppleTV3,2",
+    "order": "MD199LL/A",
+    "full_family": "3rd Gen"
+  },
+  {
+    "full_name": "Apple TV HD (4th Generation, Siri)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "October 18, 2022*",
+    "model": "A1625 (EMC 2907)",
+    "device_id": "AppleTV5,3",
+    "order": "MGY52LL/A*",
+    "full_family": "4th Gen"
+  },
+  {
+    "full_name": "Apple TV 4K (2017, Black Siri Remote)",
+    "introduced": "September 12, 2017",
+    "discontinued": "April 20, 2021",
+    "model": "A1842 (EMC 3124)",
+    "device_id": "AppleTV6,2",
+    "order": "MQD22LL/A*",
+    "full_family": "4K"
+  },
+  {
+    "full_name": "Apple TV 4K (2nd Gen, 2021)",
+    "introduced": "April 20, 2021*",
+    "discontinued": "October 18, 2022",
+    "model": "A2169 (EMC 3111)",
+    "device_id": "AppleTV11,1",
+    "order": "MXGY2LL/A*",
+    "full_family": "4K (2nd Gen)"
+  },
+  {
+    "full_name": "Apple TV 4K (3rd Gen, 2022, Wi-Fi Only)",
+    "introduced": "October 18, 2022*",
+    "discontinued": "N/A",
+    "model": "A2737 (EMC 8101)",
+    "device_id": "AppleTV14,1",
+    "order": "MN873LL/A",
+    "full_family": "4K (3rd Gen)"
+  },
+  {
+    "full_name": "Apple TV 4K (3rd Gen, 2022, Wi-Fi + Ethernet)",
+    "introduced": "October 18, 2022*",
+    "discontinued": "N/A",
+    "model": "A2843 (EMC 8165)",
+    "device_id": "AppleTV14,1",
+    "order": "MN893LL/A",
+    "full_family": "4K (3rd Gen)"
+  },
+  {
+    "full_name": "Apple Watch Series 0 (Regular - Steel, 38 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1553 (EMC 2870*)",
+    "device_id": "Watch1,1",
+    "order": "MJ302LL/A*",
+    "full_family": "Watch Standard 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 (Regular - Steel, 42 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1554 (EMC 2871*)",
+    "device_id": "Watch1,2",
+    "order": "MJ3V2LL/A*",
+    "full_family": "Watch Standard 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Sport (Aluminum, 38 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1553 (EMC 2870*)",
+    "device_id": "Watch1,1",
+    "order": "MJ2T2LL/A*",
+    "full_family": "Watch Sport 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Sport (Aluminum, 42 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1554 (EMC 2871*)",
+    "device_id": "Watch1,2",
+    "order": "MJ3N2LL/A*",
+    "full_family": "Watch Sport 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Edition (18k Gold, 38 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1553 (EMC 2870*)",
+    "device_id": "Watch1,1",
+    "order": "MJ8P2LL/A*",
+    "full_family": "Watch Edition 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Edition (18k Gold, 42 mm)",
+    "introduced": "March 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1554 (EMC 2871*)",
+    "device_id": "Watch1,2",
+    "order": "MJ4A2LL/A*",
+    "full_family": "Watch Edition 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Hermes (Steel, 38 mm)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1553 (EMC 2870*)",
+    "device_id": "Watch1,1",
+    "order": "MLCN2LL/A*",
+    "full_family": "Watch Herm\u0018\u00aes 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 0 Hermes (Steel, 42 mm)",
+    "introduced": "September 9, 2015*",
+    "discontinued": "September 7, 2016",
+    "model": "A1554 (EMC 2871*)",
+    "device_id": "Watch1,2",
+    "order": "MLCC2LL/A*",
+    "full_family": "Watch Herm\u0018\u00aes 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 1 (Aluminum, 38 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2018",
+    "model": "A1802* (EMC 3102*)",
+    "device_id": "Watch2,6",
+    "order": "MNNG2LL/A*",
+    "full_family": "Watch Series 1 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 1 (Aluminum, 42 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2018",
+    "model": "A1803* (EMC 3103*)",
+    "device_id": "Watch2,7",
+    "order": "MNNL2LL/A*",
+    "full_family": "Watch Series 1 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Aluminum/Steel, 38 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1757* (EMC 3104*)",
+    "device_id": "Watch2,3",
+    "order": "MNNW2LL/A*",
+    "full_family": "Watch Series 2 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Aluminum/Steel, 42 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1758* (EMC 3105*)",
+    "device_id": "Watch2,4",
+    "order": "MNPJ2LL/A*",
+    "full_family": "Watch Series 2 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Nike+, 38 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1757* (EMC 3104*)",
+    "device_id": "Watch2,3",
+    "order": "MP082LL/A*",
+    "full_family": "Watch Series 2 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Nike+, 42 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1758* (EMC 3105*)",
+    "device_id": "Watch2,4",
+    "order": "MP0A2LL/A*",
+    "full_family": "Watch Series 2 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Hermes, 38 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1757* (EMC 3104*)",
+    "device_id": "Watch2,3",
+    "order": "MNQ72LL/A*",
+    "full_family": "Watch Series 2 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Hermes, 42 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1758* (EMC 3105*)",
+    "device_id": "Watch2,4",
+    "order": "MNQC2LL/A*",
+    "full_family": "Watch Series 2 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Edition, 38 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1816* (EMC 3109*)",
+    "device_id": "Watch2,3",
+    "order": "MNPF2LL/A",
+    "full_family": "Watch Series 2 38mm"
+  },
+  {
+    "full_name": "Apple Watch Series 2 (Edition, 42 mm)",
+    "introduced": "September 7, 2016*",
+    "discontinued": "September 12, 2017",
+    "model": "A1817* (EMC 3110*)",
+    "device_id": "Watch2,4",
+    "order": "MNPQ2LL/A",
+    "full_family": "Watch Series 2 42mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Aluminum, GPS, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 7, 2022",
+    "model": "A1858* (EMC 3165*)",
+    "device_id": "Watch3,3",
+    "order": "MQKU2LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Aluminum, GPS, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 7, 2022",
+    "model": "A1859* (EMC 3166*)",
+    "device_id": "Watch3,4",
+    "order": "MQL02LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, US/CA, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1860* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQJN2LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, US/CA, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1861* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQK12LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, Intl, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1889* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQKF2B/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, Intl, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1891* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQKM2B/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, China, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1890* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQQE2CH/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Cellular, China, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1892* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQQR2CH/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, GPS, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1858* (EMC 3165*)",
+    "device_id": "Watch3,3",
+    "order": "MQKX2LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, GPS, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1859* (EMC 3166*)",
+    "device_id": "Watch3,4",
+    "order": "MQL32LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, US/CA, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1860* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQL52LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, US/CA, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1861* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQLC2LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, Intl, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1889* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQM72B/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, Intl, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1891* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQME2B/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, China, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1890* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQR42CH/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Nike+, China, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 15, 2020",
+    "model": "A1892* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQRG2CH/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, US/CA, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1860* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQLN2LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, US/CA, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1861* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQLU2LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, Intl, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1889* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQMQ2B/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, Intl, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1891* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQMW2B/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, China, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1890* (EMC 3169*)",
+    "device_id": "Watch3,1",
+    "order": "MQRF2CH/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Hermes, China, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1892* (EMC 3167*)",
+    "device_id": "Watch3,2",
+    "order": "MQRT2CH/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, US/CA, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1860* (EMC 3170*)",
+    "device_id": "Watch3,1",
+    "order": "MQJY2LL/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, US/CA, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1861* (EMC 3168*)",
+    "device_id": "Watch3,2",
+    "order": "MQKD2LL/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, Intl, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1889* (EMC 3170*)",
+    "device_id": "Watch3,1",
+    "order": "MQM32B/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, Intl, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1891* (EMC 3168*)",
+    "device_id": "Watch3,2",
+    "order": "MQM52B/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, China, 38 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1890* (EMC 3170*)",
+    "device_id": "Watch3,1",
+    "order": "MQQP2CH/A**",
+    "full_family": "Watch Series 3 38 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 3 (Edition, China, 42 mm)",
+    "introduced": "September 12, 2017",
+    "discontinued": "September 12, 2018",
+    "model": "A1892* (EMC 3168*)",
+    "device_id": "Watch3,2",
+    "order": "MQR22CH/A**",
+    "full_family": "Watch Series 3 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Aluminum, GPS, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1977* (EMC 3225*)",
+    "device_id": "Watch4,1",
+    "order": "MU642LL/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Aluminum, GPS, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1978* (EMC 3229*)",
+    "device_id": "Watch4,2",
+    "order": "MU6A2LL/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Cellular, US/CA, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1975* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MTUD2LL/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Cellular, US/CA, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1976* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MTUU2LL/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Cellular, Global, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2007* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MTVA2B/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Cellular, Global, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2008* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MTVR2B/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, GPS, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1977* (EMC 3225*)",
+    "device_id": "Watch4,1",
+    "order": "MU6H2LL/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, GPS, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1978* (EMC 3229*)",
+    "device_id": "Watch4,2",
+    "order": "MU6K2LL/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, US/CA, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1975* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MTV92LL/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, US/CA, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1976* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MTXC2LL/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, Global, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2007* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MTX62B/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Nike+, Global, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2008* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MTXK2B/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Hermes, US/CA, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1975* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MU6N2LL/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Hermes, US/CA, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A1976* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MU6X2LL/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Hermes, Global, 40 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2007* (EMC 3227*)",
+    "device_id": "Watch4,3",
+    "order": "MU702B/A**",
+    "full_family": "Watch Series 4 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 4 (Hermes, Global, 44 mm)",
+    "introduced": "September 12, 2018*",
+    "discontinued": "September 10, 2019",
+    "model": "A2008* (EMC 3228*)",
+    "device_id": "Watch4,4",
+    "order": "MU782B/A**",
+    "full_family": "Watch Series 4 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Aluminum, GPS, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2092* (EMC 3317*)",
+    "device_id": "Watch5,1",
+    "order": "MWV82LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Aluminum, GPS, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2093* (EMC 3318*)",
+    "device_id": "Watch5,2",
+    "order": "MWVF2LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Cellular, US/CA, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2094* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWWQ2LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Cellular, US/CA, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2095* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWW12LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Cellular, Global, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2156* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWX32B/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Cellular, Global, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2157* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWWE2B/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, GPS, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2092* (EMC 3317*)",
+    "device_id": "Watch5,1",
+    "order": "MX3R2LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, GPS, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2093* (EMC 3318*)",
+    "device_id": "Watch5,2",
+    "order": "MX3V2LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, US/CA, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2094* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MX372LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, US/CA, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2095* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MX392LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, Global, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2156* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MX3C2B/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Nike+, Global, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2157* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MX3E2B/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Hermes, US/CA, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2094* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWX02LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Hermes, US/CA, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2095* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWW92LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Hermes, Global, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2156* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWXC2B/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Hermes, Global, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2157* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWWM2B/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Edition, US/CA, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2094* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWQ12LL/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Edition, US/CA, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2095* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWQT2LL/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Edition, Global, 40 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2156* (EMC 3319*)",
+    "device_id": "Watch5,3",
+    "order": "MWQE2B/A**",
+    "full_family": "Watch Series 5 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 5 (Edition, Global, 44 mm)",
+    "introduced": "September 10, 2019*",
+    "discontinued": "September 15, 2020",
+    "model": "A2157* (EMC 3320*)",
+    "device_id": "Watch5,4",
+    "order": "MWR62B/A**",
+    "full_family": "Watch Series 5 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Aluminum, GPS, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2291* (EMC 3479*)",
+    "device_id": "Watch6,1",
+    "order": "MG143LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Aluminum, GPS, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2292* (EMC 3480*)",
+    "device_id": "Watch6,2",
+    "order": "M00J3LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Cellular, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2293* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M02R3LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Cellular, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2294* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "M07J3LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Cellular, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2375* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M06Q3B/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Cellular, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2376* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "M09A3B/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, GPS, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2291* (EMC 3479*)",
+    "device_id": "Watch6,1",
+    "order": "M00X3LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, GPS, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2292* (EMC 3480*)",
+    "device_id": "Watch6,2",
+    "order": "MG173LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2293* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M06L3LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2294* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "MG2J3LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2375* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M07E3B/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Nike, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2376* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "M09Y3B/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Hermes, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2293* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "MG2Y3LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Hermes, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2294* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "MG323LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Hermes, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2375* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "MG343B/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Hermes, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2376* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "MG3A3B/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Edition, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2293* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M0DH3LL/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Edition, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2294* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "M0GJ3LL/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Edition, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2375* (EMC 3481*)",
+    "device_id": "Watch6,3",
+    "order": "M0DY3B/A**",
+    "full_family": "Watch Series 6 40 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 6 (Edition, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "October 8, 2021*",
+    "model": "A2376* (EMC 3482*)",
+    "device_id": "Watch6,4",
+    "order": "M0H23B/A**",
+    "full_family": "Watch Series 6 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (GPS, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2351* (EMC 3485*)",
+    "device_id": "Watch5,9",
+    "order": "MYDN2LL/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (GPS, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2352* (EMC 3486*)",
+    "device_id": "Watch5,10",
+    "order": "MYDR2LL/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Cellular, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2353* (EMC 3487*)",
+    "device_id": "Watch5,11",
+    "order": "MYEA2LL/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Cellular, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2354* (EMC 3488*)",
+    "device_id": "Watch5,12",
+    "order": "MYEP2LL/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Cellular, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2355* (EMC 3487*)",
+    "device_id": "Watch5,11",
+    "order": "MYEH2B/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Cellular, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2356* (EMC 3488*)",
+    "device_id": "Watch5,12",
+    "order": "MYEX2B/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, GPS, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2351* (EMC 3485*)",
+    "device_id": "Watch5,9",
+    "order": "MYYF2LL/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, GPS, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2352* (EMC 3486*)",
+    "device_id": "Watch5,10",
+    "order": "MYYK2LL/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, US/CA, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2353* (EMC 3487*)",
+    "device_id": "Watch5,11",
+    "order": "MYYU2LL/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, US/CA, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2354* (EMC 3488*)",
+    "device_id": "Watch5,12",
+    "order": "MG063LL/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, Global, 40 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2355* (EMC 3487*)",
+    "device_id": "Watch5,11",
+    "order": "MG013B/A**",
+    "full_family": "Watch SE 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE (Nike, Global, 44 mm)",
+    "introduced": "September 15, 2020",
+    "discontinued": "September 7, 2022",
+    "model": "A2356* (EMC 3488*)",
+    "device_id": "Watch5,12",
+    "order": "MG0A3B/A**",
+    "full_family": "Watch SE 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Aluminum, GPS, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2473* (EMC 3982*)",
+    "device_id": "Watch6,6",
+    "order": "MKN03LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Aluminum, GPS, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2474* (EMC 3983*)",
+    "device_id": "Watch6,7",
+    "order": "MKN73LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Cellular, US/CA, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2475* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKHG3LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Cellular, US/CA, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2477* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKJF3LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Cellular, Global, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2476* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKHY3B/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Cellular, Global, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2478* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKJX3B/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, GPS, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2473* (EMC 3982*)",
+    "device_id": "Watch6,6",
+    "order": "MKN33LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, GPS, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2474* (EMC 3983*)",
+    "device_id": "Watch6,7",
+    "order": "MKNA3LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, US/CA, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2475* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKHL3LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, US/CA, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2477* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKJK3LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, Global, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2476* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKJ33B/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Nike, Global, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2478* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKL43B/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Hermes, US/CA, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2475* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKLK3LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Hermes, US/CA, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2477* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKMG3LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Hermes, Global, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2476* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "MKLY3B/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Hermes, Global, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2478* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "MKMV3B/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Edition, US/CA, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2475* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "ML8U3LL/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Edition, US/CA, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2477* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "ML8W3LL/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Edition, Global, 41 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2476* (EMC 3984*)",
+    "device_id": "Watch6,8",
+    "order": "ML913B/A**",
+    "full_family": "Watch Series 7 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 7 (Edition, Global, 45 mm)",
+    "introduced": "September 14, 2021*",
+    "discontinued": "September 7, 2022",
+    "model": "A2478* (EMC 3985*)",
+    "device_id": "Watch6,9",
+    "order": "ML8Y3B/A**",
+    "full_family": "Watch Series 7 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Aluminum, GPS, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2770* (EMC 8094*)",
+    "device_id": "Watch6,14",
+    "order": "MNU93LL/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Aluminum, GPS, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2771* (EMC 8095*)",
+    "device_id": "Watch6,15",
+    "order": "MNUP3LL/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, US/CA, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2772* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNUX3LL/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, US/CA, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2774* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNVP3LL/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, Global, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2773* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNHY3B/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, Global, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2775* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNK73B/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, China, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2857* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNJ03CH/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Cellular, China, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2858* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNK83CH/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, US/CA, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2772* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNN03LL/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, US/CA, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2774* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNNR3LL/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, Global, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2773* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNN13B/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, Global, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2775* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNNT3B/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, China, 41 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2857* (EMC 8096*)",
+    "device_id": "Watch6,16",
+    "order": "MNN23CH/A*",
+    "full_family": "Watch Series 8 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 8 (Hermes, China, 45 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2858* (EMC 8097*)",
+    "device_id": "Watch6,17",
+    "order": "MNNW3CH/A*",
+    "full_family": "Watch Series 8 45 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (GPS, 40 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2722* (EMC 8090*)",
+    "device_id": "Watch6,10",
+    "order": "MNT33LL/A*",
+    "full_family": "Watch SE 2 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (GPS, 44 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2723* (EMC 8091*)",
+    "device_id": "Watch6,11",
+    "order": "MNTD3LL/A*",
+    "full_family": "Watch SE 2 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, US/CA, 40 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2726* (EMC 8092*)",
+    "device_id": "Watch6,12",
+    "order": "MNTK3LL/A*",
+    "full_family": "Watch SE 2 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, US/CA, 44 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2727* (EMC 8093*)",
+    "device_id": "Watch6,13",
+    "order": "MNTW3LL/A*",
+    "full_family": "Watch SE 2 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, Global, 40 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2725* (EMC 8092*)",
+    "device_id": "Watch6,12",
+    "order": "MNPH3B/A*",
+    "full_family": "Watch SE 2 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, Global, 44 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2724* (EMC 8093*)",
+    "device_id": "Watch6,13",
+    "order": "MNPT3B/A*",
+    "full_family": "Watch SE 2 44 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, China, 40 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2855* (EMC 8092*)",
+    "device_id": "Watch6,12",
+    "order": "MNPJ3CH/A*",
+    "full_family": "Watch SE 2 40 mm"
+  },
+  {
+    "full_name": "Apple Watch SE 2 (Cellular, China, 44 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "N/A",
+    "model": "A2856* (EMC 8093*)",
+    "device_id": "Watch6,13",
+    "order": "MNPW3CH/A*",
+    "full_family": "Watch SE 2 44 mm"
+  },
+  {
+    "full_name": "Apple Watch Ultra (US/CA, 49 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2622* (EMC 8098*)",
+    "device_id": "Watch6,18",
+    "order": "MNHC3LL/A*",
+    "full_family": "Watch Ultra"
+  },
+  {
+    "full_name": "Apple Watch Ultra (Global, 49 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2684* (EMC 8098*)",
+    "device_id": "Watch6,18",
+    "order": "MNHJ3B/A*",
+    "full_family": "Watch Ultra"
+  },
+  {
+    "full_name": "Apple Watch Ultra (China, 49 mm)",
+    "introduced": "September 7, 2022",
+    "discontinued": "September 12, 2023",
+    "model": "A2859* (EMC 8098*)",
+    "device_id": "Watch6,18",
+    "order": "MNHQ3CH/A*",
+    "full_family": "Watch Ultra"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Aluminum, GPS, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2978* (EMC 8397*)",
+    "device_id": "Watch7,1",
+    "order": "MR933LL/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Aluminum, GPS, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2980* (EMC 8398*)",
+    "device_id": "Watch7,2",
+    "order": "MR9G3LL/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, US/CA, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2982* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRHY3LL/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, US/CA, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2984* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRMK3LL/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, Global, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2982* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRHY3QA/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, Global, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2984* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRMK3QA/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, China, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2983* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRJP3CH/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Cellular, China, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2985* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRPC3CH/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, US/CA, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2982* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRQ43LL/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, US/CA, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2984* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRQP3LL/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, Global, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2982* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRQ43QA/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, Global, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2984* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRQP3QA/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, China, 41 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2983* (EMC 8399*)",
+    "device_id": "Watch7,3",
+    "order": "MRQE3CH/A*",
+    "full_family": "Watch Series 9 41 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 9 (Hermes, China, 45 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2985* (EMC 8400*)",
+    "device_id": "Watch7,4",
+    "order": "MRR03CH/A*",
+    "full_family": "Watch Series 9 45 mm"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (US/CA, 49 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "N/A",
+    "model": "A2986* (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MREK3LL/A*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (Global, 49 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "N/A",
+    "model": "A2986* (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MREG3B/A*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (China, 49 mm)",
+    "introduced": "September 12, 2023",
+    "discontinued": "N/A",
+    "model": "A2987 (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MRFA3CH/A*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (Hermes, US/CA, 49 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2986* (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MX773LW/A*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (Hermes, Global, 49 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2986* (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MX773QA/A*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2 (Hermes, China, 49 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2987 (EMC 8401*)",
+    "device_id": "Watch7,5",
+    "order": "MXDY3CH/B*",
+    "full_family": "Watch Ultra 2"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Aluminum, GPS, 42 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2997* (EMC 8729*)",
+    "device_id": "Watch7,8",
+    "order": "MWWA3LW/A*",
+    "full_family": "Watch Series 10 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Aluminum, GPS, 46 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2999* (EMC 8735*)",
+    "device_id": "Watch7,9",
+    "order": "MWWL3LW/A*",
+    "full_family": "Watch Series 10 46 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Cellular, 42 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3001* (EMC 8733*)",
+    "device_id": "Watch7,10",
+    "order": "MWX33LW/A*",
+    "full_family": "Watch Series 10 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Cellular, 46 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3003* (EMC 8737*)",
+    "device_id": "Watch7,11",
+    "order": "MWY03LW/A*",
+    "full_family": "Watch Series 10 46 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Cellular, China, 42 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3002* (EMC 8734*)",
+    "device_id": "Watch7,10",
+    "order": "MWXJ3CH/B*",
+    "full_family": "Watch Series 10 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Cellular, China, 46 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3206* (EMC 8738*)",
+    "device_id": "Watch7,11",
+    "order": "MWYF3CH/B*",
+    "full_family": "Watch Series 10 46 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Hermes, 42 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3001* (EMC 8733*)",
+    "device_id": "Watch7,10",
+    "order": "MX0Q3LW/A*",
+    "full_family": "Watch Series 10 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Hermes, 46 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3003* (EMC 8737*)",
+    "device_id": "Watch7,11",
+    "order": "MX193LW/A*",
+    "full_family": "Watch Series 10 46 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Hermes, China, 42 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3002* (EMC 8734*)",
+    "device_id": "Watch7,10",
+    "order": "MX103CH/B*",
+    "full_family": "Watch Series 10 42 mm"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Hermes, China, 46 mm)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3206* (EMC 8738*)",
+    "device_id": "Watch7,11",
+    "order": "MX1H3CH/B*",
+    "full_family": "Watch Series 10 46 mm"
+  },
+  {
+    "full_name": "Apple HomePod (Smart Speaker)",
+    "introduced": "June 5, 2017*",
+    "discontinued": "March 12, 2021**",
+    "model": "A1639 (EMC N/A*)",
+    "device_id": "AudioAccessory1,1",
+    "order": "MQHV2LL/A*",
+    "full_family": "HomePod"
+  },
+  {
+    "full_name": "Apple HomePod mini (Smart Speaker)",
+    "introduced": "October 13, 2020*",
+    "discontinued": "N/A",
+    "model": "A2374 (EMC 3506*)",
+    "device_id": "AudioAccessory5,1",
+    "order": "MY5H2LL/A*",
+    "full_family": "HomePod mini"
+  },
+  {
+    "full_name": "Apple HomePod 2nd Gen (Smart Speaker)",
+    "introduced": "January 18, 2023*",
+    "discontinued": "N/A",
+    "model": "A2825 (EMC 8208)",
+    "device_id": "AudioAccessory6,1",
+    "order": "MQJ73LL/A*",
+    "full_family": "HomePod 2nd Gen"
+  },
+  {
+    "full_name": "Apple Vision Pro (Original)",
+    "introduced": "June 5, 2023*",
+    "discontinued": "N/A",
+    "model": "A2117* (EMC 4075*)",
+    "device_id": "RealityDevice14,1",
+    "order": "MQL83LL/A*",
+    "full_family": "Vision Pro"
+  }
+]

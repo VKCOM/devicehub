@@ -44,8 +44,14 @@ export const AppUploadControl = observer(({ className }: { className?: string })
           {fileInputError}
         </FormStatus>
       </ConditionalRender>
-      <ConditionalRender conditions={[applicationInstallationService.isInstalling]}>
-        <LoadingBar status={applicationInstallationService.status} value={applicationInstallationService.progress} />
+      <ConditionalRender
+        conditions={[applicationInstallationService.isInstalling || applicationInstallationService.isError]}
+      >
+        <LoadingBar
+          isLoading={applicationInstallationService.isInstalling}
+          status={applicationInstallationService.status}
+          value={applicationInstallationService.progress}
+        />
       </ConditionalRender>
       <ConditionalRender conditions={[applicationInstallationService.isInstalled]}>
         <ActivityLauncher />

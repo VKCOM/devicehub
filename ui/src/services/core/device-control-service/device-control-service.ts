@@ -157,10 +157,6 @@ export class DeviceControlService {
     return this.sendTwoWay('device.install', options)
   }
 
-  installIos(options: InstallOptions): Promise<InitializeTransactionReturn> {
-    return this.sendTwoWay('deviceIos.install', options)
-  }
-
   uninstall(packageName: string): Promise<InitializeTransactionReturn> {
     return this.sendTwoWay('device.uninstall', {
       packageName,

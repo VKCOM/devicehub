@@ -11,3 +11,5 @@
 /temp/
 /tmp/
 .mypy_cache
+
+idb-applications

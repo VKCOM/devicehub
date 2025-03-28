@@ -37,6 +37,8 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
   const { t } = useTranslation()
 
   const deviceControlStore = useInjection(CONTAINER_IDS.deviceControlStore)
+  const deviceBySerialStore = useInjection(CONTAINER_IDS.deviceBySerialStore)
+  const { data: device } = deviceBySerialStore.deviceQueryResult()
 
   return (
     <ContentCard
@@ -67,11 +69,13 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
               tooltipText={t('Camera')}
               onClick={() => deviceControlStore.camera()}
             />
-            <ButtonControl
-              icon={<Icon28TextOutline />}
-              tooltipText={t('Switch Charset')}
-              onClick={() => deviceControlStore.switchCharset()}
-            />
+            {device?.ios === false && (
+              <ButtonControl
+                icon={<Icon28TextOutline />}
+                tooltipText={t('Switch Charset')}
+                onClick={() => deviceControlStore.switchCharset()}
+              />
+            )}
             <ButtonControl
               icon={<Icon24Search />}
               tooltipText={t('Search')}
@@ -98,106 +102,110 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
             />
           </div>
         </FormItem>
-        <FormItem top={t('Special actions')}>
-          <div className={styles.buttonsContainer}>
-            <ButtonControl
-              icon={<Icon24SunOutline color='#fac60a' />}
-              tooltipText={t('Set Light Theme')}
-              onClick={() => deviceControlStore.setLightTheme()}
-            />
-            <ButtonControl
-              icon={<Icon20MoonOutline color='#6bcded' />}
-              tooltipText={t('Set Dark Theme')}
-              onClick={() => deviceControlStore.setDarkTheme()}
-            />
-            <ButtonControl tooltipText={`${t('Enable')} DKA`} onClick={() => deviceControlStore.enableDKA()}>
-              DKA
-            </ButtonControl>
-            <ButtonControl
-              appearance='negative'
-              className={styles.lineThrough}
-              tooltipText={`${t('Disable')} DKA`}
-              onClick={() => deviceControlStore.disableDKA()}
-            >
-              DKA
-            </ButtonControl>
-            <ButtonControl
-              icon={<Icon24LogoGoogle />}
-              tooltipText={`${t('Enable')} Google Services`}
-              onClick={() => deviceControlStore.enableGoogleServices()}
-            />
-            <ButtonControl
-              appearance='negative'
-              icon={<Icon24LogoGoogle />}
-              tooltipText={`${t('Disable')} Google Services`}
-              onClick={() => deviceControlStore.disableGoogleServices()}
-            />
-            <ButtonControl
-              icon={<Icon20TextTtOutline />}
-              tooltipText={t('Change language')}
-              onClick={() => deviceControlStore.openLanguageChange()}
-            />
-          </div>
-        </FormItem>
-        <FormItem top={t('Font size')}>
-          <div className={styles.buttonsContainer}>
-            <ButtonControl
-              icon={<Icon24TextOutline />}
-              iconHeight={14}
-              iconWidth={14}
-              tooltipText={t('Small')}
-              onClick={() => deviceControlStore.changeToSmallFont()}
-            />
-            <ButtonControl
-              icon={<Icon24TextOutline />}
-              iconHeight={17}
-              iconWidth={17}
-              tooltipText={t('Normal')}
-              onClick={() => deviceControlStore.changeToNormalFont()}
-            />
-            <ButtonControl
-              icon={<Icon24TextOutline />}
-              iconHeight={20}
-              iconWidth={20}
-              tooltipText={t('Big')}
-              onClick={() => deviceControlStore.changeToBigFont()}
-            />
-          </div>
-        </FormItem>
-        <FormItem top={t('Media')}>
-          <div className={styles.buttonsContainer}>
-            <ButtonControl
-              icon={<Icon24SkipPrevious />}
-              tooltipText={t('Rewind')}
-              onClick={() => deviceControlStore.mediaRewind()}
-            />
-            <ButtonControl
-              icon={<Icon24SkipBack />}
-              tooltipText={t('Previous')}
-              onClick={() => deviceControlStore.mediaPrevious()}
-            />
-            <ButtonControl
-              icon={<Icon24Play />}
-              tooltipText={t('Play/Pause')}
-              onClick={() => deviceControlStore.mediaPlayPause()}
-            />
-            <ButtonControl
-              icon={<Icon24Stop />}
-              tooltipText={t('Stop')}
-              onClick={() => deviceControlStore.mediaStop()}
-            />
-            <ButtonControl
-              icon={<Icon24SkipForward />}
-              tooltipText={t('Next')}
-              onClick={() => deviceControlStore.mediaNext()}
-            />
-            <ButtonControl
-              icon={<Icon24SkipNext />}
-              tooltipText={t('Fast Forward')}
-              onClick={() => deviceControlStore.mediaFastForward()}
-            />
-          </div>
-        </FormItem>
+        {device?.ios === false && (
+          <>
+            <FormItem top={t('Special actions')}>
+              <div className={styles.buttonsContainer}>
+                <ButtonControl
+                  icon={<Icon24SunOutline color='#fac60a' />}
+                  tooltipText={t('Set Light Theme')}
+                  onClick={() => deviceControlStore.setLightTheme()}
+                />
+                <ButtonControl
+                  icon={<Icon20MoonOutline color='#6bcded' />}
+                  tooltipText={t('Set Dark Theme')}
+                  onClick={() => deviceControlStore.setDarkTheme()}
+                />
+                <ButtonControl tooltipText={`${t('Enable')} DKA`} onClick={() => deviceControlStore.enableDKA()}>
+                  DKA
+                </ButtonControl>
+                <ButtonControl
+                  appearance='negative'
+                  className={styles.lineThrough}
+                  tooltipText={`${t('Disable')} DKA`}
+                  onClick={() => deviceControlStore.disableDKA()}
+                >
+                  DKA
+                </ButtonControl>
+                <ButtonControl
+                  icon={<Icon24LogoGoogle />}
+                  tooltipText={`${t('Enable')} Google Services`}
+                  onClick={() => deviceControlStore.enableGoogleServices()}
+                />
+                <ButtonControl
+                  appearance='negative'
+                  icon={<Icon24LogoGoogle />}
+                  tooltipText={`${t('Disable')} Google Services`}
+                  onClick={() => deviceControlStore.disableGoogleServices()}
+                />
+                <ButtonControl
+                  icon={<Icon20TextTtOutline />}
+                  tooltipText={t('Change language')}
+                  onClick={() => deviceControlStore.openLanguageChange()}
+                />
+              </div>
+            </FormItem>
+            <FormItem top={t('Font size')}>
+              <div className={styles.buttonsContainer}>
+                <ButtonControl
+                  icon={<Icon24TextOutline />}
+                  iconHeight={14}
+                  iconWidth={14}
+                  tooltipText={t('Small')}
+                  onClick={() => deviceControlStore.changeToSmallFont()}
+                />
+                <ButtonControl
+                  icon={<Icon24TextOutline />}
+                  iconHeight={17}
+                  iconWidth={17}
+                  tooltipText={t('Normal')}
+                  onClick={() => deviceControlStore.changeToNormalFont()}
+                />
+                <ButtonControl
+                  icon={<Icon24TextOutline />}
+                  iconHeight={20}
+                  iconWidth={20}
+                  tooltipText={t('Big')}
+                  onClick={() => deviceControlStore.changeToBigFont()}
+                />
+              </div>
+            </FormItem>
+            <FormItem top={t('Media')}>
+              <div className={styles.buttonsContainer}>
+                <ButtonControl
+                  icon={<Icon24SkipPrevious />}
+                  tooltipText={t('Rewind')}
+                  onClick={() => deviceControlStore.mediaRewind()}
+                />
+                <ButtonControl
+                  icon={<Icon24SkipBack />}
+                  tooltipText={t('Previous')}
+                  onClick={() => deviceControlStore.mediaPrevious()}
+                />
+                <ButtonControl
+                  icon={<Icon24Play />}
+                  tooltipText={t('Play/Pause')}
+                  onClick={() => deviceControlStore.mediaPlayPause()}
+                />
+                <ButtonControl
+                  icon={<Icon24Stop />}
+                  tooltipText={t('Stop')}
+                  onClick={() => deviceControlStore.mediaStop()}
+                />
+                <ButtonControl
+                  icon={<Icon24SkipForward />}
+                  tooltipText={t('Next')}
+                  onClick={() => deviceControlStore.mediaNext()}
+                />
+                <ButtonControl
+                  icon={<Icon24SkipNext />}
+                  tooltipText={t('Fast Forward')}
+                  onClick={() => deviceControlStore.mediaFastForward()}
+                />
+              </div>
+            </FormItem>
+          </>
+        )}
       </FormLayoutGroup>
     </ContentCard>
   )

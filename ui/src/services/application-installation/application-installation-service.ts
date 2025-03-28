@@ -10,6 +10,8 @@ import { DeviceControlStore } from '@/store/device-control-store'
 import { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import { deviceConnectionRequired } from '@/config/inversify/decorators'
 
+import { InitializeTransactionReturn } from '../core/transaction-service/types'
+
 import type { Manifest } from '@/types/manifest.type'
 import type { Device, ErrorResponse } from '@/generated/types'
 import type { ActivityOptions, ActivityOptionsSet, RunActivityArgs, SelectOption } from './types'
@@ -27,6 +29,7 @@ export class ApplicationInstallationService {
   href = ''
   status = 'Initialization'
   progress = 0
+  isError = false
   isInstalling = false
   isInstalled = false
   device: Device | undefined = undefined
@@ -164,6 +167,7 @@ export class ApplicationInstallationService {
     this.progress = 0
     this.isInstalling = false
     this.isInstalled = false
+    this.isError = false
     this.status = 'Initialization'
     this.href = ''
   }
@@ -179,7 +183,7 @@ export class ApplicationInstallationService {
   async installFile(file: File): Promise<void> {
     this.isInstalling = true
 
-    const type = file.name.split('.').pop() || 'apk'
+    const type = file.name.split('.').pop() === 'apk' ? 'apk' : 'blob'
 
     const data = await this.uploadFileMutate.mutate({ type, file })
 
@@ -191,61 +195,65 @@ export class ApplicationInstallationService {
 
     this.href = data.resources.file.href
 
-    if (this.device?.ios) {
-      this.deviceControlStore.installIos({
-        href: this.href,
-        manifest: { application: { activities: {} } } as unknown as Manifest,
-        launch: true,
-      })
+    const install = await (async (): Promise<InitializeTransactionReturn> => {
+      if (this.device?.ios === true) {
+        return await this.deviceControlStore.install({
+          href: this.href,
+          manifest: { application: { activities: {} } } as unknown as Manifest,
+          launch: true,
+        })
+      }
 
-      return
-    }
+      const manifestResponse = await this.manifestQuery.fetch()
 
-    const manifestResponse = await this.manifestQuery.fetch()
+      if (!manifestResponse.success) {
+        throw new Error('Failed to get manifest')
+      }
 
-    if (manifestResponse.success) {
-      const install = await this.deviceControlStore.install({
+      return await this.deviceControlStore.install({
         href: this.href,
         manifest: manifestResponse.manifest,
         launch: true,
       })
+    })()
 
-      const unsubscribeToProgress = install.subscribeToProgress((progress, status) => {
-        this.progress = 50 + progress / 2
+    const unsubscribeToProgress = install.subscribeToProgress((progress, status) => {
+      this.progress = 50 + progress / 2
 
-        switch (status) {
-          case 'uploading': {
-            this.status = 'Uploading'
-            break
-          }
-
-          case 'processing': {
-            this.status = 'Processing'
-            break
-          }
-
-          case 'pushing_app': {
-            this.status = 'Pushing app'
-            break
-          }
-
-          case 'installing_app': {
-            this.status = 'Installing app'
-            break
-          }
-
-          case 'launching_app': {
-            this.status = 'Launching activity'
-            break
-          }
-
-          default: {
-            this.status = 'Installing app'
-          }
+      switch (status) {
+        case 'uploading': {
+          this.status = 'Uploading'
+          break
         }
-      })
 
-      install.donePromise.then((message) => {
+        case 'processing': {
+          this.status = 'Processing'
+          break
+        }
+
+        case 'pushing_app': {
+          this.status = 'Pushing app'
+          break
+        }
+
+        case 'installing_app': {
+          this.status = 'Installing app'
+          break
+        }
+
+        case 'launching_app': {
+          this.status = 'Launching activity'
+          break
+        }
+
+        default: {
+          this.status = 'Working'
+        }
+      }
+    })
+
+    install.donePromise
+      .then((message) => {
         if (typeof message === 'string') {
           this.status = message
         }
@@ -256,11 +264,20 @@ export class ApplicationInstallationService {
 
         unsubscribeToProgress()
       })
-    }
+      .catch((error) => {
+        this.status = 'Error while installing'
+        console.error('Error while installing: ', error)
 
-    if (!manifestResponse.success) {
-      throw new Error('Failed to get manifest')
-    }
+        if (error instanceof Error) {
+          this.status += `: ${error.cause}`
+        }
+
+        this.isInstalling = false
+        this.isInstalled = false
+        this.isError = true
+
+        unsubscribeToProgress()
+      })
   }
 
   async uninstall(packageName: string): Promise<void> {
