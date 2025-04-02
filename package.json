@@ -77,6 +77,7 @@
     "mjpeg-consumer": "2.0.0",
     "mongodb": "6.13.0",
     "my-local-ip": "1.0.0",
+    "node-hid": "^3.1.2",
     "nsyslog-parser": "^0.10.1",
     "oboe": "2.1.5",
     "openid-client": "5.6.5",
