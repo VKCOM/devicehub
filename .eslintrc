@@ -20,7 +20,7 @@
     "accessor-pairs": 2,
     "block-scoped-var": 2,
     "complexity": 0,
-    "consistent-return": 1,
+    "consistent-return": 0,
     "curly": 2,
     "dot-location": [2, "property"], // defaults to "object"
     "dot-notation": 2,
@@ -50,14 +50,13 @@
     "no-native-reassign": 2,
     "no-new-func": 2,
     "no-new-wrappers": 2,
-    "no-new": 2,
+    "no-new": 0,
     "no-octal-escape": 2,
     "no-octal": 1, // TODO: accept until we use ES6 0o755 notation
     "no-param-reassign": 2,
     "no-process-env": 0, // `2` is recommended
     "no-proto": 2,
     "no-redeclare": [2, {"builtinGlobals": true}], // `2` is recommended and actually defaults to `[2, {"builtinGlobals": false}]`
-    "no-return-assign": [1, "except-parens"],
     "no-script-url": 2,
     "no-self-compare": 2,
     "no-sequences": 2,
@@ -154,7 +153,8 @@
     "no-path-concat": 2, // `2` is default
     "no-process-exit": 0, // `2` is default
     "no-restricted-modules": 0, // no default, optionally set `[2, "fs", "os"]`
-    "no-sync": 1 // `2` is default
+    "no-sync": 0, // `2` is default
+    "no-async-promise-executor": 0
 
     // eslint v2
     // "keyword-spacing": 2

@@ -28,4 +28,5 @@ jobs:
               run: docker compose -f docker-compose-test.yaml up --exit-code-from devicehub-pytest --abort-on-container-exit devicehub-pytest --remove-orphans
 
             - name: Check generate device logs
+              if: always()
               run: docker compose -f docker-compose-test.yaml logs devicehub-generate-fake-device
