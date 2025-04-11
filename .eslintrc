@@ -25,7 +25,7 @@
     "dot-location": [2, "property"], // defaults to "object"
     "dot-notation": 2,
     "eqeqeq": [2, "smart"], // `2` is recommended
-    "guard-for-in": 2,
+    "guard-for-in": 0,
     "no-alert": 1, // `2` is recommended
     "no-caller": 2,
     "no-div-regex": 2,
