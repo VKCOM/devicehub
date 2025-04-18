@@ -8,14 +8,16 @@ type KeyListItemProps = {
   title: string
   subtitle?: string
   onRemove: () => void
+  onClick?: () => void
 }
 
-export const KeyListItem = observer(({ title, subtitle, onRemove }: KeyListItemProps) => (
+export const KeyListItem = observer(({ title, subtitle, onRemove, onClick }: KeyListItemProps) => (
   <Cell
     before={<Icon20KeyOutline />}
     className={styles.listItem}
     mode='removable'
     subtitle={subtitle}
+    onClick={onClick}
     onRemove={onRemove}
   >
     {title}

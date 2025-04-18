@@ -453,5 +453,6 @@
   "Write an email to the user selection": "Сайланган кулланучыга email языгыз",
   "Really grant access to user": "Кулланучыга чыннан да керү мөмкинлеге бирергә?",
   "Really revoke access of this user": "Бу кулланучының керү мөмкинлеген чыннан да кире алырга?",
-  "User group quota": "Кулланучының төркем куллану квотасы"
+  "User group quota": "Кулланучының төркем куллану квотасы",
+  "This is sensitive information. Do not share this token.": "Бу яшерен мәгълүмат. Бу токенны бүтән кешегә бирмәгез."
 }

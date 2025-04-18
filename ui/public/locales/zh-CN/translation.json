@@ -499,5 +499,6 @@
   "Log In": "登录",
   "Contact Support": "联系支持",
   "Logout": "注销",
-  "You are authenticated via an automatic login method": "您通过自动登录方法对您进行身份验证"
+  "You are authenticated via an automatic login method": "您通过自动登录方法对您进行身份验证",
+  "This is sensitive information. Do not share this token.": "这是敏感信息。请勿共享此令牌。"
 }

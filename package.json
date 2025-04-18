@@ -18,7 +18,10 @@
     "duplicate-arguments-array": false
   },
   "scripts": {
-    "doc": "cli-docs-generator --cli=stf --pretty_cli_name=stf -o ./units.md"
+    "doc": "cli-docs-generator --cli=stf --pretty_cli_name=stf -o ./units.md",
+    "build:swagger:tests": "cd ./test/api && poetry run just regen-schema",
+    "build:swagger:ui": "cd ./ui && npm run generate-api",
+    "build:swagger": "cd ./lib/units/api && python3 ./gen_routes.py & npm run build:swagger:ui"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.772.0",

@@ -447,5 +447,6 @@
   "Log In": "Acceso",
   "Contact Support": "Soporte de contacto",
   "Logout": "Cierre de sesión",
-  "You are authenticated via an automatic login method": "Te autentican a través de un método de inicio de sesión automático"
+  "You are authenticated via an automatic login method": "Te autentican a través de un método de inicio de sesión automático",
+  "This is sensitive information. Do not share this token.": "Esta es información sensible. No comparta este token."
 }

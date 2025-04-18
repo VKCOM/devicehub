@@ -17,13 +17,16 @@ import { KeyListItem } from '../key-list-item'
 
 import styles from './access-tokens-control.module.css'
 
+import type { Token } from '@/generated/types'
 import type { FormEvent } from 'react'
 
 export const AccessTokensControl = observer(({ className }: { className?: string }) => {
   const { t } = useTranslation()
   const [accessTokenLabel, setAccessTokenLabel] = useState('')
+  const [tokenDetail, setTokenDetail] = useState<Token | null>(null)
   const [isAddNewTokenOpen, setIsAddNewTokenOpen] = useState(false)
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
+  const [isTokenDetailOpen, setIsTokenDetailOpen] = useState(false)
 
   const accessTokenService = useInjection(CONTAINER_IDS.accessTokenService)
   const { data = [] } = accessTokenService.accessTokensQueryResult
@@ -32,6 +35,18 @@ export const AccessTokensControl = observer(({ className }: { className?: string
     event.preventDefault()
 
     accessTokenService.generateAccessToken(accessTokenLabel)
+  }
+
+  const handleViewToken = (title: string) => {
+    accessTokenService.getAccessTokenByTitle(title).then((token) => {
+      setTokenDetail(token)
+      setIsTokenDetailOpen(true)
+    })
+  }
+
+  const handleCloseTokenDetail = () => {
+    setIsTokenDetailOpen(false)
+    setTokenDetail(null)
   }
 
   useEffect(() => {
@@ -100,9 +115,9 @@ export const AccessTokensControl = observer(({ className }: { className?: string
           <KeyListItem
             key={index}
             title={item}
+            onClick={() => handleViewToken(item)}
             onRemove={() => {
               accessTokenService.setTokenToRemove(item)
-
               setIsConfirmationOpen(true)
             }}
           />
@@ -118,6 +133,17 @@ export const AccessTokensControl = observer(({ className }: { className?: string
         onClose={() => setIsConfirmationOpen(false)}
         onOk={async () => accessTokenService.removeAccessToken()}
       />
+      <WarningModal
+        actions={<div />}
+        description={t('This is sensitive information. Do not share this token.')}
+        isOpen={isTokenDetailOpen && !!tokenDetail}
+        title={t('Access Token')}
+        onClose={handleCloseTokenDetail}
+      >
+        <div className={styles.tokenWrapper}>
+          <CopyableBlock copyableText={tokenDetail?.id || ''} onOkClick={() => handleCloseTokenDetail()} />
+        </div>
+      </WarningModal>
     </ContentCard>
   )
 })

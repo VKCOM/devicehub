@@ -4,6 +4,7 @@ export const OPENSTF_API_ROUTES = {
   users: '/users',
   user: '/user',
   accessTokens: '/user/accessTokens',
+  accessTokenByTitle: '/user/accessTokens/byTitle',
   adbRange: '/devices/adbRange',
   defaultGroupsQuotas: '/users/groupsQuotas',
   alertMessage: '/users/alertMessage',
@@ -15,4 +16,5 @@ export const OPENSTF_API_ROUTES = {
   userGroupQuota: (email: string) => `/users/${email}/groupsQuotas`,
   grantAdmin: (email: string) => `/users/grantAdmin/${email}`,
   revokeAdmin: (email: string) => `/users/revokeAdmin/${email}`,
+  accessTokensByEmail: (email: string) => `/users/${email}/accessTokens`,
 } as const

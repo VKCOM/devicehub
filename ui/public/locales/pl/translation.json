@@ -385,5 +385,6 @@
   "Log In": "Zaloguj się",
   "Contact Support": "Kontakt z obsługą",
   "Logout": "Logout",
-  "You are authenticated via an automatic login method": "Jesteś uwierzytelniony za pomocą automatycznej metody logowania"
+  "You are authenticated via an automatic login method": "Jesteś uwierzytelniony za pomocą automatycznej metody logowania",
+  "This is sensitive information. Do not share this token.": "To poufna informacja. Nie udostępniaj tego tokenu."
 }

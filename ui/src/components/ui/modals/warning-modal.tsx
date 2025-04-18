@@ -18,7 +18,7 @@ export const WarningModal = ({
   onOk,
   isCancelShown = true,
   ...props
-}: Omit<BaseModalProps, 'actions' | 'icon'> & WarningModalProps) => {
+}: Omit<BaseModalProps, 'icon'> & WarningModalProps) => {
   const { t } = useTranslation()
 
   const onOkClick = () => {
@@ -29,7 +29,6 @@ export const WarningModal = ({
 
   return (
     <BaseModal
-      {...props}
       icon={<Icon20ErrorCircleFillYellow height={56} width={56} />}
       actions={
         <ButtonGroup align='right' className={styles.modalActions}>
@@ -43,6 +42,7 @@ export const WarningModal = ({
           </ConditionalRender>
         </ButtonGroup>
       }
+      {...props}
     />
   )
 }

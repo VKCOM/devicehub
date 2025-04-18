@@ -14,6 +14,7 @@ import {
   getSettingsDevices,
   getShellDevices,
   getSettingsUsers,
+  getAccessTokensByEmail,
 } from '@/api/openstf-api'
 import { getAuthUrl } from '@/api/auth'
 
@@ -63,6 +64,10 @@ export const queries = createQueryKeyStore({
       queryKey: null,
       queryFn: () => getAlertMessage(),
     },
+    accessTokens: (email: string) => ({
+      queryKey: [email],
+      queryFn: (): Promise<string[]> => getAccessTokensByEmail(email),
+    }),
   },
   user: {
     profile: {

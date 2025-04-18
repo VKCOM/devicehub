@@ -4,21 +4,24 @@ import { QueryObserverResult } from '@tanstack/react-query'
 
 import { socket } from '@/api/socket'
 import { AccessTokenGeneratedMessage } from '@/types/access-token-generated-message.type'
+import { getAccessTokenByTitle } from '@/api/openstf-api'
 
 import { queries } from '@/config/queries/query-key-store'
 import { queryClient } from '@/config/queries/query-client'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
+import type { Token } from '@/generated/types'
 import type { MobxQueryFactory } from '@/types/mobx-query-factory.type'
 
 @injectable()
 export class AccessTokenService {
   private accessTokensQuery
   private tokenToRemove = ''
+  private userTokenQueries = new Map()
 
   generatedTokenId = ''
 
-  constructor(@inject(CONTAINER_IDS.factoryMobxQuery) mobxQueryFactory: MobxQueryFactory) {
+  constructor(@inject(CONTAINER_IDS.factoryMobxQuery) private mobxQueryFactory: MobxQueryFactory) {
     makeAutoObservable(this)
 
     this.onAccessTokenGenerated = this.onAccessTokenGenerated.bind(this)
@@ -28,6 +31,22 @@ export class AccessTokenService {
 
   get accessTokensQueryResult(): QueryObserverResult<string[]> {
     return this.accessTokensQuery.result
+  }
+
+  getUserAccessTokens(email: string): QueryObserverResult<string[]> {
+    if (!this.userTokenQueries.has(email)) {
+      const query = this.mobxQueryFactory(() => ({
+        ...queries.users.accessTokens(email),
+      }))
+
+      this.userTokenQueries.set(email, query)
+    }
+
+    return this.userTokenQueries.get(email)?.result
+  }
+
+  getAccessTokenByTitle(title: string): Promise<Token | null> {
+    return getAccessTokenByTitle(title)
   }
 
   setTokenToRemove(token: string): void {
@@ -58,10 +77,12 @@ export class AccessTokenService {
     })
   }
 
-  removeAccessToken(): void {
-    socket.emit('user.keys.accessToken.remove', { title: this.tokenToRemove })
+  removeAccessToken(email?: string): void {
+    socket.emit('user.keys.accessToken.remove', { title: this.tokenToRemove, ...(!!email && { email }) })
 
-    queryClient.setQueryData<string[]>(queries.user.accessTokens.queryKey, (oldData) => {
+    const queryKey = email ? queries.users.accessTokens(email).queryKey : queries.user.accessTokens.queryKey
+
+    queryClient.setQueryData<string[]>(queryKey, (oldData) => {
       if (!oldData) return []
 
       return oldData.filter((item) => item !== this.tokenToRemove)

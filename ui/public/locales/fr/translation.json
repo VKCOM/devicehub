@@ -504,5 +504,6 @@
   "Log In": "Se connecter",
   "Contact Support": "Support de contact",
   "Logout": "Déconnexion",
-  "You are authenticated via an automatic login method": "Vous êtes authentifié via une méthode de connexion automatique"
+  "You are authenticated via an automatic login method": "Vous êtes authentifié via une méthode de connexion automatique",
+  "This is sensitive information. Do not share this token.": "Ces informations sont sensibles. Ne partagez pas ce jeton."
 }

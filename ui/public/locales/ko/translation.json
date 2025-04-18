@@ -471,5 +471,6 @@
   "Write an email to the user selection": "사용자 선택에 이메일을 작성하십시오",
   "Really grant access to user": "실제로 사용자에게 액세스 권한을 부여하십시오",
   "Really revoke access of this user": "이 사용자의 액세스를 실제로 취소하십시오",
-  "User group quota": "사용자 그룹 할당량"
+  "User group quota": "사용자 그룹 할당량",
+  "This is sensitive information. Do not share this token.": "이것은 민감한 정보입니다. 이 토큰을 공유하지 마십시오."
 }

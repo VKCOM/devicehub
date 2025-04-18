@@ -454,5 +454,6 @@
   "Really revoke access of this user": "Бұл пайдаланушының кіруіне шынымен де қайтарып алыңыз?",
   "User group quota": "Пайдаланушы тобының квотасы",
   "Contact Support": "Байланыс қолдауы",
-  "You are authenticated via an automatic login method": "Автоматты кіру әдісі арқылы аутентификацияланасыз"
+  "You are authenticated via an automatic login method": "Автоматты кіру әдісі арқылы аутентификацияланасыз",
+  "This is sensitive information. Do not share this token.": "Бұл құпия ақпарат. Бұл токенді ешкіммен бөліспеңіз."
 }

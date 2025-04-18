@@ -54,6 +54,7 @@ import type {
   UpdateDefaultUserGroupsQuotasParams,
   AlertMessageResponse,
   AlertMessage,
+  Token,
 } from '@/generated/types'
 
 const getDevices = async <T>(params?: GetDevicesParams): Promise<T[]> => {
@@ -132,6 +133,20 @@ export const getAccessTokens = async (): Promise<string[]> => {
   const { data } = await openstfApiClient.get<AccessTokensResponse>(OPENSTF_API_ROUTES.accessTokens)
 
   return data.titles?.reverse() || []
+}
+
+export const getAccessTokensByEmail = async (email: string): Promise<string[]> => {
+  const { data } = await openstfApiClient.get<{ success: boolean; titles: string[] }>(
+    OPENSTF_API_ROUTES.accessTokensByEmail(email)
+  )
+
+  return data.titles || []
+}
+
+export const getAccessTokenByTitle = async (title: string): Promise<Token | null> => {
+  const { data } = await openstfApiClient.post<{ token: Token }>(OPENSTF_API_ROUTES.accessTokenByTitle, { title })
+
+  return data.token || null
 }
 
 export const addUserInGroup = async ({ groupId, userEmail }: GroupUserArgs): Promise<boolean> => {

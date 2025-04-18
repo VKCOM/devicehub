@@ -6,7 +6,7 @@ import { ConditionalRender } from '@/components/lib/conditional-render'
 import styles from './copyable-block.module.css'
 
 type CopyableBlockProps = {
-  title: string
+  title?: string
   copyableText: string
   onOkClick?: () => void
   isClosable?: boolean

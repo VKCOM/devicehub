@@ -8,6 +8,13 @@
 }
 
 .listItem {
+  cursor: pointer;
+  border-radius: var(--vkui--size_border_radius--regular);
+
+  &:hover {
+    background: var(--vkui--color_transparent--hover);
+  }
+
   svg {
     box-sizing: content-box;
   }

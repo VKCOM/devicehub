@@ -2051,6 +2051,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: user
+  /user/accessTokens/byTitle:
+    post:
+      tags:
+        - user
+      summary: Obtains an access token by its title from an authorized user
+      description: Gets one of your access tokens
+      operationId: getAccessTokenByTitle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - title
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Access Token Title
+        required: true
+      responses:
+        "200":
+          description: Access token information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccessTokenResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 404: Not Found => unknown token
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: user
   /user/accessTokens/{id}:
     get:
       tags:
