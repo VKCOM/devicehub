@@ -1,15 +1,15 @@
 import {execShellCommand} from './utils/shell'
-import { generateAdminToken } from './generateAdminToken'
+import { generateAdminToken } from './tokensHelper'
 import playwrightConfig from '../../../playwright.config';
 
 const baseUrl = playwrightConfig?.use?.baseURL
 
 export async function generateDevice(number: string) {
-    await execShellCommand('stf generate-fake-device fake-device-type --number ' + number)
+    await execShellCommand(`stf generate-fake-device fake-device-type --number ${number}`)
 }
 
 export async function generateDeviceWithName(name: string, number: string) {
-    await execShellCommand('stf generate-fake-device ' + name + ' --number ' + number)
+    await execShellCommand(`stf generate-fake-device ${name} --number ${number}`)
 }
 
 export async function removeAllDevices() {

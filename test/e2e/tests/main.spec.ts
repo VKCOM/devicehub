@@ -1,8 +1,8 @@
 import {test} from '@playwright/test'
-import {DeviceHubMainPage} from '../pageObjects/mainPage'
+import {DeviceHubMainPage} from '../pageObjects/mainPage/mainPage'
 import {DeviceHubMockLoginPage} from '../pageObjects/mockLogin'
 import {generateDevice, removeAllDevices} from '../helpers/devicesHelper'
-import {deleteAllAdminsTokens} from '../helpers/generateAdminToken'
+import {deleteAllAdminsTokens} from '../helpers/tokensHelper'
 
 test.describe('Main page tests', () => {
     test.afterAll('Delete all tokens', async() => {

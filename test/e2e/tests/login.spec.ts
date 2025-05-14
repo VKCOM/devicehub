@@ -1,6 +1,6 @@
 import {test} from '@playwright/test'
 import {DeviceHubMockLoginPage} from '../pageObjects/mockLogin'
-import {DeviceHubMainPage} from '../pageObjects/mainPage'
+import {DeviceHubMainPage} from '../pageObjects/mainPage/mainPage'
 
 test('check mock auth page is displayed', async({page}) => {
     const deviceHubMockLoginPage = new DeviceHubMockLoginPage(page)
