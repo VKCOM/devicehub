@@ -1,5 +1,8 @@
 import {execShellCommand} from './utils/shell'
-import { generateToken } from './utils/generateToken'
+import { generateAdminToken } from './generateAdminToken'
+import playwrightConfig from '../../../playwright.config';
+
+const baseUrl = playwrightConfig?.use?.baseURL
 
 export async function generateDevice(number: string) {
     await execShellCommand('stf generate-fake-device fake-device-type --number ' + number)
@@ -10,10 +13,8 @@ export async function generateDeviceWithName(name: string, number: string) {
 }
 
 export async function removeAllDevices() {
-    const baseUrl = 'http://localhost:7100/api/v1';
-
-    const token = await generateToken()
-    let devicesResp = await fetch(baseUrl + '/devices', {
+    const token = await generateAdminToken()
+    let devicesResp = await fetch(`${baseUrl}/api/v1/devices`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -22,7 +23,7 @@ export async function removeAllDevices() {
     let devicesJson = await devicesResp.json()
     if (devicesJson.devices.length > 0) {
         for (const device of devicesJson.devices) {
-            let deviceDeleteResp = await fetch(baseUrl + '/devices/' + device.serial, {
+            let deviceDeleteResp = await fetch(`${baseUrl}/api/v1/devices/${device.serial}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
