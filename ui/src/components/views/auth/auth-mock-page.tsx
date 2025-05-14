@@ -111,6 +111,7 @@ export const AuthMockPage = () => {
                 <FormItem>
                   <Button
                     disabled={!name || !email || !!nameError || !!emailError || !!formError}
+                    id='loginButton'
                     size='l'
                     type='submit'
                     stretched
@@ -119,7 +120,7 @@ export const AuthMockPage = () => {
                   </Button>
                 </FormItem>
               </FormLayoutGroup>
-              <Button className={styles.contactButton} href={authContact} mode='link'>
+              <Button className={styles.contactButton} href={authContact} id='contactButton' mode='link'>
                 {t('Contact Support')}
               </Button>
             </form>

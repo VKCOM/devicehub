@@ -23,6 +23,7 @@ type TableRowProps = {
 export const TableRow = memo(
   ({ cells, deviceState, rowSize, transformValue }: TableRowProps) => (
     <tr
+      id='deviceTableRow'
       className={cn({
         [styles.inactive]: deviceState && isDeviceInactive(deviceState),
       })}
@@ -34,6 +35,7 @@ export const TableRow = memo(
       {cells.map((cell) => (
         <td
           key={cell.id}
+          id='deviceTableCell'
           style={{
             width: `${cell.column.getSize()}px`,
           }}

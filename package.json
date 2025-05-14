@@ -122,11 +122,13 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.13.0",
+    "@playwright/test": "^1.52.0",
     "@types/bluebird": "^3.5.42",
     "@types/eventemitter3": "^1.2.0",
     "@types/express": "^5.0.1",
     "@types/http-proxy": "^1.17.16",
     "@types/lodash": "^4.17.16",
+    "@types/node": "^22.15.17",
     "@types/split": "^1.0.5",
     "@types/temp": "^0.9.4",
     "@types/tmp": "^0.2.6",

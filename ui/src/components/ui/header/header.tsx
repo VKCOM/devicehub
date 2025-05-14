@@ -45,7 +45,7 @@ export const Header = () => {
   }
 
   return (
-    <header className={styles.header}>
+    <header className={styles.header} id='mainPageHeader'>
       <div className={styles.leftSide}>
         <Link className={styles.logoLink} to={getMainRoute()}>
           <Tappable activeMode='opacity' focusVisibleMode='outside' hoverMode='opacity' onClick={() => {}}>
