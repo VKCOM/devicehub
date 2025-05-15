@@ -24,3 +24,6 @@ jobs:
       - name: Run Playwright Tests
         run: docker compose -f docker-compose-e2e-tests.yaml up --exit-code-from devicehub-e2e-tests --abort-on-container-exit devicehub-e2e-tests --remove-orphans
 
+      - name: Show logs for devicehub
+        if: always()
+        run: docker compose -f docker-compose-test.yaml logs devicehub
