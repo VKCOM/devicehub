@@ -13,7 +13,11 @@ export class DeviceHubMainPage {
     }
 
     async goto() {
-        await this.page.goto('/#/devices');
+        await this.page.goto('/');
+    }
+
+    async gotoAsDevicesPage() {
+        await this.page.goto('/#/devices')
     }
 
     async isPageDisplayed() {

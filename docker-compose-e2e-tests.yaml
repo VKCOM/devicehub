@@ -67,5 +67,4 @@ services:
       devicehub:
         condition: service_healthy
     restart: "no"
-    networks:
-      devicehub:
+    network_mode: host
