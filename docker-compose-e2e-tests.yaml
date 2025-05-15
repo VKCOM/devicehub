@@ -57,7 +57,7 @@ services:
       - /bin/sh
       - -c
       - |
-        npm ci --omit=dev && npx playwright test
+        npm install --omit=dev && npx playwright test
     depends_on:
       devicehub:
         condition: service_healthy
