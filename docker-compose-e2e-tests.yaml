@@ -35,7 +35,7 @@ services:
     container_name: devicehub
     build: .
     ports:
-      - "8080:8080"
+      - "7100:7100"
       - "7110:7110"
       - "7400-7500:7400-7500"
     environment:
@@ -44,7 +44,7 @@ services:
       - STF_ADMIN_EMAIL=administrator@fakedomain.com
       - STF_ADMIN_NAME=administrator
     restart: unless-stopped
-    command: stf local --adb-host adb --public-ip 0.0.0.0 --port 8080 --provider-min-port 7400 --provider-max-port 7500
+    command: stf local --adb-host adb --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
     healthcheck:
         test: [ "CMD", "curl", "-f", "http://devicehub:8080/auth/contact" ]
         interval: 20s
@@ -62,11 +62,7 @@ services:
     environment:
       - CI=1
     container_name: devicehub-e2e-tests
-    command:
-      - /bin/sh
-      - -c
-      - |
-        npx playwright test
+    command: npx playwright test
     depends_on:
       devicehub:
         condition: service_healthy
