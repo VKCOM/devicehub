@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  mongo1:
+    image: mongo:6.0.10
+    hostname: mongo1
+    container_name: mongo1
+    entrypoint:
+      ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
+  mongosetup:
+    image: mongo:6.0.10
+    depends_on:
+      - mongo1
+    volumes:
+      - ./scripts/mongo_setup_test.sh:/scripts/mongo_setup_test.sh
+    restart: "no"
+    entrypoint: ["bash", "/scripts/mongo_setup_test.sh"]
+  adb:
+    container_name: adb
+    image: devicefarmer/adb:latest
+    restart: unless-stopped
+    volumes:
+      - "/dev/bus/usb:/dev/bus/usb"
+    privileged: true
+  devicehub:
+    container_name: devicehub
+    build: .
+    image: devicehub:latest
+    ports:
+      - "7100:7100"
+      - "7110:7110"
+      - "7400-7500:7400-7500"
+    environment:
+      - TZ='America/Los_Angeles'
+      - MONGODB_PORT_27017_TCP=mongodb://mongo1:27017
+      - STF_ADMIN_EMAIL=administrator@fakedomain.com
+      - STF_ADMIN_NAME=administrator
+    restart: unless-stopped
+    command: stf local --adb-host adb --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
+    healthcheck:
+        test: [ "CMD", "curl", "-f", "http://devicehub:7100/auth/contact" ]
+        interval: 20s
+        timeout: 10s
+        retries: 5
+    depends_on:
+        mongosetup:
+            condition: service_completed_successfully
+        adb:
+            condition: service_started
+  devicehub-e2e-tests:
+    image: devicehub:latest
+    build: .
+    environment:
+      - PIP_DISABLE_PIP_VERSION_CHECK=1
+    container_name: devicehub-e2e-tests
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npx playwright test
+    depends_on:
+      devicehub:
+        condition: service_healthy
+    restart: "no"

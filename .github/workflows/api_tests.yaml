@@ -6,7 +6,7 @@ on:
             - 'lib/**'
             - 'Dockerfile'
             - 'test/api/**'
-            - 'docker-compose-test.yaml'
+            - '../../docker-compose-api-tests.yaml'
             - 'package.json'
             - 'package-lock.json'
 jobs:
