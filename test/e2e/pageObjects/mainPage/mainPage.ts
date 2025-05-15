@@ -1,6 +1,7 @@
 import { type Locator, type Page } from '@playwright/test'
 import { MainPageHeader } from './mainPageHeader'
 import { DeviceHubMainPageDevicesTable } from './mainPageDevicesTable'
+import { DeviceHubMainPageSearch } from './mainPageSearch'
 
 export class DeviceHubMainPage {
     readonly page: Page;
@@ -13,9 +14,11 @@ export class DeviceHubMainPage {
 
     async isPageDisplayed() {
         await new MainPageHeader(this.page).isPageDisplayed()
+        await new DeviceHubMainPageSearch(this.page).isPageDisplayed()
     }
 
     async isPageFullyDisplayedWithoutDevices() {
+        await new MainPageHeader(this.page).isPageFullyDisplayed()
         await new DeviceHubMainPageDevicesTable(this.page).isPageDisplayedWithoutDevices()
     }
 

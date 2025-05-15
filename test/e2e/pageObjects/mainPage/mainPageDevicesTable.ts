@@ -25,6 +25,7 @@ export class DeviceHubMainPageDevicesTable {
     }
 
     async isPageFullyDisplayedWithDevices() {
+        await this.isPageDisplayed()
         await expect(this.devicesRows.nth(1)).toBeVisible()
     }
 

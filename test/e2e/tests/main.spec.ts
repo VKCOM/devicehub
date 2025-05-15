@@ -5,17 +5,17 @@ import {generateDevice, removeAllDevices} from '../helpers/devicesHelper'
 import {deleteAllAdminsTokens} from '../helpers/tokensHelper'
 
 test.describe('Main page tests', () => {
+    test.beforeEach('Login as user', async({page}) => {
+        const deviceHubMockLoginPage = new DeviceHubMockLoginPage(page)
+        await deviceHubMockLoginPage.goto()
+        await deviceHubMockLoginPage.login('user', 'user@example.com')
+    })
+
     test.afterAll('Delete all tokens', async() => {
         await deleteAllAdminsTokens()
     })
 
     test.describe('Tests without devices', () => {
-        test.beforeEach('Login as user', async({page}) => {
-            const deviceHubMockLoginPage = new DeviceHubMockLoginPage(page)
-            await deviceHubMockLoginPage.goto()
-            await deviceHubMockLoginPage.login('user', 'user@example.com')
-        })
-
         test.beforeAll('Delete all devices', async() => {
             await removeAllDevices()
         })
@@ -26,13 +26,7 @@ test.describe('Main page tests', () => {
         })
     })
 
-    test.describe('Tests with devices', () => {
-        test.beforeEach('Login as user', async({page}) => {
-            const deviceHubMockLoginPage = new DeviceHubMockLoginPage(page)
-            await deviceHubMockLoginPage.goto()
-            await deviceHubMockLoginPage.login('user', 'user@example.com')
-        })
-
+    test.describe('Tests with fake devices', () => {
         test.beforeAll('Create fake device', async() => {
             await generateDevice('3')
         })
