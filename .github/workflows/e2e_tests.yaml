@@ -6,7 +6,7 @@ on:
       - 'lib/**'
       - 'Dockerfile'
       - 'test/e2e/**'
-      - '../../docker-compose-api-tests.yaml'
+      - 'docker-compose-e2e-tests.yaml'
       - 'package.json'
       - 'package-lock.json'
       - 'ui/**'

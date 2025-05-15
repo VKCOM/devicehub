@@ -1,0 +1,43 @@
+{
+  "name": "vk-devicehub-e2e-tests",
+  "version": "0.0.1",
+  "description": "E2E tests for devicehub",
+  "type": "module",
+  "yargs": {
+    "duplicate-arguments-array": false
+  },
+  "scripts": {
+  },
+  "dependencies": {
+    "@playwright/test": "^1.52.0",
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.13.0",
+    "@types/bluebird": "^3.5.42",
+    "@types/eventemitter3": "^1.2.0",
+    "@types/express": "^5.0.1",
+    "@types/http-proxy": "^1.17.16",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^22.15.17",
+    "@types/split": "^1.0.5",
+    "@types/temp": "^0.9.4",
+    "@types/tmp": "^0.2.6",
+    "@types/ws": "^3.2.1",
+    "async": "2.6.4",
+    "cli-docs-generator": "1.0.7",
+    "eslint": "8.22.0",
+    "event-stream": "3.3.5",
+    "exports-loader": "^4.0.0",
+    "fs-extra": "8.1.0",
+    "globals": "^15.11.0",
+    "http-https": "1.0.0",
+    "imports-loader": "^4.0.1"
+  },
+  "engines": {
+    "node": ">= 12",
+    "npm": ">=8.5.2"
+  },
+  "preferGlobal": true
+}

@@ -2936,6 +2936,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: devices
+  /devices/fake:
+    get:
+      tags:
+        - devices
+        - admin
+      summary: Device List
+      description: Method generates fake devices ame as stf generate-fake-device
+      operationId: generateFakeDevice
+      parameters:
+        - name: number
+          in: query
+          description: How many devices to create
+          schema:
+            type: number
+            default: 1
+      responses:
+        "200":
+          description: Devices information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceListResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: devices
   /autotests:
     get:
       tags:
