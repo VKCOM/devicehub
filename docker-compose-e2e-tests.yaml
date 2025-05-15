@@ -1,4 +1,7 @@
 version: "3"
+networks:
+  devicehub:
+    driver: bridge
 
 services:
   mongo1:
@@ -7,6 +10,8 @@ services:
     container_name: mongo1
     entrypoint:
       ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
+    networks:
+      devicehub:
   mongosetup:
     image: mongo:6.0.10
     depends_on:
@@ -15,6 +20,8 @@ services:
       - ./scripts/mongo_setup_test.sh:/scripts/mongo_setup_test.sh
     restart: "no"
     entrypoint: ["bash", "/scripts/mongo_setup_test.sh"]
+    networks:
+      devicehub:
   adb:
     container_name: adb
     image: devicefarmer/adb:latest
@@ -22,6 +29,8 @@ services:
     volumes:
       - "/dev/bus/usb:/dev/bus/usb"
     privileged: true
+    networks:
+      devicehub:
   devicehub:
     container_name: devicehub
     build: .
@@ -47,6 +56,8 @@ services:
             condition: service_completed_successfully
         adb:
             condition: service_started
+    networks:
+      devicehub:
   devicehub-e2e-tests:
     build: ./test/e2e
     environment:
@@ -56,8 +67,10 @@ services:
       - /bin/sh
       - -c
       - |
-        sleep 10 && npx playwright test
+        npx playwright test
     depends_on:
       devicehub:
         condition: service_healthy
     restart: "no"
+    networks:
+      devicehub:

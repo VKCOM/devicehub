@@ -12,6 +12,10 @@ export class DeviceHubMainPage {
         this.devicehubLogo = page.getByTitle('DeviceHub');
     }
 
+    async goto() {
+        await this.page.goto('/');
+    }
+
     async isPageDisplayed() {
         await new MainPageHeader(this.page).isPageDisplayed()
         await new DeviceHubMainPageSearch(this.page).isPageDisplayed()
