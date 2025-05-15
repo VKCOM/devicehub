@@ -56,7 +56,7 @@ services:
       - /bin/sh
       - -c
       - |
-        npx playwright test
+        sleep 10 && npx playwright test
     depends_on:
       devicehub:
         condition: service_healthy
