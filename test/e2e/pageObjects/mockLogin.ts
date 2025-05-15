@@ -18,7 +18,7 @@ export class DeviceHubMockLoginPage {
     }
 
     async goto() {
-        await this.page.goto('/auth/mock');
+        await this.page.goto('/auth');
     }
 
     async isPageDisplayed() {
