@@ -45,9 +45,9 @@ services:
       - STF_ADMIN_EMAIL=administrator@fakedomain.com
       - STF_ADMIN_NAME=administrator
     restart: unless-stopped
-    command: stf local --adb-host adb --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
+    command: stf local --adb-host adb --public-ip 0.0.0.0 --port 8080 --provider-min-port 7400 --provider-max-port 7500
     healthcheck:
-        test: [ "CMD", "curl", "-f", "http://devicehub:7100/auth/contact" ]
+        test: [ "CMD", "curl", "-f", "http://devicehub:8080/auth/contact" ]
         interval: 20s
         timeout: 10s
         retries: 5
@@ -67,7 +67,7 @@ services:
       - /bin/sh
       - -c
       - |
-        nslookup devicehub && npx playwright test
+        npx playwright test
     depends_on:
       devicehub:
         condition: service_healthy
