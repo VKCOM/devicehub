@@ -51,7 +51,7 @@ services:
     image: devicehub:latest
     build: .
     environment:
-      - PIP_DISABLE_PIP_VERSION_CHECK=1
+      - CI=1
     container_name: devicehub-e2e-tests
     command:
       - /bin/sh

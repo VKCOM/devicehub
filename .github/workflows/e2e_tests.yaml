@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Run Playwright Tests
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       - 'package-lock.json'
       - 'ui/**'
 jobs:
-  run-api-tests:
+  run-e2e-tests:
     runs-on: ubuntu-latest
 
     steps:
