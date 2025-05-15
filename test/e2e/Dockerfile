@@ -1,4 +1,4 @@
-FROM node:20.18.0-bullseye-slim
+FROM mcr.microsoft.com/playwright:v1.52.0-noble
 
 WORKDIR /tests
 
