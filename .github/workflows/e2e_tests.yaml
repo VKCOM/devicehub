@@ -1,4 +1,6 @@
 name: Run Playwright Tests
+permissions:
+  contents: read
 
 on:
   pull_request:
