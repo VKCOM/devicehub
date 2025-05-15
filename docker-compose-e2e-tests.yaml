@@ -34,9 +34,8 @@ services:
   devicehub:
     container_name: devicehub
     build: .
-    image: devicehub:latest
     ports:
-      - "7100:7100"
+      - "8080:8080"
       - "7110:7110"
       - "7400-7500:7400-7500"
     environment:
