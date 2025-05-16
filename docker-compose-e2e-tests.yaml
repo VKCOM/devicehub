@@ -62,6 +62,8 @@ services:
   emulator:
     restart: unless-stopped
     build: ./test/e2e/helpers/emulator
+    volumes:
+      - "/dev/bus/usb:/dev/bus/usb"
     privileged: true
     networks:
       devicehub:
