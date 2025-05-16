@@ -23,6 +23,10 @@ jobs:
             - name: Run API tests
               run: docker compose -f docker-compose-api-tests.yaml up --exit-code-from devicehub-pytest --abort-on-container-exit devicehub-pytest --remove-orphans
 
+            - name: Show logs for devicehub
+              if: always()
+              run: docker compose -f docker-compose-api-tests.yaml logs devicehub
+
             - name: Check generate device logs
               if: always()
               run: docker compose -f docker-compose-api-tests.yaml logs devicehub-generate-fake-device

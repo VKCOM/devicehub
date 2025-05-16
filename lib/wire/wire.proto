@@ -261,6 +261,7 @@ message GroupField {
   repeated string users = 10;
   required string state = 11;
   required bool isActive = 12;
+  repeated string moderators = 13;
 }
 
 message GroupChangeMessage {

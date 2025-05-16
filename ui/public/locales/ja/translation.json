@@ -463,5 +463,8 @@
   "Contact Support": "お問い合わせサポート",
   "Logout": "ログアウト",
   "You are authenticated via an automatic login method": "自動ログインメソッドを介して認証されます",
-  "This is sensitive information. Do not share this token.": "これは機密情報です。このトークンを共有しないでください。"
+  "This is sensitive information. Do not share this token.": "これは機密情報です。このトークンを共有しないでください。",
+  "Moderator": "モデレータ",
+  "Make Moderator": "モデレーターにする",
+  "Remove Moderator": "モデレーターを削除"
 }

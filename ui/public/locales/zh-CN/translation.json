@@ -500,5 +500,8 @@
   "Contact Support": "联系支持",
   "Logout": "注销",
   "You are authenticated via an automatic login method": "您通过自动登录方法对您进行身份验证",
-  "This is sensitive information. Do not share this token.": "这是敏感信息。请勿共享此令牌。"
+  "This is sensitive information. Do not share this token.": "这是敏感信息。请勿共享此令牌。",
+  "Moderator": "主持人",
+  "Make Moderator": "成为主持人",
+  "Remove Moderator": "移除版主"
 }

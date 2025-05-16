@@ -1,3 +1,5 @@
+from time import sleep
+
 from pytest_check import greater, equal, is_not_none, is_not_in, is_none
 
 from devicehub_client.api.admin import add_origin_group_devices
@@ -216,6 +218,7 @@ def test_return_device_to_origin_group(
     # delete bookable group
     response = delete_group.sync_detailed(id=bookable_group_id, client=api_client)
     successful_response_check(response, description='Deleted (groups)')
+    sleep(1)
     # check device return to common group
     device_in_group_check(serial=first_device_serial, group_id=common_group_id, group_name='Common')
 

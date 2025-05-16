@@ -433,5 +433,8 @@
   "Contact Support": "聯繫支持",
   "Logout": "註銷",
   "You are authenticated via an automatic login method": "您通過自動登錄方法對您進行身份驗證",
-  "This is sensitive information. Do not share this token.": "這是敏感資訊。請勿共享此令牌。"
+  "This is sensitive information. Do not share this token.": "這是敏感資訊。請勿共享此令牌。",
+  "Moderator": "主持人",
+  "Make Moderator": "成為主持人",
+  "Remove Moderator": "移除版主"
 }

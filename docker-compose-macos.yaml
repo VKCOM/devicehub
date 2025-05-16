@@ -108,7 +108,7 @@ services:
         container_name: devicehub-processor001
         env_file:
             - scripts/variables.env
-        command: stf processor --name proc001 --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260
+        command: stf processor --name proc001 --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260 --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully
@@ -207,7 +207,7 @@ services:
         container_name: devicehub-websocket
         env_file:
             - scripts/variables.env
-        command: stf websocket --port 3000 --storage-url https://${STF_DOMAIN}:${STF_PORT}/ --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --secret=${STF_SECRET}
+        command: stf websocket --port 3000 --storage-url https://${STF_DOMAIN}:${STF_PORT}/ --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270 --secret=${STF_SECRET}
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully

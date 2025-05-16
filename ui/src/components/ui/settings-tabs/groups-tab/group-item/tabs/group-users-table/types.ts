@@ -5,4 +5,5 @@ export enum GroupUsersColumnIds {
   PRIVILEGE = 'privilege',
   TAG = 'tag',
   TEXT = 'text',
+  MODERATOR = 'moderator',
 }

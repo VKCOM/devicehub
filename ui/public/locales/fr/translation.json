@@ -505,5 +505,8 @@
   "Contact Support": "Support de contact",
   "Logout": "Déconnexion",
   "You are authenticated via an automatic login method": "Vous êtes authentifié via une méthode de connexion automatique",
-  "This is sensitive information. Do not share this token.": "Ces informations sont sensibles. Ne partagez pas ce jeton."
+  "This is sensitive information. Do not share this token.": "Ces informations sont sensibles. Ne partagez pas ce jeton.",
+  "Moderator": "Modérateur",
+  "Make Moderator": "En faire un modérateur",
+  "Remove Moderator": "Supprimer le modérateur"
 }

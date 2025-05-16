@@ -37,4 +37,5 @@ export type GroupListResponseGroupsItem = {
   /** Group state; default value => pending or ready for bookable/standard classes */
   state?: GroupListResponseGroupsItemState
   users?: string[]
+  moderators?: string[]
 }

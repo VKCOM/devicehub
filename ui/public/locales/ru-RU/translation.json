@@ -456,5 +456,8 @@
   "User group quota": "Квота пользователя на использования групп",
   "Contact Support": "Связаться с поддержкой",
   "You are authenticated via an automatic login method": "Вы авторизованы через способ, когда вход происходит автоматически",
-  "This is sensitive information. Do not share this token.": "Это конфиденциальная информация. Не передавайте этот токен третьим лицам."
+  "This is sensitive information. Do not share this token.": "Это конфиденциальная информация. Не передавайте этот токен третьим лицам.",
+  "Moderator": "Модератор",
+  "Make Moderator": "Сделать модератором",
+  "Remove Moderator": "Убрать модератора"
 }

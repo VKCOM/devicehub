@@ -3287,6 +3287,84 @@ paths:
     x-swagger-router-controller: stats
   /swagger.json:
     x-swagger-pipe: swagger_raw
+  /groups/{id}/moderators/{email}:
+    put:
+      tags:
+      - groups
+      summary: Adds a user as a moderator to a group
+      description: Adds a user as a moderator to a group owned by you or if you are an administrator
+      operationId: addGroupModerator
+      parameters:
+      - name: id
+        in: path
+        description: Group identifier
+        required: true
+        schema:
+          type: string
+      - name: email
+        in: path
+        description: User identifier (email)
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Group information (an empty group is returned if no change is made)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 403: Forbidden => only owner or administrator can add moderators
+              * 404: Not Found => unknown group or user
+              * 500: Internal Server Error
+              * 503: Service Unavailable => server too busy or a lock on a resource is pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    delete:
+      tags:
+      - groups
+      summary: Removes a user as a moderator from a group
+      description: Removes a user as a moderator from a group owned by you or if you are an administrator
+      operationId: removeGroupModerator
+      parameters:
+      - name: id
+        in: path
+        description: Group identifier
+        required: true
+        schema:
+          type: string
+      - name: email
+        in: path
+        description: User identifier (email)
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Group information (an empty group is returned if no change is made)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 403: Forbidden => only owner or administrator can remove moderators
+              * 404: Not Found => unknown group or user
+              * 500: Internal Server Error
+              * 503: Service Unavailable => server too busy or a lock on a resource is pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+
 components:
   schemas:
     UnexpectedErrorResponse:

@@ -505,5 +505,8 @@
   "Contact Support": "Suporte de contato",
   "Logout": "Logout",
   "You are authenticated via an automatic login method": "Você é autenticado por meio de um método de login automático",
-  "This is sensitive information. Do not share this token.": "Esta é uma informação sensível. Não compartilhe este token."
+  "This is sensitive information. Do not share this token.": "Esta é uma informação sensível. Não compartilhe este token.",
+  "Moderator": "Moderador",
+  "Make Moderator": "Tornar moderador",
+  "Remove Moderator": "Remover moderador"
 }

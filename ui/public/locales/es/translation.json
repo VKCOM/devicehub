@@ -449,4 +449,7 @@
   "Logout": "Cierre de sesión",
   "You are authenticated via an automatic login method": "Te autentican a través de un método de inicio de sesión automático",
   "This is sensitive information. Do not share this token.": "Esta es información sensible. No comparta este token."
+  "Moderator": "Moderador",
+  "Make Moderator": "Convertirlo en moderador",
+  "Remove Moderator": "Eliminar moderador"
 }

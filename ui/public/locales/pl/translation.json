@@ -386,5 +386,8 @@
   "Contact Support": "Kontakt z obsługą",
   "Logout": "Logout",
   "You are authenticated via an automatic login method": "Jesteś uwierzytelniony za pomocą automatycznej metody logowania",
-  "This is sensitive information. Do not share this token.": "To poufna informacja. Nie udostępniaj tego tokenu."
+  "This is sensitive information. Do not share this token.": "To poufna informacja. Nie udostępniaj tego tokenu.",
+  "Moderator": "Moderator",
+  "Make Moderator": "Uczyń moderatorem",
+  "Remove Moderator": "Usuń moderatora"
 }

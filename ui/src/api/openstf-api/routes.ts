@@ -17,4 +17,5 @@ export const OPENSTF_API_ROUTES = {
   grantAdmin: (email: string) => `/users/grantAdmin/${email}`,
   revokeAdmin: (email: string) => `/users/revokeAdmin/${email}`,
   accessTokensByEmail: (email: string) => `/users/${email}/accessTokens`,
+  groupModerator: (id: string, email: string) => `/groups/${id}/moderators/${email}`,
 } as const

@@ -455,5 +455,8 @@
   "User group quota": "Пайдаланушы тобының квотасы",
   "Contact Support": "Байланыс қолдауы",
   "You are authenticated via an automatic login method": "Автоматты кіру әдісі арқылы аутентификацияланасыз",
-  "This is sensitive information. Do not share this token.": "Бұл құпия ақпарат. Бұл токенді ешкіммен бөліспеңіз."
+  "This is sensitive information. Do not share this token.": "Бұл құпия ақпарат. Бұл токенді ешкіммен бөліспеңіз.",
+  "Moderator": "Модератор",
+  "Make Moderator": "Модератор жасаңыз",
+  "Remove Moderator": "Модераторды алып тастаңыз"
 }

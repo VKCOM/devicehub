@@ -454,5 +454,8 @@
   "Really grant access to user": "Кулланучыга чыннан да керү мөмкинлеге бирергә?",
   "Really revoke access of this user": "Бу кулланучының керү мөмкинлеген чыннан да кире алырга?",
   "User group quota": "Кулланучының төркем куллану квотасы",
-  "This is sensitive information. Do not share this token.": "Бу яшерен мәгълүмат. Бу токенны бүтән кешегә бирмәгез."
+  "This is sensitive information. Do not share this token.": "Бу яшерен мәгълүмат. Бу токенны бүтән кешегә бирмәгез.",
+  "Moderator": "Модератор",
+  "Make Moderator": "Модератор яса",
+  "Remove Moderator": "Модераторны бетерегез"
 }
