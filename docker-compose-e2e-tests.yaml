@@ -22,6 +22,14 @@ services:
     entrypoint: ["bash", "/scripts/mongo_setup_test.sh"]
     networks:
       devicehub:
+  emulator:
+    restart: unless-stopped
+    build: ./test/e2e/helpers/emulator
+    volumes:
+      - "/dev/bus/usb:/dev/bus/usb"
+    privileged: true
+    networks:
+      devicehub:
   devicehub:
     container_name: devicehub
     build: .
@@ -59,11 +67,3 @@ services:
         condition: service_healthy
     restart: "no"
     network_mode: host
-  emulator:
-    restart: unless-stopped
-    build: ./test/e2e/helpers/emulator
-    volumes:
-      - "/dev/bus/usb:/dev/bus/usb"
-    privileged: true
-    networks:
-      devicehub:
