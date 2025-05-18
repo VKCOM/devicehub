@@ -27,3 +27,7 @@ jobs:
       - name: Show logs for devicehub
         if: always()
         run: docker compose -f docker-compose-e2e-tests.yaml logs devicehub
+
+      - name: Show logs for adb and emulator
+        if: always()
+        run: docker compose -f docker-compose-e2e-tests.yaml logs emulator
