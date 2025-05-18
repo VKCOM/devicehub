@@ -42,7 +42,7 @@ RUN yes | sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools" && \
 RUN sdkmanager --sdk_root=${ANDROID_HOME} \
     "emulator" \
     "platforms;android-30" \
-    "system-images;android-30;google_apis;x86_64"
+    "system-images;android-30;default;x86_64"
 
 # Создание AVD
 RUN echo "no" | avdmanager create avd \
