@@ -3,7 +3,7 @@ import {DeviceHubMainPage} from '../pageObjects/mainPage/mainPage'
 import {DeviceHubMockLoginPage} from '../pageObjects/mockLogin'
 import {generateDevice, removeAllDevices} from '../helpers/devicesHelper'
 import {deleteAllAdminsTokens} from '../helpers/tokensHelper'
-
+//
 test.describe('Main page tests', () => {
     test.beforeEach('Login as user', async({page}) => {
         const deviceHubMockLoginPage = new DeviceHubMockLoginPage(page)
