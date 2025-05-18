@@ -47,6 +47,8 @@ RUN sdkmanager --sdk_root=${ANDROID_HOME} \
 RUN echo "no" | avdmanager create avd -n test_avd -k "system-images;android-30;google_apis;x86_64" --device "pixel"
 
 # Запуск
+COPY config.ini "/root/.android/avd/test_avd.avd/config.ini"
+
 COPY start-emulator.sh /start-emulator.sh
 RUN chmod +x /start-emulator.sh
 
