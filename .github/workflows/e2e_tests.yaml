@@ -1,4 +1,4 @@
-name: Run Playwright Tests
+name: E2E Tests
 
 on:
   pull_request:
@@ -11,23 +11,40 @@ on:
       - 'package-lock.json'
       - 'ui/**'
 jobs:
-  run-e2e-tests:
+  e2e:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Docker Compose
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Run Playwright Tests
-        run: docker compose -f docker-compose-e2e-tests.yaml up --exit-code-from devicehub-e2e-tests --abort-on-container-exit devicehub-e2e-tests --remove-orphans
+      - name: Build containers
+        run: docker-compose -f docker-compose.yml build
 
-      - name: Show logs for devicehub
-        if: always()
-        run: docker compose -f docker-compose-e2e-tests.yaml logs devicehub
+      - name: Start services
+        run: docker-compose -f docker-compose.yml up -d
 
-      - name: Show logs for adb and emulator
+      - name: Wait for emulator and devicehub
+        run: |
+          echo "⏳ Waiting 60s for emulator boot..."
+          sleep 60
+          docker-compose ps
+          docker logs emulator || true
+
+      - name: Run E2E tests
+        run: docker-compose run --rm devicehub-e2e-tests
+
+      - name: Logs on failure
+        if: failure()
+        run: |
+          echo "=== Emulator Logs ==="
+          docker logs emulator || true
+          echo "=== DeviceHub Logs ==="
+          docker logs devicehub || true
+
+      - name: Shutdown
         if: always()
-        run: docker compose -f docker-compose-e2e-tests.yaml logs emulator
+        run: docker-compose down
