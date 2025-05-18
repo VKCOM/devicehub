@@ -24,6 +24,7 @@ RUN apt-get update && \
 ENV ANDROID_HOME=/opt/android-sdk
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator"
+ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
 
 # Установка Android SDK Command Line Tools (с правильной структурой)
 RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
