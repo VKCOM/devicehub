@@ -10,6 +10,6 @@ export EMULATOR_ROOT="${ANDROID_HOME}/emulator"
 #export DISPLAY=:0
 adb devices
 # Запуск эмулятора без KVM
-${EMULATOR_ROOT}/emulator -avd test_avd -no-accel -no-audio -no-window -gpu swiftshader_indirect -verbose &
+${EMULATOR_ROOT}/emulator -avd test_avd -no-accel -no-audio -no-window -gpu swiftshader_indirect -verbose -partition-size 4096 &
 
 adb wait-for-device
