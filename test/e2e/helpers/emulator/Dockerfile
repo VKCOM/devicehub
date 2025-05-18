@@ -2,9 +2,9 @@ FROM debian:bookworm-slim
 
 ENV ANDROID_HOME=/opt/android-sdk
 ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
+ENV ANDROID_AVD_HOME=/tmp/avd
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator"
-ENV ANDROID_AVD_HOME=/tmp/avd
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash coreutils unzip wget curl ca-certificates \
@@ -25,17 +25,20 @@ RUN yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses && \
         "platforms;android-30" \
         "system-images;android-30;default;x86_64"
 
+# Создание AVD в RAM-диске
 RUN mkdir -p /tmp/avd && \
-    echo "no" | avdmanager create avd -n test_avd \
+    ANDROID_AVD_HOME=/tmp/avd \
+    avdmanager create avd -n test_avd \
     -k "system-images;android-30;default;x86_64" \
     --device "pixel" && \
-    sed -i '/^disk.dataPartition.size/d' /tmp/avd/avd/test_avd.avd/config.ini && \
-    echo "disk.dataPartition.size=2048M" >> /tmp/avd/avd/test_avd.avd/config.ini && \
-    echo "tag.id=default" >> /tmp/avd/avd/test_avd.avd/config.ini && \
-    echo "tag.display=Default" >> /tmp/avd/avd/test_avd.avd/config.ini
+    sed -i '/^disk.dataPartition.size/d' /tmp/avd/test_avd.avd/config.ini && \
+    echo "disk.dataPartition.size=2048M" >> /tmp/avd/test_avd.avd/config.ini && \
+    echo "tag.id=default" >> /tmp/avd/test_avd.avd/config.ini && \
+    echo "tag.display=Default" >> /tmp/avd/test_avd.avd/config.ini
 
 COPY start-emulator.sh /start-emulator.sh
 RUN chmod +x /start-emulator.sh
 
 EXPOSE 5554 5555
+
 ENTRYPOINT ["/start-emulator.sh"]
