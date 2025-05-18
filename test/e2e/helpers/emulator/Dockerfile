@@ -45,7 +45,7 @@ RUN sdkmanager --sdk_root=${ANDROID_HOME} \
     "system-images;android-30;google_apis;x86_64"
 
 # Создание AVD
-RUN echo "no" | avdmanager --sdk_root=${ANDROID_HOME} create avd \
+RUN echo "no" | avdmanager create avd \
     -n test_avd \
     -k "system-images;android-30;google_apis;x86_64" \
     --device "pixel"
