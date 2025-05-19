@@ -26,20 +26,6 @@ services:
     entrypoint: ["bash", "/scripts/mongo_setup_test.sh"]
     networks:
       devicehub:
-
-  emulator:
-    build: ./test/e2e/helpers/emulator
-    container_name: emulator
-    privileged: true
-    environment:
-      - ANDROID_AVD_HOME=/tmp/avd
-    volumes:
-      - avd_ram:/tmp/avd
-    networks:
-      devicehub:
-    restart: unless-stopped
-
-
   devicehub:
     build: .
     container_name: devicehub
@@ -57,7 +43,7 @@ services:
       - MONGODB_PORT_27017_TCP=mongodb://mongo1:27017
       - STF_ADMIN_EMAIL=administrator@fakedomain.com
       - STF_ADMIN_NAME=administrator
-    command: stf local --adb-host emulator --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
+    command: stf local --adb-host 127.0.0.1 --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
     healthcheck:
       test: ["CMD", "curl", "-f", "http://devicehub:7100/auth/contact"]
       interval: 20s
@@ -66,6 +52,7 @@ services:
     restart: unless-stopped
     networks:
       devicehub:
+    network_mode: host
 
   devicehub-e2e-tests:
     build: ./test/e2e
