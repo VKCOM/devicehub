@@ -11,7 +11,7 @@ rm -f /tmp/avd/test_avd.avd/*.img
 echo "===> Starting emulator..."
 $ANDROID_HOME/emulator/emulator -avd test_avd \
   -no-audio -no-window -gpu swiftshader_indirect \
-  -partition-size 2048 -verbose &
+  -partition-size 2048 -verbose -sdcard 512M &
 
 adb wait-for-device
 adb shell getprop sys.boot_completed
