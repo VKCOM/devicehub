@@ -6,13 +6,12 @@ ENV ANDROID_AVD_HOME=/tmp/avd
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     bash coreutils unzip wget curl ca-certificates \
     libgl1-mesa-glx libglu1-mesa openjdk-17-jdk-headless \
-    mesa-utils xvfb pulseaudio socat locales && \
-    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
-    locale-gen && \
-    rm -rf /var/lib/apt/lists/*
+    mesa-utils pulseaudio socat locales && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     cd ${ANDROID_HOME}/cmdline-tools && \
@@ -35,6 +34,18 @@ RUN mkdir -p /tmp/avd && \
     echo "disk.dataPartition.size=2048M" >> /tmp/avd/test_avd.avd/config.ini && \
     echo "tag.id=default" >> /tmp/avd/test_avd.avd/config.ini && \
     echo "tag.display=Default" >> /tmp/avd/test_avd.avd/config.ini
+
+# Очистка всего лишнего после создания AVD
+RUN rm -rf ${ANDROID_HOME}/cmdline-tools/latest/lib \
+           ${ANDROID_HOME}/cmdline-tools/latest/source.properties \
+           ${ANDROID_HOME}/cmdline-tools/latest/NOTICE.txt \
+           ${ANDROID_HOME}/cmdline-tools/latest/README.md && \
+    rm -rf /root/.android \
+           ${ANDROID_HOME}/system-images/*/google_apis \
+           ${ANDROID_HOME}/platforms/* \
+           ${ANDROID_HOME}/temp \
+           /tmp/*.zip /tmp/temp \
+           /var/lib/apt/lists/* \
 
 COPY start-emulator.sh /start-emulator.sh
 RUN chmod +x /start-emulator.sh
