@@ -48,7 +48,7 @@ RUN echo "Converting system.img to qcow2" && \
 
 RUN echo | ${ANDROID_HOME}/cmdline-tools/bin/avdmanager create avd --name "x86_64"  --package "system-images;${ANDROID_SDK};${IMAGE_TYPE};x86_64" --tag ${IMAGE_TYPE}
 
-COPY start.sh /opt/sdk/start-emulator.sh
+COPY start-emulator.sh /opt/sdk/start-emulator.sh
 
 COPY config.ini ${EMULATOR_CONFIG}
 
@@ -56,8 +56,7 @@ RUN echo image.sysdir.1=system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/ >> ${
     echo hw.cpu.ncore=${EMULATOR_CORES_NUMBER} >> ${EMULATOR_CONFIG} &&  \
     echo hw.ramSize=${EMULATOR_RAM} >> ${EMULATOR_CONFIG} &&\
     sed -i 's:image.sysdir.1=sdk/:image.sysdir.1=:g' "/root/.android/avd/x86_64.avd/config.ini" && \
-    groupadd kvm && useradd -d /home/app -G kvm -m -r app && \
-    chmod +x /opt/sdk/start.sh && \
+    chmod +x /opt/sdk/start-emulator.sh && \
     find "${HOME}/.android/avd" -name *lock -exec rm {} \;
 
 
