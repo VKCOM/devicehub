@@ -31,6 +31,7 @@ services:
     build: ./test/e2e/helpers/emulator
     container_name: emulator
     privileged: true
+    command: adb devices && emulator -avd test_avd -no-snapshot -no-audio -no-window -no-accel
     networks:
       devicehub:
     restart: unless-stopped
