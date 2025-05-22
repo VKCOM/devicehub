@@ -1,44 +1,64 @@
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
-ENV ANDROID_HOME=/opt/android-sdk
-ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
-ENV ANDROID_AVD_HOME=/tmp/avd
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator"
+ENV ANDROID_HOME "/opt/sdk"
+ENV ANDROID_SDK_ROOT "/opt/sdk"
+ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+ENV CONSOLE_PORT 10000
+ENV ADB_PORT 10001
+ENV EMULATOR_CONFIG "/root/.android/avd/x86_64.avd/config.ini"
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    bash coreutils unzip wget curl ca-certificates \
-    libgl1-mesa-glx libglu1-mesa openjdk-17-jdk-headless \
-    mesa-utils socat  && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+ARG EMULATOR_RAM=14336
+ARG EMULATOR_CORES_NUMBER=6
+ARG CLI_TOOLS_VERSION=11076708
+ARG ANDROID_SDK=android-30
+ARG IMAGE_TYPE=default
+
+ENV EMULATOR_TYPE ${IMAGE_TYPE}
+
+# Install required dependencies
+RUN apt-get update && apt-get -y dist-upgrade && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    telnet openjdk-17-jdk bash git unzip wget redir qemu-utils procps iproute2 \
+    libx11-dev libpulse-dev libnss3 libxcomposite-dev libxcursor-dev libxi-dev \
+    libxtst-dev uuid-dev libgl-dev libasound-dev libxcb1-dev lldb strace && \
+    apt-get -y autoremove && apt-get clean autoclean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and extract Android Tools
+# New versions https://developer.android.com/studio#command-tools
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-${CLI_TOOLS_VERSION}_latest.zip -O /tmp/tools.zip && \
+    mkdir -p ${ANDROID_HOME} && \
+    unzip -qq /tmp/tools.zip -d ${ANDROID_HOME} && \
+    rm -v /tmp/tools.zip
+
+# Install SDK Packages
+RUN mkdir -p ~/.android/ && touch ~/.android/repositories.cfg && \
+    yes | ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses && \
+    ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --update && \
+    ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} emulator "system-images;${ANDROID_SDK};${IMAGE_TYPE};x86_64" platform-tools "platforms;${ANDROID_SDK}"
+
+    # Compress downloaded system.img
+RUN echo "Converting system.img to qcow2" && \
+    qemu-img convert -O qcow2 -c ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/system.img ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/system.qcow2 && \
+    mv ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/system.qcow2 ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/system.img && \
+    # Compress downloaded userdata.img
+    echo "Converting userdata.img to qcow2" && \
+    qemu-img convert -O qcow2 -c ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/userdata.img ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/userdata.qcow2 && \
+    mv ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/userdata.qcow2 ${ANDROID_HOME}/system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/userdata.img
 
 
-RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
-    cd ${ANDROID_HOME}/cmdline-tools && \
-    wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O sdk.zip && \
-    unzip sdk.zip -d temp && mv temp/cmdline-tools latest && rm -rf sdk.zip temp
+RUN echo | ${ANDROID_HOME}/cmdline-tools/bin/avdmanager create avd --name "x86_64"  --package "system-images;${ANDROID_SDK};${IMAGE_TYPE};x86_64" --tag ${IMAGE_TYPE}
 
-RUN yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses && \
-    sdkmanager --sdk_root=${ANDROID_HOME} \
-        "platform-tools" "emulator" \
-        "platforms;android-30" \
-        "system-images;android-30;default;x86_64"
+COPY start.sh /opt/sdk/start-emulator.sh
 
-# Создание AVD в RAM-диске
-RUN mkdir -p /tmp/avd && \
-    ANDROID_AVD_HOME=/tmp/avd \
-    avdmanager create avd -n test_avd \
-    -k "system-images;android-30;default;x86_64" \
-    --device "pixel" && \
-    sed -i '/^disk.dataPartition.size/d' /tmp/avd/test_avd.avd/config.ini && \
-    echo "disk.dataPartition.size=2048M" >> /tmp/avd/test_avd.avd/config.ini && \
-    echo "tag.id=default" >> /tmp/avd/test_avd.avd/config.ini && \
-    echo "tag.display=Default" >> /tmp/avd/test_avd.avd/config.ini
+COPY config.ini ${EMULATOR_CONFIG}
 
-COPY start-emulator.sh /start-emulator.sh
-RUN chmod +x /start-emulator.sh
+RUN echo image.sysdir.1=system-images/${ANDROID_SDK}/${IMAGE_TYPE}/x86_64/ >> ${EMULATOR_CONFIG} && \
+    echo hw.cpu.ncore=${EMULATOR_CORES_NUMBER} >> ${EMULATOR_CONFIG} &&  \
+    echo hw.ramSize=${EMULATOR_RAM} >> ${EMULATOR_CONFIG} &&\
+    sed -i 's:image.sysdir.1=sdk/:image.sysdir.1=:g' "/root/.android/avd/x86_64.avd/config.ini" && \
+    groupadd kvm && useradd -d /home/app -G kvm -m -r app && \
+    chmod +x /opt/sdk/start.sh && \
+    find "${HOME}/.android/avd" -name *lock -exec rm {} \;
 
-EXPOSE 5554 5555
 
-ENTRYPOINT ["/start-emulator.sh"]
+CMD /opt/sdk/start-emulator.sh

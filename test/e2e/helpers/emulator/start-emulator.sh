@@ -1,8 +1,7 @@
 #!/bin/bash
 
-export ANDROID_SDK_ROOT=/opt/android-sdk
-export ANDROID_HOME=/opt/android-sdk
-export ANDROID_AVD_HOME=/tmp/avd
+export ANDROID_SDK_ROOT=/opt/sdk
+export ANDROID_HOME=/opt/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools
 
 echo "Launching emulator..."

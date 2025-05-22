@@ -31,10 +31,6 @@ services:
     build: ./test/e2e/helpers/emulator
     container_name: emulator
     privileged: true
-    environment:
-      - ANDROID_AVD_HOME=/tmp/avd
-    volumes:
-      - avd_ram:/tmp/avd
     networks:
       devicehub:
     restart: unless-stopped
