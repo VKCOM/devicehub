@@ -34,7 +34,6 @@ services:
       devicehub:
     restart: unless-stopped
 
-
   devicehub:
     build: .
     container_name: devicehub

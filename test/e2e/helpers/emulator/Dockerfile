@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libxtst6 \
     libnss3 \
+    pulseaudio \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Установка Android SDK
