@@ -15,6 +15,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxtst6 \
     libnss3 \
     pulseaudio \
+    libtcmalloc-minimal4 \
+    libgles2-mesa \
+    redir  \
+    qemu-utils \
+    iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Установка Android SDK
