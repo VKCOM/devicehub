@@ -1,10 +1,4 @@
 version: "3"
-networks:
-  devicehub:
-    driver: bridge
-
-volumes:
-  avd_ram:
 
 services:
   mongo1:
@@ -12,10 +6,7 @@ services:
     hostname: mongo1
     container_name: mongo1
     entrypoint:
-      ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
-    networks:
-      devicehub:
-
+      [ "mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1" ]
   mongosetup:
     image: mongo:6.0.10
     depends_on:
@@ -23,19 +14,14 @@ services:
     volumes:
       - ./scripts/mongo_setup_test.sh:/scripts/mongo_setup_test.sh
     restart: "no"
-    entrypoint: ["bash", "/scripts/mongo_setup_test.sh"]
-    networks:
-      devicehub:
+    entrypoint: [ "bash", "/scripts/mongo_setup_test.sh" ]
 
   emulator:
     build: ./test/e2e/helpers/emulator
     container_name: emulator
     privileged: true
-    command: adb devices && emulator -avd test_avd -no-snapshot -no-audio -no-window -no-accel
-    networks:
-      devicehub:
+    command: adb devices && emulator -avd test_avd -no-accel -delay-adb -no-boot-anim -skip-adb-auth -qt-hide-window -no-snapshot -verbose -logcat '*:v'
     restart: unless-stopped
-
 
   devicehub:
     build: .
@@ -44,7 +30,7 @@ services:
       mongosetup:
         condition: service_completed_successfully
       emulator:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "7100:7100"
       - "7110:7110"
@@ -61,8 +47,6 @@ services:
       timeout: 10s
       retries: 5
     restart: unless-stopped
-    networks:
-      devicehub:
 
   devicehub-e2e-tests:
     build: ./test/e2e
