@@ -30,7 +30,7 @@ services:
       mongosetup:
         condition: service_completed_successfully
       emulator:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "7100:7100"
       - "7110:7110"
