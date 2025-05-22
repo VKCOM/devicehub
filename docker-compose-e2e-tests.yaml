@@ -29,7 +29,7 @@ services:
     hostname: emulator
     container_name: emulator
     privileged: true
-    command: adb devices && emulator -avd test_avd -no-accel -delay-adb -no-boot-anim -skip-adb-auth -qt-hide-window -no-snapshot -verbose -logcat '*:v'
+    command: adb start-server && emulator -avd test_avd -no-accel -delay-adb -no-boot-anim -skip-adb-auth -qt-hide-window -no-snapshot -verbose -logcat '*:v'
     networks:
       devicehub:
     restart: unless-stopped
