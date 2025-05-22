@@ -27,7 +27,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Run Playwright Tests
-        run: docker compose --build --force-recreate -f docker-compose-e2e-tests.yaml up --exit-code-from devicehub-e2e-tests --abort-on-container-exit --remove-orphans devicehub-e2e-tests
+        run: docker compose build --force-recreate -f docker-compose-e2e-tests.yaml up --exit-code-from devicehub-e2e-tests --abort-on-container-exit --remove-orphans devicehub-e2e-tests
 
       - name: Show logs for devicehub
         if: always()
