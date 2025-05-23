@@ -48,6 +48,11 @@ services:
           -verbose
           -logcat '*:v'
       "
+    healthcheck:
+      test: [ "CMD-SHELL", "adb devices | grep emulator || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - devicehub
     restart: unless-stopped
@@ -61,7 +66,7 @@ services:
       mongosetup:
         condition: service_completed_successfully
       emulator:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "7100:7100"
       - "7110:7110"
