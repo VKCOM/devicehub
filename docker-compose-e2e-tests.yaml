@@ -35,18 +35,7 @@ services:
     command: >
       bash -c "
         adb start-server & \
-        emulator -avd test_avd \
-          -read-only \
-          -no-accel \
-          -delay-adb \
-          -no-boot-anim \
-          -skip-adb-auth \
-          -no-window \
-          -no-audio \
-          -no-qt \
-          -no-snapshot \
-          -verbose \
-          -logcat '*:v'
+        emulator -avd test_avd -read-only -no-accel -delay-adb -no-boot-anim -skip-adb-auth -no-window -no-audio -no-qt -no-snapshot -verbose -logcat '*:v'
       "
     healthcheck:
       test: [ "CMD-SHELL", "adb devices | grep emulator || exit 1" ]
