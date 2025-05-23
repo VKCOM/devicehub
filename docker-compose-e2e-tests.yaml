@@ -33,8 +33,8 @@ services:
       EMULATOR_ROOT: /opt/android-sdk/emulator
       LD_LIBRARY_PATH: "/opt/android-sdk/emulator/lib64/qt/lib:/opt/android-sdk/emulator/lib64/libstdc++:/opt/android-sdk/emulator/lib64:/opt/android-sdk/emulator/lib64/gles_swiftshader"
     command: >
-      sh -c "
-        adb start-server &
+      bash -c "
+        adb start-server & \
         emulator -avd test_avd \
           -read-only \
           -no-accel \
