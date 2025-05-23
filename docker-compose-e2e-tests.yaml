@@ -30,12 +30,28 @@ services:
     container_name: emulator
     privileged: true
     environment:
-      - EMULATOR_ROOT=/opt/android-sdk/emulator
-      - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${EMULATOR_ROOT}/lib64/qt/lib:${EMULATOR_ROOT}/lib64/libstdc++:${EMULATOR_ROOT}/lib64:${EMULATOR_ROOT}/lib64/gles_swiftshader
-    command: adb start-server && emulator -avd test_avd -read-only -no-accel -delay-adb -no-boot-anim -skip-adb-auth -no-window -no-audio -no-qt -no-snapshot -verbose -logcat '*:v'
+      EMULATOR_ROOT: /opt/android-sdk/emulator
+      LD_LIBRARY_PATH: "/opt/android-sdk/emulator/lib64/qt/lib:/opt/android-sdk/emulator/lib64/libstdc++:/opt/android-sdk/emulator/lib64:/opt/android-sdk/emulator/lib64/gles_swiftshader"
+    command: >
+      sh -c "
+        adb start-server &&
+        emulator -avd test_avd
+          -read-only
+          -no-accel
+          -delay-adb
+          -no-boot-anim
+          -skip-adb-auth
+          -no-window
+          -no-audio
+          -no-qt
+          -no-snapshot
+          -verbose
+          -logcat '*:v'
+      "
     networks:
-      devicehub:
+      - devicehub
     restart: unless-stopped
+
 
   devicehub:
     build: .
