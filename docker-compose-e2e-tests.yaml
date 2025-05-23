@@ -34,7 +34,7 @@ services:
       LD_LIBRARY_PATH: "/opt/android-sdk/emulator/lib64/qt/lib:/opt/android-sdk/emulator/lib64/libstdc++:/opt/android-sdk/emulator/lib64:/opt/android-sdk/emulator/lib64/gles_swiftshader"
     command: >
       sh -c "
-        adb start-server &&
+        adb start-server &
         emulator -avd test_avd
           -read-only
           -no-accel
@@ -54,9 +54,8 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - devicehub
+      devicehub:
     restart: unless-stopped
-
 
   devicehub:
     build: .
