@@ -64,7 +64,7 @@ services:
       - MONGODB_PORT_27017_TCP=mongodb://mongo1:27017
       - STF_ADMIN_EMAIL=administrator@fakedomain.com
       - STF_ADMIN_NAME=administrator
-    command: stf local --adb-host emulator.devicehub_devicehub --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
+    command: stf local --adb-host emulator --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
     healthcheck:
       test: ["CMD", "curl", "-f", "http://devicehub:7100/auth/contact"]
       interval: 20s
