@@ -32,7 +32,7 @@ services:
     environment:
       - EMULATOR_ROOT=/opt/android-sdk/emulator
       - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${EMULATOR_ROOT}/lib64/qt/lib:${EMULATOR_ROOT}/lib64/libstdc++:${EMULATOR_ROOT}/lib64:${EMULATOR_ROOT}/lib64/gles_swiftshader
-    command: emulator -avd test_avd -no-accel -delay-adb -no-boot-anim -skip-adb-auth -qt-hide-window -no-snapshot -verbose -logcat '*:v'
+    command: emulator -avd test_avd -read-only -no-accel -delay-adb -no-boot-anim -skip-adb-auth -qt-hide-window -no-snapshot -verbose -logcat '*:v'
     networks:
       devicehub:
     restart: unless-stopped
