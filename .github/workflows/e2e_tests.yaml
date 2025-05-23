@@ -39,4 +39,4 @@ jobs:
 
       - name: docker compose down
         if: always()
-        run: docker compose down --remove-orphans
+        run: docker compose -f docker-compose-e2e-tests.yaml down --remove-orphans
