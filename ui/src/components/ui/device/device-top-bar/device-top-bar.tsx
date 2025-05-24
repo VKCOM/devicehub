@@ -48,8 +48,8 @@ export const DeviceTopBar = observer(() => {
   }, [])
 
   return (
-    <Flex align='center' className={styles.deviceHeader} justify='space-between'>
-      <Flex align='center' className={styles.deviceName} noWrap>
+    <Flex align='center' className={styles.deviceHeader} id='deviceTopBar' justify='space-between'>
+      <Flex align='center' className={styles.deviceName} id='deviceName' noWrap>
         <Icon28DevicesOutline className={styles.icon} height={25} width={25} />
         <EllipsisText>{deviceTitle}</EllipsisText>
       </Flex>

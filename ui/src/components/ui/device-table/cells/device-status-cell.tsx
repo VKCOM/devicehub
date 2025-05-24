@@ -70,7 +70,7 @@ export const DeviceStatusCell = memo(({ serial, channel, deviceState }: DeviceSt
         </Button>
       </ConditionalRender>
       <ConditionalRender conditions={[deviceState === DeviceState.USING]}>
-        <Button appearance='positive' mode='primary' title={deviceState} onClick={onStopUsing}>
+        <Button appearance='positive' id={`stopUsing_${serial}`} mode='primary' title={deviceState} onClick={onStopUsing}>
           {t('Stop Using')}
         </Button>
       </ConditionalRender>

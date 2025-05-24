@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { DeviceHubDevicePage } from '../controlPage/devicePage'
 
 export class DeviceHubMainPageDevicesTable {
     readonly page: Page
@@ -26,7 +27,18 @@ export class DeviceHubMainPageDevicesTable {
 
     async isPageFullyDisplayedWithDevices() {
         await this.isPageDisplayed()
-        await expect(this.devicesRows.nth(1)).toBeVisible()
+        await expect(this.devicesRows.nth(0)).toBeVisible()
+    }
+
+    async useDevice(deviceSerial: string) {
+        let devicePage = new DeviceHubDevicePage(this.page, deviceSerial)
+        await this.devicesRows.locator(`a[href="#/control/${deviceSerial}"]:has(button:has-text("Use"))`).click();
+        await devicePage.isPageDisplayed()
+        return devicePage
+    }
+
+    async checkDeviceIsBusy(deviceSerial: string) {
+        await expect(this.page.locator(`#stopUsing_${deviceSerial}`)).toBeVisible();
     }
 
 }

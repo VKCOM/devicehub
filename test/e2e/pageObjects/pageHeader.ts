@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test'
 
-export class MainPageHeader {
+export class PageHeader {
     readonly page: Page
     readonly baseHeader: Locator
     readonly deviceHubLogo: Locator

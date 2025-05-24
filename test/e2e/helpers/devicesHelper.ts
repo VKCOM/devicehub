@@ -37,3 +37,14 @@ export async function removeAllDevices() {
         console.log('No devices were found')
     }
 }
+
+export async function freeDevice(serial: string) {
+    const token = await generateAdminToken()
+    let devicesResp = await fetch(`${baseUrl}/api/v1/user/devices/${serial}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+    });
+    console.log(await devicesResp.json())
+}

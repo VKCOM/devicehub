@@ -1,5 +1,5 @@
 import { type Locator, type Page } from '@playwright/test'
-import { MainPageHeader } from './mainPageHeader'
+import { PageHeader } from '../pageHeader'
 import { DeviceHubMainPageDevicesTable } from './mainPageDevicesTable'
 import { DeviceHubMainPageSearch } from './mainPageSearch'
 
@@ -21,18 +21,26 @@ export class DeviceHubMainPage {
     }
 
     async isPageDisplayed() {
-        await new MainPageHeader(this.page).isPageDisplayed()
+        await new PageHeader(this.page).isPageDisplayed()
         await new DeviceHubMainPageSearch(this.page).isPageDisplayed()
     }
 
     async isPageFullyDisplayedWithoutDevices() {
-        await new MainPageHeader(this.page).isPageFullyDisplayed()
+        await new PageHeader(this.page).isPageFullyDisplayed()
         await new DeviceHubMainPageDevicesTable(this.page).isPageDisplayedWithoutDevices()
     }
 
     async isPageFullyDisplayedWithDevices() {
-        await new MainPageHeader(this.page).isPageFullyDisplayed()
+        await new PageHeader(this.page).isPageFullyDisplayed()
         await new DeviceHubMainPageDevicesTable(this.page).isPageFullyDisplayedWithDevices()
+    }
+
+    async useDevice(deviceSerial: string) {
+        return await new DeviceHubMainPageDevicesTable(this.page).useDevice(deviceSerial)
+    }
+
+    async checkDeviceIsBusy(deviceSerial: string) {
+        await new DeviceHubMainPageDevicesTable(this.page).checkDeviceIsBusy(deviceSerial)
     }
 
 }
