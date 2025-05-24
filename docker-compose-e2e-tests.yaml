@@ -80,7 +80,7 @@ services:
     depends_on:
       devicehub:
         condition: service_healthy
-    command: npx playwright test
+    command: sleep 30 && npx playwright test
     environment:
       - CI=1
     restart: "no"
