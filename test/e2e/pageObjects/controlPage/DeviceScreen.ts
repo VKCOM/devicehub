@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { getCanvasImageData } from '../../helpers/utils/canvas'
 
 export class DeviceHubDeviceScreenPage {
     readonly page: Page
@@ -9,6 +10,7 @@ export class DeviceHubDeviceScreenPage {
     readonly qualityButton: Locator
     readonly stopButton: Locator
     readonly deviceScreen: Locator
+    readonly deviceCanvas: Locator
     readonly menuButton: Locator
     readonly homeButton: Locator
     readonly appSwitchButton: Locator
@@ -23,6 +25,7 @@ export class DeviceHubDeviceScreenPage {
         this.qualityButton = page.locator('button[class*="qualityButton"]');
         this.stopButton = page.locator('button[title*="Stop Using"]');
         this.deviceScreen = page.locator('div[class*="deviceScreen"]');
+        this.deviceCanvas = page.locator('canvas[class*="_canvas_"]');
         this.menuButton = page.locator('button[title*="Menu"]');
         this.homeButton = page.locator('button[title*="Home"]');
         this.appSwitchButton = page.locator('button[title*="App switch"]');
@@ -37,6 +40,27 @@ export class DeviceHubDeviceScreenPage {
         await expect(this.qualityButton).toBeVisible()
         await expect(this.stopButton).toBeVisible()
         await expect(this.deviceScreen).toBeVisible()
+        await expect(this.deviceCanvas).toBeVisible()
+    }
+
+    async getDeviceScreen() {
+        await this.page.waitForTimeout(2000)
+        return await getCanvasImageData(this.page, this.deviceCanvas)
+    }
+
+    async swipeOnDeviceScreen() {
+        const canvas = await this.deviceCanvas.boundingBox()
+        if (!canvas) throw new Error('Canvas not visible');
+
+        const startX = canvas.x + canvas.width / 4;
+        const startY = canvas.y + canvas.height / 2;
+        const endX = canvas.x + (canvas.width * 3) / 4;
+        const endY = startY;
+
+        await this.page.mouse.move(startX, startY);
+        await this.page.mouse.down();
+        await this.page.mouse.move(endX, endY, { steps: 10 });
+        await this.page.mouse.up();
     }
 
 }

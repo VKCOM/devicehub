@@ -27,7 +27,7 @@ test.describe('Main page tests', () => {
                 const deviceHubMainPage = new DeviceHubMainPage(page)
 
                 let devicePage = await deviceHubMainPage.useDevice(deviceSerial)
-                await devicePage.pageHeader.deviceHubLogo.click()
+                await devicePage.pageHeader.openDevicesListButton.click()
 
                 await deviceHubMainPage.isPageDisplayed()
                 await deviceHubMainPage.checkDeviceIsBusy(deviceSerial)

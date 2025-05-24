@@ -8,17 +8,19 @@ export class DeviceHubDevicePage {
     readonly deviceSerial: string
     readonly pageHeader: PageHeader
     readonly baseUrl = playwrightConfig?.use?.baseURL
+    readonly deviceScreen: DeviceHubDeviceScreenPage
 
     constructor(page: Page, deviceSerial: string) {
         this.page = page
         this.deviceSerial = deviceSerial
         this.pageHeader = new PageHeader(this.page)
+        this.deviceScreen = new DeviceHubDeviceScreenPage(this.page)
     }
 
     async isPageDisplayed() {
         expect(this.page.url()).toBe(`${this.baseUrl}/#/control/${this.deviceSerial}`)
         await this.pageHeader.isPageDisplayed()
-        await new DeviceHubDeviceScreenPage(this.page).isPageDisplayed()
+        await this.deviceScreen.isPageDisplayed()
     }
 
 }
