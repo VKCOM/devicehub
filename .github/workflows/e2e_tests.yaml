@@ -27,7 +27,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Remove dangling images
-        run: docker rmi $(sudo docker images -f "dangling=true" -q)
+        run: docker rmi $(docker images -f "dangling=true" -q)
 
       - name: Run Playwright Tests
         run: docker compose -f docker-compose-e2e-tests.yaml up --build --remove-orphans --exit-code-from devicehub-e2e-tests --abort-on-container-exit devicehub-e2e-tests
