@@ -1,14 +1,13 @@
 import { expect, test } from '@playwright/test'
-import {DeviceHubMainPage} from '../pageObjects/mainPage/mainPage'
 import {DeviceHubDevicePage} from '../pageObjects/controlPage/devicePage'
 import { freeDevice } from '../helpers/devicesHelper'
 
 test.describe('Device page tests', () => {
     const deviceSerial = 'emulator-5554'
+
     test.beforeEach('Open main page and use device', async ({ page }) => {
-        let deviceHubMainPage = new DeviceHubMainPage(page)
-        await deviceHubMainPage.goto()
-        await deviceHubMainPage.useDevice(deviceSerial)
+        await new DeviceHubDevicePage(page, deviceSerial).gotoDevice(deviceSerial)
+
     })
 
     test.afterEach('free device after test', async ({ page }) => {

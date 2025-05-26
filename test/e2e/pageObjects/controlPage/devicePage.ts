@@ -17,6 +17,10 @@ export class DeviceHubDevicePage {
         this.deviceScreen = new DeviceHubDeviceScreenPage(this.page)
     }
 
+    async gotoDevice(deviceSerial: string) {
+        await this.page.goto(`/#/control/${deviceSerial}`)
+    }
+
     async isPageDisplayed() {
         expect(this.page.url()).toBe(`${this.baseUrl}/#/control/${this.deviceSerial}`)
         await this.pageHeader.isPageDisplayed()
