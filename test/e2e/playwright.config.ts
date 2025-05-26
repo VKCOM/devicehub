@@ -43,8 +43,21 @@ export default defineConfig({
     /* Configure projects for major browsers */
     , projects: [
         {
+            name: 'auth as user'
+            , testMatch: /.*\.setup\.ts/
+            , teardown: 'cleanup',
+        }
+        , {
+            name: 'cleanup'
+            , testMatch: /global\.teardown\.ts/,
+        }
+        , {
             name: 'chromium'
-            , use: {...devices['Desktop Chrome']},
+            , use: {
+                ...devices['Desktop Chrome']
+                , storageState: '.auth/user.json'
+            }
+            , dependencies: ['auth as user'],
         }
 
         /*

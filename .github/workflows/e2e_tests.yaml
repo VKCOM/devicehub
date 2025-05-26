@@ -40,6 +40,10 @@ jobs:
         if: always()
         run: docker compose -f docker-compose-e2e-tests.yaml logs emulator
 
+      - name: Show logs for e2e tests
+        if: always()
+        run: docker compose -f docker-compose-e2e-tests.yaml logs devicehub-e2e-tests
+
       - name: docker compose down
         if: always()
         run: docker compose -f docker-compose-e2e-tests.yaml down --remove-orphans
