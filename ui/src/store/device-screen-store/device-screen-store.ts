@@ -6,6 +6,7 @@ import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import { deviceErrorModalStore } from '@/store/device-error-modal-store'
 import { deviceConnectionRequired } from '@/config/inversify/decorators'
+import { authStore } from '@/store/auth-store'
 
 import type { ElementBoundSize, StartScreenStreamingMessage } from './types'
 import type { Device } from '@/generated/types'
@@ -220,7 +221,13 @@ export class DeviceScreenStore {
       throw new Error('No display url')
     }
 
-    this.websocket = new WebSocket(this.device.display.url)
+    if (!authStore.jwt) {
+      console.warn('No JWT token available in authStore')
+      throw new Error('Authentication token required')
+    }
+
+    // Pass JWT token securely via WebSocket subprotocol
+    this.websocket = new WebSocket(this.device.display.url, `access_token.${authStore.jwt}`)
 
     this.websocket.binaryType = 'blob'
     this.websocket.onopen = this.openListener.bind(this)
@@ -253,14 +260,6 @@ export class DeviceScreenStore {
 
     this.isScreenStreamingJustStarted = true
 
-    if (this.shouldUpdateScreen()) {
-      this.updateBounds()
-      this.onScreenInterestGained()
-
-      return
-    }
-
-    this.onScreenInterestLost()
   }
 
   private messageListener(message: MessageEvent<Blob | string>): void {
@@ -287,6 +286,35 @@ export class DeviceScreenStore {
       // NOTE: The current view is marked secure and cannot be viewed remotely
 
       return
+    }
+
+    // Handle authentication messages
+    if (typeof message.data === 'string') {
+      try {
+        const authMessage = JSON.parse(message.data)
+
+        if (authMessage.type === 'auth_success') {
+          console.info('WebSocket authentication successful')
+
+          if (this.shouldUpdateScreen()) {
+            this.updateBounds()
+            this.onScreenInterestGained()
+
+            return
+          }
+
+          this.onScreenInterestLost()
+
+          return
+        }
+
+        if (authMessage.type === 'auth_error') {
+          console.error('WebSocket authentication failed:', authMessage.message)
+
+          return
+        }
+      } catch {
+      }
     }
 
     const startRegex = /^start /
