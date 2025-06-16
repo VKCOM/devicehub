@@ -1,32 +1,19 @@
-# Deployment
-
-So you've got STF running via `stf local` and now you'd like to deploy it to real servers. \
-
-* [Deployment by docker-compose for systems with <= 100 devices](docker-compose-deployment.md)
-* Deployment by docker-compose for systems with > 100 devices
-* Deployment by helm in k8s
-* Deployment by operator
-
-STF consists of multiple independent processes communicating via [ZeroMQ](http://zeromq.org/) and [Protocol Buffers](https://github.com/google/protobuf). We call each process a "unit" to match systemd terminology.
-
-Each unit and its function will be explained later in the document.
-
-Market name(on UI) for device take from device's settings(if vendor's market name reachable by command `settings get global device_name`), if you would like to have other market name just change settings.
-
 ## Assumptions
+
+> ⚠️ This way is completely legacy - see [how to migrate to docker compose](systemd-to-docker.md)
 
 For this example deployment, the following assumptions will be made. You will need to adjust them as you see fit. Note that this deployment was designed to be relatively easy to set up without external tools, and may not be optimal. They're also configured so that you can run everything on a single host if required.
 
 * You have [systemd](http://www.freedesktop.org/wiki/Software/systemd/) running on each host
 * You have [Docker](https://www.docker.com/) running on each host
 * Each host has an `/etc/environment` (a la [CoreOS](https://coreos.com/)) file with `COREOS_PRIVATE_IPV4=MACHINE_IP_HERE`. This is used to load the machine IP address in configuration files.
-  - You can create the file yourself or alternatively replace `${COREOS_PRIVATE_IPV4}` manually as required.
+    - You can create the file yourself or alternatively replace `${COREOS_PRIVATE_IPV4}` manually as required.
 * You are deploying self built image
 * You want to access the app at https://stf.example.org/. Change to the actual URL you want to use.
 * You have RethinkDB running on `rethinkdb.stf.example.org`. Change to the actual address/IP where required.
-  - You may also use SRV records by giving the url in `srv+tcp://rethinkdb-28015.skydns.stf.example.org` format.
+    - You may also use SRV records by giving the url in `srv+tcp://rethinkdb-28015.skydns.stf.example.org` format.
 * You have two static IPs available for the main communication bridges (or "triproxies"), or are able to figure out an alternate method. In this example we'll use `devside.stf.example.org` and `appside.stf.example.org` as easy to remember addresses.
-  - You can also use SRV records as mentioned above.
+    - You can also use SRV records as mentioned above.
 
 ## Roles
 

@@ -115,7 +115,7 @@ With these steps completed, you should have a functional installation ready for 
 
 ## Running
 
-STF consists of several independent processes that typically need to be launched separately. In our setup, each of these processes is its own unit. Refer to [DEPLOYMENT.md](doc/DEPLOYMENT.md) and [Setup Examples](https://github.com/devicefarmer/setup-examples) for more details.
+STF consists of several independent processes that typically need to be launched separately. In our setup, each of these processes is its own unit. Refer to [DEPLOYMENT.md](doc/deployment/DEPLOYMENT.md) and [Setup Examples](https://github.com/devicefarmer/setup-examples) for more details.
 
 However, for development purposes, there's a handy command to quickly launch all the required processes along with a mock login implementation. Please note that you **must** have MongoDB running beforehand.
 
@@ -169,7 +169,7 @@ stf migrate-to-mongo
 
 ### Can I deploy STF to actual servers?
 
-Yes, please refer to [DEPLOYMENT.md](doc/DEPLOYMENT.md) and [Setup Examples](https://github.com/devicefarmer/setup-examples) for deployment instructions.
+Yes, please refer to [DEPLOYMENT.md](doc/deployment/DEPLOYMENT.md) and [Setup Examples](https://github.com/devicefarmer/setup-examples) for deployment instructions.
 
 ### Will I have to change battery packs all the time?
 
