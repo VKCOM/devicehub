@@ -252,7 +252,7 @@ services:
             devicehub-migrate:
                 condition: service_completed_successfully
         restart: unless-stopped
-        command: stf provider --name devicehub-provider --adb-host host.docker.internal --no-cleanup --connect-sub tcp://devicehub-triproxy-dev:7250 --connect-push tcp://devicehub-triproxy-dev:7270 --storage-url https://${STF_DOMAIN}:${STF_PORT}/ --public-ip ${STF_DOMAIN} --min-port=12010 --max-port=12100 --heartbeat-interval 10000 --screen-ws-url-pattern "wss://${STF_DOMAIN}:${STF_PORT}/d/devicehub-provider/<%= publicPort %>/"
+        command: stf provider --name devicehub-provider --adb-host host.docker.internal --no-cleanup --connect-sub tcp://devicehub-triproxy-dev:7250 --connect-push tcp://devicehub-triproxy-dev:7270 --storage-url https://${STF_DOMAIN}:${STF_PORT}/ --public-ip ${STF_DOMAIN} --min-port=12010 --max-port=12100 --heartbeat-interval 10000 --screen-ws-url-pattern "wss://${STF_DOMAIN}:${STF_PORT}/d/devicehub-provider/<%= publicPort %>/" --secret=${STF_SECRET}
         networks:
             devicehub:
     devicehub-ssl:
