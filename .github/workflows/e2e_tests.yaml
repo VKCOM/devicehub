@@ -24,13 +24,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Remove dangling images
-        run: docker rmi $(docker images -f "dangling=true" -q)
+        run: docker image prune -a
 
       - name: Set up Docker Compose
         uses: docker/setup-buildx-action@v3
 
       - name: Run Playwright Tests
         run: docker compose -f docker-compose-e2e-tests.yaml up --build --remove-orphans --exit-code-from devicehub-e2e-tests --abort-on-container-exit devicehub-e2e-tests
+
+      - name: Stop docker compose
+        run: docker compose down
 
       - name: Show logs for devicehub
         if: always()
