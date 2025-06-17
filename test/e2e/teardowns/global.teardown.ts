@@ -3,5 +3,4 @@ import { deleteAllAdminsTokens } from '../helpers/tokensHelper'
 
 teardown('cleaning up', async ({ }) => {
     await deleteAllAdminsTokens()
-
 });
