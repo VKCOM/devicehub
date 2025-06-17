@@ -33,7 +33,7 @@ jobs:
         run: docker compose -f docker-compose-e2e-tests.yaml up --build --remove-orphans --exit-code-from devicehub-e2e-tests --abort-on-container-exit devicehub-e2e-tests
 
       - name: Stop docker compose
-        run: docker compose down
+        run: docker compose -f docker-compose-e2e-tests.yaml down
 
       - name: Show logs for devicehub
         if: always()
