@@ -64,6 +64,7 @@ RUN set -x && \
     cd /app && \
     find /tmp -mindepth 1 ! -regex '^/tmp/hsperfdata_root\(/.*\)?' -delete && \
     ln -s /app/bin/stf.mjs /app/bin/stf && \
+    ln -s /app/bin/stf.mjs /app/bin/devicehub && \
     cd ui && \
     npm ci && \
     npx tsc -b && \

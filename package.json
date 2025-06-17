@@ -12,7 +12,8 @@
     "remote"
   ],
   "bin": {
-    "stf": "./bin/stf.mjs"
+    "stf": "./bin/stf.mjs",
+    "devicehub": "./bin/stf.mjs"
   },
   "yargs": {
     "duplicate-arguments-array": false
