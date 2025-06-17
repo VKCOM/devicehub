@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Remove dangling images
-        run: docker image prune -a
+        run: docker image prune -a -f
 
       - name: Set up Docker Compose
         uses: docker/setup-buildx-action@v3
