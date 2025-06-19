@@ -12,6 +12,7 @@ log_cli = true
 [tool.poetry.dependencies]
 python = "^3.10"
 pytest = "8.3.3"
+pytest-rerunfailures = "15.1"
 openapi-client = "1.1.7"
 openapi-python-client = "0.21.6"
 devicehub_client = {path = "devicehub_client", develop=true}
