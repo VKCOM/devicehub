@@ -3,10 +3,11 @@ name: Run API Tests
 on:
   pull_request:
     paths:
+      - '.github/workflows/api_tests.yaml'
       - 'lib/**'
       - 'Dockerfile'
       - 'test/api/**'
-      - '../../docker-compose-api-tests.yaml'
+      - 'docker-compose-api-tests.yaml'
       - 'package.json'
       - 'package-lock.json'
 
