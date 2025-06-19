@@ -16,33 +16,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐳 Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔧 Build Docker Compose services
+      - name: Build Docker Compose services
         run: |
           docker compose -f docker-compose-api-tests.yaml build
 
-      - name: 🚀 Run API tests
+      - name: Run API tests
         run: |
           docker compose -f docker-compose-api-tests.yaml up \
             --exit-code-from devicehub-pytest \
             --abort-on-container-exit \
             devicehub-pytest
 
-      - name: 📄 Show logs for devicehub
+      - name: Show logs for devicehub
         if: always()
         continue-on-error: true
         run: docker compose -f docker-compose-api-tests.yaml logs devicehub
 
-      - name: 📄 Show logs for devicehub-generate-fake-device
+      - name: Show logs for devicehub-generate-fake-device
         if: always()
         continue-on-error: true
         run: docker compose -f docker-compose-api-tests.yaml logs devicehub-generate-fake-device
 
-      - name: 🧹 Tear down Docker Compose
+      - name: Tear down Docker Compose
         if: always()
         run: docker compose -f docker-compose-api-tests.yaml down --volumes --remove-orphans
