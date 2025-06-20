@@ -330,9 +330,15 @@ export class DeviceScreenStore {
 
   private errorListener(): void {}
 
-  private closeListener(): void {
+  private closeListener(event: CloseEvent): void {
     this.setIsScreenLoading(true)
     this.websocketReconnecting = false
+
+    if (event.code === 1008) {
+      deviceErrorModalStore.setError(t('Unauthorized'))
+
+      return
+    }
 
     if (this.websocketReconnectionAttempt < this.websocketReconnectionMaxAttempts) {
       this.websocketReconnectionTimeoutID = setTimeout(() => {
