@@ -68,6 +68,7 @@ from .token import Token
 from .type_response import TypeResponse
 from .unexpected_error_response import UnexpectedErrorResponse
 from .use_and_connect_device_body import UseAndConnectDeviceBody
+from .use_device_by_user_body import UseDeviceByUserBody
 from .user import User
 from .user_access_token_response import UserAccessTokenResponse
 from .user_access_tokens_response import UserAccessTokensResponse
@@ -162,6 +163,7 @@ __all__ = (
     "TypeResponse",
     "UnexpectedErrorResponse",
     "UseAndConnectDeviceBody",
+    "UseDeviceByUserBody",
     "User",
     "UserAccessTokenResponse",
     "UserAccessTokensResponse",

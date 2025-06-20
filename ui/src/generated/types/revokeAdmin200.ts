@@ -5,10 +5,7 @@
  * Control and manages real Smartphone devices from browser and restful apis
  * OpenAPI spec version: 1.3.10
  */
-import type { ServiceUserResponseServiceUserInfo } from './serviceUserResponseServiceUserInfo'
 
-export interface ServiceUserResponse {
-  description?: string
-  serviceUserInfo: ServiceUserResponseServiceUserInfo
+export type RevokeAdmin200 = {
   success: boolean
 }

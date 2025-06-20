@@ -992,11 +992,11 @@ paths:
           type: string
       responses:
         "200":
-          description: Users information
+          description: User information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserListResponse'
+                $ref: '#/components/schemas/UserResponse'
         default:
           description: |
             Unexpected Error:
@@ -1025,11 +1025,11 @@ paths:
           type: string
       responses:
         "200":
-          description: Users information
+          description: User information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserListResponse'
+                $ref: '#/components/schemas/UserResponse'
         default:
           description: |
             Unexpected Error:
@@ -4139,7 +4139,6 @@ components:
       required:
       - description
       - success
-      - user
       type: object
       properties:
         success:
@@ -4151,7 +4150,6 @@ components:
 
     ServiceUserResponse:
       required:
-      - description
       - serviceUserInfo
       - success
       type: object

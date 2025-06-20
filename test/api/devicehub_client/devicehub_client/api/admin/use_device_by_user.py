@@ -5,24 +5,37 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.user_response import UserResponse
+from ...models.remote_connect_user_device_response import RemoteConnectUserDeviceResponse
+from ...models.use_device_by_user_body import UseDeviceByUserBody
 from ...types import Response
 
 
 def _get_kwargs(
-    email: str,
+    serial: str,
+    *,
+    body: UseDeviceByUserBody,
 ) -> Dict[str, Any]:
+    headers: Dict[str, Any] = {}
+
     _kwargs: Dict[str, Any] = {
-        "method": "delete",
-        "url": f"/users/revokeAdmin/{email}",
+        "method": "post",
+        "url": f"/devices/{serial}/use",
     }
 
+    _body = body.to_dict()
+
+    _kwargs["json"] = _body
+    headers["Content-Type"] = "application/json"
+
+    _kwargs["headers"] = headers
     return _kwargs
 
 
-def _parse_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Optional[UserResponse]:
+def _parse_response(
+    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+) -> Optional[RemoteConnectUserDeviceResponse]:
     if response.status_code == 200:
-        response_200 = UserResponse.from_dict(response.json())
+        response_200 = RemoteConnectUserDeviceResponse.from_dict(response.json())
 
         return response_200
     if client.raise_on_unexpected_status:
@@ -31,7 +44,9 @@ def _parse_response(*, client: Union[AuthenticatedClient, Client], response: htt
         return None
 
 
-def _build_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Response[UserResponse]:
+def _build_response(
+    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+) -> Response[RemoteConnectUserDeviceResponse]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -41,28 +56,30 @@ def _build_response(*, client: Union[AuthenticatedClient, Client], response: htt
 
 
 def sync_detailed(
-    email: str,
+    serial: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Response[UserResponse]:
-    """Gets users
+    body: UseDeviceByUserBody,
+) -> Response[RemoteConnectUserDeviceResponse]:
+    """Use device by specified user.
 
-     gets users; if you are the administrator user then all user fields are returned, otherwise only
-    'email'
+     Use device by specified user. Admin privilege required.
 
     Args:
-        email (str):
+        serial (str):
+        body (UseDeviceByUserBody):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[UserResponse]
+        Response[RemoteConnectUserDeviceResponse]
     """
 
     kwargs = _get_kwargs(
-        email=email,
+        serial=serial,
+        body=body,
     )
 
     response = client.get_httpx_client().request(
@@ -73,55 +90,59 @@ def sync_detailed(
 
 
 def sync(
-    email: str,
+    serial: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Optional[UserResponse]:
-    """Gets users
+    body: UseDeviceByUserBody,
+) -> Optional[RemoteConnectUserDeviceResponse]:
+    """Use device by specified user.
 
-     gets users; if you are the administrator user then all user fields are returned, otherwise only
-    'email'
+     Use device by specified user. Admin privilege required.
 
     Args:
-        email (str):
+        serial (str):
+        body (UseDeviceByUserBody):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        UserResponse
+        RemoteConnectUserDeviceResponse
     """
 
     return sync_detailed(
-        email=email,
+        serial=serial,
         client=client,
+        body=body,
     ).parsed
 
 
 async def asyncio_detailed(
-    email: str,
+    serial: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Response[UserResponse]:
-    """Gets users
+    body: UseDeviceByUserBody,
+) -> Response[RemoteConnectUserDeviceResponse]:
+    """Use device by specified user.
 
-     gets users; if you are the administrator user then all user fields are returned, otherwise only
-    'email'
+     Use device by specified user. Admin privilege required.
 
     Args:
-        email (str):
+        serial (str):
+        body (UseDeviceByUserBody):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[UserResponse]
+        Response[RemoteConnectUserDeviceResponse]
     """
 
     kwargs = _get_kwargs(
-        email=email,
+        serial=serial,
+        body=body,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -130,29 +151,31 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    email: str,
+    serial: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Optional[UserResponse]:
-    """Gets users
+    body: UseDeviceByUserBody,
+) -> Optional[RemoteConnectUserDeviceResponse]:
+    """Use device by specified user.
 
-     gets users; if you are the administrator user then all user fields are returned, otherwise only
-    'email'
+     Use device by specified user. Admin privilege required.
 
     Args:
-        email (str):
+        serial (str):
+        body (UseDeviceByUserBody):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        UserResponse
+        RemoteConnectUserDeviceResponse
     """
 
     return (
         await asyncio_detailed(
-            email=email,
+            serial=serial,
             client=client,
+            body=body,
         )
     ).parsed

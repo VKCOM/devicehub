@@ -39,6 +39,7 @@ class Group:
         devices (Union[Unset, List[str]]):
         lock (Union[Unset, GroupLock]):
         run_url (Union[None, Unset, str]):
+        moderators (Union[Unset, List[str]]):
     """
 
     field_id: Union[Unset, str] = UNSET
@@ -59,6 +60,7 @@ class Group:
     devices: Union[Unset, List[str]] = UNSET
     lock: Union[Unset, "GroupLock"] = UNSET
     run_url: Union[None, Unset, str] = UNSET
+    moderators: Union[Unset, List[str]] = UNSET
     additional_properties: Dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -119,6 +121,10 @@ class Group:
         else:
             run_url = self.run_url
 
+        moderators: Union[Unset, List[str]] = UNSET
+        if not isinstance(self.moderators, Unset):
+            moderators = self.moderators
+
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
@@ -158,6 +164,8 @@ class Group:
             field_dict["lock"] = lock
         if run_url is not UNSET:
             field_dict["runUrl"] = run_url
+        if moderators is not UNSET:
+            field_dict["moderators"] = moderators
 
         return field_dict
 
@@ -236,6 +244,8 @@ class Group:
 
         run_url = _parse_run_url(d.pop("runUrl", UNSET))
 
+        moderators = cast(List[str], d.pop("moderators", UNSET))
+
         group = cls(
             field_id=field_id,
             name=name,
@@ -255,6 +265,7 @@ class Group:
             devices=devices,
             lock=lock,
             run_url=run_url,
+            moderators=moderators,
         )
 
         group.additional_properties = d

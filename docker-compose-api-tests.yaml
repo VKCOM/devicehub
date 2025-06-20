@@ -25,7 +25,6 @@ services:
   devicehub:
     container_name: devicehub
     build: .
-    image: devicehub:latest
     ports:
       - "7100:7100"
       - "7110:7110"
@@ -48,7 +47,6 @@ services:
         adb:
             condition: service_started
   devicehub-generate-fake-device:
-    image: devicehub:latest
     build: .
     environment:
         - MONGODB_PORT_27017_TCP=mongodb://mongo1:27017
@@ -68,7 +66,7 @@ services:
           - -c
           - |
              . /scripts/token.sh &&
-             pytest --reruns 3 ./ --token=$$STF_TOKEN --base-url=http://devicehub:7100 --log-cli-level=DEBUG -vv
+             pytest --reruns 1 ./ --token=$$STF_TOKEN --base-url=http://devicehub:7100 --log-cli-level=DEBUG -vv
       volumes:
           - ./scripts/token.sh:/scripts/token.sh
       depends_on:

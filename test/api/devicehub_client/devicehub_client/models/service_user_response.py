@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, List, Type, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.service_user_response_service_user_info import ServiceUserResponseServiceUserInfo
@@ -15,31 +17,32 @@ class ServiceUserResponse:
     """
     Attributes:
         success (bool):
-        description (str):
         service_user_info (ServiceUserResponseServiceUserInfo):
+        description (Union[Unset, str]):
     """
 
     success: bool
-    description: str
     service_user_info: "ServiceUserResponseServiceUserInfo"
+    description: Union[Unset, str] = UNSET
     additional_properties: Dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         success = self.success
 
-        description = self.description
-
         service_user_info = self.service_user_info.to_dict()
+
+        description = self.description
 
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "success": success,
-                "description": description,
                 "serviceUserInfo": service_user_info,
             }
         )
+        if description is not UNSET:
+            field_dict["description"] = description
 
         return field_dict
 
@@ -50,14 +53,14 @@ class ServiceUserResponse:
         d = src_dict.copy()
         success = d.pop("success")
 
-        description = d.pop("description")
-
         service_user_info = ServiceUserResponseServiceUserInfo.from_dict(d.pop("serviceUserInfo"))
+
+        description = d.pop("description", UNSET)
 
         service_user_response = cls(
             success=success,
-            description=description,
             service_user_info=service_user_info,
+            description=description,
         )
 
         service_user_response.additional_properties = d
