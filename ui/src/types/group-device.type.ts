@@ -4,7 +4,7 @@ export type GroupDevice = {
   abi?: string
   cpuPlatform?: string
   display?: Pick<DeviceDisplay, 'width' | 'height'>
-  group?: Pick<DeviceGroup, 'originName'>
+  group?: Pick<DeviceGroup, 'originName' | 'class' | 'lifeTime'>
   manufacturer?: string
   marketName?: string
   model?: string

@@ -39,6 +39,9 @@ export const useAddDeviceToGroup = (): UseMutationResult<
 
       return { previousGroups }
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queries.devices.group({ target: 'origin' }).queryKey })
+    },
     onError: (error, _, context) => {
       queryClient.setQueryData(queries.groups.all.queryKey, context?.previousGroups)
 

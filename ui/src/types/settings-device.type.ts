@@ -1,7 +1,7 @@
 import type { DeviceGroup, DeviceProvider } from '@/generated/types'
 
 export type SettingsDevice = {
-  group?: Pick<DeviceGroup, 'originName'>
+  group?: Pick<DeviceGroup, 'originName' | 'class' | 'lifeTime'>
   manufacturer?: string
   marketName?: string
   model?: string
