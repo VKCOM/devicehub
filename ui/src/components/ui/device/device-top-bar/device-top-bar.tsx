@@ -79,7 +79,7 @@ export const DeviceTopBar = observer(() => {
         </ConditionalRender>
         <Button
           appearance='neutral'
-          before={<Icon24CancelOutline color={'red'}/>}
+          before={<Icon24CancelOutline color={'red'} />}
           borderRadiusMode='inherit'
           className={styles.topButton}
           mode='tertiary'
