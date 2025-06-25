@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-ssl
+  name: devicehub-ssl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-ssl
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-ssl
+    spec:
+      containers:
+        - env:
+            - name: SSL_SUBJECT
+              value: ':'
+          image: paulczar/omgwtfssl
+          name: devicehub-ssl
+          volumeMounts:
+            - mountPath: /certs
+              name: certs
+      restartPolicy: Always
+      volumes:
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs

@@ -118,13 +118,13 @@ services:
         restart: unless-stopped
         networks:
             devicehub:
-    devicehub-processor001:
+    devicehub-processor:
         build: .
         image: vkcom/devicehub
-        container_name: devicehub-processor001
+        container_name: devicehub-processor
         env_file:
             - scripts/variables.env
-        command: stf processor --name proc001 --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260 --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
+        command: stf processor --name processor --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260 --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully

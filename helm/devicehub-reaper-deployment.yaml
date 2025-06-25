@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-reaper
+  name: devicehub-reaper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-reaper
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-reaper
+    spec:
+      containers:
+        - args:
+            - stf
+            - reaper
+            - --name
+            - reaper001
+            - --connect-push
+            - tcp://devicehub-triproxy-dev:7270
+            - --connect-sub
+            - tcp://devicehub-triproxy-app:7150
+            - --heartbeat-timeout
+            - "30000"
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-reaper
+      restartPolicy: Always

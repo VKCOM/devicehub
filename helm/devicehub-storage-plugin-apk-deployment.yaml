@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-storage-plugin-apk
+  name: devicehub-storage-plugin-apk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-storage-plugin-apk
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-storage-plugin-apk
+    spec:
+      containers:
+        - args:
+            - stf
+            - storage-plugin-apk
+            - --port
+            - "3000"
+            - --storage-url
+            - http://devicehub-storage-temp/
+            - --secret=
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-storage-plugin-apk
+      restartPolicy: Always

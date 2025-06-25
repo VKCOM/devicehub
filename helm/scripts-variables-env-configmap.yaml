@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  AUTH_URL: auth/mock/
+  MONGODB_PORT_27017_TCP: mongodb://devicehub-mongo:27017
+  STF_DOMAIN: localhost
+  STF_PORT: "443"
+  STF_SECRET: nosecret
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: devicehub-api-scripts-variables-env
+  name: scripts-variables-env

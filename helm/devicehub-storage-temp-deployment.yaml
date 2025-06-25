@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-storage-temp
+  name: devicehub-storage-temp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-storage-temp
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-storage-temp
+    spec:
+      containers:
+        - args:
+            - stf
+            - storage-temp
+            - --port
+            - "3000"
+            - --save-dir
+            - /tmp
+            - --connect-sub
+            - tcp://devicehub-triproxy-app:7150
+            - --connect-push
+            - tcp://devicehub-triproxy-app:7170
+            - --secret=
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-storage-temp
+      restartPolicy: Always

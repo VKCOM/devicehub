@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-triproxy-app
+  name: devicehub-triproxy-app
+spec:
+  ports:
+    - name: "7150"
+      port: 7150
+      targetPort: 7150
+    - name: "7160"
+      port: 7160
+      targetPort: 7160
+    - name: "7170"
+      port: 7170
+      targetPort: 7170
+  selector:
+    io.kompose.service: devicehub-triproxy-app

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: adbd
+  name: adbd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: adbd
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: adbd
+    spec:
+      containers:
+        - image: devicefarmer/adb:latest
+          livenessProbe:
+            exec:
+              command:
+                - nc -vz 127.0.0.1 5037
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 90
+            timeoutSeconds: 30
+          name: adbd
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /dev/bus/usb
+              name: adbd-claim0
+      restartPolicy: Always
+      volumes:
+        - name: adbd-claim0
+          persistentVolumeClaim:
+            claimName: adbd-claim0

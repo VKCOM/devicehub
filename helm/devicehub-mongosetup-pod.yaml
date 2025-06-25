@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-mongosetup
+  name: devicehub-mongosetup
+spec:
+  containers:
+    - command:
+        - bash
+        - /scripts/mongo_setup.sh
+      image: mongo:7.0
+      name: devicehub-mongosetup
+      volumeMounts:
+        - mountPath: /scripts/mongo_setup.sh
+          name: devicehub-mongosetup-cm0
+          subPath: mongo_setup.sh
+  restartPolicy: Never
+  volumes:
+    - configMap:
+        items:
+          - key: mongo_setup.sh
+            path: mongo_setup.sh
+        name: devicehub-mongosetup-cm0
+      name: devicehub-mongosetup-cm0

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-websocket
+  name: devicehub-websocket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-websocket
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-websocket
+    spec:
+      containers:
+        - args:
+            - stf
+            - websocket
+            - --port
+            - "3000"
+            - --storage-url
+            - https://:/
+            - --connect-sub
+            - tcp://devicehub-triproxy-app:7150
+            - --connect-push
+            - tcp://devicehub-triproxy-app:7170
+            - --connect-sub-dev
+            - tcp://devicehub-triproxy-dev:7250
+            - --connect-push-dev
+            - tcp://devicehub-triproxy-dev:7270
+            - --secret=
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-websocket
+      restartPolicy: Always

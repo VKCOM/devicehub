@@ -1,0 +1,234 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-provider
+  name: devicehub-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-provider
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-provider
+    spec:
+      containers:
+        - args:
+            - stf
+            - provider
+            - --name
+            - devicehub-provider
+            - --adb-host
+            - adbd
+            - --no-cleanup
+            - --connect-sub
+            - tcp://devicehub-triproxy-dev:7250
+            - --connect-push
+            - tcp://devicehub-triproxy-dev:7270
+            - --storage-url
+            - https://:/
+            - --public-ip
+            - --min-port=12010
+            - --max-port=12100
+            - --heartbeat-interval
+            - "10000"
+            - --screen-ws-url-pattern
+            - wss://:/d/devicehub-provider/<%= publicPort %>/
+            - --secret=
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-provider
+          ports:
+            - containerPort: 12010
+              protocol: TCP
+            - containerPort: 12011
+              protocol: TCP
+            - containerPort: 12012
+              protocol: TCP
+            - containerPort: 12013
+              protocol: TCP
+            - containerPort: 12014
+              protocol: TCP
+            - containerPort: 12015
+              protocol: TCP
+            - containerPort: 12016
+              protocol: TCP
+            - containerPort: 12017
+              protocol: TCP
+            - containerPort: 12018
+              protocol: TCP
+            - containerPort: 12019
+              protocol: TCP
+            - containerPort: 12020
+              protocol: TCP
+            - containerPort: 12021
+              protocol: TCP
+            - containerPort: 12022
+              protocol: TCP
+            - containerPort: 12023
+              protocol: TCP
+            - containerPort: 12024
+              protocol: TCP
+            - containerPort: 12025
+              protocol: TCP
+            - containerPort: 12026
+              protocol: TCP
+            - containerPort: 12027
+              protocol: TCP
+            - containerPort: 12028
+              protocol: TCP
+            - containerPort: 12029
+              protocol: TCP
+            - containerPort: 12030
+              protocol: TCP
+            - containerPort: 12031
+              protocol: TCP
+            - containerPort: 12032
+              protocol: TCP
+            - containerPort: 12033
+              protocol: TCP
+            - containerPort: 12034
+              protocol: TCP
+            - containerPort: 12035
+              protocol: TCP
+            - containerPort: 12036
+              protocol: TCP
+            - containerPort: 12037
+              protocol: TCP
+            - containerPort: 12038
+              protocol: TCP
+            - containerPort: 12039
+              protocol: TCP
+            - containerPort: 12040
+              protocol: TCP
+            - containerPort: 12041
+              protocol: TCP
+            - containerPort: 12042
+              protocol: TCP
+            - containerPort: 12043
+              protocol: TCP
+            - containerPort: 12044
+              protocol: TCP
+            - containerPort: 12045
+              protocol: TCP
+            - containerPort: 12046
+              protocol: TCP
+            - containerPort: 12047
+              protocol: TCP
+            - containerPort: 12048
+              protocol: TCP
+            - containerPort: 12049
+              protocol: TCP
+            - containerPort: 12050
+              protocol: TCP
+            - containerPort: 12051
+              protocol: TCP
+            - containerPort: 12052
+              protocol: TCP
+            - containerPort: 12053
+              protocol: TCP
+            - containerPort: 12054
+              protocol: TCP
+            - containerPort: 12055
+              protocol: TCP
+            - containerPort: 12056
+              protocol: TCP
+            - containerPort: 12057
+              protocol: TCP
+            - containerPort: 12058
+              protocol: TCP
+            - containerPort: 12059
+              protocol: TCP
+            - containerPort: 12060
+              protocol: TCP
+            - containerPort: 12061
+              protocol: TCP
+            - containerPort: 12062
+              protocol: TCP
+            - containerPort: 12063
+              protocol: TCP
+            - containerPort: 12064
+              protocol: TCP
+            - containerPort: 12065
+              protocol: TCP
+            - containerPort: 12066
+              protocol: TCP
+            - containerPort: 12067
+              protocol: TCP
+            - containerPort: 12068
+              protocol: TCP
+            - containerPort: 12069
+              protocol: TCP
+            - containerPort: 12070
+              protocol: TCP
+            - containerPort: 12071
+              protocol: TCP
+            - containerPort: 12072
+              protocol: TCP
+            - containerPort: 12073
+              protocol: TCP
+            - containerPort: 12074
+              protocol: TCP
+            - containerPort: 12075
+              protocol: TCP
+            - containerPort: 12076
+              protocol: TCP
+            - containerPort: 12077
+              protocol: TCP
+            - containerPort: 12078
+              protocol: TCP
+            - containerPort: 12079
+              protocol: TCP
+            - containerPort: 12080
+              protocol: TCP
+            - containerPort: 12081
+              protocol: TCP
+            - containerPort: 12082
+              protocol: TCP
+            - containerPort: 12083
+              protocol: TCP
+            - containerPort: 12084
+              protocol: TCP
+            - containerPort: 12085
+              protocol: TCP
+            - containerPort: 12086
+              protocol: TCP
+            - containerPort: 12087
+              protocol: TCP
+            - containerPort: 12088
+              protocol: TCP
+            - containerPort: 12089
+              protocol: TCP
+            - containerPort: 12090
+              protocol: TCP
+            - containerPort: 12091
+              protocol: TCP
+            - containerPort: 12092
+              protocol: TCP
+            - containerPort: 12093
+              protocol: TCP
+            - containerPort: 12094
+              protocol: TCP
+            - containerPort: 12095
+              protocol: TCP
+            - containerPort: 12096
+              protocol: TCP
+            - containerPort: 12097
+              protocol: TCP
+            - containerPort: 12098
+              protocol: TCP
+            - containerPort: 12099
+              protocol: TCP
+            - containerPort: 12100
+              protocol: TCP
+      restartPolicy: Always

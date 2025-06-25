@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-api
+  name: devicehub-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-api
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-api
+    spec:
+      containers:
+        - args:
+            - stf
+            - api
+            - --port
+            - "3000"
+            - --connect-sub
+            - tcp://devicehub-triproxy-app:7150
+            - --connect-push
+            - tcp://devicehub-triproxy-app:7170
+            - --connect-sub-dev
+            - tcp://devicehub-triproxy-dev:7250
+            - --connect-push-dev
+            - tcp://devicehub-triproxy-dev:7270
+            - --secret=
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-api
+      restartPolicy: Always

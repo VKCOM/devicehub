@@ -1,0 +1,286 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-provider
+  name: devicehub-provider
+spec:
+  ports:
+    - name: "12010"
+      port: 12010
+      targetPort: 12010
+    - name: "12011"
+      port: 12011
+      targetPort: 12011
+    - name: "12012"
+      port: 12012
+      targetPort: 12012
+    - name: "12013"
+      port: 12013
+      targetPort: 12013
+    - name: "12014"
+      port: 12014
+      targetPort: 12014
+    - name: "12015"
+      port: 12015
+      targetPort: 12015
+    - name: "12016"
+      port: 12016
+      targetPort: 12016
+    - name: "12017"
+      port: 12017
+      targetPort: 12017
+    - name: "12018"
+      port: 12018
+      targetPort: 12018
+    - name: "12019"
+      port: 12019
+      targetPort: 12019
+    - name: "12020"
+      port: 12020
+      targetPort: 12020
+    - name: "12021"
+      port: 12021
+      targetPort: 12021
+    - name: "12022"
+      port: 12022
+      targetPort: 12022
+    - name: "12023"
+      port: 12023
+      targetPort: 12023
+    - name: "12024"
+      port: 12024
+      targetPort: 12024
+    - name: "12025"
+      port: 12025
+      targetPort: 12025
+    - name: "12026"
+      port: 12026
+      targetPort: 12026
+    - name: "12027"
+      port: 12027
+      targetPort: 12027
+    - name: "12028"
+      port: 12028
+      targetPort: 12028
+    - name: "12029"
+      port: 12029
+      targetPort: 12029
+    - name: "12030"
+      port: 12030
+      targetPort: 12030
+    - name: "12031"
+      port: 12031
+      targetPort: 12031
+    - name: "12032"
+      port: 12032
+      targetPort: 12032
+    - name: "12033"
+      port: 12033
+      targetPort: 12033
+    - name: "12034"
+      port: 12034
+      targetPort: 12034
+    - name: "12035"
+      port: 12035
+      targetPort: 12035
+    - name: "12036"
+      port: 12036
+      targetPort: 12036
+    - name: "12037"
+      port: 12037
+      targetPort: 12037
+    - name: "12038"
+      port: 12038
+      targetPort: 12038
+    - name: "12039"
+      port: 12039
+      targetPort: 12039
+    - name: "12040"
+      port: 12040
+      targetPort: 12040
+    - name: "12041"
+      port: 12041
+      targetPort: 12041
+    - name: "12042"
+      port: 12042
+      targetPort: 12042
+    - name: "12043"
+      port: 12043
+      targetPort: 12043
+    - name: "12044"
+      port: 12044
+      targetPort: 12044
+    - name: "12045"
+      port: 12045
+      targetPort: 12045
+    - name: "12046"
+      port: 12046
+      targetPort: 12046
+    - name: "12047"
+      port: 12047
+      targetPort: 12047
+    - name: "12048"
+      port: 12048
+      targetPort: 12048
+    - name: "12049"
+      port: 12049
+      targetPort: 12049
+    - name: "12050"
+      port: 12050
+      targetPort: 12050
+    - name: "12051"
+      port: 12051
+      targetPort: 12051
+    - name: "12052"
+      port: 12052
+      targetPort: 12052
+    - name: "12053"
+      port: 12053
+      targetPort: 12053
+    - name: "12054"
+      port: 12054
+      targetPort: 12054
+    - name: "12055"
+      port: 12055
+      targetPort: 12055
+    - name: "12056"
+      port: 12056
+      targetPort: 12056
+    - name: "12057"
+      port: 12057
+      targetPort: 12057
+    - name: "12058"
+      port: 12058
+      targetPort: 12058
+    - name: "12059"
+      port: 12059
+      targetPort: 12059
+    - name: "12060"
+      port: 12060
+      targetPort: 12060
+    - name: "12061"
+      port: 12061
+      targetPort: 12061
+    - name: "12062"
+      port: 12062
+      targetPort: 12062
+    - name: "12063"
+      port: 12063
+      targetPort: 12063
+    - name: "12064"
+      port: 12064
+      targetPort: 12064
+    - name: "12065"
+      port: 12065
+      targetPort: 12065
+    - name: "12066"
+      port: 12066
+      targetPort: 12066
+    - name: "12067"
+      port: 12067
+      targetPort: 12067
+    - name: "12068"
+      port: 12068
+      targetPort: 12068
+    - name: "12069"
+      port: 12069
+      targetPort: 12069
+    - name: "12070"
+      port: 12070
+      targetPort: 12070
+    - name: "12071"
+      port: 12071
+      targetPort: 12071
+    - name: "12072"
+      port: 12072
+      targetPort: 12072
+    - name: "12073"
+      port: 12073
+      targetPort: 12073
+    - name: "12074"
+      port: 12074
+      targetPort: 12074
+    - name: "12075"
+      port: 12075
+      targetPort: 12075
+    - name: "12076"
+      port: 12076
+      targetPort: 12076
+    - name: "12077"
+      port: 12077
+      targetPort: 12077
+    - name: "12078"
+      port: 12078
+      targetPort: 12078
+    - name: "12079"
+      port: 12079
+      targetPort: 12079
+    - name: "12080"
+      port: 12080
+      targetPort: 12080
+    - name: "12081"
+      port: 12081
+      targetPort: 12081
+    - name: "12082"
+      port: 12082
+      targetPort: 12082
+    - name: "12083"
+      port: 12083
+      targetPort: 12083
+    - name: "12084"
+      port: 12084
+      targetPort: 12084
+    - name: "12085"
+      port: 12085
+      targetPort: 12085
+    - name: "12086"
+      port: 12086
+      targetPort: 12086
+    - name: "12087"
+      port: 12087
+      targetPort: 12087
+    - name: "12088"
+      port: 12088
+      targetPort: 12088
+    - name: "12089"
+      port: 12089
+      targetPort: 12089
+    - name: "12090"
+      port: 12090
+      targetPort: 12090
+    - name: "12091"
+      port: 12091
+      targetPort: 12091
+    - name: "12092"
+      port: 12092
+      targetPort: 12092
+    - name: "12093"
+      port: 12093
+      targetPort: 12093
+    - name: "12094"
+      port: 12094
+      targetPort: 12094
+    - name: "12095"
+      port: 12095
+      targetPort: 12095
+    - name: "12096"
+      port: 12096
+      targetPort: 12096
+    - name: "12097"
+      port: 12097
+      targetPort: 12097
+    - name: "12098"
+      port: 12098
+      targetPort: 12098
+    - name: "12099"
+      port: 12099
+      targetPort: 12099
+    - name: "12100"
+      port: 12100
+      targetPort: 12100
+  selector:
+    io.kompose.service: devicehub-provider
