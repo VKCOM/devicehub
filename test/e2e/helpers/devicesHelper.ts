@@ -48,3 +48,20 @@ export async function freeDevice(serial: string) {
     });
     console.log(await devicesResp.json())
 }
+
+export async function useDevice(serial: string, timeout?: number) {
+    const token = await generateAdminToken()
+    const response = await fetch(`${baseUrl}/api/v1/user/devices`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            serial,
+            ...(timeout && { timeout })
+        })
+    })
+
+    console.log(await response.json())
+}

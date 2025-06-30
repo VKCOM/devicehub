@@ -27,4 +27,9 @@ export class DeviceHubDevicePage {
         await this.deviceScreen.isPageDisplayed()
     }
 
+    async isErrorModalDisplayed() {
+        expect(this.page.url()).toBe(`${this.baseUrl}/#/control/${this.deviceSerial}`)
+        
+    }
+
 }
