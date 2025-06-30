@@ -31,9 +31,9 @@ export const DashboardTab = observer(() => {
         <LinkOpenerControl className={styles.linkOpener} />
         <ConditionalRender conditions={[!device?.ios]}>
           <ShellControl className={styles.shell} />
-          <ClipboardControl className={styles.clipboard} />
-          {/* https://developer.apple.com/forums/thread/706761?answerId=714896022#714896022 */}
         </ConditionalRender>
+        <ClipboardControl className={styles.clipboard} />
+        {/* https://developer.apple.com/forums/thread/706761?answerId=714896022#714896022 */}
         <DeviceBookingControl className={styles.deviceBooking} />
       </div>
     </div>
