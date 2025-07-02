@@ -14,6 +14,15 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
+  server: {
+    proxy: {
+      '/proxy-api': {
+        target: 'http://localhost:7100',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/proxy-api/, ''),
+      },
+    },
+  },
   optimizeDeps: {
     esbuildOptions: {
       tsconfigRaw: {

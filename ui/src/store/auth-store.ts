@@ -1,24 +1,16 @@
 import { makeAutoObservable } from 'mobx'
+import { isHydrated, makePersistable } from 'mobx-persist-store'
 
 class AuthStore {
-  // TODO: use proper hydration from mobx-persis-store
+  jwt: string | null = null
 
   constructor() {
     makeAutoObservable(this)
+    makePersistable(this, { name: 'jwt', properties: ['jwt'], storage: window.localStorage })
   }
 
-  get jwt(): string | null {
-    return localStorage.getItem('jwt')
-  }
-
-  set jwt(value: string | null) {
-    if (value === null) {
-      localStorage.removeItem('jwt')
-
-      return
-    }
-
-    localStorage.setItem('jwt', value)
+  get isHydrated(): boolean {
+    return isHydrated(this)
   }
 
   login(jwt: string): void {

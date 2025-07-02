@@ -47,7 +47,11 @@ export const AuthMockPage = () => {
   useEffect(() => {
     if (isSuccess) {
       authStore.login(authData.jwt)
-      window.location.assign(authData.redirect)
+
+      // NOTE: If the origins differ, localStorage will be isolated, so we need to transfer the token explicitly
+      const queryParams = window.location.origin === new URL(authData.redirect).origin ? '' : `?jwt=${authData.jwt}`
+
+      window.location.assign(`${authData.redirect}${queryParams}`)
     }
   }, [authData])
 

@@ -4,7 +4,10 @@ import { useEffect } from 'react'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
+import { socket } from '@/api/socket'
+
 import { authStore } from '@/store/auth-store'
+import { variablesConfig } from '@/config/variables.config'
 
 import { getAuthRoute } from '@/constants/route-paths'
 
@@ -15,7 +18,7 @@ export const RequireAuth = observer(() => {
       const jwt = params.get('jwt')
 
       if (!jwt) {
-        window.location.assign(getAuthRoute())
+        window.location.assign(`${variablesConfig[import.meta.env.MODE].openStfApiHostUrl}${getAuthRoute()}`)
 
         return
       }
@@ -24,6 +27,12 @@ export const RequireAuth = observer(() => {
       window.history.replaceState({}, '', location.pathname + location.hash)
     }
   }, [authStore.isAuthed])
+
+  useEffect(() => {
+    if (authStore.isHydrated && authStore.isAuthed) {
+      socket.connect()
+    }
+  }, [authStore.isHydrated, authStore.isAuthed])
 
   return (
     <ConditionalRender conditions={[authStore.isAuthed]}>
