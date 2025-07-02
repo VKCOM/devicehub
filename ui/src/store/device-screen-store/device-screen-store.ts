@@ -363,6 +363,8 @@ export class DeviceScreenStore {
       return
     }
 
-    deviceErrorModalStore.setError(t('Service is currently unavailable'))
+    if (this.websocketReconnectionAttempt >= this.websocketReconnectionMaxAttempts) {
+      deviceErrorModalStore.setError(t('Service is currently unavailable'))
+    }
   }
 }
