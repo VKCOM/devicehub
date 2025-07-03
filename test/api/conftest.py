@@ -5,12 +5,14 @@ import time
 from http.cookiejar import debug
 
 import pytest
+from devicehub_client.models import GroupPayload, GroupPayloadState, GroupPayloadClass, GroupState
+from devicehub_client.types import Unset, UNSET
 from pytest_check import equal, is_not_none, is_true, is_false, is_in, greater_equal, greater, is_none
 
 from devicehub_client import AuthenticatedClient
 from devicehub_client.api.admin import create_service_user, delete_user, create_user
 from devicehub_client.api.devices import get_devices, get_device_by_serial
-from devicehub_client.api.groups import get_groups, get_group
+from devicehub_client.api.groups import get_groups, get_group, create_group, delete_group
 
 ADMIN_EMAIL = 'administrator@fakedomain.com'
 ADMIN_NAME = 'administrator'
@@ -61,22 +63,26 @@ def api_client_custom_token(base_url):
     return api_client_by_token_func
 
 
-class UserKeeper():
-  def __init__(self):
-    self.user = None
+class Keeper():
+    def __init__(self):
+        self.ls = []
 
-  def get_user(self):
-    return self.user
+    def size(self):
+        return len(self.ls)
 
-  def set_user(self, new_user):
-    self.user = new_user
+    def add_obj(self, obj):
+        self.ls.append(obj)
+
+    def pop_obj(self):
+        return self.ls.pop()
+
 
 # method create service user and return User and remove one after test
 @pytest.fixture()
 def service_user_creating(request, api_client, stf_secret, random_user, successful_response_check):
-    request.param = UserKeeper()
+    request.param = Keeper()
     def service_user_creating_func(user=random_user()):
-        request.param.set_user(user)
+        request.param.add_obj(user)
         response = create_service_user.sync_detailed(
             client=api_client,
             email=user.email,
@@ -100,16 +106,17 @@ def service_user_creating(request, api_client, stf_secret, random_user, successf
 
     yield service_user_creating_func
     # remove service user auto tests
-    response = delete_user.sync_detailed(client=api_client, email=request.param.get_user().email)
-    successful_response_check(response, description='Deleted (users)')
+    while request.param.size() != 0:
+        response = delete_user.sync_detailed(client=api_client, email=request.param.pop_obj().email)
+        successful_response_check(response, description='Deleted (users)')
 
 
 # method create regular user and return User and remove one after test
 @pytest.fixture()
 def regular_user(request, api_client, stf_secret, random_user, successful_response_check):
-    request.param = UserKeeper()
+    request.param = Keeper()
     def regular_user_func(user=random_user()):
-        request.param.set_user(user)
+        request.param.add_obj(user)
         response = create_user.sync_detailed(
             client=api_client,
             email=user.email,
@@ -132,8 +139,9 @@ def regular_user(request, api_client, stf_secret, random_user, successful_respon
 
     yield regular_user_func
     # remove regular user auto tests
-    response = delete_user.sync_detailed(client=api_client, email=request.param.get_user().email)
-    successful_response_check(response, description='Deleted (users)')
+    while request.param.size() != 0:
+        response = delete_user.sync_detailed(client=api_client, email=request.param.pop_obj().email)
+        successful_response_check(response, description='Deleted (users)')
 
 @pytest.fixture()
 def api_client_with_bad_token(base_url):
@@ -333,6 +341,47 @@ def common_group_id(api_client):
     common_group = next(filter(lambda x: x.to_dict()['name'] == 'Common', response.parsed.groups), None)
     is_not_none(common_group)
     return common_group.to_dict()['id']
+
+
+# method create group and remove one after test
+@pytest.fixture()
+def group_creating(request, api_client, stf_secret, successful_response_check, random_str, unsuccess_response_check):
+    request.param = Keeper()
+    def group_creating_func(
+            custom_api_client=api_client,
+            group_class=GroupPayloadClass.ONCE,
+            state=UNSET,
+            start_time=UNSET,
+            stop_time=UNSET,
+            repetitions=UNSET
+    ):
+        group_response = create_group.sync_detailed(
+            client=custom_api_client,
+            body=GroupPayload(
+                name=f'Group_{group_class.name}-{random_str()}',
+                class_=group_class,
+                state=state,
+                start_time=start_time,
+                stop_time=stop_time,
+                repetitions=repetitions
+            )
+        )
+        successful_response_check(group_response, status_code=201, description='Created')
+        group = group_response.parsed.group
+        is_not_none(group)
+        equal(group.class_, group_class)
+        equal(group.state, GroupState.READY if state is UNSET else state)
+        request.param.add_obj(group)
+        return group
+
+    yield group_creating_func
+    # remove groups or get response group not found
+    while request.param.size() != 0:
+        response = delete_group.sync_detailed(client=api_client, id=request.param.pop_obj().id)
+        if response.status_code == 200:
+            successful_response_check(response, description='Deleted (groups)')
+        else:
+            unsuccess_response_check(response, status_code=404, description='Not Found (groups)')
 
 
 @pytest.fixture()

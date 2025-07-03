@@ -8,8 +8,7 @@ from devicehub_client.api.admin import add_origin_group_devices
 from devicehub_client.api.groups import get_groups, get_group_device, get_group_devices, create_group, delete_group, \
     add_group_device, add_group_user, add_group_devices, remove_group_device, update_group, remove_group_devices, \
     get_group
-from devicehub_client.models import GroupPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState
-
+from devicehub_client.models import GroupPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState, GroupState
 
 def test_get_groups(api_client, successful_response_check):
     response = get_groups.sync_detailed(client=api_client)
@@ -160,67 +159,60 @@ def test_create_and_delete_once_group(api_client, random_str, successful_respons
 def test_return_device_to_origin_group(
     api_client,
     api_client_custom_token,
-        service_user_creating,
+    common_group_id,
+    device_in_group_check,
+    first_device_serial,
+    group_creating,
     random_str,
     random_user,
+    service_user_creating,
     successful_response_check,
     unsuccess_response_check,
-    common_group_id,
-    first_device_serial,
-    device_in_group_check
 ):
     # create bookable group by admin
-    bookable_group_name = f'Group_bookable-{random_str()}'
-    response = create_group.sync_detailed(
-        client=api_client,
-        body=GroupPayload(
-            name=bookable_group_name,
-            class_=GroupPayloadClass.BOOKABLE
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
+    bookable_group = group_creating(group_class=GroupPayloadClass.BOOKABLE)
+
     # add device to admin bookable group
-    bookable_group_id = response.parsed.group.to_dict()['id']
     response = add_origin_group_devices.sync_detailed(
-        id=bookable_group_id,
+        id=bookable_group.id,
         client=api_client,
         body=DevicesPayload(serials=first_device_serial)
     )
     successful_response_check(response, description='Updated (devices)')
+
     # create and add user to admin bookable group
     service_user = service_user_creating()
-    response = add_group_user.sync_detailed(id=bookable_group_id, email=service_user.email, client=api_client)
+    response = add_group_user.sync_detailed(id=bookable_group.id, email=service_user.email, client=api_client)
     successful_response_check(response, description='Added (group users)')
+
     # create once group by user
     user_api_client = api_client_custom_token(token=service_user.token)
-    response = create_group.sync_detailed(
-        client=user_api_client,
-        body=GroupPayload(
-            name=f'Group_once-{random_str()}',
-            class_=GroupPayloadClass.ONCE
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
-    once_group_id = response.parsed.group.to_dict()['id']
+    once_group = group_creating(custom_api_client=user_api_client)
+
     # add device to once group by user
     response = add_group_device.sync_detailed(
-        id=once_group_id,
+        id=once_group.id,
         client=api_client,
         serial=first_device_serial
     )
     successful_response_check(response, description='Added (group devices)')
+
     # try to delete bookable group by admin
-    response = delete_group.sync_detailed(id=bookable_group_id, client=api_client)
+    response = delete_group.sync_detailed(id=bookable_group.id, client=api_client)
     unsuccess_response_check(response, status_code=403, description='Forbidden (groups)')
+
     # delete once group by user
-    response = delete_group.sync_detailed(id=once_group_id, client=user_api_client)
+    response = delete_group.sync_detailed(id=once_group.id, client=user_api_client)
     successful_response_check(response, description='Deleted (groups)')
+
     # check device move to bookable group
-    device_in_group_check(serial=first_device_serial, group_id=bookable_group_id, group_name=bookable_group_name)
+    device_in_group_check(serial=first_device_serial, group_id=bookable_group.id, group_name=bookable_group.name)
+
     # delete bookable group
-    response = delete_group.sync_detailed(id=bookable_group_id, client=api_client)
+    response = delete_group.sync_detailed(id=bookable_group.id, client=api_client)
     successful_response_check(response, description='Deleted (groups)')
     sleep(1)
+
     # check device return to common group
     device_in_group_check(serial=first_device_serial, group_id=common_group_id, group_name='Common')
 
@@ -228,163 +220,109 @@ def test_return_device_to_origin_group(
 # @pytest.mark.focus
 def test_return_devices_after_delete_bookable_group(
     api_client,
-    random_str,
-    successful_response_check,
     common_group_id,
+    devices_in_group_check,
     devices_serial,
-    devices_in_group_check
+    group_creating,
+    successful_response_check,
 ):
     # create bookable group by admin
-    bookable_group_name = f'Group_bookable-{random_str()}'
-    response = create_group.sync_detailed(
-        client=api_client,
-        body=GroupPayload(
-            name=bookable_group_name,
-            class_=GroupPayloadClass.BOOKABLE
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
+    bookable_group = group_creating(group_class=GroupPayloadClass.BOOKABLE)
+
     # add devices to admin bookable group
-    bookable_group_id = response.parsed.group.to_dict()['id']
     response = add_origin_group_devices.sync_detailed(
-        id=bookable_group_id,
+        id=bookable_group.id,
         client=api_client,
         body=DevicesPayload(serials=','.join(devices_serial))
     )
     successful_response_check(response, description='Updated (devices)')
     # delete bookable group
-    response = delete_group.sync_detailed(id=bookable_group_id, client=api_client)
+    response = delete_group.sync_detailed(id=bookable_group.id, client=api_client)
     successful_response_check(response, description='Deleted (groups)')
+    sleep(1)
     # check device return to common group
     devices_in_group_check(serials=devices_serial, group_id=common_group_id, group_name='Common')
 
 
 def test_remove_device_by_one_from_once_group(
-    random_str,
-    successful_response_check,
-    devices_serial,
-    device_in_group_check,
     api_client_custom_token,
-        service_user_creating
+    device_in_group_check,
+    devices_serial,
+    group_creating,
+    service_user_creating,
+    successful_response_check,
 ):
     # create once group by user
     service_user = service_user_creating()
     user_api_client = api_client_custom_token(token=service_user.token)
-    response = create_group.sync_detailed(
-        client=user_api_client,
-        body=GroupPayload(
-            name=f'Group_once-{random_str()}',
-            class_=GroupPayloadClass.ONCE,
-            state=GroupPayloadState.PENDING
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
-    equal(response.parsed.group.to_dict()['state'], GroupPayloadState.PENDING)
-    once_group_id = response.parsed.group.to_dict()['id']
-    once_group_name = response.parsed.group.to_dict()['name']
-    # make once group ready
-    response = update_group.sync_detailed(
-        id=once_group_id,
-        client=user_api_client,
-        body=GroupPayload(
-            state=GroupPayloadState.READY
-        )
-    )
-    successful_response_check(response, description='Updated (group)')
-    equal(response.parsed.group.to_dict()['state'], GroupPayloadState.READY)
+    once_group = group_creating(custom_api_client=user_api_client)
+
     # add device to once group by user by one
     group_devices = []
     for serial in devices_serial:
         response = add_group_device.sync_detailed(
-            id=once_group_id,
+            id=once_group.id,
             client=user_api_client,
             serial=serial
         )
         successful_response_check(response, description='Added (group devices)')
         group_devices.append(serial)
         equal(sorted(group_devices), sorted(response.parsed.group.to_dict()['devices']))
-        device_in_group_check(serial=serial, group_id=once_group_id, group_name=once_group_name)
+        device_in_group_check(serial=serial, group_id=once_group.id, group_name=once_group.name)
     # try to delete devices by one by user
     for serial in devices_serial:
-        response = remove_group_device.sync_detailed(id=once_group_id, serial=serial, client=user_api_client)
+        response = remove_group_device.sync_detailed(id=once_group.id, serial=serial, client=user_api_client)
         successful_response_check(response, description='Removed (group devices)')
         is_not_in(serial, response.parsed.group.to_dict()['devices'])
     # delete once group by user
-    response = delete_group.sync_detailed(id=once_group_id, client=user_api_client)
+    response = delete_group.sync_detailed(id=once_group.id, client=user_api_client)
     successful_response_check(response, description='Deleted (groups)')
 
 
 def test_remove_devices_from_once_group(
-    random_str,
-    successful_response_check,
-    devices_serial,
-    devices_in_group_check,
     api_client_custom_token,
-        service_user_creating
+    devices_in_group_check,
+    devices_serial,
+    group_creating,
+    service_user_creating,
+    successful_response_check,
 ):
     # create once group by user
     service_user = service_user_creating()
     user_api_client = api_client_custom_token(token=service_user.token)
-    response = create_group.sync_detailed(
-        client=user_api_client,
-        body=GroupPayload(
-            name=f'Group_once-{random_str()}',
-            class_=GroupPayloadClass.ONCE,
-            state=GroupPayloadState.PENDING
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
-    equal(response.parsed.group.to_dict()['state'], GroupPayloadState.PENDING)
-    once_group_id = response.parsed.group.to_dict()['id']
-    once_group_name = response.parsed.group.to_dict()['name']
-    # make once group ready
-    response = update_group.sync_detailed(
-        id=once_group_id,
-        client=user_api_client,
-        body=GroupPayload(
-            state=GroupPayloadState.READY
-        )
-    )
-    successful_response_check(response, description='Updated (group)')
-    equal(response.parsed.group.to_dict()['state'], GroupPayloadState.READY)
+    once_group = group_creating(custom_api_client=user_api_client)
+
     # add device to once group by user
     response = add_group_devices.sync_detailed(
-        id=once_group_id,
+        id=once_group.id,
         client=user_api_client,
         body=DevicesPayload(serials=','.join(devices_serial))
     )
     successful_response_check(response, description='Added (group devices)')
     equal(sorted(devices_serial), sorted(response.parsed.group.to_dict()['devices']))
-    devices_in_group_check(serials=devices_serial, group_id=once_group_id, group_name=once_group_name)
+    devices_in_group_check(serials=devices_serial, group_id=once_group.id, group_name=once_group.name)
     # try to delete devices by user
-    response = remove_group_devices.sync_detailed(id=once_group_id, client=user_api_client, body=DevicesPayload())
+    response = remove_group_devices.sync_detailed(id=once_group.id, client=user_api_client, body=DevicesPayload())
     successful_response_check(response, description='Removed (group devices)')
-    equal(response.parsed.group.to_dict()['devices'], [])
+    equal(response.parsed.group.devices, [])
     # delete once group by user
-    response = delete_group.sync_detailed(id=once_group_id, client=user_api_client)
+    response = delete_group.sync_detailed(id=once_group.id, client=user_api_client)
     successful_response_check(response, description='Deleted (groups)')
 
 def test_scheduler_update_bookable_group_lifetime(
-    api_client,
-    random_str,
-    successful_response_check,
-devices_serial, devices_in_group_check, common_group_id):
+        api_client,
+        common_group_id,
+        devices_in_group_check,
+        devices_serial,
+        group_creating,
+        successful_response_check,
+):
     # create group
-    bookable_group_name = f'Group_expired_bookable-{random_str()}'
-    response = create_group.sync_detailed(
-        client=api_client,
-        body=GroupPayload(
-            name=bookable_group_name,
-            class_=GroupPayloadClass.ONCE,
-            state=GroupPayloadState.PENDING
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
-    group_id = response.parsed.group.to_dict()['id']
+    group = group_creating(state=GroupPayloadState.PENDING)
 
     # update group to bookable with passed lifetime
     response = update_group.sync_detailed(
-        id=group_id,
+        id=group.id,
         client=api_client,
         body=GroupPayload(
             class_=GroupPayloadClass.BOOKABLE,
@@ -396,7 +334,7 @@ devices_serial, devices_in_group_check, common_group_id):
 
     # add devices to bookable group
     response = add_origin_group_devices.sync_detailed(
-        id=group_id,
+        id=group.id,
         client=api_client,
         body=DevicesPayload(serials=','.join(devices_serial))
     )
@@ -406,7 +344,7 @@ devices_serial, devices_in_group_check, common_group_id):
     sleep(3)
 
     # check that scheduler update group lifetime
-    response = get_group.sync_detailed(client=api_client, id=group_id)
+    response = get_group.sync_detailed(client=api_client, id=group.id)
     successful_response_check(response, description='Group Information')
     group_dict = response.parsed.group.to_dict()
     date_now = datetime.now(timezone.utc)
@@ -418,33 +356,25 @@ devices_serial, devices_in_group_check, common_group_id):
     between_equal(group_stop_time, date_now_plus_10 - delta, date_now_plus_10 + delta)
 
     # delete group
-    response = delete_group.sync_detailed(id=group_id, client=api_client)
+    response = delete_group.sync_detailed(id=group.id, client=api_client)
     successful_response_check(response, description='Deleted (groups)')
 
     # check device return to common group
     devices_in_group_check(serials=devices_serial, group_id=common_group_id, group_name='Common')
 
 def test_scheduler_del_expired_once_group(
-    api_client,
-    random_str,
-    successful_response_check,
-devices_serial, devices_in_group_check, common_group_id, unsuccess_response_check):
+        api_client,
+        devices_in_group_check,
+        group_creating,
+        successful_response_check,
+        unsuccess_response_check,
+):
     # create group
-    bookable_group_name = f'Group_expired_once-{random_str()}'
-    response = create_group.sync_detailed(
-        client=api_client,
-        body=GroupPayload(
-            name=bookable_group_name,
-            class_=GroupPayloadClass.ONCE,
-            state=GroupPayloadState.PENDING
-        )
-    )
-    successful_response_check(response, status_code=201, description='Created')
-    group_id = response.parsed.group.to_dict()['id']
+    group = group_creating(state=GroupPayloadState.PENDING)
 
     # update group to passed lifetime
     response = update_group.sync_detailed(
-        id=group_id,
+        id=group.id,
         client=api_client,
         body=GroupPayload(
             state=GroupPayloadState.READY,
@@ -458,5 +388,83 @@ devices_serial, devices_in_group_check, common_group_id, unsuccess_response_chec
     sleep(3)
 
     # check that scheduler del group
-    response = get_group.sync_detailed(client=api_client, id=group_id)
+    response = get_group.sync_detailed(client=api_client, id=group.id)
     unsuccess_response_check(response, status_code=404, description='Not Found (group)')
+
+def test_conflict_group_response(
+        api_client,
+        api_client_custom_token,
+        devices_serial,
+        group_creating,
+        service_user_creating,
+        successful_response_check,
+        unsuccess_response_check
+):
+
+    test_start_time = datetime.now(timezone.utc).replace(microsecond=0)
+    test_start_time_plus_five = test_start_time + timedelta(minutes=5)
+    test_start_time_plus_ten = test_start_time + timedelta(minutes=10)
+    test_start_time_plus_fifteen = test_start_time + timedelta(minutes=15)
+
+    # create once group(0-10minutes) by admin and add two device to it
+    first_group = group_creating(
+        start_time=test_start_time,
+        stop_time=test_start_time_plus_ten
+    )
+    response = add_group_devices.sync_detailed(
+        id=first_group.id,
+        client=api_client,
+        body=DevicesPayload(serials=','.join(devices_serial[:2]))
+    )
+    successful_response_check(response, description='Added (group devices)')
+
+    # create once group(10-20minutes) by service user and add two device to it
+    service_user = service_user_creating()
+    user_api_client = api_client_custom_token(token=service_user.token)
+    second_group = group_creating(
+        custom_api_client=user_api_client,
+        start_time=test_start_time_plus_ten,
+        stop_time=test_start_time + timedelta(minutes=20)
+    )
+    response = add_group_devices.sync_detailed(
+        id=second_group.id,
+        client=api_client,
+        body=DevicesPayload(serials=','.join(devices_serial[2:]))
+    )
+    successful_response_check(response, description='Added (group devices)')
+
+    # create pending once group with different time period and add devices to it as well
+    conflict_group = group_creating(
+        state=GroupState.PENDING,
+        start_time=test_start_time+ timedelta(minutes=21),
+        stop_time=test_start_time + timedelta(minutes=31)
+    )
+    response = add_group_devices.sync_detailed(
+        id=conflict_group.id,
+        client=api_client,
+        body=DevicesPayload(serials=','.join(devices_serial))
+    )
+    successful_response_check(response, description='Added (group devices)')
+
+    # try to change pending group time period to get conflicts error with both ready groups
+    response = update_group.sync_detailed(
+        id=conflict_group.id,
+        client=api_client,
+        body=GroupPayload(
+            start_time=test_start_time_plus_five,
+            stop_time=test_start_time_plus_fifteen
+        )
+    )
+    unsuccess_response_check(response, status_code=409, description='Conflicts Information')
+    first_conflict = response.parsed.conflicts[0]
+    equal(sorted(devices_serial[:2]), sorted(first_conflict.devices))
+    equal(test_start_time_plus_five, first_conflict.date.start)
+    equal(test_start_time_plus_ten, first_conflict.date.stop)
+    equal(first_group.name, first_conflict.group)
+    equal(first_group.owner.email, first_conflict.owner.email)
+    second_conflict = response.parsed.conflicts[1]
+    equal(sorted(devices_serial[2:]), sorted(second_conflict.devices))
+    equal(test_start_time_plus_ten, second_conflict.date.start)
+    equal(test_start_time_plus_fifteen, second_conflict.date.stop)
+    equal(second_group.name, second_conflict.group)
+    equal(second_group.owner.email, second_conflict.owner.email)
