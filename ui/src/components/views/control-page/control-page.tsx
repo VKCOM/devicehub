@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Device } from '@/components/ui/device'
 import { DeviceControlPanel } from '@/components/ui/device-control-panel'
 import { ErrorModal } from '@/components/ui/modals'
+import { ConditionalRender } from '@/components/lib/conditional-render'
 
 import { deviceErrorModalStore } from '@/store/device-error-modal-store'
 import { createDeviceContainer } from '@/config/inversify/create-device-container'
@@ -30,12 +31,14 @@ export const ControlPage = observer(() => {
         <Device />
         <DeviceControlPanel />
       </Split>
-      <ErrorModal
-        description={deviceErrorModalStore.fatalMessage}
-        isOpen={deviceErrorModalStore.isModalOpen}
-        title={t('Device was disconnected')}
-        onClose={() => deviceErrorModalStore.closeModal()}
-      />
+      <ConditionalRender conditions={[deviceErrorModalStore.isModalOpen]}>
+        <ErrorModal
+          description={deviceErrorModalStore.fatalMessage}
+          isOpen={deviceErrorModalStore.isModalOpen}
+          title={t('Device was disconnected')}
+          onClose={() => deviceErrorModalStore.closeModal()}
+        />
+      </ConditionalRender>
     </DIContainerProvider>
   )
 })

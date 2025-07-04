@@ -52,7 +52,7 @@ export const Header = () => {
             <DynamicLogo className={styles.logo} height={32} width={120} />
           </Tappable>
         </Link>
-        <ConditionalRender conditions={[additionalUrl !== '']}>
+        <ConditionalRender conditions={[!!additionalUrl?.length]}>
           <Link className={styles.navLink} to={additionalUrl || ''}>
             <Button before={<Icon56WebDeviceOutline height={28} width={28} />} mode='tertiary' size='l'>
               {t('Browsers')}
