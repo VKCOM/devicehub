@@ -5,6 +5,7 @@ import pytest
 from pytest_check import greater, equal, is_not_none, is_not_in, is_none, between_equal
 
 from devicehub_client.api.admin import add_origin_group_devices
+from devicehub_client.api.devices import get_devices
 from devicehub_client.api.groups import get_groups, get_group_device, get_group_devices, create_group, delete_group, \
     add_group_device, add_group_user, add_group_devices, remove_group_device, update_group, remove_group_devices, \
     get_group
