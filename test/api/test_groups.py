@@ -8,8 +8,8 @@ from devicehub_client.api.admin import add_origin_group_devices
 from devicehub_client.api.devices import get_devices
 from devicehub_client.api.groups import get_groups, get_group_device, get_group_devices, create_group, delete_group, \
     add_group_device, add_group_user, add_group_devices, remove_group_device, update_group, remove_group_devices, \
-    get_group
-from devicehub_client.models import GroupPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState, GroupState
+    get_group, delete_groups
+from devicehub_client.models import GroupPayload, GroupsPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState, GroupState
 
 def test_get_groups(api_client, successful_response_check):
     response = get_groups.sync_detailed(client=api_client)
@@ -469,6 +469,13 @@ def test_conflict_group_response(
     equal(test_start_time_plus_fifteen, second_conflict.date.stop)
     equal(second_group.name, second_conflict.group)
     equal(second_group.owner.email, second_conflict.owner.email)
+
+    delete_groups.sync_detailed(
+        client=api_client,
+        body=GroupsPayload(
+            ids=[first_group.id, second_group.id, conflict_group.id]
+        )
+    )
 
 def test_periodic_group_lifetime_and_device_assignment(
     api_client,
