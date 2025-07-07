@@ -488,6 +488,7 @@ def test_periodic_group_lifetime_and_device_assignment(
     devices_in_group_check,
     random_str
 ):
+    sleep(5)
     service_user = service_user_creating()
     user_api_client = api_client_custom_token(token=service_user.token)
 
