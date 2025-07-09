@@ -3,6 +3,7 @@ permissions:
   contents: read
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - '.github/workflows/api_tests.yaml'

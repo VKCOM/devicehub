@@ -1,6 +1,7 @@
 name: Run Playwright Tests
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - '.github/workflows/e2e_tests.yaml'
