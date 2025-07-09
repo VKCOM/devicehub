@@ -470,13 +470,6 @@ def test_conflict_group_response(
     equal(second_group.name, second_conflict.group)
     equal(second_group.owner.email, second_conflict.owner.email)
 
-    delete_groups.sync_detailed(
-        client=api_client,
-        body=GroupsPayload(
-            ids=[first_group.id, second_group.id, conflict_group.id]
-        )
-    )
-
 def test_periodic_group_lifetime_and_device_assignment(
     api_client,
     api_client_custom_token,
@@ -488,11 +481,9 @@ def test_periodic_group_lifetime_and_device_assignment(
     devices_in_group_check,
     random_str
 ):
-    sleep(5)
     service_user = service_user_creating()
     user_api_client = api_client_custom_token(token=service_user.token)
 
-    # Calculate start and end dates according to requirements
     now = datetime.now(timezone.utc)
     start_date = now - timedelta(hours=1, minutes=1)
     end_date = now + timedelta(seconds=5) - timedelta(hours=1)
@@ -551,3 +542,86 @@ def test_periodic_group_lifetime_and_device_assignment(
     user_devices_response = get_devices.sync_detailed(client=user_api_client)
     successful_response_check(user_devices_response, description='Devices Information')
     equal(len(user_devices_response.parsed.devices), 5)
+
+def test_device_flow_by_schedule_in_once(
+    api_client,
+    api_client_custom_token,
+    devices_serial,
+    group_creating,
+    service_user_creating,
+    successful_response_check,
+    unsuccess_response_check,
+    random_user
+):
+      now = datetime.now(timezone.utc)
+
+      bookable = group_creating(
+          group_class=GroupPayloadClass.BOOKABLE,
+          state=GroupPayloadState.READY
+      )
+
+      response = add_origin_group_devices.sync_detailed(
+          id=bookable.id,
+          client=api_client,
+          body=DevicesPayload(serials=','.join(devices_serial))
+      )
+      successful_response_check(response, description='Updated (devices)')
+
+      user_a = api_client_custom_token(token=service_user_creating(random_user()).token)
+      user_b = api_client_custom_token(token=service_user_creating(random_user()).token)
+
+      once_a = group_creating(
+          custom_api_client=user_a,
+          group_class=GroupPayloadClass.ONCE,
+          state=GroupPayloadState.READY,
+          start_time=now,
+          stop_time=now + timedelta(seconds=5),
+          repetitions=0
+      )
+
+      once_b = group_creating(
+         custom_api_client=user_b,
+         group_class=GroupPayloadClass.ONCE,
+         state=GroupPayloadState.READY,
+         start_time=now + timedelta(seconds=7),
+         stop_time=now + timedelta(seconds=17),
+         repetitions=0
+      )
+
+      response = add_group_devices.sync_detailed(
+          id=once_a.id,
+          client=api_client,
+          body=DevicesPayload(serials=','.join(devices_serial))
+      )
+      successful_response_check(response, description='Added (group devices)')
+
+      response = add_group_devices.sync_detailed(
+          id=once_b.id,
+          client=api_client,
+          body=DevicesPayload(serials=','.join(devices_serial))
+      )
+      successful_response_check(response, description='Added (group devices)')
+
+      sleep(1)
+
+      # User A has devices
+      user_a_devices_response = get_devices.sync_detailed(client=user_a)
+      successful_response_check(user_a_devices_response, description='Devices Information')
+      equal(len(user_a_devices_response.parsed.devices), 5)
+
+      # User B has no devices
+      user_b_devices_response = get_devices.sync_detailed(client=user_b)
+      successful_response_check(user_b_devices_response, description='Devices Information')
+      equal(len(user_b_devices_response.parsed.devices), 0)
+
+      sleep(6)
+
+      # User B has devices
+      user_b_devices_response = get_devices.sync_detailed(client=user_b)
+      successful_response_check(user_b_devices_response, description='Devices Information')
+      equal(len(user_b_devices_response.parsed.devices), 5)
+
+      # User A has no devices
+      user_a_devices_response = get_devices.sync_detailed(client=user_a)
+      successful_response_check(user_a_devices_response, description='Devices Information')
+      equal(len(user_a_devices_response.parsed.devices), 0)
