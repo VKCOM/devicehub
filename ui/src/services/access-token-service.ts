@@ -93,4 +93,3 @@ export class AccessTokenService {
     this.generatedToken = token
   }
 }
-
