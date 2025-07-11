@@ -1,4 +1,4 @@
-name: Checks for /ui directory
+name: Checks for /lib directory
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - lib/**  # Запускать workflow при изменениях в директории /lib
 
 jobs:
-  lint-ui:
+  lint-lib:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
