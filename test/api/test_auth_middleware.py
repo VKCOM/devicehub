@@ -1,15 +1,21 @@
 from pytest_check import equal
 
-from devicehub_client import AuthenticatedClient, Client
 from devicehub_client.api.admin import create_service_user
+from devicehub_client.api.user import get_access_token
 from devicehub_client.api.users import get_users
 
 
-def test_bearer_token_authentication(api_client, successful_response_check):
+def test_bearer_jwt_token_authentication(api_client, successful_response_check):
     """Test standard Bearer token authentication"""
     response = get_users.sync_detailed(client=api_client)
     successful_response_check(response, description='Users Information')
 
+def test_bearer_legacy_token_authentication(api_client, successful_response_check, api_client_custom_token):
+    """Test legacy Bearer token authentication"""
+    response = get_access_token.sync_detailed(api_client.token, client=api_client)
+    legacy_client = api_client_custom_token(response.parsed.token.id)
+    response = get_users.sync_detailed(client=legacy_client)
+    successful_response_check(response, description='Users Information')
 
 def test_invalid_token_authentication(api_client_with_bad_token):
     """Test authentication failure with invalid token"""

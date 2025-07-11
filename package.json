@@ -20,6 +20,7 @@
   },
   "scripts": {
     "doc": "cli-docs-generator --cli=stf --pretty_cli_name=stf -o ./units.md",
+    "lint": "eslint ./lib",
     "build:swagger:tests": "cd ./test/api && poetry run just regen-schema",
     "build:swagger:ui": "cd ./ui && npm run generate-api",
     "build:swagger": "cd ./lib/units/api && python3 ./gen_routes.py & npm run build:swagger:ui"
@@ -122,8 +123,8 @@
     "zeromq": "6.4.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.13.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.30.1",
     "@playwright/test": "^1.52.0",
     "@types/bluebird": "^3.5.42",
     "@types/eventemitter3": "^1.2.0",
@@ -137,7 +138,7 @@
     "@types/ws": "^3.2.1",
     "async": "2.6.4",
     "cli-docs-generator": "1.0.7",
-    "eslint": "8.22.0",
+    "eslint": "9.30.1",
     "event-stream": "3.3.5",
     "exports-loader": "^4.0.0",
     "fs-extra": "8.1.0",

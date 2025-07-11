@@ -8,7 +8,7 @@ on:
       - ui/**  # Запускать workflow при изменениях в директории /ui
 
 jobs:
-  build:
+  lint-ui:
     runs-on: ubuntu-latest 
     defaults:
       run:

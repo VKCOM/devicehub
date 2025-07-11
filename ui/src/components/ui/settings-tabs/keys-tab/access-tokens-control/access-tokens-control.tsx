@@ -63,14 +63,14 @@ export const AccessTokensControl = observer(({ className }: { className?: string
       afterTooltipText={t('Generate Access Token')}
       before={<Icon28KeySquareOutline height={20} width={20} />}
       className={cn(className, styles.accessTokensControl)}
-      isAfterButtonDisabled={!!accessTokenService.generatedTokenId}
+      isAfterButtonDisabled={!!accessTokenService.generatedToken}
       title={t('Access Tokens')}
       separator
       onAfterButtonClick={() => setIsAddNewTokenOpen((prev) => !prev)}
     >
-      <ConditionalRender conditions={[!!accessTokenService.generatedTokenId]}>
+      <ConditionalRender conditions={[!!accessTokenService.generatedToken]}>
         <CopyableBlock
-          copyableText={accessTokenService.generatedTokenId}
+          copyableText={accessTokenService.generatedToken}
           title={t('This is sensitive information. Do not share this token.')}
           onOkClick={() => {
             accessTokenService.resetGeneratedTokenId(accessTokenLabel)
@@ -88,7 +88,7 @@ export const AccessTokensControl = observer(({ className }: { className?: string
               <Input
                 before={<Icon20TagOutline />}
                 className={styles.addNewTokenInput}
-                disabled={!!accessTokenService.generatedTokenId}
+                disabled={!!accessTokenService.generatedToken}
                 id='tokenTitle'
                 spellCheck={false}
                 value={accessTokenLabel}
@@ -99,7 +99,7 @@ export const AccessTokensControl = observer(({ className }: { className?: string
             <Button
               appearance='accent'
               className={styles.generateTokenButton}
-              disabled={!accessTokenLabel || !!accessTokenService.generatedTokenId}
+              disabled={!accessTokenLabel || !!accessTokenService.generatedToken}
               mode='secondary'
               size='m'
               type='submit'
