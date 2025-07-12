@@ -65,3 +65,25 @@ export async function useDevice(serial: string, timeout?: number) {
 
     console.log(await response.json())
 }
+
+
+export async function isDeviceInUse(serial: string): Promise<boolean> {
+    const token = await generateAdminToken()
+    const response = await fetch(`${baseUrl}/api/v1/devices/${serial}?fields=using,owner,present,ready`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+    });
+
+    if (!response.ok) {
+        console.error(`Failed to get device ${serial}: ${response.status}`)
+        return false
+    }
+
+    const deviceData = await response.json()
+    const device = deviceData.device
+
+    // Device is not in use if it's not being used and has no owner
+    return device.using && device.owner && device.present && device.ready
+}

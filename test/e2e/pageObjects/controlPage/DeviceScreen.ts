@@ -63,4 +63,8 @@ export class DeviceHubDeviceScreenPage {
         await this.page.mouse.up();
     }
 
+    async stopUse() {
+        await this.stopButton.click()
+    }
+
 }

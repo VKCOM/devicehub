@@ -10,6 +10,9 @@ rethinkdb_data/
 temp/
 tmp/
 doc/
+test/
+helm/
+WebDriverAgent/
 .eslintcache
 scripts/
 .mypy_cache
