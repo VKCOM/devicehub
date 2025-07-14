@@ -24,9 +24,7 @@ export const DashboardTab = observer(() => {
     <div className={styles.dashboardTabContainer}>
       <div className={styles.dashboardTab}>
         <DeviceButtonsControl className={styles.deviceButtons} />
-        <ConditionalRender conditions={[!device?.ios]}>
-          <RemoteDebugControl className={styles.remoteDebug} />
-        </ConditionalRender>
+        <RemoteDebugControl className={styles.remoteDebug} />
         <AppUploadControl className={styles.appUpload} />
         <LinkOpenerControl className={styles.linkOpener} />
         <ConditionalRender conditions={[!device?.ios]}>

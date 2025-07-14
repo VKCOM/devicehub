@@ -36,7 +36,7 @@ export class DeviceConnection {
       const startRemoteConnectResult = await this.deviceControlStore.startRemoteConnect()
 
       startRemoteConnectResult.donePromise.then(({ data }) => {
-        const debugCommand = `adb connect ${data}`
+        const debugCommand = device.ios ? `curl http://${data}/status` : `adb connect ${data}`
 
         this.debugCommand = debugCommand
 
