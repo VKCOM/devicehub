@@ -38,8 +38,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         authMock: resolve(__dirname, 'auth/auth-mock.html'),
-        authLdap: resolve(__dirname, 'auth/auth-ldap.html'),
-        authOpenid: resolve(__dirname, 'auth/auth-openid.html'),
+        authLdap: resolve(__dirname, 'auth/auth-ldap.html')
       },
     },
   },
