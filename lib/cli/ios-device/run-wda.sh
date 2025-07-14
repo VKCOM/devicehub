@@ -65,6 +65,7 @@ MONGODB_PORT_27017_TCP=mongodb://devicehub-mongo:27017 stf ios-device \
     --host localhost \
     --screen-port 1800$deviceNum \
     --mjpeg-port  910$deviceNum \
+    --connect-port 1820$deviceNum \
     --provider mightyworker \
     --public-ip localhost \
     --screen-ws-url-pattern "ws://localhost:1800$deviceNum" \

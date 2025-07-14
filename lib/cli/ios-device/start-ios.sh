@@ -5,6 +5,7 @@ stf ios-device \
     --host localhost \
     --screen-port 7409 \
     --mjpeg-port 9100 \
+    --connect-port 18200 \
     --provider m-alzhanov \
     --public-ip localhost \
     --screen-ws-url-pattern "ws://localhost:7409" \
