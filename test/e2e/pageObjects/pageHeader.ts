@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { DeviceHubSettingsPage } from './settingsPage/settingsPage'
 
 export class PageHeader {
     readonly page: Page
@@ -34,6 +35,11 @@ export class PageHeader {
         await expect(this.HelpButton).toBeVisible()
         await expect(this.LogoutButton).toBeVisible()
 
+    }
+
+    async openSettings() {
+        await this.openSettingsButton.click()
+        return new DeviceHubSettingsPage(this.page)
     }
 
 }

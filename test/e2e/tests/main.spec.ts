@@ -10,6 +10,11 @@ test.describe('Main page tests', () => {
         await deviceHubMainPage.goto()
     })
 
+    test('open settings page by click in header', async({page}) => {
+        const settingPage = await deviceHubMainPage.openSettings()
+        await settingPage.isPageDisplayed()
+    })
+
     test.describe('Tests with devices', () => {
         test('check that page is fully displayed with devices', async({page}) => {
             await deviceHubMainPage.isPageFullyDisplayedWithDevices()
