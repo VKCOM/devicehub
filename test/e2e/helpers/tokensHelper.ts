@@ -1,4 +1,4 @@
-import playwrightConfig from '../playwright.config';
+import playwrightConfig from '../playwright.config'
 
 const baseUrl = playwrightConfig?.use?.baseURL
 

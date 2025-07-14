@@ -6,10 +6,12 @@ import { DeviceHubMainPageSearch } from './mainPageSearch'
 export class DeviceHubMainPage {
     readonly page: Page;
     readonly devicehubLogo: Locator;
+    readonly pageHeader: PageHeader;
 
     constructor(page: Page) {
         this.page = page;
         this.devicehubLogo = page.getByTitle('DeviceHub');
+        this.pageHeader = new PageHeader(this.page)
     }
 
     async goto() {
@@ -21,17 +23,17 @@ export class DeviceHubMainPage {
     }
 
     async isPageDisplayed() {
-        await new PageHeader(this.page).isPageDisplayed()
+        await this.pageHeader.isPageDisplayed()
         await new DeviceHubMainPageSearch(this.page).isPageDisplayed()
     }
 
     async isPageFullyDisplayedWithoutDevices() {
-        await new PageHeader(this.page).isPageFullyDisplayed()
+        await this.pageHeader.isPageFullyDisplayed()
         await new DeviceHubMainPageDevicesTable(this.page).isPageDisplayedWithoutDevices()
     }
 
     async isPageFullyDisplayedWithDevices() {
-        await new PageHeader(this.page).isPageFullyDisplayed()
+        await this.pageHeader.isPageFullyDisplayed()
         await new DeviceHubMainPageDevicesTable(this.page).isPageFullyDisplayedWithDevices()
     }
 
@@ -41,6 +43,10 @@ export class DeviceHubMainPage {
 
     async checkDeviceIsBusy(deviceSerial: string) {
         await new DeviceHubMainPageDevicesTable(this.page).checkDeviceIsBusy(deviceSerial)
+    }
+
+    async openSettings() {
+        return this.pageHeader.openSettings()
     }
 
 }

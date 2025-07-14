@@ -1,7 +1,9 @@
-import { expect, Locator, Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 import { DeviceHubDeviceScreenPage } from './DeviceScreen'
 import { PageHeader } from '../pageHeader'
 import playwrightConfig from '../../playwright.config'
+import { DeviceHubModalPage } from '../common/errorModal'
+import { DeviceHubMainPage } from '../mainPage/mainPage'
 
 export class DeviceHubDevicePage {
     readonly page: Page
@@ -27,9 +29,13 @@ export class DeviceHubDevicePage {
         await this.deviceScreen.isPageDisplayed()
     }
 
-    async isErrorModalDisplayed() {
-        expect(this.page.url()).toBe(`${this.baseUrl}/#/control/${this.deviceSerial}`)
-        
+    async stopUse(){
+        await this.deviceScreen.stopUse()
+        const modalHeader = 'Warning'
+        const modalDescription = 'Are you sure you want to release the device? The device will be cleared before returning to the device list'
+        const modal = await new DeviceHubModalPage(this.page, modalHeader, modalDescription).isModalDisplayed()
+        await modal.pressOK()
+        return new DeviceHubMainPage(this.page)
     }
 
 }

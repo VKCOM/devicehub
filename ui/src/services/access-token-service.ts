@@ -19,7 +19,7 @@ export class AccessTokenService {
   private tokenToRemove = ''
   private userTokenQueries = new Map()
 
-  generatedTokenId = ''
+  generatedToken = ''
 
   constructor(@inject(CONTAINER_IDS.factoryMobxQuery) private mobxQueryFactory: MobxQueryFactory) {
     makeAutoObservable(this)
@@ -60,7 +60,7 @@ export class AccessTokenService {
       return [accessTokenLabel, ...oldData]
     })
 
-    this.generatedTokenId = ''
+    this.generatedToken = ''
   }
 
   addAccessTokenGeneratedListener(): void {
@@ -89,7 +89,7 @@ export class AccessTokenService {
     })
   }
 
-  private onAccessTokenGenerated({ tokenId }: AccessTokenGeneratedMessage): void {
-    this.generatedTokenId = tokenId
+  private onAccessTokenGenerated({ token }: AccessTokenGeneratedMessage): void {
+    this.generatedToken = token
   }
 }
