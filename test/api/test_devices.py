@@ -1,10 +1,11 @@
 from enum import Enum
 
 import pytest
-from pytest_check import equal, is_not_none, is_none
+from pytest_check import is_none, is_not_none, equal, is_true
 
+from devicehub_client.api.admin import use_device_by_user
 from devicehub_client.api.devices import get_devices, get_device_by_serial
-from devicehub_client.models import GetDevicesTarget
+from devicehub_client.models import GetDevicesTarget, UseDeviceByUserBody
 
 
 class WrongType(str, Enum):
@@ -158,3 +159,89 @@ def test_get_device_by_serial_with_wrong_fields(
     equal(len(device_dict.values()), 1)
     is_not_none(device_dict.get('reverseForwards'))
     equal(device_dict.get('reverseForwards'), [])
+
+def test_use_device_by_user_success(
+    api_client,
+    first_device_serial,
+    admin_user,
+    successful_response_check
+):
+    """Test successful device usage by user"""
+    body = UseDeviceByUserBody(
+        email=admin_user.email,
+        timeout=30000
+    )
+
+    response = use_device_by_user.sync_detailed(
+        serial=first_device_serial,
+        client=api_client,
+        body=body
+    )
+
+    successful_response_check(response, status_code=200)
+    is_not_none(response.parsed)
+
+def test_use_device_by_user_with_invalid_serial(
+    api_client,
+    admin_user,
+    random_str,
+    unsuccess_response_check
+):
+    """Test device usage with invalid serial"""
+    invalid_serial = f"invalid-{random_str()}"
+    body = UseDeviceByUserBody(
+        email=admin_user.email,
+        timeout=30000
+    )
+
+    response = use_device_by_user.sync_detailed(
+        serial=invalid_serial,
+        client=api_client,
+        body=body
+    )
+
+    unsuccess_response_check(response, status_code=404, description="Not Found (device)")
+
+def test_use_device_by_user_with_invalid_email(
+    api_client,
+    first_device_serial,
+    random_str,
+    unsuccess_response_check
+):
+    """Test device usage with invalid user email"""
+    invalid_email = f"invalid-{random_str()}@example.com"
+    body = UseDeviceByUserBody(
+        email=invalid_email,
+        timeout=30000
+    )
+
+    response = use_device_by_user.sync_detailed(
+        serial=first_device_serial,
+        client=api_client,
+        body=body
+    )
+      
+    unsuccess_response_check(response, status_code=404, description="Not Found (user)")
+
+@pytest.mark.parametrize("timeout", [1000, 30000, 60000])
+def test_use_device_by_user_with_different_timeouts(
+    api_client,
+    first_device_serial,
+    admin_user,
+    successful_response_check,
+    timeout
+):
+    """Test device usage with different timeout values"""
+    body = UseDeviceByUserBody(
+        email=admin_user.email,
+        timeout=timeout
+    )
+
+    response = use_device_by_user.sync_detailed(
+        serial=first_device_serial,
+        client=api_client,
+        body=body
+    )
+
+    successful_response_check(response, status_code=200)
+    is_not_none(response.parsed)

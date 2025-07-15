@@ -2,6 +2,8 @@ import json
 from datetime import datetime, timedelta, timezone
 
 import pytest
+
+from devicehub_client.api.groups import remove_group_user, remove_group_users
 from devicehub_client.api.user import get_user
 from pytest_check import equal, greater, is_not_none, is_true, is_none, is_in, is_false, between_equal
 
@@ -10,7 +12,7 @@ from devicehub_client.api.admin import update_users_alert_message, create_user, 
 from devicehub_client.api.users import get_user_by_email, get_users_alert_message
 from devicehub_client.api.users import get_users
 from devicehub_client.models import AlertMessagePayload, AlertMessagePayloadActivation, \
-    AlertMessagePayloadLevel
+    AlertMessagePayloadLevel, UsersPayload
 
 from conftest import ADMIN_PRIVILEGE, USER_PRIVILEGE
 
@@ -480,3 +482,125 @@ def test_update_user_groups_quotas_without_admin(api_client_custom_token, servic
         number=5
     )
     failure_response_check(response, status_code=403, message='Forbidden: privileged operation (admin)')
+
+
+def test_remove_single_user_from_group_success(
+        api_client,
+        common_group_id,
+        test_user_email,
+        successful_response_check
+):
+    """Test successful removal of a single user from group"""
+    response = remove_group_user.sync_detailed(
+        id=common_group_id,
+        email=test_user_email,
+        client=api_client
+    )
+
+    successful_response_check(response, description="Removed (group user)")
+    is_not_none(response.parsed.group)
+
+
+def test_remove_multiple_users_from_group_success(
+        api_client,
+        common_group_id,
+        test_users_emails,
+        successful_response_check
+):
+    """Test successful removal of multiple users from group"""
+    body = UsersPayload(emails=",".join(test_users_emails))
+
+    response = remove_group_users.sync_detailed(
+        id=common_group_id,
+        client=api_client,
+        body=body
+    )
+
+    successful_response_check(response, description="Removed (group users)")
+    is_not_none(response.parsed.group)
+
+
+def test_remove_user_from_nonexistent_group(
+        api_client,
+        test_user_email,
+        random_str,
+        unsuccess_response_check
+):
+    """Test removing user from non-existent group"""
+    fake_group_id = f"group-{random_str()}"
+
+    response = remove_group_user.sync_detailed(
+        id=fake_group_id,
+        email=test_user_email,
+        client=api_client
+    )
+
+    unsuccess_response_check(response, status_code=404, description="Not Found (group)")
+
+
+def test_remove_nonexistent_user_from_group(
+        api_client,
+        common_group_id,
+        random_str,
+        unsuccess_response_check
+):
+    """Test removing non-existent user from group"""
+    fake_email = f"fake-{random_str()}@example.com"
+
+    response = remove_group_user.sync_detailed(
+        id=common_group_id,
+        email=fake_email,
+        client=api_client
+    )
+
+    unsuccess_response_check(response, status_code=404, description="Not Found (group user)")
+
+
+def test_remove_group_owner_forbidden(
+        api_client,
+        common_group_id,
+        group_owner_email,
+        unsuccess_response_check
+):
+    """Test that removing group owner is forbidden"""
+    response = remove_group_user.sync_detailed(
+        id=common_group_id,
+        email=group_owner_email,
+        client=api_client
+    )
+
+    unsuccess_response_check(response, status_code=403, description="Forbidden (group user)")
+
+
+def test_remove_all_users_from_group(
+        api_client,
+        common_group_id,
+        successful_response_check
+):
+    """Test removing all users from group (empty emails parameter)"""
+    body = UsersPayload()  # Empty body removes all users
+
+    response = remove_group_users.sync_detailed(
+        id=common_group_id,
+        client=api_client,
+        body=body
+    )
+
+    successful_response_check(response, description="Removed (group users)")
+    is_not_none(response.parsed.group)
+
+
+def test_remove_user_already_not_in_group(
+        api_client,
+        common_group_id,
+        user_not_in_group_email,
+        successful_response_check
+):
+    """Test removing user that's already not in the group"""
+    response = remove_group_user.sync_detailed(
+        id=common_group_id,
+        email=user_not_in_group_email,
+        client=api_client
+    )
+
+    successful_response_check(response, status_code=200, description="Unchanged (group user)")
