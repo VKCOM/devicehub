@@ -3448,7 +3448,6 @@ paths:
           description: |
             Unexpected Error:
               * 401: Unauthorized => bad credentials
-              * 400: Team with this name already exists
               * 500: Internal Server Error
           content:
             application/json:
@@ -3488,11 +3487,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: teams
-    put:
+    post:
       tags:
         - teams
-      summary: Put users or groups to team
-      description: Put users or groups to team
+      summary: Update team with users or groups
+      description: Update team with users or groups
       operationId: updateTeam
       parameters:
         - name: id
@@ -3530,6 +3529,122 @@ paths:
                   $ref: '#/components/schemas/UnexpectedErrorResponse'
       x-codegen-request-body-name: team
       x-swagger-router-controller: teams
+    delete:
+      tags:
+        - teams
+      summary: Remove users or groups from team
+      description:  Remove users or groups from team
+      operationId: removeFromTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: fields need to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+        required: true
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 400: Team with this name already exists
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+      x-codegen-request-body-name: team
+      x-swagger-router-controller: teams
+  /team/{id}/user/{email}:
+    delete:
+      tags:
+        - teams
+      summary: remove user from team
+      description: remove user from team
+      operationId: removeUserFromTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: email identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
+  /team/{id}/group/{group}:
+    delete:
+      tags:
+        - teams
+      summary: remove group from team
+      description: remove group from team
+      operationId: removeGroupFromTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+        - name: group
+          in: path
+          description: group id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
 components:
   schemas:
     UnexpectedErrorResponse:
