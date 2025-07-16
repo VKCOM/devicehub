@@ -32,8 +32,8 @@ import {{{", ".join(operations.values())}}} from '{os.path.relpath(controller_f,
 """)
     for method, func in operations.items():
       route_file.write(f"""
-export function {method.replace('delete', 'del')}(req, res, next) {{
-    return {func}(req, res, next)
+export function {method.replace('delete', 'del')}(req, res) {{
+    return {func}(req, res)
 }}
 
 """)
