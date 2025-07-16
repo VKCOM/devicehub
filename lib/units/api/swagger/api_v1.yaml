@@ -3706,6 +3706,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: teams
+  /team/{id}/delete:
+    delete:
+      tags:
+        - teams
+      summary: Delete team by id
+      description: Delete team by id
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 404: Not Found => unknown group or device or user or team
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
 components:
   schemas:
     UnexpectedErrorResponse:
