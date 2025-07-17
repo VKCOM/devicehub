@@ -3520,6 +3520,7 @@ paths:
     get:
       tags:
         - teams
+        - admin
       summary: Get team info by id
       description: Get full team object by id
       operationId: getTeamById
@@ -3551,6 +3552,7 @@ paths:
     post:
       tags:
         - teams
+        - admin
       summary: Update team with users or groups
       description: Update team with users or groups
       operationId: updateTeam
@@ -3593,6 +3595,7 @@ paths:
     delete:
       tags:
         - teams
+        - admin
       summary: Remove users or groups from team
       description:  Remove users or groups from team
       operationId: removeFromTeam
@@ -3636,6 +3639,7 @@ paths:
     delete:
       tags:
         - teams
+        - admin
       summary: remove user from team
       description: remove user from team
       operationId: removeUserFromTeam
@@ -3673,6 +3677,7 @@ paths:
     delete:
       tags:
         - teams
+        - admin
       summary: remove group from team
       description: remove group from team
       operationId: removeGroupFromTeam
@@ -3710,6 +3715,7 @@ paths:
     delete:
       tags:
         - teams
+        - admin
       summary: Delete team by id
       description: Delete team by id
       operationId: deleteTeam
