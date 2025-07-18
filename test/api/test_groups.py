@@ -8,8 +8,10 @@ from devicehub_client.api.admin import add_origin_group_devices
 from devicehub_client.api.devices import get_devices
 from devicehub_client.api.groups import get_groups, get_group_device, get_group_devices, create_group, delete_group, \
     add_group_device, add_group_user, add_group_devices, remove_group_device, update_group, remove_group_devices, \
-    get_group, delete_groups
-from devicehub_client.models import GroupPayload, GroupsPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState, GroupState
+    get_group, delete_groups, add_group_users
+from devicehub_client.models import GroupPayload, GroupsPayload, GroupPayloadClass, DevicesPayload, GroupPayloadState, \
+    GroupState, UsersPayload
+
 
 def test_get_groups(api_client, successful_response_check):
     response = get_groups.sync_detailed(client=api_client)
@@ -625,3 +627,75 @@ def test_device_flow_by_schedule_in_once(
       user_a_devices_response = get_devices.sync_detailed(client=user_a)
       successful_response_check(user_a_devices_response, description='Devices Information')
       equal(len(user_a_devices_response.parsed.devices), 0)
+
+
+def test_add_nonexistent_user_to_group_single(
+        api_client,
+        common_group_id,
+        random_str,
+        successful_response_check
+):
+    """Test adding a single non-existent user to group returns 207 Multi-Status"""
+    fake_email = f"nonexistent-{random_str()}@example.com"
+
+    response = add_group_user.sync_detailed(
+        id=common_group_id,
+        email=fake_email,
+        client=api_client
+    )
+
+    # Based on controller logic, this should return 207 with partial success info
+    equal(response.status_code, 207)
+    is_not_none(response.parsed)
+    equal(response.parsed.description, "Not all of users added (group user)")
+    is_not_none(response.parsed.info)
+
+
+def test_add_nonexistent_users_to_group_multiple(
+        api_client,
+        common_group_id,
+        random_str,
+        successful_response_check
+):
+    """Test adding multiple non-existent users to group"""
+    fake_emails = [
+        f"fake1-{random_str()}@example.com",
+        f"fake2-{random_str()}@example.com"
+    ]
+    body = UsersPayload(emails=",".join(fake_emails))
+
+    response = add_group_users.sync_detailed(
+        id=common_group_id,
+        client=api_client,
+        body=body
+    )
+
+    equal(response.status_code, 207)
+    is_not_none(response.parsed)
+    equal(response.parsed.description, "Not all of users added (group users)")
+    is_not_none(response.parsed.info)
+
+
+def test_add_mix_existing_nonexistent_users_to_group(
+        api_client,
+        common_group_id,
+        test_user_email,
+        random_str,
+        successful_response_check
+):
+    """Test adding mix of existing and non-existent users to group"""
+    fake_email = f"nonexistent-{random_str()}@example.com"
+    mixed_emails = [test_user_email, fake_email]
+    body = UsersPayload(emails=",".join(mixed_emails))
+
+    response = add_group_users.sync_detailed(
+        id=common_group_id,
+        client=api_client,
+        body=body
+    )
+
+    equal(response.status_code, 207)
+    is_not_none(response.parsed)
+    equal(response.parsed.description, "Not all of users added (group users)")
+    is_not_none(response.parsed.info)
+    is_not_none(response.parsed.group)
