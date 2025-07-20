@@ -405,7 +405,6 @@ def devices_serial(successful_response_check, api_client):
 @pytest.fixture()
 def successful_response_check():
     def successful_response_check_func(response, status_code=200, description=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         is_true(response.parsed.success)
         if description is not None:
@@ -417,7 +416,6 @@ def successful_response_check():
 @pytest.fixture()
 def unsuccess_response_check():
     def unsuccess_response_check_func(response, status_code=400, description=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         response_content = json.loads(response.content)
         is_false(response_content['success'])
@@ -429,7 +427,6 @@ def unsuccess_response_check():
 @pytest.fixture()
 def failure_response_check():
     def failure_response_check_func(response, status_code=401, message=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         response_content = json.loads(response.content)
         if message is not None:

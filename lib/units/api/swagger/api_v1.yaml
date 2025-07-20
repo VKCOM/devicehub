@@ -3481,9 +3481,35 @@ paths:
     x-swagger-router-controller: stats
   /swagger.json:
     x-swagger-pipe: swagger_raw
+  /teams:
+    get:
+      tags:
+        - teams
+        - admin
+      summary: Get all teams
+      description: Get all existing teams
+      operationId: getTeams
+      responses:
+        "200":
+          description: All teams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
   /team:
     post:
       tags:
+        - teams
         - admin
       summary: Create team
       description: create team with users and groups belongs to it
@@ -3823,9 +3849,20 @@ components:
         team:
           $ref: '#/components/schemas/Team'
     TeamsResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Team'
+      required:
+        - description
+        - team
+        - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        description:
+          type: string
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
     Conflict:
       type: object
       properties:
@@ -4438,17 +4475,13 @@ components:
         name:
           type: string
         users:
-          type: object
-          properties:
-            email:
-              type: string
-              format: email
-            name:
-              type: string
+          type: array
+          items:
+            type: string
         groups:
           type: array
           items:
-            $ref: '#/components/schemas/Group'
+            type: string
     AdbKeyAddedResponse:
       required:
       - success
