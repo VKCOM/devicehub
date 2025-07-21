@@ -12,7 +12,11 @@ uint8_t nameLen = 0;
 bool readingName = false;
 
 void setup() {
-  Serial.setTxTimeoutMs(0);
+  #if ARDUINO_USB_CDC_ON_BOOT && !ARDUINO_USB_MODE //Serial used for USB CDC
+    // https://github.com/espressif/arduino-esp32/blob/8ee5f0a11e5423a018e0f89146e05074466274db/cores/esp32/USBCDC.cpp#L449-L451
+    // setTxTimeoutMs exists only for CDC usb serial communication. Otherwise it's hardware and no setTxTimeoutMs
+    Serial.setTxTimeoutMs(0);
+  #endif
   Serial.begin(115200);
 #ifdef DEBUG
   esp_log_level_set("*", ESP_LOG_VERBOSE);  // "*" means all tags
@@ -128,18 +132,19 @@ void handleCommand(char cmd) {
       if (areConnected) bleMouse->release(MOUSE_LEFT);
       break;
     case '0':
-      if (areConnected)
+      if (areConnected) {
         bleMouse->move(-127, -127);  // move to the corner
-      delay(INTERVAL);
-      bleMouse->move(0, padding);  // go down a bit to position where there is no corner
-      delay(INTERVAL);
-      bleMouse->move(-127, 0);  // Go to the left
-      delay(INTERVAL);
-      for (int i = 0; i < padding; i++) {  // Go fixed to the right `padding` times
-        bleMouse->move(1, 0);
         delay(INTERVAL);
+        bleMouse->move(0, padding);  // go down a bit to position where there is no corner
+        delay(INTERVAL);
+        bleMouse->move(-127, 0);  // Go to the left
+        delay(INTERVAL);
+        for (int i = 0; i < padding; i++) {  // Go fixed to the right `padding` times
+          bleMouse->move(1, 0);
+          delay(INTERVAL);
+        }
+        bleMouse->move(0, -127);  // Go to the top
       }
-      bleMouse->move(0, -127);  // Go to the top
       break;
     case '-':
       ESP.restart();
