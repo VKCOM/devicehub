@@ -64,6 +64,10 @@ from .remote_connect_user_device_response import RemoteConnectUserDeviceResponse
 from .service_user_response import ServiceUserResponse
 from .service_user_response_service_user_info import ServiceUserResponseServiceUserInfo
 from .size_response import SizeResponse
+from .team import Team
+from .team_payload import TeamPayload
+from .team_response import TeamResponse
+from .teams_response import TeamsResponse
 from .token import Token
 from .type_response import TypeResponse
 from .unexpected_error_response import UnexpectedErrorResponse
@@ -159,6 +163,10 @@ __all__ = (
     "ServiceUserResponse",
     "ServiceUserResponseServiceUserInfo",
     "SizeResponse",
+    "Team",
+    "TeamPayload",
+    "TeamResponse",
+    "TeamsResponse",
     "Token",
     "TypeResponse",
     "UnexpectedErrorResponse",

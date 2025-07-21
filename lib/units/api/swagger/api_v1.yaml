@@ -29,24 +29,24 @@ paths:
   /groups:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets groups
       description: Returns the groups to which you belong
       operationId: getGroups
       parameters:
-      - name: fields
-        in: query
-        description: Comma-seperated list of fields; only listed fields will be returned
-          in response
-        schema:
-          type: string
-      - name: owner
-        in: query
-        description: "Selects the groups for which you are the owner (true) or a simple\
+        - name: fields
+          in: query
+          description: Comma-seperated list of fields; only listed fields will be returned
+            in response
+          schema:
+            type: string
+        - name: owner
+          in: query
+          description: "Selects the groups for which you are the owner (true) or a simple\
           \ member (false); note that by not providing this parameter, it means all\
           \ groups to which you belong are selected"
-        schema:
-          type: boolean
+          schema:
+            type: boolean
       responses:
         "200":
           description: Groups information
@@ -65,7 +65,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - groups
+        - groups
       summary: Creates a group
       description: Creates a group with you as owner
       operationId: createGroup
@@ -99,7 +99,7 @@ paths:
       x-codegen-request-body-name: group
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes groups
       description: Removes the groups owned by you
       operationId: deleteGroups
@@ -139,23 +139,23 @@ paths:
   /groups/{id}:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets a group
       description: Returns a group to which you belong
       operationId: getGroup
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of group fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of group fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Group information
@@ -175,17 +175,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - groups
+        - groups
       summary: Updates a group
       description: Updates a group owned by you
       operationId: updateGroup
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Group properties; at least one property is required
         content:
@@ -226,17 +226,17 @@ paths:
       x-codegen-request-body-name: group
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes a group
       description: Removes a group owned by you
       operationId: deleteGroup
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group removing is OK
@@ -260,32 +260,32 @@ paths:
   /groups/{id}/devices:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets the devices of a group
       description: Returns the devices of the group to which you belong
       operationId: getGroupDevices
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: bookable
-        in: query
-        description: "Selects devices which could be potentially booked by that transient\
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: bookable
+          in: query
+          description: "Selects devices which could be potentially booked by that transient\
           \ group (true => irrelevant for an origin group!), or selects all devices\
           \ of the group (false); note that by not providing this parameter all devices\
           \ of the group are selected"
-        schema:
-          type: boolean
-          default: false
-      - name: fields
-        in: query
-        description: Comma-separated list of device fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+          schema:
+            type: boolean
+            default: false
+        - name: fields
+          in: query
+          description: Comma-separated list of device fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Group devices information
@@ -306,17 +306,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - groups
+        - groups
       summary: Adds devices into a transient group
       description: Adds devices into a transient group owned by you
       operationId: addGroupDevices
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Devices to add as a comma-separated list of serials; note that
           by not providing this parameter it means all devices which could be potentially
@@ -359,17 +359,17 @@ paths:
       x-codegen-request-body-name: devices
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes devices from a transient group
       description: Removes devices from a transient group owned by you
       operationId: removeGroupDevices
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Devices to remove as a comma-separated list of serials; note
           that by not providing this parameter it means all devices of the group are
@@ -407,29 +407,29 @@ paths:
   /groups/{id}/devices/{serial}:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets a device of a group
       description: Returns a device of a group to which you belong
       operationId: getGroupDevice
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of device fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of device fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Group device information
@@ -449,23 +449,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - groups
+        - groups
       summary: Adds a device into a transient group
       description: Adds a device into a transient group owned by you
       operationId: addGroupDevice
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group information (an empty group is returned if no change
@@ -495,23 +495,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes a device from a transient group
       description: Removes a device from a transient group owned by you
       operationId: removeGroupDevice
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group information (an empty group is returned if no change
@@ -536,25 +536,25 @@ paths:
   /groups/{id}/users:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets the users of a group
       description: "Gets the users of a group to which you belong; if you are the\
         \ administrator user then all user fields are returned, otherwise only 'email',\
         \ 'name' and 'privilege' user fields are returned"
       operationId: getGroupUsers
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of user fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of user fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Group users information
@@ -574,17 +574,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - groups
+        - groups
       summary: Adds users into a group
       description: Adds users into a group owned by you
       operationId: addGroupUsers
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Users to add as a comma-separated list of emails; note that by
           not providing this parameter it means all available users are added into
@@ -619,17 +619,17 @@ paths:
       x-codegen-request-body-name: users
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes users from a group
       description: Removes users from a group owned by you
       operationId: removeGroupUsers
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Users to remove as a comma-separated list of emails; note that
           by not providing this parameter it means all users of the group are removed
@@ -666,31 +666,31 @@ paths:
   /groups/{id}/users/{email}:
     get:
       tags:
-      - groups
+        - groups
       summary: Gets a user of a group
       description: "Gets a user of a group to which you belong; if you are the administrator\
         \ user then all user fields are returned, otherwise only 'email', 'name' and\
         \ 'privilege' user fields are returned"
       operationId: getGroupUser
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of user fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of user fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Group user information
@@ -710,23 +710,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - groups
+        - groups
       summary: Adds a user into a group
       description: Adds a user into a group owned by you
       operationId: addGroupUser
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group information (an empty group is returned if no change
@@ -748,23 +748,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - groups
+        - groups
       summary: Removes a user from a group
       description: Removes a user from a group owned by you
       operationId: removeGroupUser
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group information (an empty group is returned if no change
@@ -786,22 +786,131 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: groups
+  /groups/{id}/moderators/{email}:
+    put:
+      tags:
+        - groups
+      summary: Adds a user as a moderator to a group
+      description: Adds a user as a moderator to a group owned by you or if you are an administrator
+      operationId: addGroupModerator
+      parameters:
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group information (an empty group is returned if no change is made)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 403: Forbidden => only owner or administrator can add moderators
+              * 404: Not Found => unknown group or user
+              * 500: Internal Server Error
+              * 503: Service Unavailable => server too busy or a lock on a resource is pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    delete:
+      tags:
+        - groups
+      summary: Removes a user as a moderator from a group
+      description: Removes a user as a moderator from a group owned by you or if you are an administrator
+      operationId: removeGroupModerator
+      parameters:
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group information (an empty group is returned if no change is made)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 403: Forbidden => only owner or administrator can remove moderators
+              * 404: Not Found => unknown group or user
+              * 500: Internal Server Error
+              * 503: Service Unavailable => server too busy or a lock on a resource is pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: groups
+  /groups/{id}/teams:
+    get:
+      tags:
+        - teams
+      summary: Get group teams
+      description: Get teams where groups stands
+      operationId: getGroupsTeams
+      parameters:
+        - name: id
+          in: path
+          description: group id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group Teams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
   /users:
     get:
       tags:
-      - users
+        - users
       summary: Gets users
       description: "gets users; if you are the administrator user then all user fields\
         \ are returned, otherwise only 'email', 'name' and 'privilege' user fields\
         \ are returned"
       operationId: getUsers
       parameters:
-      - name: fields
-        in: query
-        description: Comma-separated list of user fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of user fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Users information
@@ -820,18 +929,18 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes users
       description: Removes users from the database
       operationId: deleteUsers
       parameters:
-      - name: groupOwner
-        in: query
-        description: Allows or not the removing of each user depending respectively
-          if the user is a group owner (true) or not (false); note that by not providing
-          the groupOwner parameter it means an unconditionally removing
-        schema:
-          type: boolean
+        - name: groupOwner
+          in: query
+          description: Allows or not the removing of each user depending respectively
+            if the user is a group owner (true) or not (false); note that by not providing
+            the groupOwner parameter it means an unconditionally removing
+          schema:
+            type: boolean
       requestBody:
         description: Users to remove as a comma-separated list of emails; note that
           by not providing this parameter it means all users are selected for removing
@@ -867,18 +976,18 @@ paths:
   /users/alertMessage:
     get:
       tags:
-      - users
+        - users
       summary: Gets the users alert message
       description: The Users Alert Message endpoint returns the current alert message
         launched by the administrator user
       operationId: getUsersAlertMessage
       parameters:
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Current Users Alert Message
@@ -897,7 +1006,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     put:
       tags:
-      - admin
+        - admin
       summary: Updates the users alert message
       description: Updates the users alert message
       operationId: updateUsersAlertMessage
@@ -933,29 +1042,29 @@ paths:
   /users/groupsQuotas:
     put:
       tags:
-      - admin
+        - admin
       summary: Updates the default groups quotas of users
       description: Updates the default groups quotas allocated to each new user
       operationId: updateDefaultUserGroupsQuotas
       parameters:
-      - name: number
-        in: query
-        description: Number of groups
-        schema:
-          minimum: 0
-          type: integer
-      - name: duration
-        in: query
-        description: Total duration of groups (milliseconds)
-        schema:
-          minimum: 0
-          type: integer
-      - name: repetitions
-        in: query
-        description: Number of repetitions per Group
-        schema:
-          minimum: 0
-          type: integer
+        - name: number
+          in: query
+          description: Number of groups
+          schema:
+            minimum: 0
+            type: integer
+        - name: duration
+          in: query
+          description: Total duration of groups (milliseconds)
+          schema:
+            minimum: 0
+            type: integer
+        - name: repetitions
+          in: query
+          description: Number of repetitions per Group
+          schema:
+            minimum: 0
+            type: integer
       responses:
         "200":
           description: Administrator user information (an empty user is returned if
@@ -978,18 +1087,18 @@ paths:
   /users/grantAdmin/{email}:
     post:
       tags:
-      - admin
+        - admin
       summary: Gets users
       description: "gets users; if you are the administrator user then all user fields\
         \ are returned, otherwise only 'email'"
       operationId: grantAdmin
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: User information
@@ -1011,18 +1120,18 @@ paths:
   /users/revokeAdmin/{email}:
     delete:
       tags:
-      - admin
+        - admin
       summary: Gets users
       description: "gets users; if you are the administrator user then all user fields\
         \ are returned, otherwise only 'email'"
       operationId: revokeAdmin
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: User information
@@ -1044,25 +1153,25 @@ paths:
   /users/{email}:
     get:
       tags:
-      - users
+        - users
       summary: Gets a user
       description: "Gets a user; if you are the administrator user then all user fields\
         \ are returned, otherwise only 'email', 'name' and 'privilege' user fields\
         \ are returned"
       operationId: getUserByEmail
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of user fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of user fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: User information
@@ -1082,23 +1191,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - admin
+        - admin
       summary: Creates a user
       description: Creates a user in the database
       operationId: createUser
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: name
-        in: query
-        description: User name
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: User name
+          required: true
+          schema:
+            type: string
       responses:
         "201":
           description: User information
@@ -1118,24 +1227,24 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes a user
       description: Removes a user from the database
       operationId: deleteUser
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: groupOwner
-        in: query
-        description: Allows or not the removing of the user depending respectively
-          if the user is a group owner (true) or not (false); note that by not providing
-          this parameter it means an unconditionally removing
-        schema:
-          type: boolean
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: groupOwner
+          in: query
+          description: Allows or not the removing of the user depending respectively
+            if the user is a group owner (true) or not (false); note that by not providing
+            this parameter it means an unconditionally removing
+          schema:
+            type: boolean
       responses:
         "200":
           description: User removing is OK
@@ -1159,34 +1268,34 @@ paths:
   /users/service/{email}:
     post:
       tags:
-      - admin
+        - admin
       summary: Creates a serviceUser
       description: Creates a user in the database by parameters
       operationId: createServiceUser
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: name
-        in: query
-        description: User name
-        required: true
-        schema:
-          type: string
-      - name: admin
-        in: query
-        description: Give user admin privilege
-        schema:
-          type: boolean
-      - name: secret
-        in: query
-        description: Secret for jwt
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: User name
+          required: true
+          schema:
+            type: string
+        - name: admin
+          in: query
+          description: Give user admin privilege
+          schema:
+            type: boolean
+        - name: secret
+          in: query
+          description: Secret for jwt
+          required: true
+          schema:
+            type: string
       responses:
         "201":
           description: User information
@@ -1209,35 +1318,35 @@ paths:
   /users/{email}/groupsQuotas:
     put:
       tags:
-      - admin
+        - admin
       summary: Updates the groups quotas of a user
       description: Updates the groups quotas of a user
       operationId: updateUserGroupsQuotas
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: number
-        in: query
-        description: Number of groups
-        schema:
-          minimum: 0
-          type: integer
-      - name: duration
-        in: query
-        description: Total duration of groups (milliseconds)
-        schema:
-          minimum: 0
-          type: integer
-      - name: repetitions
-        in: query
-        description: Number of repetitions per Group
-        schema:
-          minimum: 0
-          type: integer
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: number
+          in: query
+          description: Number of groups
+          schema:
+            minimum: 0
+            type: integer
+        - name: duration
+          in: query
+          description: Total duration of groups (milliseconds)
+          schema:
+            minimum: 0
+            type: integer
+        - name: repetitions
+          in: query
+          description: Number of repetitions per Group
+          schema:
+            minimum: 0
+            type: integer
       responses:
         "200":
           description: User information (an empty user is returned if no change is
@@ -1262,23 +1371,23 @@ paths:
   /users/{email}/devices:
     get:
       tags:
-      - admin
+        - admin
       summary: Gets the devices controlled by a user
       description: Gets the devices controlled by a user
       operationId: getUserDevicesV2
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of device fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of device fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Controlled devices information
@@ -1300,29 +1409,29 @@ paths:
   /users/{email}/devices/{serial}:
     get:
       tags:
-      - admin
+        - admin
       summary: Gets a device controlled by a user
       description: Gets a device controlled by a user
       operationId: getUserDevice
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (Serial)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-separated list of device fields; only listed fields will
-          be returned in response
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (Serial)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-separated list of device fields; only listed fields will
+            be returned in response
+          schema:
+            type: string
       responses:
         "200":
           description: Controlled device information
@@ -1343,34 +1452,34 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - admin
+        - admin
       summary: Places a device under user control
       description: Places a device under user control; note this is not completely
         analogous to press the 'Use' button in the UI because that does not authorize
         remote connection through ADB
       operationId: addUserDeviceV3
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: timeout
-        in: query
-        description: Means the device will be automatically removed from the user
-          control if it is kept idle for this period (in milliseconds); default value
-          is provided by the provider 'group timeout'
-        required: true
-        schema:
-          minimum: 120
-          type: integer
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          description: Means the device will be automatically removed from the user
+            control if it is kept idle for this period (in milliseconds); default value
+            is provided by the provider 'group timeout'
+          required: true
+          schema:
+            minimum: 120
+            type: integer
       responses:
         "200":
           description: Device controlling is OK
@@ -1392,25 +1501,25 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Remove a device from the user control
       description: Remove a device from the user control; note this is analogous to
         press the 'Stop Using' button in the UI because that forbids also remote connection
         through ADB
       operationId: deleteUserDevice
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device releasing is OK
@@ -1434,24 +1543,24 @@ paths:
   /users/{email}/devices/{serial}/remoteConnect:
     post:
       tags:
-      - admin
+        - admin
       summary: Allows to remotely connect to a device controlled by a user
       description: Allows to remotely connect to a device controlled by a user; returns
         the remote debug URL in response for use with ADB
       operationId: remoteConnectUserDevice
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Remote debug URL
@@ -1473,24 +1582,24 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Forbids to remotely connect to a device controlled by a user
       description: Forbids using ADB to remotely connect to a device controlled by
         a user
       operationId: remoteDisconnectUserDevice
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Remote debug URL disabling is OK
@@ -1514,17 +1623,17 @@ paths:
   /users/{email}/accessTokens:
     get:
       tags:
-      - admin
+        - admin
       summary: Gets the access tokens of a user
       description: Gets the access tokens of a user
       operationId: getUserAccessTokensV2
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access tokens information
@@ -1544,23 +1653,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - admin
+        - admin
       summary: Create an access token for a user
       description: Creates an access token for a user.
       operationId: createUserAccessToken
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: title
-        in: query
-        description: Access token title
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: title
+          in: query
+          description: Access token title
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access token information
@@ -1580,17 +1689,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Remove the access tokens of a user
       description: Remove the access tokens of a user
       operationId: deleteUserAccessTokens
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access tokens removing is OK
@@ -1612,23 +1721,23 @@ paths:
   /users/{email}/accessTokens/{id}:
     get:
       tags:
-      - admin
+        - admin
       summary: Gets an access token of a user
       description: Gets an access token of a user
       operationId: getUserAccessToken
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: Access token identifier
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Access token identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access token information
@@ -1648,23 +1757,23 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes an access token of a user
       description: Removes an access token of a user
       operationId: deleteUserAccessToken
       parameters:
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: Access token identifier
-        required: true
-        schema:
-          type: string
+        - name: email
+          in: path
+          description: User identifier (email)
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Access token identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access token removing is OK
@@ -1686,7 +1795,7 @@ paths:
   /user:
     get:
       tags:
-      - user
+        - user
       summary: User Profile
       description: The User Profile endpoint returns information about current authorized
         user
@@ -1708,18 +1817,18 @@ paths:
   /user/devices:
     get:
       tags:
-      - user
+        - user
       summary: User Devices
       description: The User Devices endpoint returns device list owner by current
         authorized user
       operationId: getUserDevices
       parameters:
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Current User Devices List
@@ -1738,7 +1847,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - user
+        - user
       summary: Add a device to a user
       description: The User Devices endpoint will request stf server for a new device.
       operationId: addUserDevice
@@ -1755,7 +1864,7 @@ paths:
       responses:
         "200":
           description: Add User Device Status
-          content: {}
+          content: { }
         default:
           description: |
             Unexpected Error:
@@ -1773,23 +1882,23 @@ paths:
   /user/devices/{serial}:
     get:
       tags:
-      - user
+        - user
       summary: User Device
       description: The devices enpoint return information about device owned by user
       operationId: getUserDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Device Information owned by user
@@ -1810,27 +1919,27 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     post:
       tags:
-      - user
+        - user
       summary: Places a device under user control
       description: Places a device under user control; note this is not completely
         analogous to press the 'Use' button in the UI because that does not authorize
         remote connection through ADB
       operationId: addUserDeviceV2
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: timeout
-        in: query
-        description: Means the device will be automatically removed from the user
-          control if it is kept idle for this period (in milliseconds); default value
-          is provided by the provider 'group timeout'
-        schema:
-          minimum: 0
-          type: integer
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          description: Means the device will be automatically removed from the user
+            control if it is kept idle for this period (in milliseconds); default value
+            is provided by the provider 'group timeout'
+          schema:
+            minimum: 0
+            type: integer
       responses:
         "200":
           description: Device controlling is OK
@@ -1852,19 +1961,19 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - user
+        - user
       summary: Delete User Device
       description: The User Devices endpoint will request for device release from
         stf server. It will return request accepted if device is being used by current
         user
       operationId: deleteUserDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Delete User Device Status
@@ -1888,18 +1997,18 @@ paths:
   /user/devices/{serial}/remoteConnect:
     post:
       tags:
-      - user
+        - user
       summary: Remote Connect
       description: The device connect endpoint will request stf server to connect
         remotely
       operationId: remoteConnectUserDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Remote Connect User Device Request Status
@@ -1921,18 +2030,18 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - user
+        - user
       summary: Remote Disconnect
       description: The device connect endpoint will request stf server to disconnect
         remotely
       operationId: remoteDisconnectUserDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Remote Disсonnect User Device Request Status
@@ -1956,7 +2065,7 @@ paths:
   /user/fullAccessTokens:
     get:
       tags:
-      - user
+        - user
       summary: Gets your access tokens
       description: Gets your access tokens; note that all fields are returned in response
         including the 'id' one
@@ -1981,7 +2090,7 @@ paths:
   /user/accessTokens:
     get:
       tags:
-      - user
+        - user
       summary: Access Tokens
       description: The Access Tokens endpoints returns titles of all the valid access
         tokens
@@ -2001,17 +2110,17 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-      - user
+        - user
       summary: Create an access token
       description: Create an access token for you
       operationId: createAccessToken
       parameters:
-      - name: title
-        in: query
-        description: Access token title
-        required: true
-        schema:
-          type: string
+        - name: title
+          in: query
+          description: Access token title
+          required: true
+          schema:
+            type: string
       responses:
         "201":
           description: Access token information
@@ -2030,7 +2139,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - user
+        - user
       summary: Removes your access tokens
       description: Removes your access tokens
       operationId: deleteAccessTokens
@@ -2091,17 +2200,17 @@ paths:
   /user/accessTokens/{id}:
     get:
       tags:
-      - user
+        - user
       summary: Gets an access token
       description: Gets one of your access tokens
       operationId: getAccessToken
       parameters:
-      - name: id
-        in: path
-        description: Access token identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Access token identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access token information
@@ -2121,17 +2230,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - user
+        - user
       summary: Removes an access token
       description: Removes one of your access tokens
       operationId: deleteAccessToken
       parameters:
-      - name: id
-        in: path
-        description: Access token identifier
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Access token identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Access token removing is OK
@@ -2153,7 +2262,7 @@ paths:
   /user/adbPublicKeys:
     post:
       tags:
-      - user
+        - user
       summary: Adb public keys
       description: Add adb public key for current user
       operationId: addAdbPublicKey
@@ -2162,7 +2271,7 @@ paths:
           application/json:
             schema:
               required:
-              - publickey
+                - publickey
               type: object
               properties:
                 publickey:
@@ -2176,9 +2285,9 @@ paths:
         "200":
           description: Add adb key response
           content:
-              application/json:
-                  schema:
-                      $ref: '#/components/schemas/AdbKeyAddedResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdbKeyAddedResponse'
         default:
           description: Unexpected Error
           content:
@@ -2188,7 +2297,7 @@ paths:
       x-codegen-request-body-name: adb
     delete:
       tags:
-      - user
+        - user
       summary: Remove adb public key
       description: remove adb public for current user
       operationId: removeAdbPublicKey
@@ -2201,7 +2310,7 @@ paths:
       responses:
         "200":
           description: Add adb key response
-          content: {}
+          content: { }
         default:
           description: Unexpected Error
           content:
@@ -2210,39 +2319,70 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: fingerprint
     x-swagger-router-controller: user
+  /user/{email}/teams:
+    get:
+      tags:
+        - teams
+      summary: Get user teams
+      description: Get teams where user stands
+      operationId: getUserTeams
+      parameters:
+        - name: email
+          in: path
+          description: user email
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User Teams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
   /devices:
     get:
       tags:
-      - devices
+        - devices
       summary: Device List
       description: The devices endpoint return list of all the STF devices including
         Disconnected and Offline
       operationId: getDevices
       parameters:
-      - name: target
-        in: query
-        description: |
-          Targets devices of your universe:
-           * bookable - devices belonging to a bookable group
-           * standard - devices belonging to a standard group
-           * origin - all devices
-           * standardizable - devices which are not yet booked including those belonging to a standard group
-           * user (default value) - devices which are accessible by you at a given time
-        schema:
-          type: string
-          default: user
-          enum:
-          - bookable
-          - standard
-          - origin
-          - standardizable
-          - user
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: target
+          in: query
+          description: |
+            Targets devices of your universe:
+             * bookable - devices belonging to a bookable group
+             * standard - devices belonging to a standard group
+             * origin - all devices
+             * standardizable - devices which are not yet booked including those belonging to a standard group
+             * user (default value) - devices which are accessible by you at a given time
+          schema:
+            type: string
+            default: user
+            enum:
+              - bookable
+              - standard
+              - origin
+              - standardizable
+              - user
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Devices information
@@ -2261,39 +2401,39 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes devices
       description: Removes devices from the database
       operationId: deleteDevices
       parameters:
-      - name: present
-        in: query
-        description: Allows or not the removing of each device depending respectively
-          if the device is present (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: booked
-        in: query
-        description: Allows or not the removing of each device depending respectively
-          if the device is booked (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: annotated
-        in: query
-        description: Allows or not the removing of each device depending respectively
-          if the device is annotated (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: controlled
-        in: query
-        description: Allows or not the removing of each device depending respectively
-          if the device is controlled (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
+        - name: present
+          in: query
+          description: Allows or not the removing of each device depending respectively
+            if the device is present (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: booked
+          in: query
+          description: Allows or not the removing of each device depending respectively
+            if the device is booked (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: annotated
+          in: query
+          description: Allows or not the removing of each device depending respectively
+            if the device is annotated (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: controlled
+          in: query
+          description: Allows or not the removing of each device depending respectively
+            if the device is controlled (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
       requestBody:
         description: Devices to remove as a comma-separated list of serials; note
           that by not providing this parameter it means all devices are selected for
@@ -2329,7 +2469,7 @@ paths:
   /devices/adbRange:
     get:
       tags:
-      - devices
+        - devices
       summary: AdbRange
       description: The range whic used to forward adb ports
       operationId: getAdbRange
@@ -2353,23 +2493,23 @@ paths:
   /devices/{serial}:
     get:
       tags:
-      - devices
+        - devices
       summary: Device Information
       description: The devices serial enpoint return information about a single device
       operationId: getDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Device Information
@@ -2385,17 +2525,17 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
       tags:
-      - admin
+        - admin
       summary: Adds device information
       description: Adds device information
       operationId: putDeviceBySerial
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       requestBody:
         description: |
           Information to add for device. Supports only notes-field and status change(Disconnected).
@@ -2427,45 +2567,45 @@ paths:
       x-codegen-request-body-name: device
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes a device
       description: Removes a device from the database
       operationId: deleteDevice
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: present
-        in: query
-        description: Allows or not the removing of the device depending respectively
-          if the device is present (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: booked
-        in: query
-        description: Allows or not the removing of the device depending respectively
-          if the device is booked (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: annotated
-        in: query
-        description: Allows or not the removing of the device depending respectively
-          if the device is annotated (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
-      - name: controlled
-        in: query
-        description: Allows or not the removing of the device depending respectively
-          if the device is controlled (true) or not (false); note that by not providing
-          this parameter it means an unconditional removing
-        schema:
-          type: boolean
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: present
+          in: query
+          description: Allows or not the removing of the device depending respectively
+            if the device is present (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: booked
+          in: query
+          description: Allows or not the removing of the device depending respectively
+            if the device is booked (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: annotated
+          in: query
+          description: Allows or not the removing of the device depending respectively
+            if the device is annotated (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
+        - name: controlled
+          in: query
+          description: Allows or not the removing of the device depending respectively
+            if the device is controlled (true) or not (false); note that by not providing
+            this parameter it means an unconditional removing
+          schema:
+            type: boolean
       responses:
         "200":
           description: Device removing is OK
@@ -2488,32 +2628,32 @@ paths:
   /devices/{serial}/updateStorageInfo:
     put:
       tags:
-      - admin
+        - admin
       summary: update device storage info
       description: update device storage info
       operationId: updateStorageInfo
       parameters:
-      - name: serial
-        in: path
-        description: Device Serial
-        required: true
-        schema:
-          type: string
-      - name: place
-        in: query
-        description: Device place
-        schema:
-          type: string
-      - name: storageId
-        in: query
-        description: Device storageId
-        schema:
-          type: string
-      - name: adbPort
-        in: query
-        description: Device adbPort
-        schema:
-          type: integer
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          schema:
+            type: string
+        - name: place
+          in: query
+          description: Device place
+          schema:
+            type: string
+        - name: storageId
+          in: query
+          description: Device storageId
+          schema:
+            type: string
+        - name: adbPort
+          in: query
+          description: Device adbPort
+          schema:
+            type: integer
       responses:
         "200":
           description: Storing success
@@ -2538,17 +2678,17 @@ paths:
   /devices/{serial}/size:
     get:
       tags:
-      - user
+        - user
       summary: Gets the size of a device
       description: Gets the size of a device
       operationId: getDeviceSize
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device size information
@@ -2569,7 +2709,7 @@ paths:
   /devices/{serial}/use:
     post:
       tags:
-      - admin
+        - admin
       summary: Use device by specified user.
       description: Use device by specified user. Admin privilege required.
       operationId: useDeviceByUser
@@ -2615,24 +2755,24 @@ paths:
   /devices/groups/{id}:
     put:
       tags:
-      - admin
+        - admin
       summary: Adds devices into an origin group
       description: Adds devices into an origin group along with updating each added
         device; returns the updated devices
       operationId: addOriginGroupDevices
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-seperated list of fields; only listed fields will be returned
-          in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-seperated list of fields; only listed fields will be returned
+            in response
+          schema:
+            type: string
       requestBody:
         description: |
           Devices to add as a comma-separated list of serials; note that by not providing this parameter it means all 'available devices' are selected for adding:
@@ -2671,24 +2811,24 @@ paths:
       x-codegen-request-body-name: devices
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes devices from an origin group
       description: Removes devices from an origin group along with updating each removed
         device; returns the updated devices
       operationId: removeOriginGroupDevices
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-seperated list of fields; only listed fields will be returned
-          in response
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-seperated list of fields; only listed fields will be returned
+            in response
+          schema:
+            type: string
       requestBody:
         description: Devices to remove as a comma-separated list of serials; note
           that by not providing this parameter it means all devices of the group are
@@ -2728,17 +2868,17 @@ paths:
   /devices/{serial}/adbPort:
     put:
       tags:
-      - admin
+        - admin
       summary: Renews adb port for device
       description: Renews adb port for device
       operationId: renewAdbPort
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Storing success
@@ -2763,17 +2903,17 @@ paths:
   /devices/{serial}/owner:
     get:
       tags:
-      - user
+        - user
       summary: Gets the group owner of a device
       description: Gets the group owner of a device
       operationId: getDeviceOwner
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device size information
@@ -2794,23 +2934,23 @@ paths:
   /devices/{serial}/groups:
     get:
       tags:
-      - admin
+        - admin
       summary: Gets the groups to which the device belongs
       description: Gets the groups to which the device belongs
       operationId: getDeviceGroups
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Comma-seperated list of fields; only listed fields will be returned
-          in response
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Comma-seperated list of fields; only listed fields will be returned
+            in response
+          schema:
+            type: string
       responses:
         "200":
           description: Groups information
@@ -2832,17 +2972,17 @@ paths:
   /devices/{serial}/type:
     get:
       tags:
-      - user
+        - user
       summary: Gets the type of a device
       description: Gets the type of a device
       operationId: getDeviceType
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device type information
@@ -2863,23 +3003,23 @@ paths:
   /devices/{serial}/bookings:
     get:
       tags:
-      - devices
+        - devices
       summary: Gets the bookings to which the device belongs
       description: Gets the bookings (i.e. transient groups) to which the device belongs
       operationId: getDeviceBookings
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: fields
-        in: query
-        description: Fields query parameter takes a comma seperated list of fields.
-          Only listed field will be return in response
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Fields query parameter takes a comma seperated list of fields.
+            Only listed field will be return in response
+          schema:
+            type: string
       responses:
         "200":
           description: Bookings information
@@ -2901,24 +3041,24 @@ paths:
   /devices/{serial}/groups/{id}:
     put:
       tags:
-      - admin
+        - admin
       summary: Adds a device into an origin group
       description: Adds a device into an origin group along with updating the added
         device; returns the updated device
       operationId: addOriginGroupDevice
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device information
@@ -2942,24 +3082,24 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - admin
+        - admin
       summary: Removes a device from an origin group
       description: Removes a device from an origin group along with updating the removed
         device; returns the updated device
       operationId: removeOriginGroupDevice
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Device information
@@ -3025,61 +3165,61 @@ paths:
   /autotests:
     get:
       tags:
-      - autotests
+        - autotests
       summary: Get devices for autotests run
       description: Create group and return serials of captured devices
       operationId: captureDevices
       parameters:
-      - name: timeout
-        in: query
-        description: timeout for group in seconds
-        required: true
-        schema:
-          minimum: 600
-          type: integer
-      - name: amount
-        in: query
-        description: Device amount needed for autotests run
-        required: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: need_amount
-        in: query
-        description: "need only specified amount, not less"
-        schema:
-          type: boolean
-      - name: abi
-        in: query
-        description: device abi
-        schema:
-          type: string
-      - name: sdk
-        in: query
-        description: device sdk
-        schema:
-          type: string
-      - name: model
-        in: query
-        description: device model
-        schema:
-          type: string
-      - name: type
-        in: query
-        description: device type
-        schema:
-          type: string
-      - name: version
-        in: query
-        description: device os version
-        schema:
-          type: string
-      - name: run
-        in: query
-        description: run identificator
-        required: true
-        schema:
-          type: string
+        - name: timeout
+          in: query
+          description: timeout for group in seconds
+          required: true
+          schema:
+            minimum: 600
+            type: integer
+        - name: amount
+          in: query
+          description: Device amount needed for autotests run
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: need_amount
+          in: query
+          description: "need only specified amount, not less"
+          schema:
+            type: boolean
+        - name: abi
+          in: query
+          description: device abi
+          schema:
+            type: string
+        - name: sdk
+          in: query
+          description: device sdk
+          schema:
+            type: string
+        - name: model
+          in: query
+          description: device model
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: device type
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: device os version
+          schema:
+            type: string
+        - name: run
+          in: query
+          description: run identificator
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group created for run
@@ -3099,17 +3239,17 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     delete:
       tags:
-      - autotests
+        - autotests
       summary: delete autotests run data
       description: delete group and data created for autotests
       operationId: freeDevices
       parameters:
-      - name: group
-        in: query
-        description: Device amount needed for autotests run
-        required: true
-        schema:
-          type: string
+        - name: group
+          in: query
+          description: Device amount needed for autotests run
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Group created for run
@@ -3129,89 +3269,89 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
     x-swagger-router-controller: autotests
   /autotests/{id}/addDevices/:
-      get:
-          tags:
-              - autotests
-          summary: Add devices for autotests group
-          description: Filter and add devices to autotests group
-          operationId: addDevices
-          parameters:
-              -   name: id
-                  in: path
-                  description: Group identifier
-                  required: true
-                  schema:
-                      type: string
-              -   name: amount
-                  in: query
-                  description: Device amount needed for autotests run
-                  required: true
-                  schema:
-                      minimum: 1
-                      type: integer
-              -   name: need_amount
-                  in: query
-                  description: "need only specified amount, not less"
-                  schema:
-                      type: boolean
-              -   name: abi
-                  in: query
-                  description: device abi
-                  schema:
-                      type: string
-              -   name: sdk
-                  in: query
-                  description: device sdk
-                  schema:
-                      type: string
-              -   name: model
-                  in: query
-                  description: device model
-                  schema:
-                      type: string
-              -   name: type
-                  in: query
-                  description: device type
-                  schema:
-                      type: string
-              -   name: version
-                  in: query
-                  description: device os version
-                  schema:
-                      type: string
-          responses:
-              "200":
-                  description: Updated group with new devices
-                  content:
-                      application/json:
-                          schema:
-                              $ref: '#/components/schemas/AutoTestResponse'
-              default:
-                  description: |
-                      Unexpected Error:
-                        * 401: Unauthorized => bad credentials
-                        * 404: Not Found => unknown data
-                        * 500: Internal Server Error
-                  content:
-                      application/json:
-                          schema:
-                              $ref: '#/components/schemas/UnexpectedErrorResponse'
-          x-codegen-request-body-name: addDevices
-      x-swagger-router-controller: autotests
+    get:
+      tags:
+        - autotests
+      summary: Add devices for autotests group
+      description: Filter and add devices to autotests group
+      operationId: addDevices
+      parameters:
+        - name: id
+          in: path
+          description: Group identifier
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          description: Device amount needed for autotests run
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: need_amount
+          in: query
+          description: "need only specified amount, not less"
+          schema:
+            type: boolean
+        - name: abi
+          in: query
+          description: device abi
+          schema:
+            type: string
+        - name: sdk
+          in: query
+          description: device sdk
+          schema:
+            type: string
+        - name: model
+          in: query
+          description: device model
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: device type
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: device os version
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated group with new devices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoTestResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 404: Not Found => unknown data
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+      x-codegen-request-body-name: addDevices
+    x-swagger-router-controller: autotests
   /autotests/install/{serial}:
     post:
       tags:
-      - autotests
+        - autotests
       summary: install apk on device by serial
       description: Installing apk to device from url
       operationId: installOnDevice
       parameters:
-      - name: serial
-        in: path
-        description: Device identifier (serial)
-        required: true
-        schema:
-          type: string
+        - name: serial
+          in: path
+          description: Device identifier (serial)
+          required: true
+          schema:
+            type: string
       requestBody:
         description: List of flags for adb install
         content:
@@ -3246,7 +3386,7 @@ paths:
   /autotests/useDevice:
     post:
       tags:
-      - autotests
+        - autotests
       summary: Use device and remote controll it in one method
       description: Use device and remote controll it in one method
       operationId: useAndConnectDevice
@@ -3256,7 +3396,7 @@ paths:
           application/json:
             schema:
               required:
-              - serial
+                - serial
               type: object
               properties:
                 serial:
@@ -3288,7 +3428,7 @@ paths:
   /stats:
     post:
       tags:
-      - stats
+        - stats
       summary: Write action to stats
       description: Write action with device and user to stats table
       operationId: writeStats
@@ -3297,8 +3437,8 @@ paths:
           multipart/form-data:
             schema:
               required:
-              - action
-              - serial
+                - action
+                - serial
               type: object
               properties:
                 serial:
@@ -3310,8 +3450,8 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               required:
-              - action
-              - serial
+                - action
+                - serial
               type: object
               properties:
                 serial:
@@ -3341,85 +3481,295 @@ paths:
     x-swagger-router-controller: stats
   /swagger.json:
     x-swagger-pipe: swagger_raw
-  /groups/{id}/moderators/{email}:
-    put:
+  /teams:
+    get:
       tags:
-      - groups
-      summary: Adds a user as a moderator to a group
-      description: Adds a user as a moderator to a group owned by you or if you are an administrator
-      operationId: addGroupModerator
-      parameters:
-      - name: id
-        in: path
-        description: Group identifier
-        required: true
-        schema:
-          type: string
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
+        - teams
+        - admin
+      summary: Get all teams
+      description: Get all existing teams
+      operationId: getTeams
       responses:
         "200":
-          description: Group information (an empty group is returned if no change is made)
+          description: All teams
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupResponse'
+                $ref: '#/components/schemas/TeamsResponse'
         default:
           description: |
             Unexpected Error:
               * 401: Unauthorized => bad credentials
-              * 403: Forbidden => only owner or administrator can add moderators
-              * 404: Not Found => unknown group or user
               * 500: Internal Server Error
-              * 503: Service Unavailable => server too busy or a lock on a resource is pending
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
+  /team:
+    post:
+      tags:
+        - teams
+        - admin
+      summary: Create team
+      description: create team with users and groups belongs to it
+      operationId: createTeam
+      requestBody:
+        description: team to create with name, users and groups as arrays
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+        required: true
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+      x-codegen-request-body-name: team
+    x-swagger-router-controller: teams
+  /team/{id}:
+    get:
+      tags:
+        - teams
+        - admin
+      summary: Get team info by id
+      description: Get full team object by id
+      operationId: getTeamById
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 404: Not Found => unknown group or device or user or team
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
+    post:
+      tags:
+        - teams
+        - admin
+      summary: Update team with users or groups
+      description: Update team with users or groups
+      operationId: updateTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: fields need to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+        required: true
+      responses:
+          "200":
+            description: Team information
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TeamResponse'
+          default:
+            description: |
+              Unexpected Error:
+                * 401: Unauthorized => bad credentials
+                * 400: Team with this name already exists
+                * 500: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UnexpectedErrorResponse'
+      x-codegen-request-body-name: team
+      x-swagger-router-controller: teams
     delete:
       tags:
-      - groups
-      summary: Removes a user as a moderator from a group
-      description: Removes a user as a moderator from a group owned by you or if you are an administrator
-      operationId: removeGroupModerator
+        - teams
+        - admin
+      summary: Remove users or groups from team
+      description:  Remove users or groups from team
+      operationId: removeFromTeam
       parameters:
-      - name: id
-        in: path
-        description: Group identifier
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: fields need to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/TeamPayload'
         required: true
-        schema:
-          type: string
-      - name: email
-        in: path
-        description: User identifier (email)
-        required: true
-        schema:
-          type: string
       responses:
         "200":
-          description: Group information (an empty group is returned if no change is made)
+          description: Team information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupResponse'
+                $ref: '#/components/schemas/TeamResponse'
         default:
           description: |
             Unexpected Error:
               * 401: Unauthorized => bad credentials
-              * 403: Forbidden => only owner or administrator can remove moderators
-              * 404: Not Found => unknown group or user
+              * 400: Team with this name already exists
               * 500: Internal Server Error
-              * 503: Service Unavailable => server too busy or a lock on a resource is pending
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
-    x-swagger-router-controller: groups
-
+      x-codegen-request-body-name: team
+      x-swagger-router-controller: teams
+  /team/{id}/user/{email}:
+    delete:
+      tags:
+        - teams
+        - admin
+      summary: remove user from team
+      description: remove user from team
+      operationId: removeUserFromTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: path
+          description: email identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
+  /team/{id}/group/{group}:
+    delete:
+      tags:
+        - teams
+        - admin
+      summary: remove group from team
+      description: remove group from team
+      operationId: removeGroupFromTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+        - name: group
+          in: path
+          description: group id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
+  /team/{id}/delete:
+    delete:
+      tags:
+        - teams
+        - admin
+      summary: Delete team by id
+      description: Delete team by id
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          in: path
+          description: Team identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 404: Not Found => unknown group or device or user or team
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: teams
 components:
   schemas:
     UnexpectedErrorResponse:
@@ -3485,6 +3835,34 @@ components:
           type: string
         group:
           $ref: '#/components/schemas/Group'
+    TeamResponse:
+      required:
+        - description
+        - team
+        - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        description:
+          type: string
+        team:
+          $ref: '#/components/schemas/Team'
+    TeamsResponse:
+      required:
+        - description
+        - team
+        - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        description:
+          type: string
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
     Conflict:
       type: object
       properties:
@@ -3850,7 +4228,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Group'
-
     Group:
       type: object
       properties:
@@ -4090,6 +4467,21 @@ components:
                   type: number
                 repetitions:
                   type: integer
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        users:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: string
     AdbKeyAddedResponse:
       required:
       - success
@@ -4147,7 +4539,6 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/User'
-
     ServiceUserResponse:
       required:
       - serviceUserInfo
@@ -4397,6 +4788,20 @@ components:
           type: string
           description: Comma-separated list of emails
       description: Payload object for adding/removing users
+    TeamPayload:
+      type: object
+      properties:
+        name:
+          type: string
+        users:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: string
+      description: Payload object for adding new team
     DevicePayload:
       type: object
       properties:
