@@ -1,7 +1,7 @@
 {
   "name": "vk-devicehub-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.4.7",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,6 +1,6 @@
 {
   "name": "vk-devicehub",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Smartphone Test Farm",
   "type": "module",
   "keywords": [
@@ -13,7 +13,8 @@
   ],
   "bin": {
     "stf": "./bin/stf.mjs",
-    "devicehub": "./bin/stf.mjs"
+    "devicehub": "./bin/stf.mjs",
+    "dh": "./bin/stf.mjs"
   },
   "yargs": {
     "duplicate-arguments-array": false
