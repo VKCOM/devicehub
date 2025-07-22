@@ -29,7 +29,8 @@ export const DeviceTopBar = observer(() => {
 
   const { data: device } = deviceBySerialStore.deviceQueryResult()
 
-  const deviceTitle = device?.platform === 'Android' ? `${device?.manufacturer || ''} ${device?.marketName || ''}` : device?.model || ''
+  const deviceTitle =
+    device?.platform === 'Android' ? `${device?.manufacturer || ''} ${device?.marketName || ''}` : device?.model || ''
   const currentRotation = `${t('Current rotation:')} ${deviceScreenStore.getScreenRotation}°`
 
   useEffect(() => {
