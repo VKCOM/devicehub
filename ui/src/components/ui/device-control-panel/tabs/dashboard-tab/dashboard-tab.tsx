@@ -27,7 +27,7 @@ export const DashboardTab = observer(() => {
         <RemoteDebugControl className={styles.remoteDebug} />
         <AppUploadControl className={styles.appUpload} />
         <LinkOpenerControl className={styles.linkOpener} />
-        <ConditionalRender conditions={[!device?.ios]}>
+        <ConditionalRender conditions={[device?.platform == 'Android']}>
           <ShellControl className={styles.shell} />
         </ConditionalRender>
         <ClipboardControl className={styles.clipboard} />

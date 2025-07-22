@@ -23,11 +23,11 @@ export class InfoService {
   findDevice(): void {
     const { data: device } = this.deviceBySerialStore.deviceQueryResult()
 
-    if (device?.ios) {
+    if (device?.manufacturer === 'Apple') {
       this.deviceControlStore.finder()
     }
 
-    if (!device?.ios) {
+    if (device?.manufacturer !== 'Apple') {
       this.deviceControlStore.identify()
     }
   }

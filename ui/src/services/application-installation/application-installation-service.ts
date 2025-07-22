@@ -173,7 +173,7 @@ export class ApplicationInstallationService {
   }
 
   allowedFileExtensions(): string[] {
-    if (this.device?.ios) {
+    if (this.device?.manufacturer !== 'Apple') {
       return ['.ipa', 'application/octet-stream']
     }
 
@@ -196,7 +196,7 @@ export class ApplicationInstallationService {
     this.href = data.resources.file.href
 
     const install = await (async (): Promise<InitializeTransactionReturn> => {
-      if (this.device?.ios === true) {
+      if (this.device?.manufacturer === 'Apple') {
         return await this.deviceControlStore.install({
           href: this.href,
           manifest: { application: { activities: {} } } as unknown as Manifest,
