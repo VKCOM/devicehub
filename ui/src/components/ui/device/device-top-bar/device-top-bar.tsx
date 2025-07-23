@@ -29,7 +29,8 @@ export const DeviceTopBar = observer(() => {
 
   const { data: device } = deviceBySerialStore.deviceQueryResult()
 
-  const deviceTitle = !device?.ios ? `${device?.manufacturer || ''} ${device?.marketName || ''}` : device?.model || ''
+  const deviceTitle =
+    device?.platform === 'Android' ? `${device?.manufacturer || ''} ${device?.marketName || ''}` : device?.model || ''
   const currentRotation = `${t('Current rotation:')} ${deviceScreenStore.getScreenRotation}°`
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export const DeviceTopBar = observer(() => {
           title={`${t('Landscape')} (${currentRotation})`}
           onClick={() => deviceControlStore.tryToRotate('landscape')}
         />
-        <ConditionalRender conditions={[!device?.ios]}>
+        <ConditionalRender conditions={[device?.platform === 'Android']}>
           <ScreenQualitySelector />
         </ConditionalRender>
         <Button

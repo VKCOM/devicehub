@@ -4132,8 +4132,6 @@ components:
           type: string
         iosClientChannel:
           type: string
-        ios:
-          type: boolean
         product:
           type: string
         ram:

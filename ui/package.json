@@ -105,6 +105,9 @@
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^3.0.9"
   },
+  "overrides": {
+    "stylus": "npm:empty-npm-package@1.0.0"
+  },
   "msw": {
     "workerDirectory": [
       "public"

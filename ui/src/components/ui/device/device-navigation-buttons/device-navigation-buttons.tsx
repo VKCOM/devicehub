@@ -22,7 +22,7 @@ export const DeviceNavigationButtons = observer(() => {
 
   return (
     <Flex align='center' className={styles.deviceNavigationButtons} justify='space-around'>
-      <ConditionalRender conditions={[!!device?.ios]}>
+      <ConditionalRender conditions={[device?.manufacturer === 'Apple']}>
         <NavigationButton
           beforeIcon={<Icon24SquareOutline />}
           title={`${t('Home')}`}
@@ -31,7 +31,7 @@ export const DeviceNavigationButtons = observer(() => {
           }}
         />
       </ConditionalRender>
-      <ConditionalRender conditions={[!device?.ios]}>
+      <ConditionalRender conditions={[device?.manufacturer !== 'Apple']}>
         <NavigationButton
           beforeIcon={<Icon28Menu />}
           title={`${t('Menu')}`}
