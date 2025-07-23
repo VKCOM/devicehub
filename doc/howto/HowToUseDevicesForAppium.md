@@ -79,6 +79,8 @@ curl -X DELETE -H "Authorization: Bearer YOUR-TOKEN-HERE" \
 
 ### Python Code Examples
 
+Example use [devicehub_client](../../test/api/devicehub_client) package for accessing the API.
+
 #### Authentication Setup
 ```python
 from devicehub_client import AuthenticatedClient
@@ -87,7 +89,7 @@ client = AuthenticatedClient(
     base_url="https://your-devicehub.com",
     token="your-access-token"
 )
-``` [6](#2-5) 
+```
 
 #### Device Capture (Both Platforms)
 ```python
@@ -240,7 +242,7 @@ def run_appium_tests_with_devicehub():
 
 **Android**: Uses ADB connections exposed through `remoteConnectUrl` 
 
-**iOS**: Requires WebDriverAgent setup and uses `pymobiledevice3` for port forwarding. The iOS provider handles WDA connectivity automatically [8](#2-7) .
+**iOS**: Requires WebDriverAgent setup and uses `pymobiledevice3` for port forwarding. The iOS provider handles WDA connectivity automatically.
 
 ### Authentication
 
@@ -253,4 +255,4 @@ curl -H "Authorization: Bearer YOUR-TOKEN-HERE" \
 
 ## Notes
 
-The unified API works seamlessly for both platforms through the same endpoints, with DeviceHub automatically handling the underlying protocol differences (ADB vs WDA). Regular users are limited to 2 devices per test run [10](#2-9) . The system supports device filtering by architecture, model, SDK level, and platform type for precise device allocation.
+The unified API works seamlessly for both platforms through the same endpoints, with DeviceHub automatically handling the underlying protocol differences (ADB vs WDA). Regular users are limited to 2 devices per test run. The system supports device filtering by architecture, model, SDK level, and platform type for precise device allocation.
