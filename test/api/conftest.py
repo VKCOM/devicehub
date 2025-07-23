@@ -207,7 +207,7 @@ def random_choice():
 @pytest.fixture()
 def fake_device_field_check():
     def fake_device_field_check_func(device_dict):
-        equal(len(device_dict.values()), 33)
+        equal(len(device_dict.values()), 34)
         equal(len(device_dict.get('provider').values()), 2)
         # for local run pass need add runUrl to device.group
         greater_equal(len(device_dict.get('group').values()), 9, device_dict.get('group').keys())
