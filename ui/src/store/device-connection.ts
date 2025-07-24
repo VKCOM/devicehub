@@ -36,11 +36,12 @@ export class DeviceConnection {
       const startRemoteConnectResult = await this.deviceControlStore.startRemoteConnect()
 
       startRemoteConnectResult.donePromise.then(({ data }) => {
-        this.debugCommand = device.manufacturer === 'Apple'
-          ? `curl http://${data}/status`
-          : device.manufacturer && device.model
-            ? `adb connect ${data}`
-            : `sdb connect ${data}`
+        this.debugCommand =
+          device.manufacturer === 'Apple'
+            ? `curl http://${data}/status`
+            : device.manufacturer && device.model
+              ? `adb connect ${data}`
+              : `sdb connect ${data}`
 
         console.info(this.debugCommand)
       })
