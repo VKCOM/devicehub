@@ -36,11 +36,14 @@ export class DeviceConnection {
       const startRemoteConnectResult = await this.deviceControlStore.startRemoteConnect()
 
       startRemoteConnectResult.donePromise.then(({ data }) => {
-        const debugCommand = device.manufacturer === 'Apple' ? `curl http://${data}/status` : `adb connect ${data}`
+        this.debugCommand =
+          device.manufacturer === 'Apple'
+            ? `curl http://${data}/status`
+            : device.manufacturer && device.model
+              ? `adb connect ${data}`
+              : `sdb connect ${data}`
 
-        this.debugCommand = debugCommand
-
-        console.info(debugCommand)
+        console.info(this.debugCommand)
       })
 
       await this.groupService.invite(this.serial, device.channel, device.group)
