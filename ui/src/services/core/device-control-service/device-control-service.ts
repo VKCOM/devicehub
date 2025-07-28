@@ -62,6 +62,12 @@ export class DeviceControlService {
     })
   }
 
+  async setAirplaneMode(state: boolean): Promise<InitializeTransactionReturn> {
+    return await this.sendTwoWay('airplane.set', {
+      enabled: state,
+    })
+  }
+
   // NOTE: I have no idea where this method used
   touchMoveIos({ x, y, pX, pY, pressure, contact, seq }: TouchMoveIosArgs): void {
     this.sendOneWay('input.touchMoveIos', {
@@ -280,7 +286,7 @@ export class DeviceControlService {
 
     const device = await this.deviceBySerialStore.fetch()
 
-    const platformSpecificAction = device?.ios ? `${action}Ios` : action
+    const platformSpecificAction = device?.platform != 'Android' ? `${action}Ios` : action
 
     socket.emit(platformSpecificAction, device?.channel, initializeTransaction.channel, data)
 

@@ -297,7 +297,7 @@ export class GroupItemService {
   async getGroupUsersEmails(users: Row<DataWithGroupStatus<GroupUser>>[]): Promise<string> {
     const currentUserProfileStore = await this.currentUserProfileStore.fetch()
 
-    const emailSeparator = currentUserProfileStore.settings?.emailAddressSeparator
+    const emailSeparator = currentUserProfileStore?.settings?.emailAddressSeparator
     const emails: string[] = users.map((item) => item.getValue(GroupUsersColumnIds.EMAIL))
     const uniqueEmail = Array.from(new Set(emails))
 

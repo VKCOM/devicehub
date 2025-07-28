@@ -242,7 +242,7 @@ def test_return_devices_after_delete_bookable_group(
     # delete bookable group
     response = delete_group.sync_detailed(id=bookable_group.id, client=api_client)
     successful_response_check(response, description='Deleted (groups)')
-    sleep(1)
+    sleep(2)
     # check device return to common group
     devices_in_group_check(serials=devices_serial, group_id=common_group_id, group_name='Common')
 

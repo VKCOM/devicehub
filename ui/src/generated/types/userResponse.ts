@@ -3,12 +3,12 @@
  * Do not edit manually.
  * DeviceHub
  * Control and manages real Smartphone devices from browser and restful apis
- * OpenAPI spec version: 1.3.10
+ * OpenAPI spec version: 1.4.7
  */
 import type { User } from './user'
 
 export interface UserResponse {
   description: string
   success: boolean
-  user: User
+  user?: User
 }

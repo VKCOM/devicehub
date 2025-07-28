@@ -1,6 +1,8 @@
 // eslint.config.js
+import {defineConfig} from 'eslint/config'
 
-export default [
+
+export default defineConfig([
     {
         ignores: ['dist'],
         languageOptions: {
@@ -166,4 +168,4 @@ export default [
             'no-async-promise-executor': 0,
         },
     }
-]
+])

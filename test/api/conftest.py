@@ -43,6 +43,12 @@ def base_url(request):
         pytest.fail(reason='Missed base_url')
     return f'{url}/api/v1'
 
+@pytest.fixture(scope='module')
+def base_ws_uri(request):
+    url = request.config.option.base_url
+    if url is None:
+        pytest.fail(reason='Missed base_url')
+    return f'{url.replace("https", "wss")}/socket.io/?EIO=4&transport=websocket'
 
 @pytest.fixture()
 def api_client(token_from_params, base_url):
@@ -201,7 +207,7 @@ def random_choice():
 @pytest.fixture()
 def fake_device_field_check():
     def fake_device_field_check_func(device_dict):
-        equal(len(device_dict.values()), 33)
+        equal(len(device_dict.values()), 34)
         equal(len(device_dict.get('provider').values()), 2)
         # for local run pass need add runUrl to device.group
         greater_equal(len(device_dict.get('group').values()), 9, device_dict.get('group').keys())
@@ -405,7 +411,6 @@ def devices_serial(successful_response_check, api_client):
 @pytest.fixture()
 def successful_response_check():
     def successful_response_check_func(response, status_code=200, description=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         is_true(response.parsed.success)
         if description is not None:
@@ -417,7 +422,6 @@ def successful_response_check():
 @pytest.fixture()
 def unsuccess_response_check():
     def unsuccess_response_check_func(response, status_code=400, description=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         response_content = json.loads(response.content)
         is_false(response_content['success'])
@@ -429,7 +433,6 @@ def unsuccess_response_check():
 @pytest.fixture()
 def failure_response_check():
     def failure_response_check_func(response, status_code=401, message=None):
-        # print(f'\n!!!DEBUG!!!\n{response}\n=================')
         equal(response.status_code, status_code)
         response_content = json.loads(response.content)
         if message is not None:

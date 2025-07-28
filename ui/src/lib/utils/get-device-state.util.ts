@@ -38,7 +38,7 @@ export const getDeviceState = (data: Device): DeviceState => {
 
   if (
     (data.status === 3 && data.ready && (!data.using || isDeviceUsedByMistake) && !data.owner) ||
-    (data.status === 6 && data.ios)
+    (data.status === 6 && data.manufacturer === 'Apple')
   ) {
     return DeviceState.AVAILABLE
   }

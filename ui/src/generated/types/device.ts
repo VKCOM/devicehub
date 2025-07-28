@@ -3,7 +3,7 @@
  * Do not edit manually.
  * DeviceHub
  * Control and manages real Smartphone devices from browser and restful apis
- * OpenAPI spec version: 1.3.10
+ * OpenAPI spec version: 1.4.7
  */
 import type { DeviceBattery } from './deviceBattery'
 import type { DeviceBrowser } from './deviceBrowser'
@@ -37,7 +37,6 @@ export interface Device {
   display?: DeviceDisplay
   group?: DeviceGroup
   image?: string
-  ios?: boolean
   iosClientChannel?: string
   likelyLeaveReason?: string
   logs_enabled?: boolean

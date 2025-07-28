@@ -3,7 +3,7 @@
  * Do not edit manually.
  * DeviceHub
  * Control and manages real Smartphone devices from browser and restful apis
- * OpenAPI spec version: 1.3.10
+ * OpenAPI spec version: 1.4.7
  */
 
 export interface UnexpectedErrorResponse {

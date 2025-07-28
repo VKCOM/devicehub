@@ -59,7 +59,8 @@ export class SettingsService {
   }
 
   async init(): Promise<void> {
-    const { settings } = await this.currentUserProfileStore.fetch()
+    const user = await this.currentUserProfileStore.fetch()
+    const settings = user?.settings
     const alertMessage = await this.alertMessageQuery.fetch()
 
     runInAction(() => {

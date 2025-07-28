@@ -1,13 +1,14 @@
 import { useInjection } from 'inversify-react'
 import { useTranslation } from 'react-i18next'
 import { Icon20BugOutline, Icon20CopyOutline } from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
 
 import { OutputField } from '@/components/lib/output-field'
 import { ContentCard } from '@/components/lib/content-card'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
-export const RemoteDebugControl = ({ className }: { className?: string }) => {
+export const RemoteDebugControl = observer(({ className }: { className?: string }) => {
   const { t } = useTranslation()
 
   const deviceConnection = useInjection(CONTAINER_IDS.deviceConnection)
@@ -25,4 +26,4 @@ export const RemoteDebugControl = ({ className }: { className?: string }) => {
       <OutputField text={deviceConnection.debugCommand} />
     </ContentCard>
   )
-}
+})

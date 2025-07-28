@@ -121,6 +121,7 @@ enum MessageType {
     InstallResultMessage              = 1210;
     UnlockDeviceMessage               = 1211;
     CapabilitiesMessage               = 1212;
+    AirplaneSetMessage                = 1213;
     ConnectGetForwardUrlMessage = 9000;
     GetServicesAvailabilityMessage = 9001;
     BluetoothSetEnabledMessage = 9002;
@@ -822,6 +823,10 @@ enum RingerMode {
     SILENT = 0;
     VIBRATE = 1;
     NORMAL = 2;
+}
+
+message AirplaneSetMessage {
+  required bool enabled = 1;
 }
 
 message RingerSetMessage {

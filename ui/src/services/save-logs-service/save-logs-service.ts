@@ -42,7 +42,7 @@ export class SaveLogsService {
     const parsedLogs = this.parseLogsToDefinedExtension(
       this.logcatService.deviceLogs,
       this.selectedExtension,
-      device?.ios ? 'IOS' : 'Android'
+      device?.manufacturer === 'Apple' ? 'Apple' : 'Android'
     )
     const mimeType = this.selectedExtension === 'json' ? 'application/json;charset=utf-8' : 'text/plain;charset=utf-8'
 

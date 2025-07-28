@@ -1,4 +1,4 @@
-import { FormItem, FormLayoutGroup } from '@vkontakte/vkui'
+import { FormItem, FormLayoutGroup, SelectionControl, Switch } from '@vkontakte/vkui'
 import { useTranslation } from 'react-i18next'
 import {
   Icon24Play,
@@ -24,6 +24,7 @@ import {
 } from '@vkontakte/icons'
 import { observer } from 'mobx-react-lite'
 import { useInjection } from 'inversify-react'
+import { useMutation } from '@tanstack/react-query'
 
 import { ContentCard } from '@/components/lib/content-card'
 
@@ -39,6 +40,12 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
   const deviceControlStore = useInjection(CONTAINER_IDS.deviceControlStore)
   const deviceBySerialStore = useInjection(CONTAINER_IDS.deviceBySerialStore)
   const { data: device } = deviceBySerialStore.deviceQueryResult()
+  const airplaneMutation = useMutation({
+    mutationFn: async ({ enabled }: { enabled: boolean }) => {
+      const tr = await deviceControlStore.setAirplaneMode(enabled)
+      await tr.donePromise
+    },
+  })
 
   return (
     <ContentCard
@@ -69,7 +76,7 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
               tooltipText={t('Camera')}
               onClick={() => deviceControlStore.camera()}
             />
-            {device?.ios === undefined && (
+            {device?.platform === 'Android' && (
               <ButtonControl
                 icon={<Icon28TextOutline />}
                 tooltipText={t('Switch Charset')}
@@ -102,7 +109,7 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
             />
           </div>
         </FormItem>
-        {device?.ios === undefined && (
+        {device?.platform === 'Android' && (
           <>
             <FormItem top={t('Special actions')}>
               <div className={styles.buttonsContainer}>
@@ -143,6 +150,18 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
                   tooltipText={t('Change language')}
                   onClick={() => deviceControlStore.openLanguageChange()}
                 />
+              </div>
+              <div className={styles.buttonsContainer}>
+                <SelectionControl>
+                  <Switch
+                    checked={device?.airplaneMode}
+                    disabled={airplaneMutation.isPending}
+                    onChange={(event) => {
+                      airplaneMutation.mutate({ enabled: event.target.checked })
+                    }}
+                  />
+                  <SelectionControl.Label>{t('Airplane Mode')}</SelectionControl.Label>
+                </SelectionControl>
               </div>
             </FormItem>
             <FormItem top={t('Font size')}>

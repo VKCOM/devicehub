@@ -87,7 +87,7 @@ export class TouchService {
     const scaled = this.getScaledCoords({
       displayWidth: device.display.width,
       displayHeight: device.display.height,
-      isIosDevice: !!device.ios,
+      isIosDevice: device.manufacturer === 'Apple',
       mousePageX,
       mousePageY,
       screenBoundingRect,
@@ -162,7 +162,7 @@ export class TouchService {
     const scaled = this.getScaledCoords({
       displayWidth: device.display.width,
       displayHeight: device.display.height,
-      isIosDevice: !!device.ios,
+      isIosDevice: device.manufacturer === 'Apple',
       mousePageX,
       mousePageY,
       screenBoundingRect,
@@ -173,7 +173,7 @@ export class TouchService {
     if (
       (Math.abs(this.prevCoords.x - scaled.coords.xP) >= 0.1 ||
         Math.abs(this.prevCoords.y - scaled.coords.yP) >= 0.1) &&
-      !!device.ios
+      device.manufacturer === 'Apple'
     ) {
       this.deviceControlStore.touchMoveIos({
         x: scaled.coords.xP,
@@ -218,7 +218,7 @@ export class TouchService {
     const scaled = this.getScaledCoords({
       displayWidth: device.display.width,
       displayHeight: device.display.height,
-      isIosDevice: !!device.ios,
+      isIosDevice: device.manufacturer === 'Apple',
       mousePageX,
       mousePageY,
       screenBoundingRect,
@@ -239,12 +239,12 @@ export class TouchService {
       pressure,
     })
 
-    if (addGhostFinger && !!device.ios) {
+    if (addGhostFinger && device.manufacturer === 'Apple') {
       // TODO: implement touchDownIos
       // this.deviceControlStore.touchDownIos(this.nextSeq(), 1, 1 - scaled.coords.xP, 1 - scaled.coords.yP, pressure)
     }
 
-    if (addGhostFinger && !device.ios) {
+    if (addGhostFinger && device.manufacturer !== 'Apple') {
       this.deviceControlStore.touchDown({
         seq: this.nextSeq(),
         contact: 1,
@@ -341,7 +341,7 @@ export class TouchService {
       const scaled = this.getScaledCoords({
         displayWidth: device.display.width,
         displayHeight: device.display.height,
-        isIosDevice: !!device.ios,
+        isIosDevice: device.manufacturer === 'Apple',
         mousePageX: touch.pageX,
         mousePageY: touch.pageY,
         screenBoundingRect,
@@ -351,7 +351,7 @@ export class TouchService {
 
       const pressure = touch.force || 0.5
 
-      if (!device.ios) {
+      if (device.manufacturer !== 'Apple') {
         this.deviceControlStore.touchDown({
           seq: this.nextSeq(),
           contact: slot,
@@ -383,7 +383,7 @@ export class TouchService {
       const scaled = this.getScaledCoords({
         displayWidth: device.display.width,
         displayHeight: device.display.height,
-        isIosDevice: !!device.ios,
+        isIosDevice: device.manufacturer === 'Apple',
         mousePageX: touch.pageX,
         mousePageY: touch.pageY,
         screenBoundingRect,

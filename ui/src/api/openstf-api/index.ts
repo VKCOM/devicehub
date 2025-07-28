@@ -123,7 +123,7 @@ export const getDeviceBySerial = async (serial: string, params?: GetDeviceBySeri
   return data.device
 }
 
-export const getCurrentUserProfile = async (): Promise<User> => {
+export const getCurrentUserProfile = async (): Promise<User | undefined> => {
   const { data } = await openstfApiClient.get<UserResponse>(OPENSTF_API_ROUTES.user)
 
   return data.user

@@ -18,7 +18,7 @@ export class CurrentUserProfileStore {
     this.profileQuery = mobxQueryFactory(() => ({ ...queries.user.profile, staleTime: Infinity }))
   }
 
-  get profileQueryResult(): QueryObserverResult<User> {
+  get profileQueryResult(): QueryObserverResult<User | undefined> {
     return this.profileQuery.result
   }
 
@@ -26,7 +26,7 @@ export class CurrentUserProfileStore {
     return this.profileQueryResult.data?.privilege === 'admin'
   }
 
-  fetch(): Promise<User> {
+  fetch(): Promise<User | undefined> {
     return this.profileQuery.fetch()
   }
 }

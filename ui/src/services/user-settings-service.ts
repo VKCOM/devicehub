@@ -62,7 +62,7 @@ export class UserSettingsService extends ListManagementService<'email', Settings
   async getUserEmails(): Promise<string> {
     const currentUserProfileStore = await this.currentUserProfileStore.fetch()
 
-    const emailSeparator = currentUserProfileStore.settings?.emailAddressSeparator
+    const emailSeparator = currentUserProfileStore?.settings?.emailAddressSeparator
     const emails: string[] = this.selectedItems.map((item) => item.email || '')
     const uniqueEmail = Array.from(new Set(emails))
 

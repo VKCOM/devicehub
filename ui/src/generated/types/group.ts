@@ -3,7 +3,7 @@
  * Do not edit manually.
  * DeviceHub
  * Control and manages real Smartphone devices from browser and restful apis
- * OpenAPI spec version: 1.3.10
+ * OpenAPI spec version: 1.4.7
  */
 import type { GroupClass } from './groupClass'
 import type { GroupDatesItem } from './groupDatesItem'
@@ -27,6 +27,7 @@ export interface Group {
   id?: string
   isActive?: boolean
   lock?: GroupLock
+  moderators?: string[]
   name?: string
   owner?: GroupOwner
   privilege?: string

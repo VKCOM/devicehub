@@ -1,7 +1,7 @@
 from pytest_check import equal
 
 from devicehub_client.api.admin import create_service_user
-from devicehub_client.api.user import get_access_token
+from devicehub_client.api.user import create_access_token
 from devicehub_client.api.users import get_users
 
 
@@ -10,9 +10,10 @@ def test_bearer_jwt_token_authentication(api_client, successful_response_check):
     response = get_users.sync_detailed(client=api_client)
     successful_response_check(response, description='Users Information')
 
-def test_bearer_legacy_token_authentication(api_client, successful_response_check, api_client_custom_token):
+def test_bearer_legacy_token_authentication(api_client, successful_response_check, api_client_custom_token, random_str):
     """Test legacy Bearer token authentication"""
-    response = get_access_token.sync_detailed(api_client.token, client=api_client)
+    response = create_access_token.sync_detailed(client=api_client, title=random_str())
+    successful_response_check(response, status_code=201, description='Created (access token)')
     legacy_client = api_client_custom_token(response.parsed.token.id)
     response = get_users.sync_detailed(client=legacy_client)
     successful_response_check(response, description='Users Information')

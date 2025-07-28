@@ -66,7 +66,6 @@ class Device:
         phone (Union[Unset, DevicePhone]):
         platform (Union[Unset, str]):
         ios_client_channel (Union[Unset, str]):
-        ios (Union[Unset, bool]):
         product (Union[Unset, str]):
         ram (Union[Unset, str]):
         sdk (Union[Unset, str]):
@@ -124,7 +123,6 @@ class Device:
     phone: Union[Unset, "DevicePhone"] = UNSET
     platform: Union[Unset, str] = UNSET
     ios_client_channel: Union[Unset, str] = UNSET
-    ios: Union[Unset, bool] = UNSET
     product: Union[Unset, str] = UNSET
     ram: Union[Unset, str] = UNSET
     sdk: Union[Unset, str] = UNSET
@@ -266,8 +264,6 @@ class Device:
 
         ios_client_channel = self.ios_client_channel
 
-        ios = self.ios
-
         product = self.product
 
         ram = self.ram
@@ -391,8 +387,6 @@ class Device:
             field_dict["platform"] = platform
         if ios_client_channel is not UNSET:
             field_dict["iosClientChannel"] = ios_client_channel
-        if ios is not UNSET:
-            field_dict["ios"] = ios
         if product is not UNSET:
             field_dict["product"] = product
         if ram is not UNSET:
@@ -619,8 +613,6 @@ class Device:
 
         ios_client_channel = d.pop("iosClientChannel", UNSET)
 
-        ios = d.pop("ios", UNSET)
-
         product = d.pop("product", UNSET)
 
         ram = d.pop("ram", UNSET)
@@ -721,7 +713,6 @@ class Device:
             phone=phone,
             platform=platform,
             ios_client_channel=ios_client_channel,
-            ios=ios,
             product=product,
             ram=ram,
             sdk=sdk,
