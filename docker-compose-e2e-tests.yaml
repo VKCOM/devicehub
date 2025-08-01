@@ -66,7 +66,7 @@ services:
       - STF_ADMIN_NAME=administrator
     command: stf local --adb-host emulator --public-ip 0.0.0.0 --provider-min-port 7400 --provider-max-port 7500
     healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://devicehub:7100/auth/contact"]
+      test: ["CMD", "curl", "-f", "http://devicehub:7100/auth/contact"]
       interval: 20s
       timeout: 10s
       retries: 10
