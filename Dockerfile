@@ -52,8 +52,9 @@ RUN rm -rf ./ui
 COPY --from=builder /app/ui/dist ./ui/dist
 
 RUN ln -s /app/bin/stf.mjs /app/bin/stf && \
-    ln -s /app/bin/stf.mjs /app/bin/devicehub
+    ln -s /app/bin/stf.mjs /app/bin/devicehub && \
+    ln -s /app/bin/stf.mjs /app/bin/dh
 
 USER devicehub-user
 
-CMD ["stf", "--help"]
+CMD ["devicehub", "--help"]
