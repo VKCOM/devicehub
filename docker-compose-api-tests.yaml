@@ -40,7 +40,7 @@ services:
         test: [ "CMD", "curl", "-f", "http://devicehub:7100/auth/contact" ]
         interval: 20s
         timeout: 10s
-        retries: 5
+        retries: 10
     depends_on:
         mongosetup:
             condition: service_completed_successfully
@@ -66,7 +66,7 @@ services:
           - -c
           - |
              . /scripts/token.sh &&
-             pytest --reruns 2 ./ --token=$$STF_TOKEN --base-url=http://devicehub:7100 --log-cli-level=DEBUG -vv
+             pytest --numprocesses 1 --reruns 2 ./ --token=$$STF_TOKEN --base-url=http://devicehub:7100 --log-cli-level=DEBUG -vv
       volumes:
           - ./scripts/token.sh:/scripts/token.sh
       depends_on:
