@@ -41,6 +41,11 @@ jobs:
         continue-on-error: true
         run: docker compose -f docker-compose-api-tests.yaml logs devicehub
 
+      - name: Show healthchek status for devicehub
+        if: always()
+        continue-on-error: true
+        run: docker inspect --format "{{json .State.Health }}" devicehub | jq
+
       - name: Show logs for devicehub-generate-fake-device
         if: always()
         continue-on-error: true
