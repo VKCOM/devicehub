@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     yasm \
     libzmq3-dev \
     libprotobuf-dev \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -40,6 +39,11 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 EXPOSE 3000
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 
 RUN useradd --system --create-home --shell /usr/sbin/nologin devicehub-user
 
