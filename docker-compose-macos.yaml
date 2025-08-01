@@ -66,7 +66,6 @@ services:
             devicehub:
     devicehub-migrate:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-migrate
         env_file:
             - scripts/variables.env
@@ -78,7 +77,6 @@ services:
             devicehub:
     devicehub-app:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-app
         env_file:
             - scripts/variables.env
@@ -91,7 +89,6 @@ services:
             devicehub:
     devicehub-auth:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-auth
         env_file:
             - scripts/variables.env
@@ -104,7 +101,6 @@ services:
             devicehub:
     devicehub-processor:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-processor
         env_file:
             - scripts/variables.env
@@ -117,7 +113,6 @@ services:
             devicehub:
     devicehub-reaper:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-reaper
         env_file:
             - scripts/variables.env
@@ -130,7 +125,6 @@ services:
             devicehub:
     devicehub-storage-plugin-apk:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-storage-plugin-apk
         env_file:
             - scripts/variables.env
@@ -143,7 +137,6 @@ services:
             devicehub:
     devicehub-storage-plugin-image:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-storage-plugin-image
         env_file:
             - scripts/variables.env
@@ -156,7 +149,6 @@ services:
             devicehub:
     devicehub-storage-temp:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-storage-temp
         env_file:
             - scripts/variables.env
@@ -169,7 +161,6 @@ services:
             devicehub:
     devicehub-triproxy-app:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-triproxy-app
         env_file:
             - scripts/variables.env
@@ -186,7 +177,6 @@ services:
             devicehub:
     devicehub-triproxy-dev:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-triproxy-dev
         env_file:
             - scripts/variables.env
@@ -203,7 +193,6 @@ services:
             devicehub:
     devicehub-websocket:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-websocket
         env_file:
             - scripts/variables.env
@@ -216,7 +205,6 @@ services:
             devicehub:
     devicehub-api:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-api
         env_file:
             - scripts/variables.env
@@ -229,7 +217,6 @@ services:
             devicehub:
     devicehub-api-groups-engine:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-api-groups-engine
         env_file:
             - scripts/variables.env
@@ -242,7 +229,6 @@ services:
             devicehub:
     devicehub-provider:
         build: .
-        image: vkcom/devicehub
         container_name: devicehub-provider
         env_file:
             - scripts/variables.env
