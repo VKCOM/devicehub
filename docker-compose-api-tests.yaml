@@ -40,7 +40,7 @@ services:
         test: [ "CMD", "curl", "-f", "http://devicehub:7100/auth/contact" ]
         interval: 20s
         timeout: 10s
-        retries: 5
+        retries: 10
     depends_on:
         mongosetup:
             condition: service_completed_successfully
