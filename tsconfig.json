@@ -22,9 +22,5 @@
     "outDir": "dist"
   },
   "include": ["./lib/**/*.js", "./lib/types/**/*.d.ts", "./lib/**/*.ts"],
-  "verbose": true,
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node",
-  }
+  "verbose": true
 }
