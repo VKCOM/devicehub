@@ -50,7 +50,8 @@ COPY --from=builder /app .
 RUN rm -rf ./ui
 COPY --from=builder /app/ui/dist ./ui/dist
 
-RUN tsc
+RUN npm install -g typescript && \
+    tsc
 
 RUN ln -s /app/bin/stf.mjs /app/bin/stf && \
     ln -s /app/bin/stf.mjs /app/bin/devicehub && \
