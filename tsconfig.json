@@ -14,13 +14,17 @@
     "allowJs": true,
     "noEmit": true,
     "declaration": true,
-    "target": "ES2016",
+    "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["ES2016"],
+    "lib": ["ES2020"],
     "types": ["node"],
     "outDir": "dist"
   },
   "include": ["./lib/**/*.js", "./lib/types/**/*.d.ts", "./lib/**/*.ts"],
-  "verbose": true
+  "verbose": true,
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+  }
 }

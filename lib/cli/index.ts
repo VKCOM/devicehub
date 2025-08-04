@@ -4,9 +4,6 @@
 
 import yargs from 'yargs'
 import {hideBin} from 'yargs/helpers'
-// import Promise from 'bluebird'
-// Promise.longStackTraces()
-
 import * as api from './api/index.js'
 import * as app from './app/index.js'
 import * as authLdap from './auth-ldap/index.js'
