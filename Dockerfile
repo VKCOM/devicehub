@@ -42,14 +42,15 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm install -g tsx
+    && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --system --create-home --shell /usr/sbin/nologin devicehub-user
 
 COPY --from=builder /app .
 RUN rm -rf ./ui
 COPY --from=builder /app/ui/dist ./ui/dist
+
+RUN tsc
 
 RUN ln -s /app/bin/stf.mjs /app/bin/stf && \
     ln -s /app/bin/stf.mjs /app/bin/devicehub && \

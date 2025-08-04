@@ -24,7 +24,9 @@
     "lint": "eslint ./lib",
     "build:swagger:tests": "cd ./test/api && poetry run just regen-schema",
     "build:swagger:ui": "cd ./ui && npm run generate-api",
-    "build:swagger": "cd ./lib/units/api && python3 ./gen_routes.py & npm run build:swagger:ui"
+    "build:swagger": "cd ./lib/units/api && python3 ./gen_routes.py & npm run build:swagger:ui",
+    "build": "tsc",
+    "dev": "tsx ./bin/devstf.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.772.0",
