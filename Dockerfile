@@ -42,8 +42,8 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     curl \
-    && rm -rf /var/lib/apt/lists/*
-
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g tsx
 
 RUN useradd --system --create-home --shell /usr/sbin/nologin devicehub-user
 
