@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
 COPY . .
 
 RUN npm ci --python="/usr/bin/python3" --loglevel http && \
+    ./node_modules/.bin/tsc && \
     npm prune --production
 
 WORKDIR /app/ui
@@ -49,9 +50,6 @@ RUN useradd --system --create-home --shell /usr/sbin/nologin devicehub-user
 COPY --from=builder /app .
 RUN rm -rf ./ui
 COPY --from=builder /app/ui/dist ./ui/dist
-
-RUN npm install -g typescript && \
-    tsc
 
 RUN ln -s /app/bin/stf.mjs /app/bin/stf && \
     ln -s /app/bin/stf.mjs /app/bin/devicehub && \
