@@ -2,6 +2,13 @@ import { socket } from '@/api/socket'
 
 import { KEYBOARD_KEYS_MAP } from '@/constants/keyboard-keys-map'
 
+import type {
+  ApplicationAsset,
+  ApplicationAssetsList,
+  ApplicationKillResult,
+  ApplicationLaunchResult,
+  ApplicationsList
+} from '@/types/application.type.ts';
 import type { FSListMessage } from '@/types/fs-list-message.type'
 import type { TransactionFactory } from '@/types/transaction-factory.type'
 import type { DeviceBySerialStore } from '@/store/device-by-serial-store'
@@ -163,7 +170,7 @@ export class DeviceControlService {
     })
   }
 
-  install(options: InstallOptions): Promise<InitializeTransactionReturn> {
+  install(options: InstallOptions): Promise<InitializeTransactionReturn<ApplicationLaunchResult>> {
     return this.sendTwoWay('device.install', options)
   }
 
@@ -171,6 +178,38 @@ export class DeviceControlService {
     return this.sendTwoWay('device.uninstall', {
       packageName,
     })
+  }
+
+  getApps(): Promise<InitializeTransactionReturn<ApplicationsList>> {
+    return this.sendTwoWay('device.getApps')
+  }
+
+  launchApp(pkg: string): Promise<InitializeTransactionReturn<ApplicationLaunchResult>> {
+    return this.sendTwoWay('device.launchApp', {pkg})
+  }
+
+  terminateApp(): Promise<InitializeTransactionReturn<ApplicationKillResult>> {
+    return this.sendTwoWay('app.kill')
+  }
+
+  killApp(): Promise<InitializeTransactionReturn<ApplicationKillResult>> {
+    return this.sendTwoWay('app.kill', {force: true})
+  }
+
+  getAppAssetList(): Promise<InitializeTransactionReturn<ApplicationAssetsList>> {
+    return this.sendTwoWay('app.getAssetList')
+  }
+
+  getAppAsset(url: string): Promise<InitializeTransactionReturn<ApplicationAsset>> {
+    return this.sendTwoWay('app.getAsset', {url})
+  }
+
+  getAppHTML(): Promise<InitializeTransactionReturn<ApplicationAsset<false>>> {
+    return this.sendTwoWay('app.getAppHTML')
+  }
+
+  getAppInspectServerUrl(): Promise<InitializeTransactionReturn<string>> {
+    return this.sendTwoWay('app.getInspectServerUrl')
   }
 
   reboot(): Promise<InitializeTransactionReturn> {
@@ -286,7 +325,7 @@ export class DeviceControlService {
 
     const device = await this.deviceBySerialStore.fetch()
 
-    const platformSpecificAction = device?.platform != 'Android' ? `${action}Ios` : action
+    const platformSpecificAction = device?.manufacturer === 'Apple' ? `${action}Ios` : action
 
     socket.emit(platformSpecificAction, device?.channel, initializeTransaction.channel, data)
 

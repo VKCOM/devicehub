@@ -301,6 +301,7 @@ export default tseslint.config(
       'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
       'consistent-return': 'error',
       'no-alert': 'error',
+      'no-async-promise-executor': 'off',
       'no-param-reassign': [
         'error',
         {
@@ -310,7 +311,7 @@ export default tseslint.config(
       ],
       'object-shorthand': 'error',
       'no-else-return': ['error', { allowElseIf: false }],
-      'no-else/no-else': 'error',
+      'no-else/no-else': 'off',
       'no-restricted-syntax': [
         'error',
         {

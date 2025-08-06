@@ -1,0 +1,194 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--vkui--color_background);
+  overflow: hidden;
+}
+
+.content {
+  overflow: hidden;
+  flex: 1;
+}
+
+.tabContent {
+  height: 100%;
+  overflow: hidden;
+  padding: 8px 12px;
+}
+
+.tabsContainer {
+  border-top: 1px solid var(--vkui--color_separator_primary);
+  background-color: var(--vkui--color_background);
+  height: 45px;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitContainer .gutter {
+  background-color: var(--vkui--color_separator_primary);
+  cursor: row-resize;
+}
+
+.splitContainer .gutter:hover {
+  background-color: var(--vkui--color_background_accent);
+}
+
+.consolePanel {
+  flex: 1;
+  border-top: 1px solid var(--vkui--color_separator_primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.consoleFeed {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.consoleInput {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--vkui--color_separator_primary);
+  background-color: var(--vkui--color_background);
+}
+
+.consoleInput input {
+  flex: 1;
+}
+
+.domContent {
+  height: 100%;
+}
+
+.htmlDisplay {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--vkui--color_text_primary);
+  background-color: var(--vkui--color_background_secondary);
+  border: 1px solid var(--vkui--color_separator_primary);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+}
+
+.assetsContent {
+  height: 100%;
+}
+
+.assetsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.assetItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+}
+
+.assetItem:last-child {
+  border-bottom: none;
+}
+
+.assetInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.assetName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vkui--color_text_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.assetType {
+  font-size: 12px;
+  color: var(--vkui--color_text_secondary);
+}
+
+.downloadButton {
+  background-color: var(--vkui--color_background_accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.downloadButton:hover {
+  background-color: var(--vkui--color_background_accent_themed);
+}
+
+.downloadButton:active {
+  transform: scale(0.95);
+}
+
+.emptyContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--vkui--color_text_secondary);
+  font-size: 14px;
+}
+
+.consoleTabActive {
+  color: var(--vkui--color_background_accent) !important;
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: 12px;
+}
+
+.loadingText {
+  color: var(--vkui--color_text_secondary);
+  font-size: 14px;
+}
+
+.errorState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  padding: 16px;
+}
+
+.errorText {
+  color: var(--vkui--color_text_negative);
+  font-size: 14px;
+  text-align: center;
+  background-color: var(--vkui--color_background_negative);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--vkui--color_stroke_negative);
+}

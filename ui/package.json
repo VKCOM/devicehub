@@ -38,6 +38,7 @@
     "@vkontakte/vkui": "^7.1.2",
     "axios": "^1.11.0",
     "classnames": "^2.5.1",
+    "console-feed": "^3.8.0",
     "date-fns": "^4.1.0",
     "i18next": "^23.16.0",
     "i18next-browser-languagedetector": "^8.0.0",

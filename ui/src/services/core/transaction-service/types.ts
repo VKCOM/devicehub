@@ -34,4 +34,5 @@ export type InstallOptions = {
   href: string
   manifest: Manifest
   launch: boolean
+  pkg?: string
 }

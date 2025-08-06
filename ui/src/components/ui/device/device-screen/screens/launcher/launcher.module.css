@@ -1,0 +1,183 @@
+.appItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  overflow: hidden;
+}
+
+.appItem:hover {
+  background-color: var(--vkui--color_background_secondary);
+}
+
+.appItem:last-child {
+  border-bottom: none;
+}
+
+.appInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.appName {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--vkui--color_text_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appPackage {
+  font-size: 14px;
+  color: var(--vkui--color_text_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.buttonContainer {
+  position: absolute;
+  right: -300px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.appItem:hover .buttonContainer {
+  right: 16px;
+}
+
+.launchButton {
+  background-color: var(--vkui--color_background_accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.launchButton:hover {
+  background-color: var(--vkui--color_background_accent_themed);
+}
+
+.launchButton:active {
+  transform: scale(0.95);
+}
+
+.launchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.abortButton {
+  background-color: var(--vkui--color_background_negative);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.abortButton:hover {
+  background-color: var(--vkui--color_background_negative_tint);
+}
+
+.abortButton:active {
+  transform: scale(0.95);
+}
+
+.runningButton {
+  background-color: var(--vkui--color_background_positive);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.runningButton:hover {
+  background-color: var(--vkui--color_background_positive_tint);
+}
+
+.runningButton:active {
+  transform: scale(0.95);
+}
+
+.terminatingButton {
+  background-color: var(--vkui--color_background_negative);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: not-allowed;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+
+.terminateButton {
+  background-color: var(--vkui--color_background_negative);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.terminateButton:hover {
+  background-color: var(--vkui--color_background_negative_tint);
+}
+
+.terminateButton:active {
+  transform: scale(0.95);
+}
+
+.killButton {
+  background-color: var(--vkui--color_background_negative);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.killButton:hover {
+  background-color: var(--vkui--color_background_negative_tint);
+}
+
+.killButton:active {
+  transform: scale(0.95);
+}

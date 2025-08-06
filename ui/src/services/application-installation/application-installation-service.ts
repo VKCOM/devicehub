@@ -10,8 +10,6 @@ import { DeviceControlStore } from '@/store/device-control-store'
 import { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import { deviceConnectionRequired } from '@/config/inversify/decorators'
 
-import { InitializeTransactionReturn } from '../core/transaction-service/types'
-
 import type { Manifest } from '@/types/manifest.type'
 import type { Device, ErrorResponse } from '@/generated/types'
 import type { ActivityOptions, ActivityOptionsSet, RunActivityArgs, SelectOption } from './types'
@@ -32,6 +30,10 @@ export class ApplicationInstallationService {
   isError = false
   isInstalling = false
   isInstalled = false
+  isLaunching = false
+  isLaunched = false
+  isAndroid = false
+  installedApp = {name: '', pkg: ''}
   device: Device | undefined = undefined
 
   constructor(
@@ -55,6 +57,7 @@ export class ApplicationInstallationService {
 
     runInAction(() => {
       this.device = device
+      this.isAndroid = !(device.manufacturer === 'Apple' || device.platform === 'Tizen')
     })
   }
 
@@ -167,20 +170,23 @@ export class ApplicationInstallationService {
     this.progress = 0
     this.isInstalling = false
     this.isInstalled = false
+    this.isLaunching = false
+    this.isLaunched = false
     this.isError = false
     this.status = 'Initialization'
     this.href = ''
+    this.installedApp = {name: '', pkg: ''}
   }
 
   allowedFileExtensions(): string[] {
-    if (this.device?.manufacturer !== 'Apple') {
+    if (!this.isAndroid) {
       return ['.ipa', 'application/octet-stream']
     }
 
     return ['.apk', '.aab', 'application/x-authorware-bin', 'application/vnd.android.package-archive']
   }
 
-  async installFile(file: File): Promise<void> {
+  async installFile(file: File, pkg?: string): Promise<void> {
     this.isInstalling = true
 
     const type = file.name.split('.').pop() === 'apk' ? 'apk' : 'blob'
@@ -195,12 +201,14 @@ export class ApplicationInstallationService {
 
     this.href = data.resources.file.href
 
-    const install = await (async (): Promise<InitializeTransactionReturn> => {
-      if (this.device?.manufacturer === 'Apple') {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const install = await (async () => {
+      if (!this.isAndroid) {
         return await this.deviceControlStore.install({
           href: this.href,
           manifest: { application: { activities: {} } } as unknown as Manifest,
           launch: true,
+          pkg
         })
       }
 
@@ -243,6 +251,9 @@ export class ApplicationInstallationService {
 
         case 'launching_app': {
           this.status = 'Launching activity'
+          this.isInstalled = true
+          this.isLaunching = true
+          this.installedApp = {name: file.name, pkg: pkg || ''}
           break
         }
 
@@ -252,29 +263,32 @@ export class ApplicationInstallationService {
       }
     })
 
-    install.donePromise
-      .then((message) => {
-        if (typeof message === 'string') {
-          this.status = message
-        }
-
+    await install.donePromise
+      .then(() => {
         this.progress = 100
+
         this.isInstalling = false
         this.isInstalled = true
 
+        this.isLaunching = false
+        this.isLaunched = true
+
+        this.installedApp = {name: file.name, pkg: pkg || ''}
         unsubscribeToProgress()
       })
       .catch((error) => {
-        this.status = 'Error while installing'
+        this.status = `Error while installing: ${error?.cause || error?.message || error}`
         console.error('Error while installing: ', error)
-
-        if (error instanceof Error) {
-          this.status += `: ${error.cause}`
-        }
 
         this.isInstalling = false
         this.isInstalled = false
+
+        this.isLaunching = false
+        this.isLaunched = false
+
         this.isError = true
+
+        this.installedApp = {name: '', pkg: ''}
 
         unsubscribeToProgress()
       })

@@ -1,0 +1,169 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--vkui--color_background);
+  text-align: start;
+}
+
+.searchContainer {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--vkui--color_background);
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  padding: 12px 16px;
+}
+
+.scrollContainer {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.appList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.appItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  overflow: hidden;
+}
+
+.appItem:hover {
+  background-color: var(--vkui--color_background_secondary);
+}
+
+.appItem:last-child {
+  border-bottom: none;
+}
+
+.appInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.appName {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--vkui--color_text_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appPackage {
+  font-size: 14px;
+  color: var(--vkui--color_text_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.buttonContainer {
+  position: absolute;
+  right: -300px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.appItem:hover .buttonContainer {
+  right: 16px;
+}
+
+.installButton {
+  background-color: var(--vkui--color_background_accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.installButton:hover {
+  background-color: var(--vkui--color_background_accent_themed);
+}
+
+.installButton:active {
+  transform: scale(0.95);
+}
+
+.abortButton {
+  background-color: var(--vkui--color_background_negative);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.abortButton:hover {
+  background-color: var(--vkui--color_background_negative_tint);
+}
+
+.abortButton:active {
+  transform: scale(0.95);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--vkui--color_text_secondary);
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.emptyStateText {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.emptyStateSubtext {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.headerContainer {
+  background-color: var(--vkui--color_background);
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  padding: 8px 16px;
+}

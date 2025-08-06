@@ -66,12 +66,14 @@ export class DeviceScreenStore {
     this.isScreenLoading = value
   }
 
+  async init(): Promise<void> {
+    this.device = await this.deviceBySerialStore.fetch()
+  }
+
   async startScreenStreaming(canvas: HTMLCanvasElement, canvasWrapper: HTMLDivElement): Promise<void> {
     runInAction(() => {
       this.setIsScreenLoading(true)
     })
-
-    const device = await this.deviceBySerialStore.fetch()
 
     // NOTE: Prevents ws connection if stopScreenStreaming was called earlier
     if (this.disposed) {
@@ -80,7 +82,6 @@ export class DeviceScreenStore {
       return
     }
 
-    this.device = device
     this.context = canvas.getContext('bitmaprenderer')
     this.canvasWrapper = canvasWrapper
 

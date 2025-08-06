@@ -127,6 +127,13 @@ enum MessageType {
     BluetoothSetEnabledMessage = 9002;
     BluetoothGetStatusMessage  = 9003;
     BluetoothCleanBondedMessage = 9004;
+    LaunchDeviceApp = 9005;
+    TerminateDeviceApp = 9006;
+    KillDeviceApp = 9007;
+    GetAppAsset = 9008;
+    GetAppAssetsList = 9009;
+    GetAppHTML = 9010;
+    GetAppInspectServerUrl = 9011;
 }
 
 message UpdateAccessTokenMessage {
@@ -717,6 +724,7 @@ message InstallMessage {
   optional string manifest = 4;
   repeated string installFlags = 5;
   optional string jwt = 6; // used for storage authorization
+  optional string pkg = 7; // used for .tpk installation via sdb
 }
 
 message UninstallMessage {
@@ -952,7 +960,7 @@ message TransationGetMessage {
   required string data = 2;
 }
 message GetInstalledApplications {
-  required string serial = 1;
+  // required string serial = 1;
   // optional string channel = 2;
 }
 message UpdateIosDevice{
@@ -992,4 +1000,27 @@ message UpdateRemoteConnectUrl {
 
 message IosServiceMessage {
   required bool hasAPNS= 1;
+}
+
+message LaunchDeviceApp {
+  required string pkg = 1;
+}
+
+message TerminateDeviceApp {
+}
+
+message KillDeviceApp {
+}
+
+message GetAppAsset {
+  required string url = 1;
+}
+
+message GetAppAssetsList {
+}
+
+message GetAppHTML {
+}
+
+message GetAppInspectServerUrl {
 }

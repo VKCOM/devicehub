@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--vkui--color_background);
+}
+
+.assetItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--vkui--size_base_padding_vertical--regular) var(--vkui--size_base_padding_horizontal--regular);
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.assetItem:hover {
+  background-color: var(--vkui--color_background_secondary);
+}
+
+.assetItem:last-child {
+  border-bottom: none;
+}
+
+.assetInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.assetName {
+  font-size: var(--vkui--font_text--font_size--regular);
+  font-weight: var(--vkui--font_text--font_weight--regular);
+  color: var(--vkui--color_text_primary);
+  margin-bottom: 2px;
+  word-break: break-all;
+}
+
+.assetSubtitle {
+  font-size: var(--vkui--font_caption--font_size--regular);
+  color: var(--vkui--color_text_secondary);
+  word-break: break-all;
+}
+
+.buttonContainer {
+  position: absolute;
+  right: -300px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.assetItem:hover .buttonContainer {
+  right: 16px;
+}
+
+.downloadButton {
+  flex-shrink: 0;
+}
+
+.downloadButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
