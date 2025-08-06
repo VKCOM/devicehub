@@ -1,9 +1,11 @@
 .container {
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+
   height: 100%;
+
   background-color: var(--vkui--color_background);
-  overflow: hidden;
 }
 
 .content {
@@ -12,28 +14,30 @@
 }
 
 .tabContent {
-  height: 100%;
   overflow: hidden;
+  height: 100%;
   padding: 8px 12px;
 }
 
 .tabsContainer {
-  border-top: 1px solid var(--vkui--color_separator_primary);
-  background-color: var(--vkui--color_background);
-  height: 45px;
   display: flex;
   flex-direction: column;
+
+  height: 45px;
+
+  background-color: var(--vkui--color_background);
+  border-top: 1px solid var(--vkui--color_separator_primary);
 }
 
 .splitContainer {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .splitContainer .gutter {
-  background-color: var(--vkui--color_separator_primary);
   cursor: row-resize;
+  background-color: var(--vkui--color_separator_primary);
 }
 
 .splitContainer .gutter:hover {
@@ -41,24 +45,27 @@
 }
 
 .consolePanel {
-  flex: 1;
-  border-top: 1px solid var(--vkui--color_separator_primary);
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  border-top: 1px solid var(--vkui--color_separator_primary);
 }
 
 .consoleFeed {
-  flex: 1;
   overflow-y: auto;
+  flex: 1;
 }
 
 .consoleInput {
   display: flex;
   gap: 8px;
+
   padding: 8px 12px;
-  border-top: 1px solid var(--vkui--color_separator_primary);
+
   background-color: var(--vkui--color_background);
+  border-top: 1px solid var(--vkui--color_separator_primary);
 }
 
 .consoleInput input {
@@ -70,18 +77,21 @@
 }
 
 .htmlDisplay {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  overflow-x: auto;
+
+  margin: 0;
+  padding: 12px;
+
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
   font-size: 12px;
   line-height: 1.4;
   color: var(--vkui--color_text_primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+
   background-color: var(--vkui--color_background_secondary);
   border: 1px solid var(--vkui--color_separator_primary);
   border-radius: 8px;
-  padding: 12px;
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-x: auto;
 }
 
 .assetsContent {
@@ -98,7 +108,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 12px 0;
+
   border-bottom: 1px solid var(--vkui--color_separator_primary);
 }
 
@@ -107,20 +119,22 @@
 }
 
 .assetInfo {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 4px;
+
   min-width: 0;
 }
 
 .assetName {
+  overflow: hidden;
+
   font-size: 14px;
   font-weight: 500;
   color: var(--vkui--color_text_primary);
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .assetType {
@@ -129,14 +143,18 @@
 }
 
 .downloadButton {
-  background-color: var(--vkui--color_background_accent);
-  color: white;
-  border: none;
-  border-radius: 6px;
+  cursor: pointer;
+
   padding: 6px 12px;
+
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
+  color: white;
+
+  background-color: var(--vkui--color_background_accent);
+  border: none;
+  border-radius: 6px;
+
   transition: background-color 0.2s ease;
 }
 
@@ -152,9 +170,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 200px;
-  color: var(--vkui--color_text_secondary);
+
   font-size: 14px;
+  color: var(--vkui--color_text_secondary);
 }
 
 .consoleTabActive {
@@ -164,31 +184,35 @@
 .loadingState {
   display: flex;
   flex-direction: column;
+  gap: 12px;
   align-items: center;
   justify-content: center;
+
   height: 200px;
-  gap: 12px;
 }
 
 .loadingText {
-  color: var(--vkui--color_text_secondary);
   font-size: 14px;
+  color: var(--vkui--color_text_secondary);
 }
 
 .errorState {
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 200px;
   padding: 16px;
 }
 
 .errorText {
-  color: var(--vkui--color_text_negative);
-  font-size: 14px;
-  text-align: center;
-  background-color: var(--vkui--color_background_negative);
   padding: 12px 16px;
-  border-radius: 8px;
+
+  font-size: 14px;
+  color: var(--vkui--color_text_negative);
+  text-align: center;
+
+  background-color: var(--vkui--color_background_negative);
   border: 1px solid var(--vkui--color_stroke_negative);
+  border-radius: 8px;
 }

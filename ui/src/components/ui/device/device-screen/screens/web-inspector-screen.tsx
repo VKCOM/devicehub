@@ -1,19 +1,19 @@
-import {observer} from 'mobx-react-lite'
-import {useEffect, useRef, useState} from 'react'
-import {useInjection} from 'inversify-react'
-import {Button, Spinner} from '@vkontakte/vkui'
-import {Icon24ArrowLeftOutline} from '@vkontakte/icons'
-import {Decode} from 'console-feed'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
+import { useInjection } from 'inversify-react'
+import { Button, Spinner } from '@vkontakte/vkui'
+import { Icon24ArrowLeftOutline } from '@vkontakte/icons'
+import { Decode } from 'console-feed'
 
-import {CONTAINER_IDS} from '@/config/inversify/container-ids'
-import {globalToast} from '@/store/global-toast'
+import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { globalToast } from '@/store/global-toast'
 
-import {Launcher} from './launcher'
-import {Inspector} from './inspector'
+import { Launcher } from './launcher'
+import { Inspector } from './inspector'
 
 import styles from './web-inspector-screen.module.css'
 
-import type {ApplicationsList, ApplicationAssetsListItem} from '@/types/application.type'
+import type { ApplicationsList, ApplicationAssetsListItem } from '@/types/application.type'
 
 type CurrentView = 'launcher' | 'inspector'
 
@@ -56,7 +56,7 @@ export const WebInspectorScreen = observer(() => {
 
   useEffect(() => {
     if (!inspectorConnection.current) {
-      return ()=>{}
+      return () => {}
     }
 
     inspectorConnection.current.onmessage = (event) => {
@@ -66,7 +66,7 @@ export const WebInspectorScreen = observer(() => {
       if (data.htmlUpdate) {
         setHTML(data.htmlUpdate)
       } else {
-        setConsoleLogs(prev => [...prev, Decode(data)])
+        setConsoleLogs((prev) => [...prev, Decode(data)])
       }
     }
 
@@ -107,7 +107,7 @@ export const WebInspectorScreen = observer(() => {
     }
   }
 
-  const connectInspectService = async() => {
+  const connectInspectService = async () => {
     if (inspectorConnection.current) {
       fetchHtmlContent()
 
@@ -126,7 +126,7 @@ export const WebInspectorScreen = observer(() => {
 
   const handleAppLaunch = async (pkg: string) => {
     try {
-      setAppStates(prev => ({ ...prev, [pkg]: 'launching' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'launching' }))
       const ldaReq = await deviceControlStore.launchApp(pkg)
       const response = await ldaReq.donePromise
 
@@ -135,12 +135,12 @@ export const WebInspectorScreen = observer(() => {
       }
 
       setLaunchedApp(pkg)
-      setAppStates(prev => ({ ...prev, [pkg]: 'running' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'running' }))
       connectInspectService()
       setCurrentView('inspector')
       loadAssetsList()
     } catch (err: unknown) {
-      setAppStates(prev => ({ ...prev, [pkg]: 'idle' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'idle' }))
       globalToast.setMessage(`App Launch Error: ${(err as Error)?.message || 'Failed to launch application'}`)
       console.error('Failed to launch app:', err)
     }
@@ -148,7 +148,7 @@ export const WebInspectorScreen = observer(() => {
 
   const handleAppTerminate = async (pkg: string) => {
     try {
-      setAppStates(prev => ({ ...prev, [pkg]: 'terminating' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'terminating' }))
       const terminateReq = await deviceControlStore.terminateApp()
       const response = await terminateReq.donePromise
 
@@ -156,10 +156,10 @@ export const WebInspectorScreen = observer(() => {
         throw new Error(response.content.error)
       }
 
-      setAppStates(prev => ({ ...prev, [pkg]: 'idle' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'idle' }))
       setLaunchedApp(null)
     } catch (err: unknown) {
-      setAppStates(prev => ({ ...prev, [pkg]: 'running' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'running' }))
       globalToast.setMessage(`App Terminate Error: ${(err as Error)?.message || 'Failed to terminate application'}`)
       console.error('Failed to terminate app:', err)
     }
@@ -167,7 +167,7 @@ export const WebInspectorScreen = observer(() => {
 
   const handleAppKill = async (pkg: string) => {
     try {
-      setAppStates(prev => ({ ...prev, [pkg]: 'killing' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'killing' }))
       const killReq = await deviceControlStore.killApp()
       const response = await killReq.donePromise
 
@@ -175,10 +175,10 @@ export const WebInspectorScreen = observer(() => {
         throw new Error(response.content.error)
       }
 
-      setAppStates(prev => ({ ...prev, [pkg]: 'idle' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'idle' }))
       setLaunchedApp(null)
     } catch (err: unknown) {
-      setAppStates(prev => ({ ...prev, [pkg]: 'running' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'running' }))
       globalToast.setMessage(`App Kill Error: ${(err as Error)?.message || 'Failed to kill application'}`)
       console.error('Failed to kill app:', err)
     }
@@ -231,11 +231,15 @@ export const WebInspectorScreen = observer(() => {
     if (inspectorConnection.current && inspectorConnection.current.readyState === WebSocket.OPEN) {
       try {
         inspectorConnection.current.send(command)
-        setConsoleLogs(prev => prev.concat([{
-          method: 'command',
-          timestamp: new Date().toISOString(),
-          data: [command]
-        }]))
+        setConsoleLogs((prev) =>
+          prev.concat([
+            {
+              method: 'command',
+              timestamp: new Date().toISOString(),
+              data: [command],
+            },
+          ])
+        )
       } catch (error) {
         console.error('Failed to encode command:', error)
       }
@@ -252,18 +256,17 @@ export const WebInspectorScreen = observer(() => {
     const app = applicationInstallationService.installedApp
 
     if (app.pkg && applicationInstallationService.isLaunching) {
-      setAppStates(prev => ({ ...prev, [app.pkg]: 'launching' }))
+      setAppStates((prev) => ({ ...prev, [app.pkg]: 'launching' }))
     }
 
     if (!applicationInstallationService.isLaunched) {
-      const [pkg] = Object.entries(appStates)
-        .find(([, state]) => state === 'launching') || []
+      const [pkg] = Object.entries(appStates).find(([, state]) => state === 'launching') || []
 
       if (!pkg) {
         return
       }
 
-      setAppStates(prev => ({ ...prev, [pkg]: 'idle' }))
+      setAppStates((prev) => ({ ...prev, [pkg]: 'idle' }))
 
       if (applicationInstallationService.isError) {
         globalToast.setMessage(`App Launch Error: ${applicationInstallationService.status}}`)
@@ -276,22 +279,21 @@ export const WebInspectorScreen = observer(() => {
     const app = applicationInstallationService.installedApp
 
     if (app.pkg) {
-      const exist = Object.values(apps)
-        .some(pkg => pkg === app.pkg)
+      const exist = Object.values(apps).some((pkg) => pkg === app.pkg)
 
       if (!exist) {
-        setApps(prev => ({ ...prev, [app.name]: app.pkg }))
+        setApps((prev) => ({ ...prev, [app.name]: app.pkg }))
       }
 
       if (applicationInstallationService.isLaunched) {
         try {
           setLaunchedApp(app.pkg)
-          setAppStates(prev => ({ ...prev, [app.pkg]: 'running' }))
+          setAppStates((prev) => ({ ...prev, [app.pkg]: 'running' }))
           connectInspectService()
           setCurrentView('inspector')
           loadAssetsList()
         } catch (err: unknown) {
-          setAppStates(prev => ({ ...prev, [app.pkg]: 'idle' }))
+          setAppStates((prev) => ({ ...prev, [app.pkg]: 'idle' }))
           globalToast.setMessage(`App Launch Error: ${(err as Error)?.message || 'Failed to launch application'}`)
           console.error('Failed to launch app:', err)
         }
@@ -303,7 +305,7 @@ export const WebInspectorScreen = observer(() => {
     return (
       <div className={styles.container}>
         <div className={styles.loadingState}>
-          <Spinner size="l" />
+          <Spinner size='l' />
         </div>
       </div>
     )
@@ -313,12 +315,7 @@ export const WebInspectorScreen = observer(() => {
     <div className={styles.container}>
       {currentView === 'inspector' && (
         <div className={styles.headerContainer}>
-          <Button
-            before={<Icon24ArrowLeftOutline />}
-            mode="tertiary"
-            size="s"
-            onClick={handleBackToLauncher}
-          >
+          <Button before={<Icon24ArrowLeftOutline />} mode='tertiary' size='s' onClick={handleBackToLauncher}>
             {'Back to Applications'}
           </Button>
         </div>

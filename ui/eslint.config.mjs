@@ -328,6 +328,7 @@ export default tseslint.config(
       'no-await-in-loop': 'error',
       'no-shadow': 'off',
       'no-continue': 'off',
+      'jsx-a11y/click-events-have-key-events': 'off',
       'i18next/no-literal-string': [
         'error',
         { words: { exclude: ['%', 'Stub', 'OK', 'DKA', '.apk', 'aab', '.ipa', '\\)', '\\(', '%', '.', '%\\)'] } },

@@ -1,9 +1,9 @@
-import {observer} from 'mobx-react-lite'
-import {useMemo, type ReactNode, type ChangeEvent} from 'react'
-import {Input, Spinner, CustomScrollView} from '@vkontakte/vkui'
-import {Icon16Clear, Icon56DevicesOutline} from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
+import { useMemo, type ReactNode, type ChangeEvent } from 'react'
+import { Input, Spinner, CustomScrollView } from '@vkontakte/vkui'
+import { Icon16Clear, Icon56DevicesOutline } from '@vkontakte/icons'
 
-import {useDebounce} from '@/lib/hooks/use-debounce.hook'
+import { useDebounce } from '@/lib/hooks/use-debounce.hook'
 
 import styles from './screen-list.module.css'
 
@@ -66,129 +66,121 @@ export interface ScreenListProps {
   hidden?: boolean
 }
 
-export const ScreenList = observer<ScreenListProps>(({
-  items,
-  onItemClick,
-  isLoading = false,
-  searchQuery = '',
-  onSearchChange,
-  renderItem,
-  placeholder = 'Search...',
-  emptyStateTitle = 'No items found',
-  emptyStateSubtitle = 'Items will appear here when available',
-  showSearch = true,
-  hidden
-}) => {
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+export const ScreenList = observer<ScreenListProps>(
+  ({
+    items,
+    onItemClick,
+    isLoading = false,
+    searchQuery = '',
+    onSearchChange,
+    renderItem,
+    placeholder = 'Search...',
+    emptyStateTitle = 'No items found',
+    emptyStateSubtitle = 'Items will appear here when available',
+    showSearch = true,
+    hidden,
+  }) => {
+    const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-  const filteredItems = useMemo(() => {
-    if (!debouncedSearchQuery.trim()) {
-      return items
+    const filteredItems = useMemo(() => {
+      if (!debouncedSearchQuery.trim()) {
+        return items
+      }
+
+      const query = debouncedSearchQuery.toLowerCase()
+
+      return items.filter(
+        (item) => item.name.toLowerCase().includes(query) || item.subtitle?.toLowerCase().includes(query)
+      )
+    }, [items, debouncedSearchQuery])
+
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+      onSearchChange?.(event.target.value)
     }
 
-    const query = debouncedSearchQuery.toLowerCase()
+    const clearSearch = () => {
+      onSearchChange?.('')
+    }
 
-    return items.filter(item =>
-      item.name.toLowerCase().includes(query) ||
-      item.subtitle?.toLowerCase().includes(query)
-    )
-  }, [items, debouncedSearchQuery])
+    const handleItemClick = (item: ScreenListItem) => {
+      onItemClick?.(item)
+    }
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onSearchChange?.(event.target.value)
-  }
-
-  const clearSearch = () => {
-    onSearchChange?.('')
-  }
-
-  const handleItemClick = (item: ScreenListItem) => {
-    onItemClick?.(item)
-  }
-
-  const defaultRenderItem = (item: ScreenListItem) => (
-    <div
-      key={item.id}
-      className={styles.listItem}
-      role="button"
-      tabIndex={0}
-      onClick={() => handleItemClick(item)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleItemClick(item)
-        }
-      }}
-    >
-      <div className={styles.itemInfo}>
-        <div className={styles.itemName}>{item.name}</div>
-        {item.subtitle && (
-          <div className={styles.itemSubtitle}>{item.subtitle}</div>
-        )}
-      </div>
-    </div>
-  )
-
-  if (hidden) return null
-
-  return (
-    <div className={styles.container}>
-      {showSearch && (
-        <div className={styles.searchContainer}>
-          <Input
-            placeholder={placeholder}
-            value={searchQuery}
-            after={
-              searchQuery && (
-                <button
-                  type="button"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                  onClick={clearSearch}
-                >
-                  <Icon16Clear />
-                </button>
-              )
-            }
-            onChange={handleSearchChange}
-          />
+    const defaultRenderItem = (item: ScreenListItem) => (
+      <div
+        key={item.id}
+        className={styles.listItem}
+        role='button'
+        tabIndex={0}
+        onClick={() => handleItemClick(item)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleItemClick(item)
+          }
+        }}
+      >
+        <div className={styles.itemInfo}>
+          <div className={styles.itemName}>{item.name}</div>
+          {item.subtitle && <div className={styles.itemSubtitle}>{item.subtitle}</div>}
         </div>
-      )}
+      </div>
+    )
 
-      <CustomScrollView className={styles.scrollContainer}>
-        {isLoading ? (
-          <div className={styles.loadingState}>
-            <Spinner size="l" />
-          </div>
-        ) : filteredItems.length === 0 ? (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyStateIcon}>
-              <Icon56DevicesOutline />
-            </div>
-            <div className={styles.emptyStateText}>
-              {searchQuery ? 'No items found' : emptyStateTitle}
-            </div>
-            <div className={styles.emptyStateSubtext}>
-              {searchQuery
-                ? `Try adjusting your search for "${searchQuery}"`
-                : emptyStateSubtitle
+    if (hidden) return null
+
+    return (
+      <div className={styles.container}>
+        {showSearch && (
+          <div className={styles.searchContainer}>
+            <Input
+              placeholder={placeholder}
+              value={searchQuery}
+              after={
+                searchQuery && (
+                  <button
+                    type='button'
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                    onClick={clearSearch}
+                  >
+                    <Icon16Clear />
+                  </button>
+                )
               }
-            </div>
-          </div>
-        ) : (
-          <div className={styles.itemList}>
-            {filteredItems.map((item, index) =>
-              renderItem ? renderItem(item, index) : defaultRenderItem(item)
-            )}
+              onChange={handleSearchChange}
+            />
           </div>
         )}
-      </CustomScrollView>
-    </div>
-  )
-})
+
+        <CustomScrollView className={styles.scrollContainer}>
+          {isLoading ? (
+            <div className={styles.loadingState}>
+              <Spinner size='l' />
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateIcon}>
+                <Icon56DevicesOutline />
+              </div>
+              <div className={styles.emptyStateText}>{searchQuery ? 'No items found' : emptyStateTitle}</div>
+              <div className={styles.emptyStateSubtext}>
+                {searchQuery ? `Try adjusting your search for "${searchQuery}"` : emptyStateSubtitle}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.itemList}>
+              {filteredItems.map((item, index) => (renderItem ? renderItem(item, index) : defaultRenderItem(item)))}
+            </div>
+          )}
+        </CustomScrollView>
+      </div>
+    )
+  }
+)

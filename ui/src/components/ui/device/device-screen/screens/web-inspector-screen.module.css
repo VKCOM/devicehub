@@ -1,23 +1,28 @@
 .container {
   display: flex;
   flex-direction: column;
+
   height: 100%;
-  background-color: var(--vkui--color_background);
+
   text-align: start;
+
+  background-color: var(--vkui--color_background);
 }
 
 .searchContainer {
   position: sticky;
-  top: 0;
   z-index: 10;
+  top: 0;
+
+  padding: 12px 16px;
+
   background-color: var(--vkui--color_background);
   border-bottom: 1px solid var(--vkui--color_separator_primary);
-  padding: 12px 16px;
 }
 
 .scrollContainer {
-  flex: 1;
   overflow-y: auto;
+  flex: 1;
 }
 
 .appList {
@@ -27,15 +32,20 @@
 }
 
 .appItem {
+  cursor: pointer;
+
   position: relative;
+
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px;
+
   border-bottom: 1px solid var(--vkui--color_separator_primary);
-  cursor: pointer;
+
   transition: background-color 0.2s ease;
-  overflow: hidden;
 }
 
 .appItem:hover {
@@ -47,40 +57,45 @@
 }
 
 .appInfo {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 4px;
+
   min-width: 0;
 }
 
 .appName {
+  overflow: hidden;
+
   font-size: 16px;
   font-weight: 500;
   color: var(--vkui--color_text_primary);
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .appPackage {
+  overflow: hidden;
+
   font-size: 14px;
   color: var(--vkui--color_text_secondary);
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .buttonContainer {
   position: absolute;
-  right: -300px;
+  z-index: 2;
   top: 50%;
+  right: -300px;
   transform: translateY(-50%);
+
   display: flex;
   gap: 8px;
   align-items: center;
+
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 2;
 }
 
 .appItem:hover .buttonContainer {
@@ -88,15 +103,19 @@
 }
 
 .installButton {
-  background-color: var(--vkui--color_background_accent);
-  color: white;
-  border: none;
-  border-radius: 8px;
+  cursor: pointer;
+
   padding: 8px 16px;
+
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
+  color: white;
   white-space: nowrap;
+
+  background-color: var(--vkui--color_background_accent);
+  border: none;
+  border-radius: 8px;
+
   transition: background-color 0.2s ease;
 }
 
@@ -109,15 +128,19 @@
 }
 
 .abortButton {
-  background-color: var(--vkui--color_background_negative);
-  color: white;
-  border: none;
-  border-radius: 8px;
+  cursor: pointer;
+
   padding: 8px 16px;
+
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
+  color: white;
   white-space: nowrap;
+
+  background-color: var(--vkui--color_background_negative);
+  border: none;
+  border-radius: 8px;
+
   transition: background-color 0.2s ease;
 }
 
@@ -134,20 +157,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   padding: 48px 24px;
-  text-align: center;
+
   color: var(--vkui--color_text_secondary);
+  text-align: center;
 }
 
 .emptyStateIcon {
-  font-size: 48px;
   margin-bottom: 16px;
+  font-size: 48px;
   opacity: 0.5;
 }
 
 .emptyStateText {
-  font-size: 16px;
   margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .emptyStateSubtext {
@@ -163,7 +188,7 @@
 }
 
 .headerContainer {
+  padding: 8px 16px;
   background-color: var(--vkui--color_background);
   border-bottom: 1px solid var(--vkui--color_separator_primary);
-  padding: 8px 16px;
 }

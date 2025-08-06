@@ -7,8 +7,8 @@ import type {
   ApplicationAssetsList,
   ApplicationKillResult,
   ApplicationLaunchResult,
-  ApplicationsList
-} from '@/types/application.type.ts';
+  ApplicationsList,
+} from '@/types/application.type'
 import type { FSListMessage } from '@/types/fs-list-message.type'
 import type { TransactionFactory } from '@/types/transaction-factory.type'
 import type { DeviceBySerialStore } from '@/store/device-by-serial-store'
@@ -185,7 +185,7 @@ export class DeviceControlService {
   }
 
   launchApp(pkg: string): Promise<InitializeTransactionReturn<ApplicationLaunchResult>> {
-    return this.sendTwoWay('device.launchApp', {pkg})
+    return this.sendTwoWay('device.launchApp', { pkg })
   }
 
   terminateApp(): Promise<InitializeTransactionReturn<ApplicationKillResult>> {
@@ -193,7 +193,7 @@ export class DeviceControlService {
   }
 
   killApp(): Promise<InitializeTransactionReturn<ApplicationKillResult>> {
-    return this.sendTwoWay('app.kill', {force: true})
+    return this.sendTwoWay('app.kill', { force: true })
   }
 
   getAppAssetList(): Promise<InitializeTransactionReturn<ApplicationAssetsList>> {
@@ -201,7 +201,7 @@ export class DeviceControlService {
   }
 
   getAppAsset(url: string): Promise<InitializeTransactionReturn<ApplicationAsset>> {
-    return this.sendTwoWay('app.getAsset', {url})
+    return this.sendTwoWay('app.getAsset', { url })
   }
 
   getAppHTML(): Promise<InitializeTransactionReturn<ApplicationAsset<false>>> {

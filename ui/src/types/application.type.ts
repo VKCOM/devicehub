@@ -12,7 +12,24 @@ export interface ApplicationKillResult {
   error?: string
 }
 
-export type ResourceType = ('Document' | 'Stylesheet' | 'Image' | 'Media' | 'Font' | 'Script' | 'TextTrack' | 'XHR' | 'Fetch' | 'EventSource' | 'WebSocket' | 'Manifest' | 'SignedExchange' | 'Ping' | 'CSPViolationReport' | 'Preflight' | 'Other');
+export type ResourceType =
+  | 'Document'
+  | 'Stylesheet'
+  | 'Image'
+  | 'Media'
+  | 'Font'
+  | 'Script'
+  | 'TextTrack'
+  | 'XHR'
+  | 'Fetch'
+  | 'EventSource'
+  | 'WebSocket'
+  | 'Manifest'
+  | 'SignedExchange'
+  | 'Ping'
+  | 'CSPViolationReport'
+  | 'Preflight'
+  | 'Other'
 
 export interface ApplicationAssetsListItem {
   url: string

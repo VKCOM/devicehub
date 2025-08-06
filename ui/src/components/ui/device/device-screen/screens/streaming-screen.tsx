@@ -1,4 +1,4 @@
-import { useEffect, useRef} from 'react'
+import { useEffect, useRef } from 'react'
 import cn from 'classnames'
 import { observer } from 'mobx-react-lite'
 import { Spinner } from '@vkontakte/vkui'
@@ -13,13 +13,13 @@ import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
 import styles from '../device-screen.module.css'
 
-import type { ChangeEvent, ClipboardEvent, KeyboardEvent, MouseEvent, TouchEvent, RefObject} from 'react'
+import type { ChangeEvent, ClipboardEvent, KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react'
 
 interface ScreenProps {
   canvasWrapperRef: RefObject<HTMLDivElement>
 }
 
-export const StreamingScreen = observer(({canvasWrapperRef}: ScreenProps) => {
+export const StreamingScreen = observer(({ canvasWrapperRef }: ScreenProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -142,23 +142,23 @@ export const StreamingScreen = observer(({canvasWrapperRef}: ScreenProps) => {
       <div className={styles.canvasWrapper}>
         <canvas
           ref={canvasRef}
-          className={cn(styles.canvas, {[styles.letterbox]: deviceScreenStore.isAspectRatioModeLetterbox})}
+          className={cn(styles.canvas, { [styles.letterbox]: deviceScreenStore.isAspectRatioModeLetterbox })}
         />
         {touchService.slots.map((value, index) => (
           <span
             key={value}
-            className={cn(styles.finger, {[styles.activeFinger]: touchService.fingers[index]})}
+            className={cn(styles.finger, { [styles.activeFinger]: touchService.fingers[index] })}
             style={
               touchService.fingers[index]
                 ? {
-                  transform: `translate3d(${touchService.fingers[index].x}px,${touchService.fingers[index].y}px,0) scale(${touchService.fingers[index].pressure + 0.5},${touchService.fingers[index].pressure + 0.5}`,
-                }
+                    transform: `translate3d(${touchService.fingers[index].x}px,${touchService.fingers[index].y}px,0) scale(${touchService.fingers[index].pressure + 0.5},${touchService.fingers[index].pressure + 0.5}`,
+                  }
                 : {}
             }
           />
         ))}
         <ConditionalRender conditions={[deviceScreenStore.isScreenLoading]}>
-          <Spinner className={styles.spinner} size='xl'/>
+          <Spinner className={styles.spinner} size='xl' />
         </ConditionalRender>
       </div>
       <input

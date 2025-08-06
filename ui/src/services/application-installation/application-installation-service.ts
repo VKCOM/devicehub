@@ -33,7 +33,7 @@ export class ApplicationInstallationService {
   isLaunching = false
   isLaunched = false
   isAndroid = false
-  installedApp = {name: '', pkg: ''}
+  installedApp = { name: '', pkg: '' }
   device: Device | undefined = undefined
 
   constructor(
@@ -175,7 +175,7 @@ export class ApplicationInstallationService {
     this.isError = false
     this.status = 'Initialization'
     this.href = ''
-    this.installedApp = {name: '', pkg: ''}
+    this.installedApp = { name: '', pkg: '' }
   }
 
   allowedFileExtensions(): string[] {
@@ -208,7 +208,7 @@ export class ApplicationInstallationService {
           href: this.href,
           manifest: { application: { activities: {} } } as unknown as Manifest,
           launch: true,
-          pkg
+          pkg,
         })
       }
 
@@ -253,7 +253,7 @@ export class ApplicationInstallationService {
           this.status = 'Launching activity'
           this.isInstalled = true
           this.isLaunching = true
-          this.installedApp = {name: file.name, pkg: pkg || ''}
+          this.installedApp = { name: file.name, pkg: pkg || '' }
           break
         }
 
@@ -273,7 +273,7 @@ export class ApplicationInstallationService {
         this.isLaunching = false
         this.isLaunched = true
 
-        this.installedApp = {name: file.name, pkg: pkg || ''}
+        this.installedApp = { name: file.name, pkg: pkg || '' }
         unsubscribeToProgress()
       })
       .catch((error) => {
@@ -288,7 +288,7 @@ export class ApplicationInstallationService {
 
         this.isError = true
 
-        this.installedApp = {name: '', pkg: ''}
+        this.installedApp = { name: '', pkg: '' }
 
         unsubscribeToProgress()
       })

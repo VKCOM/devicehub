@@ -1,15 +1,15 @@
 .container {
-  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  height: 100%;
 }
 
 .domTree {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  height: 100%;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
   font-size: 12px;
   line-height: 1.4;
-  height: 100%;
 }
 
 .elementNode {
@@ -17,13 +17,17 @@
 }
 
 .elementHeader {
-  display: flex;
-  align-items: center;
   cursor: pointer;
-  padding: 2px 0;
-  border-radius: 2px;
-  transition: background-color 0.1s ease;
+
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+
+  padding: 2px 0;
+
+  border-radius: 2px;
+
+  transition: background-color 0.1s ease;
 }
 
 .elementHeader:hover {
@@ -33,15 +37,17 @@
 .toggleIcon {
   display: inline-flex;
   align-items: center;
-  margin-right: 4px;
+
   width: 16px;
   height: 16px;
+  margin-right: 4px;
+
   color: var(--vkui--color_text_secondary);
 }
 
 .tagName {
-  color: var(--vkui--color_text_accent);
   font-weight: 500;
+  color: var(--vkui--color_text_accent);
 }
 
 .attribute {
@@ -74,9 +80,9 @@
 }
 
 .textContent {
+  padding: 1px 4px;
   color: var(--vkui--color_text_primary);
   background-color: var(--vkui--color_background_secondary);
-  padding: 1px 4px;
   border-radius: 2px;
 }
 
@@ -85,19 +91,20 @@
 }
 
 .commentContent {
-  color: var(--vkui--color_text_secondary);
   font-style: italic;
+  color: var(--vkui--color_text_secondary);
 }
 
 .emptyState {
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 100%;
   padding: 48px 24px;
 }
 
 .emptyText {
-  color: var(--vkui--color_text_secondary);
   font-size: 14px;
+  color: var(--vkui--color_text_secondary);
 }

@@ -1,23 +1,28 @@
 .container {
   display: flex;
   flex-direction: column;
+
   height: 100%;
-  background-color: var(--vkui--color_background);
+
   text-align: start;
+
+  background-color: var(--vkui--color_background);
 }
 
 .searchContainer {
   position: sticky;
-  top: 0;
   z-index: 10;
+  top: 0;
+
+  padding: 12px 16px;
+
   background-color: var(--vkui--color_background);
   border-bottom: 1px solid var(--vkui--color_separator_primary);
-  padding: 12px 16px;
 }
 
 .scrollContainer {
-  flex: 1;
   overflow-y: auto;
+  flex: 1;
 }
 
 .itemList {
@@ -27,15 +32,20 @@
 }
 
 .listItem {
+  cursor: pointer;
+
   position: relative;
+
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px;
+
   border-bottom: 1px solid var(--vkui--color_separator_primary);
-  cursor: pointer;
+
   transition: background-color 0.2s ease;
-  overflow: hidden;
 }
 
 .listItem:hover {
@@ -47,28 +57,31 @@
 }
 
 .itemInfo {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 4px;
+
   min-width: 0;
 }
 
 .itemName {
+  overflow: hidden;
+
   font-size: 16px;
   font-weight: 500;
   color: var(--vkui--color_text_primary);
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .itemSubtitle {
+  overflow: hidden;
+
   font-size: 14px;
   color: var(--vkui--color_text_secondary);
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emptyState {
@@ -76,20 +89,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   padding: 48px 24px;
-  text-align: center;
+
   color: var(--vkui--color_text_secondary);
+  text-align: center;
 }
 
 .emptyStateIcon {
-  font-size: 48px;
   margin-bottom: 16px;
+  font-size: 48px;
   opacity: 0.5;
 }
 
 .emptyStateText {
-  font-size: 16px;
   margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .emptyStateSubtext {

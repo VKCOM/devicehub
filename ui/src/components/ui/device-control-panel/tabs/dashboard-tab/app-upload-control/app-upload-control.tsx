@@ -1,8 +1,8 @@
-import {useMemo, useState} from 'react'
+import { useMemo, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useInjection } from 'inversify-react'
-import {FormStatus, Input, Spacing} from '@vkontakte/vkui'
+import { FormStatus, Input, Spacing } from '@vkontakte/vkui'
 import { Icon20DeleteOutline, Icon24Upload } from '@vkontakte/icons'
 
 import { FileInput } from '@/components/lib/file-input'
@@ -41,9 +41,9 @@ export const AppUploadControl = observer(({ className }: { className?: string })
       {pkgInput && (
         <Input
           placeholder={'pkg'}
-          style={{marginBottom: '24px'}}
+          style={{ marginBottom: '24px' }}
           value={pkg}
-          onChange={event => setPkg(event.target.value)}
+          onChange={(event) => setPkg(event.target.value)}
         />
       )}
       <FileInput

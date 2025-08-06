@@ -1,7 +1,8 @@
-import {observer} from 'mobx-react-lite'
-import {useState, useMemo} from 'react'
-import {CustomScrollView} from '@vkontakte/vkui'
-import {Icon16Chevron, Icon24ChevronDownSmall} from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
+import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { CustomScrollView } from '@vkontakte/vkui'
+import { Icon16Chevron, Icon24ChevronDownSmall } from '@vkontakte/icons'
 
 import styles from './dom-tab-content.module.css'
 
@@ -45,25 +46,25 @@ const parseHTML = (html: string): DOMNode[] => {
         tagName: element.tagName.toLowerCase(),
         attributes,
         children,
-        level
+        level,
       }
     }
 
- if (node.nodeType === Node.TEXT_NODE) {
+    if (node.nodeType === Node.TEXT_NODE) {
       const content = node.textContent?.trim()
 
       if (content) {
         return {
           type: 'text',
           content,
-          level
+          level,
         }
       }
     } else if (node.nodeType === Node.COMMENT_NODE) {
       return {
         type: 'comment',
         content: node.textContent || '',
-        level
+        level,
       }
     }
 
@@ -81,23 +82,27 @@ const parseHTML = (html: string): DOMNode[] => {
   return nodes
 }
 
-const DOMNodeComponent = observer(({node}: {node: DOMNode}) => {
+const DOMNodeComponent = observer(({ node }: { node: DOMNode }) => {
   const [isCollapsed, setCollapsed] = useState(false)
   const hasChildren = node.children && node.children.length > 0
   const indent = node.level * 16
 
   if (node.type === 'text') {
     return (
-      <div className={styles.textNode} style={{paddingLeft: indent}}>
-        <span className={styles.textContent}>"{node.content}"</span>
+      <div className={styles.textNode} style={{ paddingLeft: indent }}>
+        <span className={styles.textContent}>{`"${node.content}"`}</span>
       </div>
     )
   }
 
   if (node.type === 'comment') {
     return (
-      <div className={styles.commentNode} style={{paddingLeft: indent}}>
-        <span className={styles.commentContent}>{'<!--'}{node.content}{'-->'}</span>
+      <div className={styles.commentNode} style={{ paddingLeft: indent }}>
+        <span className={styles.commentContent}>
+          {'<!--'}
+          {node.content}
+          {'-->'}
+        </span>
       </div>
     )
   }
@@ -107,47 +112,51 @@ const DOMNodeComponent = observer(({node}: {node: DOMNode}) => {
       <div
         className={styles.elementHeader}
         role={hasChildren ? 'button' : undefined}
-        style={{paddingLeft: indent}}
+        style={{ paddingLeft: indent }}
         tabIndex={hasChildren ? 0 : undefined}
         onClick={() => hasChildren && setCollapsed(!isCollapsed)}
       >
         {hasChildren && (
-          <span className={styles.toggleIcon}>
-            {isCollapsed ? <Icon16Chevron /> : <Icon24ChevronDownSmall />}
-          </span>
+          <span className={styles.toggleIcon}>{isCollapsed ? <Icon16Chevron /> : <Icon24ChevronDownSmall />}</span>
         )}
-        <span className={styles.tagName}>{'<'}{node.tagName}</span>
-        {node.attributes && Object.entries(node.attributes).map(([key, value]) => (
-          <span key={key} className={styles.attribute}>
-            <span className={styles.attributeName}>{key}</span>
-            <span className={styles.attributeEquals}>{'='}</span>
-            <span className={styles.attributeValue}>"{value}"</span>
-          </span>
-        ))}
+        <span className={styles.tagName}>
+          {'<'}
+          {node.tagName}
+        </span>
+        {node.attributes &&
+          Object.entries(node.attributes).map(([key, value]) => (
+            <span key={key} className={styles.attribute}>
+              <span className={styles.attributeName}>{key}</span>
+              <span className={styles.attributeEquals}>{'='}</span>
+              <span className={styles.attributeValue}>{`"${value}"`}</span>
+            </span>
+          ))}
         <span className={styles.tagName}>{isCollapsed ? ' />' : '>'}</span>
       </div>
 
       {hasChildren && !isCollapsed && (
         <div className={styles.children}>
           {node.children?.map((child, index) => (
-            <DOMNodeComponent
-              key={`${child.tagName || child.type}-${index}`}
-              node={child}
-            />
+            <DOMNodeComponent key={`${child.tagName || child.type}-${index}`} node={child} />
           ))}
         </div>
       )}
 
       {hasChildren && !isCollapsed && (
-        <div className={styles.closingTag} style={{paddingLeft: indent}}>
-          <span className={styles.tagName}>{'</'}{node.tagName}{'>'}</span>
+        <div className={styles.closingTag} style={{ paddingLeft: indent }}>
+          <span className={styles.tagName}>
+            {'</'}
+            {node.tagName}
+            {'>'}
+          </span>
         </div>
       )}
     </div>
   )
 })
 
-export const DOMTabContent = observer<DOMTabContentProps>(({htmlContent}) => {
+export const DOMTabContent = observer<DOMTabContentProps>(({ htmlContent }) => {
+  const { t } = useTranslation()
   const parsedNodes = useMemo(() => {
     if (!htmlContent) return []
 
@@ -157,7 +166,7 @@ export const DOMTabContent = observer<DOMTabContentProps>(({htmlContent}) => {
   if (!htmlContent) {
     return (
       <div className={styles.emptyState}>
-        <div className={styles.emptyText}>No HTML content available</div>
+        <div className={styles.emptyText}>{t('No HTML content available')}</div>
       </div>
     )
   }
@@ -165,12 +174,9 @@ export const DOMTabContent = observer<DOMTabContentProps>(({htmlContent}) => {
   return (
     <div className={styles.container}>
       <CustomScrollView className={styles.domTree}>
-          {parsedNodes.map((node, index) => (
-            <DOMNodeComponent
-              key={`${node.tagName || node.type}-${index}`}
-              node={node}
-            />
-          ))}
+        {parsedNodes.map((node, index) => (
+          <DOMNodeComponent key={`${node.tagName || node.type}-${index}`} node={node} />
+        ))}
       </CustomScrollView>
     </div>
   )
