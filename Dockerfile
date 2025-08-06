@@ -18,7 +18,7 @@ COPY . .
 
 RUN sed -i 's/tsx/node/g' ./bin/stf.mjs && \
     npm ci --python="/usr/bin/python3" --loglevel http && \
-    ./node_modules/.bin/tsc && \
+    ./node_modules/.bin/tsc -p tsconfig.node.json && \
     npm prune --production
 
 
