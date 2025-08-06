@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3'
 import wire from './index.js'
-import { Logger as logger } from '../util/logger'
+import { Logger as logger } from '../util/logger.js'
 
 const log = logger.createLogger('wire:router')
 
