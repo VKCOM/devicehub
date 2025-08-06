@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY . .
 
-RUN sed -i .bak 's/tsx/node/g' ./bin/stf.mjs && \
+RUN sed -i 's/tsx/node/g' ./bin/stf.mjs && \
     npm ci --python="/usr/bin/python3" --loglevel http && \
     ./node_modules/.bin/tsc && \
     npm prune --production
