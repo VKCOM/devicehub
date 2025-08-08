@@ -3175,7 +3175,8 @@ paths:
           description: timeout for group in seconds
           required: true
           schema:
-            minimum: 600
+            minimum: 60
+            maximum: 10800
             type: integer
         - name: amount
           in: query
