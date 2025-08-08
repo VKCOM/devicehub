@@ -12,6 +12,7 @@ export const SUPPORTED_LANGUAGES = [
   'pl',
   'pt-BR',
   'ru-RU',
+  'be-BY',
   'tt-RU',
   'kk-KZ',
   'zh-CN',
