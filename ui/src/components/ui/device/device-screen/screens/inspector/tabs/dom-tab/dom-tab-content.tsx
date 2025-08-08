@@ -7,6 +7,7 @@ import { Icon16Chevron, Icon24ChevronDownSmall } from '@vkontakte/icons'
 import styles from './dom-tab-content.module.css'
 
 interface DOMNode {
+  id: string
   type: 'element' | 'text' | 'comment'
   tagName?: string
   attributes?: Record<string, string>
@@ -23,10 +24,11 @@ const parseHTML = (html: string): DOMNode[] => {
   const parser = new DOMParser()
   const doc = parser.parseFromString(html, 'text/html')
 
-  const parseNode = (node: Node, level = 0): DOMNode | null => {
+  const parseNode = (node: Node, level = 0, index = 0): DOMNode | null => {
     if (node.nodeType === Node.ELEMENT_NODE) {
       const element = node as Element
       const attributes: Record<string, string> = {}
+      const tagName = element.tagName.toLowerCase()
 
       for (let i = 0; i < element.attributes.length; i++) {
         const attr = element.attributes[i]
@@ -36,14 +38,15 @@ const parseHTML = (html: string): DOMNode[] => {
       const children: DOMNode[] = []
 
       for (let i = 0; i < element.childNodes.length; i++) {
-        const child = parseNode(element.childNodes[i], level + 1)
+        const child = parseNode(element.childNodes[i], level + 1, i)
 
         if (child) children.push(child)
       }
 
       return {
+        id: `${level}-${index}-${tagName}`,
         type: 'element',
-        tagName: element.tagName.toLowerCase(),
+        tagName,
         attributes,
         children,
         level,
@@ -55,6 +58,7 @@ const parseHTML = (html: string): DOMNode[] => {
 
       if (content) {
         return {
+          id: String(Math.random() * 100),
           type: 'text',
           content,
           level,
@@ -62,6 +66,7 @@ const parseHTML = (html: string): DOMNode[] => {
       }
     } else if (node.nodeType === Node.COMMENT_NODE) {
       return {
+        id: String(Math.random() * 100),
         type: 'comment',
         content: node.textContent || '',
         level,
@@ -82,7 +87,7 @@ const parseHTML = (html: string): DOMNode[] => {
   return nodes
 }
 
-const DOMNodeComponent = observer(({ node }: { node: DOMNode }) => {
+const DOMNodeComponent = observer(({node}: { node: DOMNode, key?: string }) => {
   const [isCollapsed, setCollapsed] = useState(false)
   const hasChildren = node.children && node.children.length > 0
   const indent = node.level * 16
@@ -136,8 +141,8 @@ const DOMNodeComponent = observer(({ node }: { node: DOMNode }) => {
 
       {hasChildren && !isCollapsed && (
         <div className={styles.children}>
-          {node.children?.map((child, index) => (
-            <DOMNodeComponent key={`${child.tagName || child.type}-${index}`} node={child} />
+          {node.children?.map((child) => (
+            <DOMNodeComponent key={child.id} node={child} />
           ))}
         </div>
       )}
@@ -174,8 +179,8 @@ export const DOMTabContent = observer<DOMTabContentProps>(({ htmlContent }) => {
   return (
     <div className={styles.container}>
       <CustomScrollView className={styles.domTree}>
-        {parsedNodes.map((node, index) => (
-          <DOMNodeComponent key={`${node.tagName || node.type}-${index}`} node={node} />
+        {parsedNodes.map((node) => (
+          <DOMNodeComponent key={node.id} node={node} />
         ))}
       </CustomScrollView>
     </div>
