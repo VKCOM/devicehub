@@ -87,7 +87,7 @@ const parseHTML = (html: string): DOMNode[] => {
   return nodes
 }
 
-const DOMNodeComponent = observer(({node}: { node: DOMNode, key?: string }) => {
+const DOMNodeComponent = observer(({ node }: { node: DOMNode }) => {
   const [isCollapsed, setCollapsed] = useState(false)
   const hasChildren = node.children && node.children.length > 0
   const indent = node.level * 16
@@ -141,9 +141,7 @@ const DOMNodeComponent = observer(({node}: { node: DOMNode, key?: string }) => {
 
       {hasChildren && !isCollapsed && (
         <div className={styles.children}>
-          {node.children?.map((child) => (
-            <DOMNodeComponent key={child.id} node={child} />
-          ))}
+          {node.children?.map((child) => <DOMNodeComponent key={child.id} node={child} />)}
         </div>
       )}
 
