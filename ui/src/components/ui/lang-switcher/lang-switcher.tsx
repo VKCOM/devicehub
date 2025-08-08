@@ -18,6 +18,7 @@ const OPTION_NAMES: Record<SupportedLanguages, string> = {
   pl: 'Język polski',
   ['pt-BR']: 'Português (Brasil)',
   ['ru-RU']: 'Русский',
+  ['be-BY']: 'Беларуская',
   ['tt-RU']: 'Татар',
   ['kk-KZ']: 'Қазақ',
   ['zh-CN']: '简体中文',

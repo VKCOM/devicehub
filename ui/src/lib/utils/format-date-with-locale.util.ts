@@ -13,6 +13,7 @@ const LOCALES: Record<string, Locale> = {
   pl,
   ['pt-BR']: ptBR,
   ['tt-RU']: ru,
+  ['be-BY']: ru,
   ['kk-KZ']: kk,
   ['zh-CN']: zhCN,
   ['zh-Hant']: zhHK,
