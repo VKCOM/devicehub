@@ -10,17 +10,18 @@
     "alwaysStrict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
     "checkJs": true,
     "allowJs": true,
     "noEmit": false,
     "declaration": false,
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "es2022",
+    "rewriteRelativeImportExtensions": true,
     "lib": ["ES2020"],
     "types": ["node"]
   },
-  "include": ["./lib/types/**/*.d.ts", "./lib/**/*.ts"],
+  "include": ["./lib/**/*.js", "./lib/types/**/*.d.ts", "./lib/**/*.ts"],
+  "exclude": ["node_modules/**"],
   "verbose": true
 }

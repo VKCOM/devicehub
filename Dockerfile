@@ -16,9 +16,11 @@ RUN apt-get update && apt-get install -y \
 
 COPY . .
 
-RUN npm ci --python="/usr/bin/python3" --loglevel http && \
-    ./node_modules/.bin/tsc && \
+RUN sed -i 's/tsx/node/g' ./bin/stf.mjs && \
+    npm ci --python="/usr/bin/python3" --loglevel http && \
+    ./node_modules/.bin/tsc -p tsconfig.node.json && \
     npm prune --production
+
 
 WORKDIR /app/ui
 

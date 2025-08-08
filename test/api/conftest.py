@@ -437,5 +437,6 @@ def failure_response_check():
         response_content = json.loads(response.content)
         if message is not None:
             equal(response_content['message'], message)
+        return response_content
 
     return failure_response_check_func

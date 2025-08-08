@@ -96,3 +96,51 @@ class TestAutotestsMethods:
         equal(response.status_code, 200)
         is_(response.parsed.success, True)
         equal(response.parsed.description, 'Deleted (groups)')
+
+    @pytest.mark.focus
+    @pytest.mark.parametrize("validation", [
+        {'timeout': 59, 'success': False, 'message': 'must be >= 60', 'path':'timeout'},
+        {'timeout': 10801, 'success': False, 'message': 'must be <= 10800', 'path':'timeout'},
+        {'timeout': UNSET, 'success': False, 'message': 'must have required property \'timeout\'', 'path': 'timeout'},
+        {'timeout': 300, 'success': True},
+        {'amount': 0, 'success': False, 'message': 'must be >= 1', 'path': 'amount'},
+        {'amount': 1, 'success': True},
+    ], ids=[
+        'minimum timeout validation',
+        'maximum timeout validation',
+        'absent timeout validation',
+        'positive timeout validation',
+        'minimum amount validation',
+        'positive amount validation',
+    ])
+    def test_create_autotest_group_validation(self, api_client, random_str, validation, failure_response_check,
+                                              successful_response_check):
+        # Create autotests group
+        timeout = validation['timeout'] if 'timeout' in validation else 600
+        amount = validation['amount'] if 'amount' in validation else 2
+        response = capture_devices.sync_detailed(
+            client=api_client,
+            timeout=timeout,
+            amount=amount,
+            need_amount=True,
+            abi='armeabi-v7a',
+            run=f'Test-run-{random_str()}',
+            sdk=UNSET, model=UNSET,
+            type=UNSET,
+            version=UNSET
+        )
+        if validation['success']:
+            successful_response_check(response, description='Added (group devices)')
+            # remove autotests group
+            group_dict = response.parsed.group.to_dict()
+            autotests_group_id = group_dict['id']
+            response = free_devices.sync_detailed(client=api_client, group=autotests_group_id)
+            successful_response_check(response, description='Deleted (groups)')
+        else:
+            response_content = failure_response_check(response, 400)
+            equal(len(response_content), 1)
+            validation_content = response_content[0]
+            equal(validation_content['path'], validation['path'])
+            equal(validation_content['message'], validation['message'])
+
+
