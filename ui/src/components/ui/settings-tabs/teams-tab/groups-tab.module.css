@@ -1,0 +1,16 @@
+.groupsTab {
+  overflow: hidden;
+  width: 100%;
+
+  svg {
+    box-sizing: content-box;
+  }
+}
+
+.search {
+  max-width: 325px;
+}
+
+.pagination {
+  margin: 20px 0;
+}

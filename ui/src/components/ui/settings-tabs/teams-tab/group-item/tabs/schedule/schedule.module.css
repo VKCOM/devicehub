@@ -1,0 +1,8 @@
+.schedule {
+  max-width: 550px;
+}
+
+.submitButton {
+  width: fit-content;
+  margin: 0 auto;
+}

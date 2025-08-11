@@ -17,6 +17,7 @@ import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import {
   getSettingsDevicesRoute,
   getSettingsGroupsRoute,
+  getSettingsTeamsRoute,
   getSettingsKeysRoute,
   getSettingsRoute,
   getSettingsShellRoute,
@@ -49,6 +50,12 @@ export const SettingsPage = observer(() => {
       {
         id: getSettingsGroupsRoute(),
         title: t('Groups'),
+        ariaControls: 'tab-content-groups',
+        content: <GroupsTab />,
+      },
+      {
+        id: getSettingsTeamsRoute(),
+        title: t('Teams'),
         ariaControls: 'tab-content-groups',
         content: <GroupsTab />,
       },
