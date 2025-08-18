@@ -5,7 +5,6 @@ import { TeamUsersColumnIds } from '@/components/ui/settings-tabs/teams-tab/team
 
 import { TeamSettingsService } from '@/services/team-settings-service'
 import { DataWithTeamStatus } from '@/types/data-with-team-status.type'
-
 import { TeamGroup } from '@/types/team-group.type'
 
 import { queries } from '@/config/queries/query-key-store'
