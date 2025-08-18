@@ -1,1 +1,1 @@
-export { GroupsTab } from './groups-tab'
+export { TeamsTab } from './teams-tab'

@@ -16,6 +16,9 @@ import {
   getSettingsUsers,
   getAccessTokensByEmail,
   getUsersInGroup,
+  getTeams,
+  getTeamUsers,
+  getTeamGroups,
 } from '@/api/openstf-api'
 import { getAuthUrl } from '@/api/auth'
 
@@ -92,6 +95,20 @@ export const queries = createQueryKeyStore({
       queryKey: [groupId],
       queryFn: (): Promise<GroupUser[]> => getUsersInGroup({ groupId }),
     }),
+  },
+  teams: {
+    all: {
+      queryKey: null,
+      queryFn: () => getTeams(),
+    },
+    users: {
+      queryKey: null,
+      queryFn: () => getTeamUsers(),
+    },
+    groups: {
+      queryKey: null,
+      queryFn: () => getTeamGroups(),
+    },
   },
   auth: {
     docs: {

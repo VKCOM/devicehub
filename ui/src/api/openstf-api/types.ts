@@ -24,6 +24,16 @@ export type GroupDeviceArgs = {
   serial?: string
 }
 
+export type TeamUserArgs = {
+  teamId: string
+  userEmail?: string
+}
+
+export type TeamGroupArgs = {
+  teamId: string
+  groupId: string
+}
+
 export type CreateUserArgs = { email: string } & CreateUserParams
 export type RemoveUserArgs = { email: string } & DeleteUserParams
 export type RemoveUsersArgs = { emails: string } & DeleteUsersParams
