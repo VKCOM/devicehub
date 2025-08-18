@@ -8,11 +8,11 @@ import { queryClient } from '@/config/queries/query-client'
 import type { AxiosError } from 'axios'
 import type { TeamUserArgs } from '@/api/openstf-api/types'
 import type { UseMutationResult } from '@tanstack/react-query'
-import type { Team, UnexpectedErrorResponse} from '@/generated/types'
+import type { Team, UnexpectedErrorResponse } from '@/generated/types'
 
 export const useAddUserInTeam = (): UseMutationResult<boolean, AxiosError<UnexpectedErrorResponse>, TeamUserArgs> =>
   useMutation({
-    mutationFn: (data) => updateTeam(data.teamId, {users: data.userEmail ? [data.userEmail] : []}),
+    mutationFn: (data) => updateTeam(data.teamId, { users: data.userEmail ? [data.userEmail] : [] }),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queries.teams.all.queryKey })
       const previousTeams = queryClient.getQueryData(queries.teams.all.queryKey)

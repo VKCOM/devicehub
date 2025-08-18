@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 
-import {createTeam} from '@/api/openstf-api'
+import { createTeam } from '@/api/openstf-api'
 
 import type { AxiosError } from 'axios'
 import type { UseMutationResult } from '@tanstack/react-query'

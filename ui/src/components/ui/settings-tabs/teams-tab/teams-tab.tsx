@@ -9,7 +9,6 @@ import { useCreateTeam } from '@/lib/hooks/use-create-team.hook'
 
 import { TeamList } from './team-list'
 
-
 export const TeamsTab = observer(() => {
   const { t } = useTranslation()
 

@@ -8,11 +8,11 @@ import { queryClient } from '@/config/queries/query-client'
 import type { AxiosError } from 'axios'
 import type { TeamGroupArgs } from '@/api/openstf-api/types'
 import type { UseMutationResult } from '@tanstack/react-query'
-import type { Team, UnexpectedErrorResponse} from '@/generated/types'
+import type { Team, UnexpectedErrorResponse } from '@/generated/types'
 
 export const useAddGroupInTeam = (): UseMutationResult<boolean, AxiosError<UnexpectedErrorResponse>, TeamGroupArgs> =>
   useMutation({
-    mutationFn: (data) => updateTeam(data.teamId, {groups: data.groupId ? [data.groupId] : []}),
+    mutationFn: (data) => updateTeam(data.teamId, { groups: data.groupId ? [data.groupId] : [] }),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queries.teams.all.queryKey })
       const previousTeams = queryClient.getQueryData(queries.teams.all.queryKey)

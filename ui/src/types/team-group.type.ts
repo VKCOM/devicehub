@@ -1,4 +1,4 @@
-import type { GroupClass, GroupOwner } from '@/generated/types';
+import type { GroupClass, GroupOwner } from '@/generated/types'
 
 export type TeamGroup = {
   name?: string

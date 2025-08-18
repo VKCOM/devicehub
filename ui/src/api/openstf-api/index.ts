@@ -65,8 +65,8 @@ import type {
   TeamResponse,
   GetGroupParams,
 } from '@/generated/types'
-import type {TeamUser} from '@/types/team-user.type'
-import type {TeamGroup} from '@/types/team-group.type'
+import type { TeamUser } from '@/types/team-user.type'
+import type { TeamGroup } from '@/types/team-group.type'
 
 const getDevices = async <T>(params?: GetDevicesParams): Promise<T[]> => {
   const { data } = await openstfApiClient.get<DeviceWithFieldsListResponse<T>>(OPENSTF_API_ROUTES.devices, { params })

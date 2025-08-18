@@ -10,14 +10,12 @@ import { TeamGroup } from '@/types/team-group.type'
 import { queries } from '@/config/queries/query-key-store'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
-
 import type { Row } from '@tanstack/react-table'
 import type { TeamUser } from '@/types/team-user.type'
 import type { QueryObserverResult } from '@tanstack/react-query'
 import type { MobxQueryFactory } from '@/types/mobx-query-factory.type'
 import type { Team } from '@/generated/types'
 import type { CurrentUserProfileStore } from '@/store/current-user-profile-store'
-
 
 @injectable()
 export class TeamItemService {

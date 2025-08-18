@@ -49,9 +49,7 @@ export const TeamUsersTable = observer(() => {
             <IsInTeamCell
               isInTeam={getValue()}
               onAddToTeam={() => addUsersInTeam({ teamId: teamItemService.currentTeamId, userEmail })}
-              onRemoveFromTeam={() =>
-                removeUsersFromTeam({ teamId: teamItemService.currentTeamId, userEmail })
-              }
+              onRemoveFromTeam={() => removeUsersFromTeam({ teamId: teamItemService.currentTeamId, userEmail })}
             />
           )
         },

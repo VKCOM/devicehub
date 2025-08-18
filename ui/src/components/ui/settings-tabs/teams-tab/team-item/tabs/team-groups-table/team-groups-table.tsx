@@ -17,7 +17,6 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { DataWithTeamStatus } from '@/types/data-with-team-status.type'
 import type { GroupListResponseGroupsItem } from '@/generated/types'
 
-
 const columnHelper = createColumnHelper<DataWithTeamStatus<GroupListResponseGroupsItem>>()
 
 export const TeamGroupsTable = observer(() => {
@@ -26,7 +25,6 @@ export const TeamGroupsTable = observer(() => {
 
   const teamItemService = useInjection(CONTAINER_IDS.teamItemService)
   const { isLoading } = teamItemService.groupsQueryResult
-
 
   // Transform groups data to include isInTeam status based on groupId
   const userGroupsData = useMemo(() => {
@@ -53,9 +51,7 @@ export const TeamGroupsTable = observer(() => {
             <IsInTeamCell
               isInTeam={getValue()}
               onAddToTeam={() => (teamId && groupId ? addGroupInTeam({ teamId, groupId }) : undefined)}
-              onRemoveFromTeam={() =>
-                teamId && groupId ? removeGroupFromTeam({ teamId, groupId }) : undefined
-              }
+              onRemoveFromTeam={() => (teamId && groupId ? removeGroupFromTeam({ teamId, groupId }) : undefined)}
             />
           )
         },

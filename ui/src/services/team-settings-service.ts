@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import { computed, makeObservable, observable } from 'mobx'
 
-import {Team} from '@/generated/types'
+import { Team } from '@/generated/types'
 
 import { queries } from '@/config/queries/query-key-store'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
@@ -17,9 +17,7 @@ export class TeamSettingsService extends ListManagementService<'id', Team> {
 
   @observable currentTeamId = ''
 
-  constructor(
-    @inject(CONTAINER_IDS.factoryMobxQuery) mobxQueryFactory: MobxQueryFactory,
-  ) {
+  constructor(@inject(CONTAINER_IDS.factoryMobxQuery) mobxQueryFactory: MobxQueryFactory) {
     super('id')
 
     makeObservable(this)

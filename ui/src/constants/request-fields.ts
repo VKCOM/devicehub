@@ -15,8 +15,6 @@ export const USERS_GROUPS_FIELDS =
 
 export const USERS_SETTINGS_FIELDS = 'email,name,privilege,groups.quotas'
 
-export const USERS_TEAMS_FIELDS =
-  'email,name,privilege'
+export const USERS_TEAMS_FIELDS = 'email,name,privilege'
 
-export const GROUPS_TEAMS_FIELDS =
-  'name,id,class,owner,privilege'
+export const GROUPS_TEAMS_FIELDS = 'name,id,class,owner,privilege'

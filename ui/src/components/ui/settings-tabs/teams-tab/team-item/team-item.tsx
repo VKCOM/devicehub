@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ListItem } from '@/components/lib/list-item'
 import { TabsPanel } from '@/components/lib/tabs-panel'
-import {TeamGroupsTable} from '@/components/ui/settings-tabs/teams-tab/team-item/tabs/team-groups-table'
+import { TeamGroupsTable } from '@/components/ui/settings-tabs/teams-tab/team-item/tabs/team-groups-table'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { useRemoveTeam } from '@/lib/hooks/use-remove-team.hook'

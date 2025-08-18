@@ -3,13 +3,11 @@ import { List } from '@vkontakte/vkui'
 import { observer } from 'mobx-react-lite'
 import { useInjection, Provider as DIContainerProvider } from 'inversify-react'
 
-
 import { TeamItemService } from '@/services/team-item-service'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
 import { TeamItem } from './team-item'
-
 
 const createTeamItemContainer = (teamId: string) => {
   const container = new Container()

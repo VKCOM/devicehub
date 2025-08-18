@@ -11,7 +11,8 @@ import type { Team, TeamPayload, UnexpectedErrorResponse } from '@/generated/typ
 
 export const useUpdateTeam = (
   teamId: string
-): UseMutationResult<boolean, AxiosError<UnexpectedErrorResponse>, Partial<TeamPayload>> => useMutation({
+): UseMutationResult<boolean, AxiosError<UnexpectedErrorResponse>, Partial<TeamPayload>> =>
+  useMutation({
     mutationFn: (data) => updateTeam(teamId, data),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queries.teams.all.queryKey })
