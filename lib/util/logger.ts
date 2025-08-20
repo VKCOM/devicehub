@@ -25,12 +25,24 @@ export const LogLevelLabel: Record<LogLevel, string> = {
 const innerLogger = new EventEmitter()
 
 export interface LogEntry {
+    unit: string;
     timestamp: Date;
     priority: LogLevel;
     tag: string;
     pid: number;
     identifier: string;
     message: string;
+}
+
+const unitColors = {
+    websocket: [chalk.gray, chalk.bgBlack],
+    'groups-engine': [chalk.gray, chalk.bgBlack],
+    poorxy: [chalk.gray, chalk.bgBlack],
+    api: [chalk.green, chalk.bgGreen],
+    triproxy: [chalk.magenta, chalk.bgMagenta],
+    processor: [chalk.red, chalk.bgRed],
+    provider: [chalk.blue, chalk.bgBlue],
+    device: [chalk.cyan, chalk.bgCyan],
 }
 
 export class Log extends EventEmitter {
@@ -88,6 +100,7 @@ export class Log extends EventEmitter {
 
     private _entry(priority: LogLevel, args: any[]): LogEntry {
         return {
+            unit: globalLogger.unit,
             timestamp: new Date(),
             priority,
             tag: this.tag,
@@ -98,14 +111,16 @@ export class Log extends EventEmitter {
     }
 
     private _format(entry: LogEntry): string {
+        const [fg, bg] = unitColors[entry.unit as keyof typeof unitColors] ?? [chalk.yellow, chalk.bgYellow]
         return util.format(
-            '%s %s/%s %d [%s] %s',
+            '%s %s %s/%s %d [%s] %s',
             chalk.grey(entry.timestamp.toJSON()),
+            fg(bg(entry.unit)),
             this._name(entry.priority),
             chalk.bold(entry.tag),
             entry.pid,
             entry.identifier,
-            entry.message
+            entry.message.includes('\n') ? JSON.stringify(entry.message) : entry.message
         )
     }
 
@@ -116,8 +131,7 @@ export class Log extends EventEmitter {
     }
 
     private _write(entry: LogEntry): void {
-
-        console.error(this._format(entry))
+        globalConsoleError(this._format(entry))
         this.emit('entry', entry)
         innerLogger.emit('entry', entry)
     }
@@ -129,6 +143,7 @@ export const createLogger = (tag: string): Log => {
 class Logger {
     Level = LogLevel
     LevelLabel = LogLevelLabel
+    unit = 'unknown'
     globalIdentifier = '*'
     createLogger = createLogger
 
@@ -139,5 +154,14 @@ class Logger {
 
     on = innerLogger.on.bind(innerLogger)
 }
+
+
 const globalLogger = new Logger()
+
+const consoleLogger = createLogger('console')
+
+const globalConsoleError = console.error
+console.log = consoleLogger.info.bind(consoleLogger)
+console.error = consoleLogger.error.bind(consoleLogger)
+
 export default globalLogger
