@@ -34,6 +34,7 @@ export const appRouter = createHashRouter(
             <Route element={<SettingsPage />} path={getSettingsRoute()}>
               <Route element={<SettingsPage />} path='keys' />
               <Route element={<SettingsPage />} path='groups' />
+              <Route element={<SettingsPage />} path='teams' />
               <Route element={<SettingsPage />} path='devices' />
               <Route element={<SettingsPage />} path='users' />
               <Route element={<SettingsPage />} path='shell' />

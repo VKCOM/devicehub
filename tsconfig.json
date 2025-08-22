@@ -21,7 +21,12 @@
     "lib": ["ES2022"],
     "types": ["node"]
   },
-  "include": ["./lib/**/*.js", "./lib/types/**/*.d.ts", "./lib/**/*.ts"],
+  "include": [
+    "./lib/**/*.js",
+    "./lib/**/*.mjs",
+    "./lib/types/**/*.d.ts",
+    "./lib/**/*.ts"
+  ],
   "exclude": ["node_modules/**"],
   "verbose": true
 }

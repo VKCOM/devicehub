@@ -9,6 +9,7 @@ export const getControlInfoRoute = (serial: string) => `/control/${serial}/info`
 export const getSettingsRoute = () => '/settings' as const
 export const getSettingsKeysRoute = () => '/settings/keys' as const
 export const getSettingsGroupsRoute = () => '/settings/groups' as const
+export const getSettingsTeamsRoute = () => '/settings/teams' as const
 export const getSettingsDevicesRoute = () => '/settings/devices' as const
 export const getSettingsUsersRoute = () => '/settings/users' as const
 export const getSettingsShellRoute = () => '/settings/shell' as const

@@ -32,9 +32,12 @@ import type { DeviceScreenStore } from '@/store/device-screen-store/device-scree
 import type { LogsTrackerService } from '@/services/logs-tracker-service/logs-tracker-service'
 import type { PortForwardingService } from '@/services/port-forwarding-service/port-forwarding-service'
 import type { ApplicationInstallationService } from '@/services/application-installation/application-installation-service'
+import type { TeamSettingsService } from '@/services/team-settings-service'
+import type { TeamItemService } from '@/services/team-item-service'
 
 export const CONTAINER_IDS = {
   groupId: Symbol.for('groupId') as interfaces.ServiceIdentifier<string>,
+  teamId: Symbol.for('teamId') as interfaces.ServiceIdentifier<string>,
   deviceSerial: Symbol.for('serial') as interfaces.ServiceIdentifier<string>,
   infoService: Symbol.for('InfoService') as interfaces.ServiceIdentifier<InfoService>,
   touchService: Symbol.for('TouchService') as interfaces.ServiceIdentifier<TouchService>,
@@ -49,6 +52,7 @@ export const CONTAINER_IDS = {
   settingsService: Symbol.for('SettingsService') as interfaces.ServiceIdentifier<SettingsService>,
   saveLogsService: Symbol.for('SaveLogsService') as interfaces.ServiceIdentifier<SaveLogsService>,
   groupItemService: Symbol.for('GroupItemService') as interfaces.ServiceIdentifier<GroupItemService>,
+  teamItemService: Symbol.for('TeamItemService') as interfaces.ServiceIdentifier<TeamItemService>,
   deviceConnection: Symbol.for('DeviceConnection') as interfaces.ServiceIdentifier<DeviceConnection>,
   factoryMobxQuery: Symbol.for('Factory<MobxQuery>') as interfaces.ServiceIdentifier<MobxQueryFactory>,
   shellControlStore: Symbol.for('ShellControlStore') as interfaces.ServiceIdentifier<ShellControlStore>,
@@ -63,6 +67,7 @@ export const CONTAINER_IDS = {
   factoryMobxMutation: Symbol.for('Factory<MobxMutation>') as interfaces.ServiceIdentifier<MobxMutationFactory>,
   shellSettingsService: Symbol.for('ShellSettingsService') as interfaces.ServiceIdentifier<ShellSettingsService>,
   groupSettingsService: Symbol.for('GroupSettingsService') as interfaces.ServiceIdentifier<GroupSettingsService>,
+  teamSettingsService: Symbol.for('TeamSettingsService') as interfaces.ServiceIdentifier<TeamSettingsService>,
   portForwardingService: Symbol.for('PortForwardingService') as interfaces.ServiceIdentifier<PortForwardingService>,
   deviceSettingsService: Symbol.for('DeviceSettingsService') as interfaces.ServiceIdentifier<DeviceSettingsService>,
   deviceLifecycleService: Symbol.for('DeviceLifecycleService') as interfaces.ServiceIdentifier<DeviceLifecycleService>,

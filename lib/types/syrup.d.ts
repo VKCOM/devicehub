@@ -1,5 +1,5 @@
-declare module "@devicefarmer/stf-syrup" {
-    import Bluebird from "bluebird";
+declare module '@devicefarmer/stf-syrup' {
+    import Bluebird from 'bluebird'
     type extractDesRet<RetT> = RetT extends SyrupI<never, never, infer RetX>
         ? RetX
         : unknown;
@@ -40,18 +40,18 @@ declare module "@devicefarmer/stf-syrup" {
         options?: OptionsT
     ) => SyrupI;
     export namespace ParallelSyrup {
-        const Syrup: SyrupI;
+        const Syrup: SyrupI
     }
 
     export type SerialSyrup = ParallelSyrup;
     export namespace SerialSyrup {
-        const Syrup: SyrupI;
+        const Syrup: SyrupI
     }
 
     export type Syrup = ParallelSyrup;
     export namespace Syrup {
-        const serial: SerialSyrup;
+        const serial: SerialSyrup
     }
 
-    export default Syrup;
+    export default Syrup
 }

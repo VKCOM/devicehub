@@ -1,6 +1,8 @@
 export const OPENSTF_API_ROUTES = {
   devices: '/devices',
   groups: '/groups',
+  teams: '/teams',
+  team: '/team',
   users: '/users',
   user: '/user',
   accessTokens: '/user/accessTokens',
@@ -18,4 +20,7 @@ export const OPENSTF_API_ROUTES = {
   revokeAdmin: (email: string) => `/users/revokeAdmin/${email}`,
   accessTokensByEmail: (email: string) => `/users/${email}/accessTokens`,
   groupModerator: (id: string, email: string) => `/groups/${id}/moderators/${email}`,
+  teamDelete: (id: string) => `/team/${id}/delete`,
+  teamUser: (id: string, email: string) => `/team/${id}/user/${email}`,
+  teamGroup: (id: string, groupId: string) => `/team/${id}/group/${groupId}`,
 } as const

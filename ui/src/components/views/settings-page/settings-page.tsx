@@ -7,6 +7,7 @@ import { Panel, View } from '@vkontakte/vkui'
 import { TabsPanel } from '@/components/lib/tabs-panel'
 import { GeneralTab } from '@/components/ui/settings-tabs/general-tab'
 import { GroupsTab } from '@/components/ui/settings-tabs/groups-tab'
+import { TeamsTab } from '@/components/ui/settings-tabs/teams-tab'
 import { KeysTab } from '@/components/ui/settings-tabs/keys-tab'
 import { DevicesTab } from '@/components/ui/settings-tabs/devices-tab'
 import { ShellTab } from '@/components/ui/settings-tabs/shell-tab'
@@ -17,6 +18,7 @@ import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import {
   getSettingsDevicesRoute,
   getSettingsGroupsRoute,
+  getSettingsTeamsRoute,
   getSettingsKeysRoute,
   getSettingsRoute,
   getSettingsShellRoute,
@@ -51,6 +53,13 @@ export const SettingsPage = observer(() => {
         title: t('Groups'),
         ariaControls: 'tab-content-groups',
         content: <GroupsTab />,
+      },
+      {
+        id: getSettingsTeamsRoute(),
+        title: t('Teams'),
+        ariaControls: 'tab-content-teams',
+        disabled: !isAdmin,
+        content: <TeamsTab />,
       },
       {
         id: getSettingsDevicesRoute(),
