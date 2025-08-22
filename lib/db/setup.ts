@@ -48,11 +48,13 @@ export default async function setupDb(conn: Db): Promise<Db> {
             if (alreadyExistsError(err)) {
                 log.info('Table "%s" already exists', table)
             }
-
-            if (noMasterAvailableError(err)) {
+            else if (noMasterAvailableError(err)) {
                 log.info('No master available')
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 return createTable(table, options) // retry
+            }
+            else {
+                throw err
             }
         }
     }
