@@ -1,12 +1,12 @@
 /**
- * Copyright © 2019 contains code contributed by Orange SA, authors: Denis Barbaron - Licensed under the Apache license 2.0
+ * Copyright 2019 contains code contributed by Orange SA, authors: Denis Barbaron - Licensed under the Apache license 2.0
  **/
 
 // import r from "mongodb";
 
 export default {
     users: {
-        primaryKey: "email",
+        primaryKey: 'email',
         // indexes: {
         //     adbKeys: {
         //         indexFunction: function (user) {
@@ -19,13 +19,13 @@ export default {
         // },
     },
     accessTokens: {
-        primaryKey: "id",
+        primaryKey: 'id',
         // indexes: {
         //     email: null,
         // },
     },
     vncauth: {
-        primaryKey: "password",
+        primaryKey: 'password',
         // indexes: {
         //     response: null,
         //     responsePerDevice: {
@@ -36,7 +36,7 @@ export default {
         // },
     },
     devices: {
-        primaryKey: "serial",
+        primaryKey: 'serial',
         // indexes: {
         //     owner: {
         //         indexFunction: function (device) {
@@ -62,10 +62,10 @@ export default {
         // },
     },
     logs: {
-        primaryKey: "id",
+        primaryKey: 'id',
     },
     groups: {
-        primaryKey: "id",
+        primaryKey: 'id',
         // indexes: {
         //     privilege: null,
         //     owner: {
@@ -81,6 +81,6 @@ export default {
         // },
     },
     stats: {
-        primaryKey: "id",
+        primaryKey: 'id',
     },
-} as const;
+} as const

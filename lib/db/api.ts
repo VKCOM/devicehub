@@ -1,9 +1,9 @@
-import AllModel from "./models/all/index.js";
-import GroupModel from "./models/group/index.js";
-import TeamModel from "./models/team/index.js";
+import AllModel from './models/all/index.js'
+import GroupModel from './models/group/index.js'
+import TeamModel from './models/team/index.js'
 
 const concatModels = <T extends object[]>(...models: T) =>
-    Object.assign({}, ...models);
+    Object.assign({}, ...models)
 
 /**
  * @deprecated
@@ -13,4 +13,4 @@ export default concatModels(
     AllModel,
     GroupModel,
     TeamModel
-) as typeof AllModel & typeof GroupModel & typeof TeamModel;
+) as typeof AllModel & typeof GroupModel & typeof TeamModel

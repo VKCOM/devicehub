@@ -1,4 +1,5 @@
-declare module "nsyslog-parser" {
+declare module 'nsyslog-parser' {
+
     /**
      * Represents a single structured data entry, e.g. the objects within "structuredData".
      * Each of these can have a mandatory "$id" key and then any additional properties.
@@ -28,6 +29,7 @@ declare module "nsyslog-parser" {
      * can be null or empty strings when absent or unknown.
      */
     export interface SyslogMessage {
+
         /** The full, unmodified original log line. */
         originalMessage: string;
 
@@ -38,12 +40,15 @@ declare module "nsyslog-parser" {
 
         /** Syslog facility as numeric value, if known. */
         facilityval?: number | null;
+
         /** Syslog level (severity) as numeric value, if known. */
         levelval?: number | null;
+
         /** Parsed facility name, if known (e.g. "auth", "local7"). */
-        facility?: "kern" | "user" | "mail" | "daemon" | "auth" | "syslog" | "lpr" | "news" | "uucp" | "cron" | "authpriv" | "ftp" | "ntp" | "security" | "console" | "solaris" | "local0" | "local1" | "local2" | "local3" | "local4" | "local5" | "local6" | "local7" | string;
+        facility?: 'kern' | 'user' | 'mail' | 'daemon' | 'auth' | 'syslog' | 'lpr' | 'news' | 'uucp' | 'cron' | 'authpriv' | 'ftp' | 'ntp' | 'security' | 'console' | 'solaris' | 'local0' | 'local1' | 'local2' | 'local3' | 'local4' | 'local5' | 'local6' | 'local7' | string;
+
         /** Parsed severity/level name, if known (e.g. "crit", "notice"). */
-        level?: "emerg" | "alert" | "crit" | "error" | "warn" | "notice" | "info" | "debug" | string;
+        level?: 'emerg' | 'alert' | 'crit' | 'error' | 'warn' | 'notice' | 'info' | 'debug' | string;
 
         /**
          * Syslog version (used in RFC 5424). For BSD-type or unknown messages,
@@ -65,10 +70,13 @@ declare module "nsyslog-parser" {
 
         /** Hostname or IP, if found. */
         host?: string;
+
         /** Application name/process name, if found. */
         appName?: string;
+
         /** Process ID (pid) if it was found in the header, e.g. "1334" in "pinger[1334]". */
         pid?: string;
+
         /** RFC5424 message ID if present, e.g. "ID47". */
         messageid?: string;
 
@@ -76,7 +84,7 @@ declare module "nsyslog-parser" {
         message?: string;
 
         /**
-         * Some log lines contain "chain"—for example, in RFC5424 with multiple hostnames
+         * Some log lines contain "chain" -- for example, in RFC5424 with multiple hostnames
          * or structured references. Often an empty array.
          */
         chain?: string[];
@@ -99,5 +107,5 @@ declare module "nsyslog-parser" {
          */
         cef?: CefExtension;
     }
-    export default function parse(line: string): SyslogMessage;
+    export default function parse(line: string): SyslogMessage
 }

@@ -157,7 +157,8 @@
     "globals": "^15.11.0",
     "http-https": "1.0.0",
     "imports-loader": "^4.0.1",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.39.1"
   },
   "overrides": {
     "busboy": "npm:@fastify/busboy@1.2.1",

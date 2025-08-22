@@ -1,20 +1,17 @@
-import EventEmitter from "eventemitter3";
-import wire from "./index.js";
-import logger from "../util/logger.js";
+import EventEmitter from 'eventemitter3'
+import wire from './index.js'
+import logger from '../util/logger.js'
 
-const log = logger.createLogger("wire:router");
-
-// Тип сообщения Wire
+const log = logger.createLogger('wire:router')
 export interface WireMessage {
     $code: string;
 }
 
-// Тип события: либо строка, либо символ, либо WireMessage
 type EventType = string | symbol | WireMessage;
 
 export class WireRouter extends EventEmitter {
     constructor() {
-        super();
+        super()
     }
 
     on(
@@ -29,16 +26,17 @@ export class WireRouter extends EventEmitter {
         context?: any
     ): this {
         if (
-            typeof eventOrMessage !== "string" &&
-            typeof eventOrMessage !== "symbol" &&
-            "$code" in eventOrMessage
+            typeof eventOrMessage !== 'string' &&
+            typeof eventOrMessage !== 'symbol' &&
+            '$code' in eventOrMessage
         ) {
             // WireMessage
-            super.on(eventOrMessage.$code, fn);
-        } else {
-            super.on(eventOrMessage as string | symbol, fn, context);
+            super.on(eventOrMessage.$code, fn)
         }
-        return this;
+        else {
+            super.on(eventOrMessage as string | symbol, fn, context)
+        }
+        return this
     }
 
     removeListener(
@@ -52,39 +50,41 @@ export class WireRouter extends EventEmitter {
         fn: (...args: any[]) => void,
         context?: any
     ): this {
-        if (typeof eventOrMessage === "object" && "$code" in eventOrMessage) {
-            super.removeListener(eventOrMessage.$code, fn);
-        } else {
+        if (typeof eventOrMessage === 'object' && '$code' in eventOrMessage) {
+            super.removeListener(eventOrMessage.$code, fn)
+        }
+        else {
             super.removeListener(
                 eventOrMessage as string | symbol,
                 fn,
                 context
-            );
+            )
         }
-        return this;
+        return this
     }
 
     handler(): (channel: any, data: Uint8Array) => void {
         return (channel: any, data: Uint8Array) => {
-            const wrapper = wire.Envelope.decode(data);
-            const type = wire.ReverseMessageType[wrapper.type];
-            let decodedMessage: any;
+            const wrapper = wire.Envelope.decode(data)
+            const type = wire.ReverseMessageType[wrapper.type]
+            let decodedMessage: any
 
             try {
-                decodedMessage = wire[type].decode(wrapper.message);
-            } catch (e) {
+                decodedMessage = wire[type].decode(wrapper.message)
+            }
+            catch (e) {
                 log.error(
                     'Received message with type "%s", but cant parse data ' +
                         wrapper.message
-                );
-                throw e;
+                )
+                throw e
             }
 
             log.info(
                 'Received message with type "%s", and data %s',
                 type || wrapper.type,
                 JSON.stringify(decodedMessage)
-            );
+            )
 
             if (type) {
                 this.emit(
@@ -92,14 +92,15 @@ export class WireRouter extends EventEmitter {
                     wrapper.channel || channel,
                     decodedMessage,
                     data
-                );
-                this.emit("message", channel);
-            } else {
+                )
+                this.emit('message', channel)
+            }
+            else {
                 log.warn(
                     'Unknown message type "%d", perhaps we need an update?',
                     wrapper.type
-                );
+                )
             }
-        };
+        }
     }
 }

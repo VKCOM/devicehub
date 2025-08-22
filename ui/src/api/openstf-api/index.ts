@@ -8,6 +8,8 @@ import {
   USERS_GROUPS_FIELDS,
   DEVICE_SHELL_FIELDS,
   USERS_SETTINGS_FIELDS,
+  USERS_TEAMS_FIELDS,
+  GROUPS_TEAMS_FIELDS,
 } from '@/constants/request-fields'
 
 import { OPENSTF_API_ROUTES } from './routes'
@@ -30,6 +32,8 @@ import type {
   UsersWithFieldsListResponse,
   DeviceWithFieldsListResponse,
   UpdateUserGroupQuotaArgs,
+  TeamUserArgs,
+  TeamGroupArgs,
 } from './types'
 import type { GroupDevice } from '@/types/group-device.type'
 import type { ListDevice } from '@/types/list-device.type'
@@ -55,7 +59,14 @@ import type {
   AlertMessageResponse,
   AlertMessage,
   Token,
+  Team,
+  TeamsResponse,
+  TeamPayload,
+  TeamResponse,
+  GetGroupParams,
 } from '@/generated/types'
+import type { TeamUser } from '@/types/team-user.type'
+import type { TeamGroup } from '@/types/team-group.type'
 
 const getDevices = async <T>(params?: GetDevicesParams): Promise<T[]> => {
   const { data } = await openstfApiClient.get<DeviceWithFieldsListResponse<T>>(OPENSTF_API_ROUTES.devices, { params })
@@ -116,6 +127,52 @@ export const getGroups = async (params?: GetGroupsParams): Promise<GroupListResp
 
   return data.groups
 }
+
+export const createTeam = async (): Promise<boolean> => {
+  const { data } = await openstfApiClient.post<TeamResponse>(OPENSTF_API_ROUTES.team, {})
+
+  return data.success
+}
+
+export const getTeams = async (): Promise<Team[]> => {
+  const { data } = await openstfApiClient.get<TeamsResponse>(OPENSTF_API_ROUTES.teams)
+
+  return data.teams || []
+}
+
+export const updateTeam = async (id: string, data: TeamPayload): Promise<boolean> => {
+  const {
+    data: { success },
+  } = await openstfApiClient.post<TeamResponse>(`${OPENSTF_API_ROUTES.team}/${id}`, data)
+
+  return success
+}
+
+export const removeTeam = async (id: string): Promise<boolean> => {
+  const { data } = await openstfApiClient.delete<DefaultResponse>(OPENSTF_API_ROUTES.teamDelete(id))
+
+  return data.success
+}
+
+export const removeUserFromTeam = async ({ teamId, userEmail }: TeamUserArgs): Promise<boolean> => {
+  if (!userEmail) throw new Error('User email is required to remove user')
+  const { data } = await openstfApiClient.delete<TeamResponse>(OPENSTF_API_ROUTES.teamUser(teamId, userEmail))
+
+  return data.success
+}
+
+export const removeGroupFromTeam = async ({ teamId, groupId }: TeamGroupArgs): Promise<boolean> => {
+  if (!groupId) throw new Error('Group id is required to remove group')
+  const { data } = await openstfApiClient.delete<TeamResponse>(OPENSTF_API_ROUTES.teamGroup(teamId, groupId))
+
+  return data.success
+}
+
+export const getTeamUsers = (params?: ParamsWithoutFields<GetUsersParams>): Promise<TeamUser[]> =>
+  getUsers({ ...params, fields: USERS_TEAMS_FIELDS })
+
+export const getTeamGroups = (params?: ParamsWithoutFields<GetGroupParams>): Promise<TeamGroup[]> =>
+  getGroups({ ...params, fields: GROUPS_TEAMS_FIELDS })
 
 export const getDeviceBySerial = async (serial: string, params?: GetDeviceBySerialParams): Promise<Device> => {
   const { data } = await openstfApiClient.get<DeviceResponse>(`${OPENSTF_API_ROUTES.devices}/${serial}`, { params })

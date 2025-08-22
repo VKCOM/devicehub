@@ -1,0 +1,27 @@
+.input {
+  all: unset;
+  cursor: text;
+  display: 'inline-block';
+  width: 315px;
+}
+
+.name {
+  cursor: cursor;
+
+  .editIcon {
+    position: relative;
+    top: -1px;
+    display: none;
+    margin-left: 5px;
+  }
+
+  &:hover {
+    .editIcon {
+      display: inline;
+    }
+  }
+}
+
+.error {
+  color: var(--vkui--color_accent_orange_fire);
+}
