@@ -125,7 +125,6 @@
     "utf-8-validate": "5.0.9",
     "uuid": "^11.0.3",
     "webpack": "^5.88.1",
-    "websocket-stream": "5.5.2",
     "ws": "5.2.4",
     "yaml": "2.4.2",
     "yargs": "^17.7.2",

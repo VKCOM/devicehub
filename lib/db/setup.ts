@@ -1,4 +1,4 @@
-import {Db} from 'mongodb'
+import {Db, MongoServerError} from 'mongodb'
 import logger from '../util/logger.ts'
 import tables from './tables.ts'
 
@@ -8,26 +8,6 @@ interface TableOptions {
 
 export default async function setupDb(conn: Db): Promise<Db> {
     const log = logger.createLogger('db:setup')
-
-    function alreadyExistsError(err: unknown): boolean {
-        return (
-            typeof err === 'object' &&
-            err !== null &&
-            'msg' in err &&
-            typeof (err as any).msg === 'string' &&
-            (err as any).msg.includes('already exists')
-        )
-    }
-
-    function noMasterAvailableError(err: unknown): boolean {
-        return (
-            typeof err === 'object' &&
-            err !== null &&
-            'msg' in err &&
-            typeof (err as any).msg === 'string' &&
-            (err as any).msg.includes('No master available')
-        )
-    }
 
     async function createTable(
         table: string,
@@ -45,16 +25,15 @@ export default async function setupDb(conn: Db): Promise<Db> {
             await conn.collection(table).createIndex(index, {unique: true})
         }
         catch (err) {
-            if (alreadyExistsError(err)) {
-                log.info('Table "%s" already exists', table)
-            }
-            else if (noMasterAvailableError(err)) {
-                log.info('No master available')
-                await new Promise((resolve) => setTimeout(resolve, 1000))
-                return createTable(table, options) // retry
-            }
-            else {
-                throw err
+            if(err instanceof MongoServerError) {
+                if(err.message.includes('already exists')) {
+                    log.info('Table "%s" already exists', table)
+                    return
+                }
+                else if (err.message.includes('No master available')) {
+                    await new Promise((resolve) => setTimeout(resolve, 1000))
+                    return createTable(table, options) // retry
+                }
             }
         }
     }
