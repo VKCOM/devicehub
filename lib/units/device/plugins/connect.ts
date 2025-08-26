@@ -1,20 +1,21 @@
 import util from 'util'
 import syrup from '@devicefarmer/stf-syrup'
-import logger from '../../../util/logger.js'
-import wire from '../../../wire/index.js'
+import logger from '../../../util/logger.ts'
 import wireutil from '../../../wire/util.js'
-import lifecycle from '../../../util/lifecycle.js'
-import db from '../../../db/index.js'
+import lifecycle from '../../../util/lifecycle.ts'
+import db from '../../../db/index.ts'
 import adb from '../support/adb.js'
 import connector, {DEVICE_TYPE} from '../../base-device/support/connector.js'
-import push from '../../base-device/support/push.js'
-import router from '../../base-device/support/push.js'
+import push from '../../base-device/support/push.ts'
+import router from '../../base-device/support/router.js'
 import group from './group.js'
 import solo from './solo.js'
 import urlformat from '../../base-device/support/urlformat.js'
 import identity from './util/identity.js'
 import data from './util/data.js'
 import {GRPC_WAIT_TIMEOUT} from '../../../util/apiutil.js'
+import { TcpUsbServer } from '@u4/adbkit'
+import { AdbKeysUpdatedMessage } from '../../../wire/wire.js'
 
 // The promise passed as an argument will not be cancelled after the time has elapsed,
 // only the second promise will be rejected.
@@ -38,7 +39,7 @@ export default syrup.serial()
     .dependency(data)
     .define(async function(options, adb, router, push, group, solo, urlformat, connector, identity, data) {
         const log = logger.createLogger('device:plugins:connect')
-        let activeServer = null
+        let activeServer: TcpUsbServer | null = null
 
         await db.connect()
 
@@ -72,6 +73,17 @@ export default syrup.serial()
                 reject(new Error('Device is already in use'))
             }
         }
+
+        const auth = key => promiseTimeout(new Promise((resolve, reject) => {
+            group.on('join', (g, id) =>
+                joinListener(g, id, key, reject)
+            )
+            group.on('autojoin', (id, joined) =>
+                autojoinListener(id, joined, key, resolve, reject)
+            )
+            router.on(AdbKeysUpdatedMessage, () => notify(key))
+            notify(key)
+        }), 120_000) // reject after 2 minutes if autojoin event doesn't fire
 
         const plugin = {
             serial: options.serial,

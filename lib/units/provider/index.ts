@@ -10,6 +10,7 @@ import db from '../../db/index.js'
 import dbapi from '../../db/api.js'
 import {ChildProcess} from 'node:child_process'
 import ADBObserver, {ADBDevice} from './ADBObserver.js'
+import { DeviceRegisteredMessage } from '../../wire/wire.ts'
 
 interface DeviceWorker {
     state: 'waiting' | 'running'
@@ -87,7 +88,7 @@ export default (async function(options: Options) {
         })
 
         sub.on('message', new WireRouter()
-            .on(wire.DeviceRegisteredMessage, (channel, message) => {
+            .on(DeviceRegisteredMessage, (channel, message) => {
                 if (workers[message.serial]?.resolveRegister) {
                     workers[message.serial].resolveRegister!()
                     delete workers[message.serial]?.resolveRegister
