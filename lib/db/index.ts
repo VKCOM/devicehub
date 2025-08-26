@@ -254,13 +254,11 @@ export default class DbClient {
     // an issue with the processor unit, as it started processing messages before
     // it was actually truly able to save anything to the database. This lead to
     // lost messages in certain situations.
-    static ensureConnectivity = (fn: Function) =>
-        function() {
-            let args = [].slice.call(arguments)
-            return DbClient.connect().then(function() {
-                return fn.apply(null, args)
-            })
-        }
+    static ensureConnectivity = async <T extends Function>(fn: T) => {
+        await DbClient.connect()
+        log.info("Db is up")
+        return fn
+    }
 
     // Sets up the database
     static setup = () => DbClient.connect().then((conn) => _setup(conn))
