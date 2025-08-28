@@ -34,7 +34,6 @@ const useDevice = ({user, device, channelRouter, push, sub, usage = null, log}: 
         }
 
         const timeout = (new Date(device.group.lifeTime.stop)).getTime() - Date.now()
-        log?.info(`[useDevice] Device ${device.serial} in group ${device.group}, use with timeout - ${timeout}`)
 
         datautil.normalize(device, user)
         if (!deviceutil.isAddable(device)) {
@@ -59,14 +58,8 @@ const useDevice = ({user, device, channelRouter, push, sub, usage = null, log}: 
             log?.info('[useDevice] Successfully send and processed transaction (UngroupMessage)')
         }
         catch (e: any) {
-            if (!(e?.message || e).includes('Not a member of any group')) {
-                log?.info('[useDevice] Failed to run transaction (UngroupMessage):', e)
-                reject(e)
-            }
+            log?.info('[useDevice] Failed to run transaction (UngroupMessage):', e)
         }
-
-        const responseChannel = 'txn_' + uuidv4()
-        sub.subscribe(responseChannel)
 
         const responseTimeout = setTimeout(() => {
             channelRouter.removeListener(wireutil.global, useDeviceMessageListener)
@@ -81,22 +74,23 @@ const useDevice = ({user, device, channelRouter, push, sub, usage = null, log}: 
                     clearTimeout(responseTimeout)
                     channelRouter.removeListener(wireutil.global, useDeviceMessageListener)
 
-                    const clearTimer = () => {
-                        clearTimeout(connectTimeout)
-                        channelRouter.removeListener(responseChannel, messageListener)
+                    const responseChannel = 'txn_' + uuidv4()
+                    sub.subscribe(responseChannel)
 
+                    const connectTimeout = setTimeout(function() {
+                        channelRouter.removeListener(responseChannel, useDeviceMessageListener)
                         sub.unsubscribe(responseChannel)
-                        reject(UseDeviceError.FAILED_CONNECT)
-                    }
 
-                    const connectTimeout = setTimeout(clearTimer, apiutil.GRPC_WAIT_TIMEOUT)
+                        reject(UseDeviceError.FAILED_CONNECT)
+                    }, apiutil.GRPC_WAIT_TIMEOUT)
 
                     const messageListener = new WireRouter()
-                        .on(wire.ConnectStartedMessage, (channel, message) => {
+                        .on(wire.ConnectStartedMessage, function(channel, message) {
                             if (message.serial === device.serial) {
-                                clearTimer()
+                                clearTimeout(connectTimeout)
+                                sub.unsubscribe(responseChannel)
+                                channelRouter.removeListener(responseChannel, messageListener)
 
-                                log?.info(`[useDevice] Device ${device.serial} listening new connections (ConnectStartedMessage)`)
                                 resolve(message.url)
                             }
                         })
