@@ -58,9 +58,11 @@ const useDevice = ({user, device, channelRouter, push, sub, usage = null, log}: 
             await runTransaction(device.channel, new wire.UngroupMessage(deviceRequirements), {sub, push, channelRouter})
             log?.info('[useDevice] Successfully send and processed transaction (UngroupMessage)')
         }
-        catch (e) {
-            log?.info('[useDevice] Failed to run transaction (UngroupMessage):', e)
-            reject(e)
+        catch (e: any) {
+            if (!(e?.message || e).includes('Not a member of any group')) {
+                log?.info('[useDevice] Failed to run transaction (UngroupMessage):', e)
+                reject(e)
+            }
         }
 
         const responseChannel = 'txn_' + uuidv4()
