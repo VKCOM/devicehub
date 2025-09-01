@@ -54,7 +54,7 @@ class TestGroupListEndpoint:
         admin_groups = admin_groups_response.parsed.groups
         admin_group_count = len(admin_groups) - 1 # ignore common group
 
-        # Step 5: Verify that admin user has access to more groups
+        # Verify that admin user has access to more groups
         assert admin_group_count > initial_group_count, (
             f"Admin user should have more groups. "
             f"Initial: {initial_group_count}, Admin (ignore common): {admin_group_count}"
