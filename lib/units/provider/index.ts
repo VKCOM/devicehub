@@ -173,7 +173,6 @@ export default (async function(options: Options) {
         }
 
         const privateTracker = new EventEmitter()
-        let allocatedPorts: number[] = []
         let willStop = false
         let timer
 
@@ -216,7 +215,7 @@ export default (async function(options: Options) {
 
         // Spawn a device worker
         const spawn = () => {
-            allocatedPorts = ports.splice(0, 4)
+            let allocatedPorts = ports.splice(0, 4)
             lists.waiting.add(device.id)
 
             let didExit = false
@@ -265,7 +264,10 @@ export default (async function(options: Options) {
 
             return {
                 cancel: () => {
-                    if (!didExit) {
+                    // Return used ports to the main pool
+                    ports.push(...allocatedPorts)
+
+                    if (!didExit) { // Prevents when the process is already dead
                         log.info('Gracefully killing device worker "%s"', device.id)
                         return procutil.gracefullyKill(proc, options.killTimeout)
                     }
@@ -283,9 +285,6 @@ export default (async function(options: Options) {
                 workers[device.id] = async() => {
                     worker?.cancel() // if process exited - no effect
                     log.info('Cleaning up device worker "%s"', device.id)
-
-                    // Return used ports to the main pool
-                    ports.concat(allocatedPorts)
 
                     // Update lists
                     lists.all.delete(device.id)
@@ -397,8 +396,10 @@ export default (async function(options: Options) {
 
     lifecycle.share('Tracker', tracker)
 
-    lifecycle.observe(function() {
-        [push, sub].forEach(function(sock) {
+    lifecycle.observe(async() => {
+        await Promise.all(Object.keys(workers).map(serial => workers[serial]()))
+        clearTimeout(totalsTimer)
+        ;[push, sub].forEach((sock) => {
             try {
                 sock.close()
             }
@@ -406,8 +407,6 @@ export default (async function(options: Options) {
                 // No-op
             }
         })
-        clearTimeout(totalsTimer)
-        return Promise.all(Object.keys(workers).map(serial => workers[serial]()))
     })
 })
 
