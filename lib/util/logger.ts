@@ -1,4 +1,4 @@
-import util from 'util'
+import {printf} from 'fast-printf'
 import {EventEmitter} from 'events'
 import chalk from 'chalk'
 
@@ -12,17 +12,9 @@ export enum LogLevel {
     FATAL = 7,
 }
 
-export const LogLevelLabel: Record<LogLevel, string> = {
-    [LogLevel.DEBUG]: 'DBG',
-    [LogLevel.VERBOSE]: 'VRB',
-    [LogLevel.INFO]: 'INF',
-    [LogLevel.IMPORTANT]: 'IMP',
-    [LogLevel.WARNING]: 'WRN',
-    [LogLevel.ERROR]: 'ERR',
-    [LogLevel.FATAL]: 'FTL',
-}
-
 const innerLogger = new EventEmitter()
+
+type LogArguments = [string, ...any[]]
 
 export interface LogEntry {
     unit: string;
@@ -31,27 +23,40 @@ export interface LogEntry {
     tag: string;
     pid: number;
     identifier: string;
-    message: string;
-}
-
-const unitColors = {
-    websocket: [chalk.gray, chalk.bgBlack],
-    'groups-engine': [chalk.gray, chalk.bgBlack],
-    poorxy: [chalk.gray, chalk.bgBlack],
-    api: [chalk.green, chalk.bgGreen],
-    triproxy: [chalk.magenta, chalk.bgMagenta],
-    processor: [chalk.red, chalk.bgRed],
-    provider: [chalk.blue, chalk.bgBlue],
-    device: [chalk.cyan, chalk.bgCyan],
+    args: LogArguments;
 }
 
 export class Log extends EventEmitter {
     private tag: string
     private localIdentifier: string | null = null
 
-    private readonly names: Record<LogLevel, string> = LogLevelLabel
+    // Track stdout backpressure state
+    private static stdoutBlocked = false
+    private static pendingWrites: string[] = []
+    private static drainListenerAttached = false
 
-    private readonly styles = {
+    private static readonly unitColors: Record<string, chalk.ChalkChain[]> = {
+        websocket: [chalk.gray, chalk.bgBlack],
+        'groups-engine': [chalk.gray, chalk.bgBlack],
+        poorxy: [chalk.gray, chalk.bgBlack],
+        api: [chalk.green, chalk.bgGreen],
+        triproxy: [chalk.magenta, chalk.bgMagenta],
+        processor: [chalk.red, chalk.bgRed],
+        provider: [chalk.blue, chalk.bgBlue],
+        device: [chalk.cyan, chalk.bgCyan],
+    }
+
+    private static readonly names: Record<LogLevel, string> = {
+        [LogLevel.DEBUG]: 'DBG',
+        [LogLevel.VERBOSE]: 'VRB',
+        [LogLevel.INFO]: 'INF',
+        [LogLevel.IMPORTANT]: 'IMP',
+        [LogLevel.WARNING]: 'WRN',
+        [LogLevel.ERROR]: 'ERR',
+        [LogLevel.FATAL]: 'FTL',
+    }
+
+    private static readonly styles = {
         [LogLevel.DEBUG]: 'grey',
         [LogLevel.VERBOSE]: 'cyan',
         [LogLevel.INFO]: 'green',
@@ -70,70 +75,112 @@ export class Log extends EventEmitter {
         this.localIdentifier = identifier
     }
 
-    debug(...args: any[]): void {
+    debug(...args: LogArguments): void {
         this._write(this._entry(LogLevel.DEBUG, args))
     }
 
-    verbose(...args: any[]): void {
+    verbose(...args: LogArguments): void {
         this._write(this._entry(LogLevel.VERBOSE, args))
     }
 
-    info(...args: any[]): void {
+    info(...args: LogArguments): void {
         this._write(this._entry(LogLevel.INFO, args))
     }
 
-    important(...args: any[]): void {
+    important(...args: LogArguments): void {
         this._write(this._entry(LogLevel.IMPORTANT, args))
     }
 
-    warn(...args: any[]): void {
+    warn(...args: LogArguments): void {
         this._write(this._entry(LogLevel.WARNING, args))
     }
 
-    error(...args: any[]): void {
+    error(...args: LogArguments): void {
         this._write(this._entry(LogLevel.ERROR, args))
     }
 
-    fatal(...args: any[]): void {
+    fatal(...args: LogArguments): void {
         this._write(this._entry(LogLevel.FATAL, args))
     }
 
-    private _entry(priority: LogLevel, args: any[]): LogEntry {
+    private _entry(priority: LogLevel, args: LogArguments): LogEntry {
         return {
-            unit: globalLogger.unit,
+            unit: 'unknown',
             timestamp: new Date(),
             priority,
             tag: this.tag,
             pid: process.pid,
-            identifier: this.localIdentifier || globalLogger.globalIdentifier,
-            message: util.format(...args),
+            identifier: this.localIdentifier || '*',
+            args
         }
     }
 
     private _format(entry: LogEntry): string {
-        const [fg, bg] = unitColors[entry.unit as keyof typeof unitColors] ?? [chalk.yellow, chalk.bgYellow]
-        return util.format(
-            '%s %s %s/%s %d [%s] %s',
-            chalk.grey(entry.timestamp.toJSON()),
-            fg(bg(entry.unit)),
-            this._name(entry.priority),
-            chalk.bold(entry.tag),
-            entry.pid,
-            entry.identifier,
-            entry.message.includes('\n') ? JSON.stringify(entry.message) : entry.message
+        for (let i = 0; i < entry.args?.length || 0; i++) {
+            if (typeof entry.args[i] !== 'string') {
+                entry.args[0] = JSON.stringify(entry.args[0])
+            }
+        }
+
+        const [fg, bg] = Log.unitColors[entry.unit] ?? [chalk.yellow, chalk.bgYellow]
+        return (
+            `${chalk.grey(entry.timestamp.toJSON())} ${fg(bg(entry.unit))} ${this._name(entry.priority)}/${chalk.bold(entry.tag)} ${entry.pid} [${entry.identifier}] ${printf(...entry.args)}\n`
         )
     }
 
     private _name(priority: LogLevel): string {
-        const name = this.names[priority]
-        const color = this.styles[priority]
+        const name = Log.names[priority]
+        const color = Log.styles[priority]
         return chalk[color](name)
     }
 
     private _write(entry: LogEntry): void {
-        globalConsoleError(this._format(entry))
-        this.emit('entry', entry)
-        innerLogger.emit('entry', entry)
+        setImmediate(() => {
+            const output = this._format(entry)
+
+            // Emit events immediately
+            this.emit('entry', entry)
+            innerLogger.emit('entry', entry)
+
+            // Handle stdout backpressure
+            if (Log.stdoutBlocked) {
+                // If stdout is blocked, queue the output
+                Log.pendingWrites.push(output)
+                return
+            }
+
+            // Try to write directly to stdout
+            const success = process.stdout.write(output)
+            if (!success) {
+                // stdout buffer is full, set up drain listener if not already done
+                Log.stdoutBlocked = true
+                Log.setupDrainListener()
+            }
+        })
+    }
+
+    private static setupDrainListener(): void {
+        if (Log.drainListenerAttached) {
+            return
+        }
+
+        Log.drainListenerAttached = true
+        process.stdout.once('drain', () => {
+            Log.drainListenerAttached = false
+            Log.stdoutBlocked = false
+
+            // Flush any pending writes
+            while (Log.pendingWrites.length > 0) {
+                const output = Log.pendingWrites.shift()!
+                const success = process.stdout.write(output)
+                if (!success) {
+                    // stdout is blocked again
+                    Log.stdoutBlocked = true
+                    Log.setupDrainListener()
+                    break
+                }
+            }
+        })
     }
 }
 export const createLogger = (tag: string): Log => {
@@ -142,7 +189,6 @@ export const createLogger = (tag: string): Log => {
 
 class Logger {
     Level = LogLevel
-    LevelLabel = LogLevelLabel
     unit = 'unknown'
     globalIdentifier = '*'
     createLogger = createLogger
@@ -155,13 +201,8 @@ class Logger {
     on = innerLogger.on.bind(innerLogger)
 }
 
-
-const globalLogger = new Logger()
-
 const consoleLogger = createLogger('console')
-
-const globalConsoleError = console.error
 console.log = consoleLogger.info.bind(consoleLogger)
 console.error = consoleLogger.error.bind(consoleLogger)
 
-export default globalLogger
+export default new Logger()
