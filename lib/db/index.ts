@@ -5,7 +5,7 @@ import EventEmitter from 'events'
 import GroupChangeHandler from './handlers/group/index.js'
 import * as zmqutil from '../util/zmqutil.js'
 import lifecycle from '../util/lifecycle.js'
-import logger from '../util/logger.ts'
+import logger from '../util/logger.js'
 import wireutil from '../wire/util.js'
 import {type SocketWrapper} from '../util/zmqutil.js'
 
