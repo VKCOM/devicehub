@@ -24,6 +24,7 @@ export interface LogEntry {
     pid: number;
     identifier: string;
     args: LogArguments;
+    message?: string;
 }
 
 export class Log extends EventEmitter {
@@ -116,15 +117,10 @@ export class Log extends EventEmitter {
     }
 
     private _format(entry: LogEntry): string {
-        for (let i = 0; i < entry.args?.length || 0; i++) {
-            if (typeof entry.args[i] !== 'string') {
-                entry.args[0] = JSON.stringify(entry.args[0])
-            }
-        }
-
+        entry.message = printf(...entry.args)
         const [fg, bg] = Log.unitColors[entry.unit] ?? [chalk.yellow, chalk.bgYellow]
         return (
-            `${chalk.grey(entry.timestamp.toJSON())} ${fg(bg(entry.unit))} ${this._name(entry.priority)}/${chalk.bold(entry.tag)} ${entry.pid} [${entry.identifier}] ${printf(...entry.args)}\n`
+            `${chalk.grey(entry.timestamp.toJSON())} ${fg(bg(entry.unit))} ${this._name(entry.priority)}/${chalk.bold(entry.tag)} ${entry.pid} [${entry.identifier}] ${entry.message}\n`
         )
     }
 
