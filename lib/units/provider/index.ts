@@ -409,11 +409,3 @@ export default (async function(options: Options) {
         })
     })
 })
-
-process.on('uncaughtException', (err) => {
-    console.log('uncaughtException %s', err)
-})
-
-process.on('unhandledRejection', (err) => {
-    console.log('unhandledRejection %s', err)
-})

@@ -1,5 +1,4 @@
 import syrup from '@devicefarmer/stf-syrup'
-import logger from '../../util/logger.js'
 import lifecycle from '../../util/lifecycle.js'
 import logger$0 from '../base-device/support/logger.js'
 import heartbeat from '../base-device/plugins/heartbeat.js'
@@ -36,7 +35,7 @@ import push from '../base-device/support/push.js'
 import adb from './support/adb.js'
 import router from '../base-device/support/router.js'
 
-export default (function(options) {
+export default (function(options: any) {
     return syrup.serial()
         // We want to send logs before anything else starts happening
         .dependency(logger$0)
@@ -49,10 +48,10 @@ export default (function(options) {
             log.info('Preparing device')
 
             if (!options.provider) {
-                let listener
+                let listener = null
                 const waitRegister = Promise.race([
                     new Promise(resolve =>
-                        router.on(wire.DeviceRegisteredMessage, listener = (...args) => resolve(args))
+                        router.on(wire.DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
                     ),
                     new Promise(r => setTimeout(r, 15000))
                 ])
@@ -64,7 +63,7 @@ export default (function(options) {
                 ])
 
                 await waitRegister
-                router.removeListener(wire.DeviceRegisteredMessage, listener)
+                router.removeListener(wire.DeviceRegisteredMessage, listener as unknown as (...args: any[]) => void)
                 listener = null
             }
 
@@ -95,7 +94,7 @@ export default (function(options) {
                 .dependency(trackModuleReadyness('filesystem', filesystem))
                 .dependency(trackModuleReadyness('mobileService', mobileService))
                 .dependency(trackModuleReadyness('remotedebug', remotedebug))
-                .define(function(options, heartbeat) {
+                .define((options, heartbeat) => {
                     if (process.send) {
                         // Only if we have a parent process
                         process.send('ready')
@@ -106,7 +105,7 @@ export default (function(options) {
                 .consume(options)
         })
         .consume(options)
-        .catch(function(err) {
+        .catch((err) => {
             if (err.stack.includes('no service started')) {
                 return lifecycle.graceful(err.stack)
             }
