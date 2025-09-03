@@ -48,7 +48,7 @@ export default (function(options: any) {
             log.info('Preparing device')
 
             if (!options.provider) {
-                let listener = null
+                let listener: ((...args: any[]) => void) | null = null
                 const waitRegister = Promise.race([
                     new Promise(resolve =>
                         router.on(wire.DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
@@ -63,7 +63,7 @@ export default (function(options: any) {
                 ])
 
                 await waitRegister
-                router.removeListener(wire.DeviceRegisteredMessage, listener as unknown as (...args: any[]) => void)
+                router.removeListener(wire.DeviceRegisteredMessage, listener!)
                 listener = null
             }
 
