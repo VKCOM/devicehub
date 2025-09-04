@@ -1,6 +1,3 @@
-import {Adb, Device as AdbDevice} from '@u4/adbkit'
-import _ from 'lodash'
-import EventEmitter from 'eventemitter3'
 import logger from '../../util/logger.js'
 import wire from '../../wire/index.js'
 import wireutil from '../../wire/util.js'
@@ -12,31 +9,31 @@ import * as zmqutil from '../../util/zmqutil.js'
 import db from '../../db/index.js'
 import dbapi from '../../db/api.js'
 import {ChildProcess} from 'node:child_process'
+import ADBObserver, {ADBDevice} from './ADBObserver.js'
 
-const debounce = (fn: (...args: any) => Promise<any> | any, wait: number) => {
-    let timeout: NodeJS.Timeout
-    return (...args: any[]) => {
-        clearTimeout(timeout)
-        timeout = setTimeout(fn, wait, ...args)
-    }
+interface DeviceWorker {
+    state: 'waiting' | 'running'
+    time: number
+    terminate: () => Promise<void> | void
+    resolveRegister?: () => void
+    register: Promise<void>
+    waitingTimeoutTimer?: NodeJS.Timeout
 }
 
-type Device = AdbDevice & { present: boolean }
-
 export interface Options {
+    name: string
     adbHost: string
     adbPort: number
     ports: number[]
+    allowRemote: boolean
+    killTimeout: number
+    deviceType: string
     endpoints: {
         push: string[]
         sub: string[]
     }
-    allowRemote: boolean
-    filter: (device: Device) => boolean
-    deviceType: string
-    name: string
-    fork: (device: Device, ports: number[]) => ChildProcess
-    killTimeout: number
+    filter: (device: ADBDevice) => boolean
+    fork: (device: ADBDevice, ports: number[]) => ChildProcess
 }
 
 export default (async function(options: Options) {
@@ -49,52 +46,22 @@ export default (async function(options: Options) {
         lifecycle.fatal()
     }
 
-    const client = Adb.createClient({
-        host: options.adbHost,
-        port: options.adbPort
-    })
+    const workers: Record<string, DeviceWorker> = {}
 
-    const workers: Record<string, () => Promise<void>> = {}
     const solo = wireutil.makePrivateChannel()
-    const lists = {
-        all: new Set(),
-        ready: new Set(),
-        waiting: new Set()
-    }
-    let totalsTimer: NodeJS.Timeout
 
     // To make sure that we always bind the same type of service to the same
     // port, we must ensure that we allocate ports in fixed groups.
     let ports = options.ports.slice(0, options.ports.length - options.ports.length % 4)
-
-    // Information about total devices
-    const totals = () => {
-        if (lists.waiting.size) {
-            log.info('Providing %d of %d device(s); waiting for "%s"', lists.ready.size, lists.all.size, Array.from(lists.waiting).join('", "'))
-            delayedTotals()
-        }
-        else if (lists.ready.size < lists.all.size) {
-            log.info('Providing all %d of %d device(s); ignoring not ready: "%s"', lists.ready.size, lists.all.size, _.difference(Array.from(lists.all), Array.from(lists.ready)).join('", "'))
-        }
-        else {
-            log.info('Providing all %d device(s)', lists.all.size)
-        }
-    }
-
-    const delayedTotals = () => {
-        clearTimeout(totalsTimer)
-        totalsTimer = setTimeout(totals, 10000)
-    }
 
     // Output
     const push = zmqutil.socket('push')
     try {
         await Promise.all(options.endpoints.push.map(async(endpoint) => {
             const records = await srv.resolve(endpoint)
-            return await srv.attempt(records, (record) => {
+            return srv.attempt(records, (record) => {
                 log.info('Sending output to "%s"', record.url)
                 push.connect(record.url)
-                return Promise.resolve(true)
             })
         }))
     }
@@ -108,304 +75,321 @@ export default (async function(options: Options) {
     try {
         await Promise.all(options.endpoints.sub.map(async(endpoint) => {
             const records = await srv.resolve(endpoint)
-            return await srv.attempt(records, (record) => {
+            return srv.attempt(records, (record) => {
                 log.info('Receiving input to "%s"', record.url)
                 sub.connect(record.url)
-                return Promise.resolve(true)
             })
         }))
+
+        ;[solo].forEach(function(channel) {
+            log.info('Subscribing to permanent channel "%s"', channel)
+            sub.subscribe(channel)
+        })
+
+        sub.on('message', new WireRouter()
+            .on(wire.DeviceRegisteredMessage, (channel, message) => {
+                if (workers[message.serial]?.resolveRegister) {
+                    workers[message.serial].resolveRegister!()
+                    delete workers[message.serial]?.resolveRegister
+                }
+            })
+            .handler()
+        )
     }
     catch (err) {
         log.fatal('Unable to connect to sub endpoint', err)
         lifecycle.fatal()
     }
 
-
-    ;[solo].forEach(function(channel) {
-        log.info('Subscribing to permanent channel "%s"', channel)
-        sub.subscribe(channel)
-    })
-
-    // This can happen when ADB doesn't have a good connection to
-    // the device
-    const isWeirdUnusableDevice = (device: Device) =>
-        device.id === '????????????'
-
-    // Check whether the device is remote (i.e. if we're connecting to
-    // an IP address (or hostname) and port pair).
-    const isRemoteDevice = (device: Device) =>
-        device.id.includes(':')
-
     // Helper for ignoring unwanted devices
-    const filterDevice = (listener: (device: Device) => any | Promise<any>) =>
-        ((device: Device) => {
-            if (isWeirdUnusableDevice(device)) {
-                log.warn('ADB lists a weird device: "%s"', device.id)
+    const filterDevice = (listener: (device: ADBDevice, oldType?: ADBDevice['type']) => any | Promise<any>) =>
+        ((device: ADBDevice, oldType?: ADBDevice['type']) => {
+            if (device.serial === '????????????') {
+                log.warn('ADB lists a weird device: "%s"', device.serial)
                 return false
             }
-            if (!options.allowRemote && isRemoteDevice(device)) {
-                log.info('Filtered out remote device "%s", use --allow-remote to override', device.id)
+            if (!options.allowRemote && device.serial.includes(':')) {
+                log.info('Filtered out remote device "%s", use --allow-remote to override', device.serial)
                 return false
             }
             if (options.filter && !options.filter(device)) {
-                log.info('Filtered out device "%s"', device.id)
+                log.info('Filtered out device "%s"', device.serial)
                 return false
             }
-            return listener(device)
-        }) as (device: AdbDevice) => any | Promise<any>
+            return listener(device, oldType)
+        }) as (device: ADBDevice, oldType?: ADBDevice['type']) => any | Promise<any>
+
+    const stop = async(device: ADBDevice) => {
+        if (workers[device.serial]) {
+            log.info('Shutting down device worker "%s" [%s]', device.serial, device.type)
+            return workers[device.serial].terminate()
+        }
+    }
+
+    const register = (device: ADBDevice) => new Promise<void>(async(resolve) =>{
+        log.info('Registering device')
+
+        // Tell others we found a device
+        push.send([
+            wireutil.global,
+            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name)))
+        ])
+
+        dbapi.setDeviceType(device.serial, options.deviceType)
+        process.nextTick(() => { // after creating workers[device.serial] obj
+            if (workers[device.serial]) {
+                workers[device.serial].resolveRegister = () => resolve()
+            }
+        })
+    })
+
+    const spawn = (device: ADBDevice, onReady: () => Promise<any> | any, onError: (error: any) => Promise<any> | any) => {
+        if (!workers[device.serial]) { // when device disconnected - stop restart loop
+            return
+        }
+
+        let allocatedPorts = ports.splice(0, 4)
+
+        const proc = options.fork(device, allocatedPorts)
+        log.info('Spawned a device worker')
+
+        const exitListener = (code?: number, signal?: string) => {
+            proc.removeAllListeners('exit')
+            proc.removeAllListeners('error')
+            proc.removeAllListeners('message')
+
+            if (signal) {
+                log.warn('Device worker "%s" was killed with signal %s, assuming ' +
+                    'deliberate action and not restarting', device.serial, signal)
+
+                if (workers[device.serial].state === 'running') {
+                    workers[device.serial].terminate()
+                }
+                return
+            }
+
+            if (code === 0) {
+                log.info('Device worker "%s" stopped cleanly', device.serial)
+            }
+
+            onError(new procutil.ExitError(code))
+        }
+
+        if (!workers[device.serial]) {
+            procutil.gracefullyKill(proc, options.killTimeout)
+            return
+        }
+        workers[device.serial].terminate = () => exitListener(0)
+
+        const errorListener = (err: any) => {
+            log.error('Device worker "%s" had an error: %s', device.serial, err.message)
+            onError(err)
+        }
+
+        const messageListener = (message: string) => {
+            if (message !== 'ready') {
+                log.warn('Unknown message from device worker "%s": "%s"', device.serial, message)
+                return
+            }
+
+            onReady()
+            proc.removeListener('message', messageListener)
+        }
+
+        proc.on('exit', exitListener)
+        proc.on('error', errorListener)
+        proc.on('message', messageListener)
+
+        return {
+            kill: () => {
+                // Return used ports to the main pool
+                ports.push(...allocatedPorts)
+                proc.removeAllListeners('exit')
+                proc.removeAllListeners('error')
+                proc.removeAllListeners('message')
+
+                log.info('Gracefully killing device worker "%s"', device.serial)
+                return procutil.gracefullyKill(proc, options.killTimeout)
+            }
+        }
+    }
+
+    const work = async(device: ADBDevice) => {
+        if (!workers[device.serial]) { // when device disconnected - stop restart loop
+            return
+        }
+
+        log.info('Starting to work for device "%s"', device.serial)
+        let resolveReady: () => void
+
+        const ready = new Promise<void>(resolve => (resolveReady = resolve))
+        const resolveRegister = () => {
+            if (workers[device.serial]?.resolveRegister) {
+                workers[device.serial].resolveRegister!()
+                delete workers[device.serial]?.resolveRegister
+            }
+        }
+
+        const handleError = async(err: any) => {
+            log.error('Failed start device worker "%s": %s', device.serial, err)
+            resolveReady()
+
+            if (err instanceof procutil.ExitError) {
+                log.error('Device worker "%s" died with code %s', device.serial, err.code)
+                log.info('Restarting device worker "%s"', device.serial)
+
+                await new Promise(r => setTimeout(r, 2000))
+                work(device)
+            }
+
+            resolveRegister()
+        }
+
+        const worker = spawn(device, resolveReady!, handleError)
+
+        await Promise.all([
+            workers[device.serial].register.then(() =>
+                log.info('Registered device "%s"', device.serial)
+            ),
+            ready.then(() =>
+                log.info('Device "%s" is ready', device.serial)
+            )
+        ])
+
+        if (!workers[device.serial]) { // when device disconnected - stop restart loop
+            return
+        }
+
+        // Worker stop
+        workers[device.serial].terminate = async() => {
+            resolveRegister()
+            delete workers[device.serial]
+
+            worker?.kill?.() // if process exited - no effect
+            log.info('Cleaning up device worker "%s"', device.serial)
+
+            // Tell others the device is gone
+            push.send([
+                wireutil.global,
+                wireutil.envelope(new wire.DeviceAbsentMessage(device.serial))
+            ])
+
+            stats()
+
+            // Wait while DeviceAbsentMessage processed on app side (1s)
+            await new Promise(r => setTimeout(r, 1000))
+        }
+
+        workers[device.serial].state = 'running'
+
+        stats()
+
+        // Tell others the device state changed
+        push.send([
+            wireutil.global,
+            wireutil.envelope(new wire.DeviceStatusMessage(device.serial, wireutil.toDeviceStatus(device.type)))
+        ])
+    }
 
     // Track and manage devices
-    const tracker = await client.trackDevices()
-
+    const tracker = new ADBObserver({intervalMs: 2000})
     log.info('Tracking devices')
 
-    // To make things easier, we're going to cheat a little, and make all
-    // device events go to their own EventEmitters. This way we can keep all
-    // device data in the same scope.
-    const flippedTracker = new EventEmitter()
-    tracker.on('add', filterDevice(async(device) => {
-        log.info('Found device "%s" (%s)', device.id, device.type)
-
-        if (workers[device.id]) {
-            log.info('Device "%s" is already exists, reboot process', device.id)
-            log.info('Shutting down device worker "%s"', device.id)
-            await workers[device.id]()
+    tracker.on('connect', filterDevice((device) => {
+        if (workers[device.serial]) {
+            log.warn('Device has been connected twice. Skip.')
+            return
         }
 
-        const privateTracker = new EventEmitter()
-        let willStop = false
-        let timer
+        log.info('Connected device "%s" [%s]', device.serial, device.type)
 
-        // Check if we can do anything with the device
-        const check = async() => {
-            log.info(`Checking ${device.id}`)
-            clearTimeout(timer)
-
-            if (device.present && ['device', 'emulator'].includes(device?.type)) {
-                log.info(`Checking ${device.id} successfully`)
-                return true
-            }
-
-            log.info(`Checking ${device.id} failed [deviceType: ${device?.type}]`)
-            return false
+        workers[device.serial] = {
+            state: 'waiting',
+            time: Date.now(),
+            terminate: () => {},
+            register: register(device) // Register device immediately, before 'running' state
         }
 
-        // Wait for others to acknowledge the device
-        const register = new Promise<void>(async(resolve) =>{
-            privateTracker.on('remove', () => {
-                resolve()
-            })
+        stats()
 
-            log.info('Registering device')
+        if (device.type === 'device') {
+            work(device)
+            return
+        }
 
-            // Tell others we found a device
-            push.send([
-                wireutil.global,
-                wireutil.envelope(new wire.DeviceIntroductionMessage(device.id, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name)))
-            ])
-
-            dbapi.setDeviceType(device.id, options.deviceType)
-
-            privateTracker.once('register', () => {
-                privateTracker.once('ready', () => {
-                    resolve()
-                })
-            })
-        })
-
-        // Spawn a device worker
-        const spawn = () => {
-            let allocatedPorts = ports.splice(0, 4)
-            lists.waiting.add(device.id)
-
-            let didExit = false
-            const proc = options.fork(device, allocatedPorts)
-
-            log.info('Spawned a device worker')
-
-            const exitListener = (code: number, signal: string) => {
-                didExit = true
-                if (signal) {
-                    log.warn('Device worker "%s" was killed with signal %s, assuming ' +
-                        'deliberate action and not restarting', device.id, signal)
-
-                    lists.waiting.delete(device.id)
-                    workers[device.id]?.()
+        // Try to reconnect device if it is not available for more than 30 seconds
+        if (device.serial.includes(':')) {
+            workers[device.serial].waitingTimeoutTimer = setTimeout((serial) => {
+                const device = tracker.getDevice(serial)
+                if (device && !['device', 'emulator'].includes(device?.type)) {
+                    device.reconnect()
                 }
-                else if (code === 0) {
-                    log.info('Device worker "%s" stopped cleanly', device.id)
-                }
-                else {
-                    throw new procutil.ExitError(code)
-                }
-            }
-
-            const errorListener = (err: any) => {
-                log.error('Device worker "%s" had an error: %s', device.id, err.message)
-            }
-
-            const messageListener = (message: string) => {
-                if (message !== 'ready') {
-                    log.warn('Unknown message from device worker "%s": "%s"', device.id, message)
-                    return
-                }
-
-                log.info('Device "%s" is ready', device.id)
-
-                lists.waiting.delete(device.id)
-                lists.ready.add(device.id)
-
-                privateTracker.emit('ready')
-            }
-
-            proc.on('exit', exitListener)
-            proc.on('error', errorListener)
-            proc.on('message', messageListener)
-
-            return {
-                cancel: () => {
-                    // Return used ports to the main pool
-                    ports.push(...allocatedPorts)
-
-                    if (!didExit) { // Prevents when the process is already dead
-                        log.info('Gracefully killing device worker "%s"', device.id)
-                        return procutil.gracefullyKill(proc, options.killTimeout)
-                    }
-                }
-            }
-        }
-
-        // Starts a device worker and keeps it alive
-        const work = async() => {
-            log.info('Starting to work for device "%s"', device.id)
-            try {
-                const worker = spawn()
-
-                // Worker stop
-                workers[device.id] = async() => {
-                    worker?.cancel() // if process exited - no effect
-                    log.info('Cleaning up device worker "%s"', device.id)
-
-                    // Update lists
-                    lists.all.delete(device.id)
-                    lists.ready.delete(device.id)
-                    lists.waiting.delete(device.id)
-
-                    delayedTotals()
-
-                    // Tell others the device is gone
-                    push.send([
-                        wireutil.global,
-                        wireutil.envelope(new wire.DeviceAbsentMessage(device.id))
-                    ])
-
-                    // Wait while DeviceAbsentMessage processed on app side (1s)
-                    await new Promise(r => setTimeout(r, 1000))
-                    delete workers[device.id]
-                }
-
-                await register
-                log.info('Registered device "%s"', device.id)
-
-                // Statistics
-                delayedTotals()
-            }
-            catch (err: any) {
-                log.error('Failed start device worker "%s": %s', device.id, err)
-                if (err instanceof procutil.ExitError && !willStop) {
-                    log.error('Device worker "%s" died with code %s', device.id, err.code)
-                    log.info('Restarting device worker "%s"', device.id)
-                    await new Promise(r => setTimeout(r, 500))
-                    return work()
-                }
-            }
-        }
-
-        const stop = () => {
-            log.info('Shutting down device worker "%s"', device.id) // log required
-            return workers[device.id]?.() // if running
-        }
-
-        // When any event occurs on the added device
-        const deviceListener = (type: string, ...args: any[]) => {
-            log.info(`deviceListener ${type} ${JSON.stringify(args)}`)
-            // Okay, this is a bit unnecessary, but it allows us to get rid of an
-            // ugly switch statement and return to the original style.
-            privateTracker.emit(type, ...args)
-        }
-
-        // When the added device changes
-        const changeListener = async(updatedDevice: AdbDevice) => {
-            log.info('Device "%s" is now "%s" (was "%s")', device.id, updatedDevice.type, device.type)
-            device.type = updatedDevice.type
-
-            // Tell others the device changed
-            push.send([
-                wireutil.global,
-                wireutil.envelope(new wire.DeviceStatusMessage(device.id, wireutil.toDeviceStatus(device.type)))
-            ])
-
-            // If not running, but can
-            if (!lists.waiting.has(device.id) && !workers[device.id] && await check()) {
-                await work()
-            }
-        }
-
-        // When the added device gets removed
-        const removeListener = async() => {
-            log.info('Lost device "%s" (%s)', device.id, device.type)
-            clearTimeout(timer)
-
-            flippedTracker.removeListener(device.id, deviceListener)
-
-            device.present = false
-            willStop = true
-            await stop()
-        }
-
-
-        flippedTracker.on(device.id, (type: string, ...args: any[]) =>
-            deviceListener(type, ...args)
-        )
-        privateTracker.on('change', changeListener)
-        privateTracker.on('remove', removeListener)
-
-        // Will be set to false when the device is removed
-        device.present = true
-
-        // If work has not started, will start it later.
-        if (await check()) {
-            await work()
+            }, 30_000, device.serial)
         }
     }))
 
-    tracker.on('change', debounce(filterDevice((device) =>
-        flippedTracker.emit(device.id, 'change', device)
-    ), 400))
+    tracker.on('update', filterDevice((device, oldType) => {
+        if (!['device', 'emulator'].includes(device.type)) {
+            log.info('Lost device "%s" [%s]', device.serial, device.type)
+            return stop(device)
+        }
 
-    tracker.on('remove', filterDevice((device) => {
-        flippedTracker.emit(device.id, 'remove', device)
+        log.info('Device "%s" is now "%s" (was "%s")', device.serial, device.type, oldType)
+
+        // If not running, but can
+        if (device.type === 'device' && workers[device.serial]?.state === 'waiting') {
+            clearTimeout(workers[device.serial].waitingTimeoutTimer)
+            work(device)
+        }
     }))
 
-    sub.on('message', new WireRouter()
-        .on(wire.DeviceRegisteredMessage, (channel, message) => {
-            flippedTracker.emit(message.serial, 'register')
-        })
-        .handler()
-    )
+    tracker.on('disconnect', filterDevice(async(device) => {
+        log.info('Disconnect device "%s" [%s]', device.serial, device.type)
+        clearTimeout(workers[device.serial].waitingTimeoutTimer)
+        await stop(device)
+        delete workers[device.serial]
+    }))
 
-    lifecycle.share('Tracker', tracker)
+    tracker.start()
+
+    let statsTimer: NodeJS.Timeout
+    const stats = (twice = true) => {
+        const all = Object.keys(workers).length
+        const result: any = {
+            waiting: [],
+            running: []
+        }
+        for (const serial of Object.keys(workers)) {
+            if (workers[serial].state === 'running') {
+                result.running.push(serial)
+                continue
+            }
+            result.waiting.push(serial)
+        }
+
+        log.info(`Providing ${result.running.length} of ${all} device(s); waiting for [${result.waiting.join(', ')}]`)
+        log.info(`Providing all ${all} of ${tracker.count} device(s)`)
+        log.info(`Providing all ${tracker.count} device(s)`)
+
+        if (twice) {
+            clearTimeout(statsTimer)
+            statsTimer = setTimeout(stats, 10000, false)
+        }
+    }
 
     lifecycle.observe(async() => {
-        await Promise.all(Object.keys(workers).map(serial => workers[serial]()))
-        clearTimeout(totalsTimer)
-        ;[push, sub].forEach((sock) => {
-            try {
-                sock.close()
-            }
-            catch (err) {
-                // No-op
-            }
-        })
+        await Promise.all(
+            Object.values(workers)
+                .map(worker =>
+                    worker.terminate()
+                )
+        )
+
+        stats(false)
+        tracker.destroy()
+
+        ;[push, sub].forEach((sock) =>
+            sock.close()
+        )
     })
 })
