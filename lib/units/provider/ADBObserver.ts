@@ -1,8 +1,5 @@
 import EventEmitter from 'events'
-import {exec} from 'child_process'
-import {promisify} from 'util'
-
-const execAsync = promisify(exec)
+import net, {Socket} from 'net'
 
 interface ADBDevice {
     serial: string
@@ -19,20 +16,27 @@ class ADBObserver extends EventEmitter {
     static instance: ADBObserver | null = null
 
     private readonly intervalMs: number = 1000 // Default 1 second polling
+    private readonly host: string = 'localhost'
+    private readonly port: number = 5037
 
     private devices: Map<string, ADBDevice> = new Map()
     private pollTimeout: NodeJS.Timeout | null = null
     private isPolling: boolean = false
     private isDestroyed: boolean = false
     private shouldContinuePolling: boolean = false
+    private connection: Socket | null = null
+    private isConnecting: boolean = false
+    private pendingRequests: Map<string, {resolve: (value: string) => void; reject: (error: Error) => void}> = new Map()
 
-    constructor(options?: {intervalMs?: number}) {
+    constructor(options?: {intervalMs?: number; host?: string; port?: number}) {
         if (ADBObserver.instance) {
             return ADBObserver.instance
         }
 
         super()
         this.intervalMs = options?.intervalMs || this.intervalMs
+        this.host = options?.host || this.host
+        this.port = options?.port || this.port
 
         ADBObserver.instance = this
     }
@@ -68,6 +72,7 @@ class ADBObserver extends EventEmitter {
             clearTimeout(this.pollTimeout)
             this.pollTimeout = null
         }
+        this.closeConnection()
         ADBObserver.instance = null
     }
 
@@ -158,29 +163,203 @@ class ADBObserver extends EventEmitter {
 
     private async getADBDevices(): Promise<ADBDeviceEntry[]> {
         try {
-            const {stdout} = await execAsync('adb devices')
-            return this.parseADBDevicesOutput(stdout)
+            const response = await this.sendADBCommand('host:devices')
+            return this.parseADBDevicesOutput(response)
         }
         catch (error) {
-            throw new Error(`Failed to execute 'adb devices': ${error}`)
+            throw new Error(`Failed to get ADB devices from ${this.host}:${this.port}: ${error}`)
         }
     }
 
     /**
-     * Parse the output of 'adb devices' command
+     * Establish or reuse persistent connection to ADB server
+     */
+    private async ensureConnection(): Promise<Socket> {
+        if (this.connection && !this.connection.destroyed) {
+            return this.connection
+        }
+
+        if (this.isConnecting) {
+            // Wait for ongoing connection attempt
+            return new Promise((resolve, reject) => {
+                const checkConnection = () => {
+                    if (this.connection && !this.connection.destroyed) {
+                        resolve(this.connection)
+                    }
+                    else if (!this.isConnecting) {
+                        reject(new Error('Connection failed'))
+                    }
+                    else {
+                        setTimeout(checkConnection, 10)
+                    }
+                }
+                checkConnection()
+            })
+        }
+
+        return this.createConnection()
+    }
+
+    /**
+     * Create new connection to ADB server
+     */
+    private async createConnection(): Promise<Socket> {
+        this.isConnecting = true
+
+        return new Promise((resolve, reject) => {
+            const client = net.createConnection(this.port, this.host, () => {
+                this.connection = client
+                this.isConnecting = false
+                this.setupConnectionHandlers(client)
+                resolve(client)
+            })
+
+            client.on('error', (err) => {
+                this.isConnecting = false
+                this.connection = null
+                reject(err)
+            })
+        })
+    }
+
+    /**
+     * Setup event handlers for persistent connection
+     */
+    private setupConnectionHandlers(client: Socket): void {
+        let responseBuffer = Buffer.alloc(0)
+
+        client.on('data', (data) => {
+            responseBuffer = Buffer.concat([responseBuffer, data])
+            responseBuffer = this.processADBResponses(responseBuffer)
+        })
+
+        client.on('close', () => {
+            this.connection = null
+            // Reject any pending requests
+            for (const [, {reject}] of this.pendingRequests) {
+                reject(new Error('Connection closed'))
+            }
+            this.pendingRequests.clear()
+            
+            // Auto-reconnect if we should continue polling
+            if (this.shouldContinuePolling && !this.isDestroyed) {
+                this.ensureConnection().catch(err => {
+                    this.emit('error', err)
+                })
+            }
+        })
+
+        client.on('error', (err) => {
+            this.connection = null
+            this.emit('error', err)
+        })
+    }
+
+    /**
+     * Process ADB protocol responses and return remaining buffer
+     */
+    private processADBResponses(buffer: Buffer): Buffer {
+        let offset = 0
+
+        while (offset < buffer.length) {
+            // Need at least 8 bytes for status (4) + length (4)
+            if (buffer.length - offset < 8) {
+                break
+            }
+
+            const status = buffer.subarray(offset, offset + 4).toString('ascii')
+            const lengthHex = buffer.subarray(offset + 4, offset + 8).toString('ascii')
+            const dataLength = parseInt(lengthHex, 16)
+
+            // Check if we have the complete response
+            if (buffer.length - offset < 8 + dataLength) {
+                break
+            }
+
+            const responseData = buffer.subarray(offset + 8, offset + 8 + dataLength).toString('utf-8')
+            
+            if (status === 'OKAY') {
+                // Find and resolve the corresponding request
+                const requestId = 'host:devices' // For now, we only handle device listing
+                const pending = this.pendingRequests.get(requestId)
+                if (pending) {
+                    this.pendingRequests.delete(requestId)
+                    pending.resolve(responseData)
+                }
+            }
+            else if (status === 'FAIL') {
+                const requestId = 'host:devices'
+                const pending = this.pendingRequests.get(requestId)
+                if (pending) {
+                    this.pendingRequests.delete(requestId)
+                    pending.reject(new Error(responseData || 'ADB command failed'))
+                }
+            }
+
+            offset += 8 + dataLength
+        }
+
+        // Return remaining incomplete data in buffer
+        return offset > 0 ? buffer.subarray(offset) : buffer
+    }
+
+    /**
+     * Send command to ADB server using persistent connection
+     */
+    private async sendADBCommand(command: string): Promise<string> {
+        const connection = await this.ensureConnection()
+        
+        return new Promise((resolve, reject) => {
+            // Store the request for response matching
+            this.pendingRequests.set(command, {resolve, reject})
+
+            const commandBuffer = Buffer.from(command, 'utf-8')
+            const lengthHex = commandBuffer.length.toString(16).padStart(4, '0')
+            const message = Buffer.concat([
+                Buffer.from(lengthHex, 'ascii'),
+                commandBuffer
+            ])
+
+            connection.write(message, (err) => {
+                if (err) {
+                    this.pendingRequests.delete(command)
+                    reject(err)
+                }
+            })
+        })
+    }
+
+    /**
+     * Close the persistent connection
+     */
+    private closeConnection(): void {
+        if (this.connection && !this.connection.destroyed) {
+            this.connection.destroy()
+            this.connection = null
+        }
+        
+        // Reject any pending requests
+        for (const [, {reject}] of this.pendingRequests) {
+            reject(new Error('Connection closed'))
+        }
+        this.pendingRequests.clear()
+    }
+
+    /**
+     * Parse the output of 'adb devices' command from ADB protocol response
      */
     private parseADBDevicesOutput(output: string): ADBDeviceEntry[] {
         const lines = output.trim().split('\n')
         const devices: ADBDeviceEntry[] = []
 
-        // Skip the first line which is "List of devices attached"
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i].trim()
-            if (!line) {
+        // Parse each line directly (no header line in protocol response)
+        for (const line of lines) {
+            const trimmedLine = line.trim()
+            if (!trimmedLine) {
                 continue
             }
 
-            const parts = line.split(/\s+/)
+            const parts = trimmedLine.split(/\s+/)
             if (parts.length >= 2) {
                 const serial = parts[0]
                 const state = parts[1] as ADBDevice['type']
@@ -200,13 +379,19 @@ class ADBObserver extends EventEmitter {
             type: deviceEntry.state,
             reconnect: async(): Promise<boolean> => {
                 try {
-                    // Try to reconnect the device using adb connect (for network devices)
+                    // Try to reconnect the device using ADB protocol (for network devices)
                     // For USB devices, this might not be applicable
                     if (device.serial.includes(':')) {
                         if (this.devices.has(device.serial)) {
-                            await execAsync(`adb disconnect ${device.serial}`)
+                            try {
+                                await this.sendADBCommand(`host:disconnect:${device.serial}`)
+                            }
+                            catch {
+                                // Ignore disconnect errors
+                            }
                         }
-                        await execAsync(`adb connect ${device.serial}`)
+
+                        await this.sendADBCommand(`host:connect:${device.serial}`)
                         await new Promise(resolve => setTimeout(resolve, 1000))
 
                         const devices = await this.getADBDevices()

@@ -292,7 +292,11 @@ export default (async function(options: Options) {
     }
 
     // Track and manage devices
-    const tracker = new ADBObserver({intervalMs: 2000})
+    const tracker = new ADBObserver({
+        intervalMs: 2000,
+        port: options.adbPort,
+        host: options.adbHost
+    })
     log.info('Tracking devices')
 
     tracker.on('connect', filterDevice((device) => {
