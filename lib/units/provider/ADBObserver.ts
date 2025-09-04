@@ -71,9 +71,6 @@ class ADBObserver extends EventEmitter {
         ADBObserver.instance = null
     }
 
-    /**
-     * Destroy the observer and clean up resources
-     */
     destroy(): void {
         this.isDestroyed = true
         this.stop()
@@ -81,16 +78,11 @@ class ADBObserver extends EventEmitter {
         this.removeAllListeners()
     }
 
-    /**
-     * Get all currently tracked devices
-     */
     getDevices(): ADBDevice[] {
         return Array.from(this.devices.values())
     }
 
-    /**
-     * Get a specific device by serial
-     */
+
     getDevice(serial: string): ADBDevice | undefined {
         return this.devices.get(serial)
     }
@@ -146,7 +138,7 @@ class ADBObserver extends EventEmitter {
     }
 
     /**
-     * Schedule the next polling cycle using setTimeout
+     * Schedule the next polling cycle
      */
     private scheduleNextPoll(): void {
         if (!this.shouldContinuePolling || this.isDestroyed) {
@@ -158,16 +150,12 @@ class ADBObserver extends EventEmitter {
                 this.emit('error', err)
             })
 
-            // Schedule next poll if we should continue
             if (this.shouldContinuePolling && !this.isDestroyed) {
                 this.scheduleNextPoll()
             }
         }, this.intervalMs)
     }
 
-    /**
-     * Execute 'adb devices' and parse the output
-     */
     private async getADBDevices(): Promise<ADBDeviceEntry[]> {
         try {
             const {stdout} = await execAsync('adb devices')
