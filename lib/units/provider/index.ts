@@ -322,7 +322,7 @@ export default (async function(options: Options) {
         }
 
         // Try to reconnect device if it is not available for more than 30 seconds
-        if (device.serial.includes(':')) {
+        if (device.serial.includes(':') && workers[device.serial]) {
             workers[device.serial].waitingTimeoutTimer = setTimeout((serial) => {
                 const device = tracker.getDevice(serial)
                 if (device && !['device', 'emulator'].includes(device?.type)) {
@@ -349,7 +349,7 @@ export default (async function(options: Options) {
 
     tracker.on('disconnect', filterDevice(async(device) => {
         log.info('Disconnect device "%s" [%s]', device.serial, device.type)
-        clearTimeout(workers[device.serial].waitingTimeoutTimer)
+        clearTimeout(workers[device.serial]?.waitingTimeoutTimer)
         await stop(device)
         delete workers[device.serial]
     }))
