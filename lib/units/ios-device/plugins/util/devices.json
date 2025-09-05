@@ -3003,7 +3003,7 @@
     "model": "A1553 (EMC 2870*)",
     "device_id": "Watch1,1",
     "order": "MLCN2LL/A*",
-    "full_family": "Watch Herm\u0018\u00aes 38mm"
+    "full_family": "Watch Herm\u0018®s 38mm"
   },
   {
     "full_name": "Apple Watch Series 0 Hermes (Steel, 42 mm)",
@@ -3012,7 +3012,7 @@
     "model": "A1554 (EMC 2871*)",
     "device_id": "Watch1,2",
     "order": "MLCC2LL/A*",
-    "full_family": "Watch Herm\u0018\u00aes 42mm"
+    "full_family": "Watch Herm\u0018®s 42mm"
   },
   {
     "full_name": "Apple Watch Series 1 (Aluminum, 38 mm)",
@@ -4678,5 +4678,365 @@
     "device_id": "RealityDevice14,1",
     "order": "MQL83LL/A*",
     "full_family": "Vision Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (US)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2848 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (CA/JP/MX/SA)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3101 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (Global)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3102 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (China/HK/Macau)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3104 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (US)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2849 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (CA/JP/MX/SA)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3105 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (Global)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3106 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (China/HK/Macau)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3108 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3081 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3286 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3287 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3288 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 Plus (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3080 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3290 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3291 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3296 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Pro (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3083 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3292 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3293 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3294 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3084 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3295 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3297 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3298 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPad Pro 11\" (M4, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2836 (EMC N/A*)",
+    "device_id": "iPad16,3",
+    "order": "N/A*",
+    "full_family": "iPad Pro 11\" (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 11\" (M4, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2837 (EMC N/A*)",
+    "device_id": "iPad16,4",
+    "order": "N/A*",
+    "full_family": "iPad Pro 11\" (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 13\" (M4, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2923 (EMC N/A*)",
+    "device_id": "iPad16,5",
+    "order": "N/A*",
+    "full_family": "iPad Pro 13\" (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 13\" (M4, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2924 (EMC N/A*)",
+    "device_id": "iPad16,6",
+    "order": "N/A*",
+    "full_family": "iPad Pro 13\" (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Air 11\" (M2, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2902 (EMC N/A*)",
+    "device_id": "iPad14,8",
+    "order": "N/A*",
+    "full_family": "iPad Air 11\" (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 11\" (M2, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2903 (EMC N/A*)",
+    "device_id": "iPad14,9",
+    "order": "N/A*",
+    "full_family": "iPad Air 11\" (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 13\" (M2, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2904 (EMC N/A*)",
+    "device_id": "iPad14,10",
+    "order": "N/A*",
+    "full_family": "iPad Air 13\" (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 13\" (M2, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2905 (EMC N/A*)",
+    "device_id": "iPad14,11",
+    "order": "N/A*",
+    "full_family": "iPad Air 13\" (M2, 2024)"
+  },
+  {
+    "full_name": "iPad mini (7th Gen, 2024 Wi‑Fi)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A28xx (EMC N/A*)",
+    "device_id": "iPad16,1",
+    "order": "N/A*",
+    "full_family": "iPad mini (7th Gen)"
+  },
+  {
+    "full_name": "iPad mini (7th Gen, 2024 Wi‑Fi + Cellular)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A28xx (EMC N/A*)",
+    "device_id": "iPad16,2",
+    "order": "N/A*",
+    "full_family": "iPad mini (7th Gen)"
+  },
+  {
+    "full_name": "iPad (11th Gen, 2024 Wi‑Fi)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A29xx (EMC N/A*)",
+    "device_id": "iPad15,7",
+    "order": "N/A*",
+    "full_family": "iPad (11th Gen)"
+  },
+  {
+    "full_name": "iPad (11th Gen, 2024 Wi‑Fi + Cellular)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A29xx (EMC N/A*)",
+    "device_id": "iPad15,8",
+    "order": "N/A*",
+    "full_family": "iPad (11th Gen)"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (41mm, Aluminum)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2997 (EMC N/A*)",
+    "device_id": "Watch7,8",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (45/46mm, Aluminum)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2999 (EMC N/A*)",
+    "device_id": "Watch7,9",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Titanium)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3000 (EMC N/A*)",
+    "device_id": "Watch7,9",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2",
+    "introduced": "September 12, 2023",
+    "discontinued": "N/A",
+    "model": "A2986 (EMC N/A*)",
+    "device_id": "Watch7,4",
+    "order": "N/A*",
+    "full_family": "Apple Watch Ultra 2"
   }
 ]
