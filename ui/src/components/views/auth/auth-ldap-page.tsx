@@ -122,9 +122,11 @@ export const AuthLdapPage = () => {
                   </Button>
                 </FormItem>
               </FormLayoutGroup>
-              <Button className={styles.contactButton} href={authContact} mode='link'>
-                {t('Contact Support')}
-              </Button>
+              <ConditionalRender conditions={[!!authContact, authContact != 'example.com']}>
+                <Button className={styles.contactButton} href={authContact} mode='link'>
+                  {t('Contact Support')}
+                </Button>
+              </ConditionalRender>
             </form>
           </div>
         </Group>
