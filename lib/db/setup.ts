@@ -1,5 +1,5 @@
 import {Db, MongoServerError} from 'mongodb'
-import logger from '../util/logger.ts'
+import logger from '../util/logger.js'
 import tables from './tables.ts'
 
 interface TableOptions {

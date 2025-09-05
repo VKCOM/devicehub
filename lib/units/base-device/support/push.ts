@@ -1,5 +1,5 @@
 import syrup from '@devicefarmer/stf-syrup'
-import logger from '../../../util/logger.ts'
+import logger from '../../../util/logger.js'
 import srv from '../../../util/srv.ts'
 import lifecycle from '../../../util/lifecycle.js'
 import * as zmqutil from '../../../util/zmqutil.js'
