@@ -810,7 +810,7 @@
     "full_family": "iPhone 11 Pro Max"
   },
   {
-    "full_name": "iPhone SE (2 - 4.7\" 2020 US/CA A2275)",
+    "full_name": "iPhone SE (2 - 4.7 2020 US/CA A2275)",
     "introduced": "April 15, 2020",
     "discontinued": "March 8, 2022",
     "model": "A2275* (EMC 3500*)",
@@ -819,7 +819,7 @@
     "full_family": "iPhone SE (2nd Gen)"
   },
   {
-    "full_name": "iPhone SE (2 - 4.7\" 2020 Global A2296)",
+    "full_name": "iPhone SE (2 - 4.7 2020 Global A2296)",
     "introduced": "April 15, 2020",
     "discontinued": "March 8, 2022",
     "model": "A2296* (EMC 3500*)",
@@ -828,7 +828,7 @@
     "full_family": "iPhone SE (2nd Gen)"
   },
   {
-    "full_name": "iPhone SE (2 - 4.7\" 2020 China A2298)",
+    "full_name": "iPhone SE (2 - 4.7 2020 China A2298)",
     "introduced": "April 15, 2020",
     "discontinued": "March 8, 2022",
     "model": "A2298* (EMC 3500*)",
@@ -1161,7 +1161,7 @@
     "full_family": "iPhone 13 Pro Max"
   },
   {
-    "full_name": "iPhone SE (3 - 4.7\" 2022 US/CA A2595)",
+    "full_name": "iPhone SE (3 - 4.7 2022 US/CA A2595)",
     "introduced": "March 8, 2022",
     "discontinued": "February 19, 2025",
     "model": "A2595* (EMC 4082*)",
@@ -1170,7 +1170,7 @@
     "full_family": "iPhone SE (3rd Gen)"
   },
   {
-    "full_name": "iPhone SE (3 - 4.7\" 2022 Japan A2782)",
+    "full_name": "iPhone SE (3 - 4.7 2022 Japan A2782)",
     "introduced": "March 8, 2022",
     "discontinued": "February 19, 2025",
     "model": "A2782* (EMC 8064*)",
@@ -1179,7 +1179,7 @@
     "full_family": "iPhone SE (3rd Gen)"
   },
   {
-    "full_name": "iPhone SE (3 - 4.7\" 2022 Global A2783)",
+    "full_name": "iPhone SE (3 - 4.7 2022 Global A2783)",
     "introduced": "March 8, 2022",
     "discontinued": "February 19, 2025",
     "model": "A2783* (EMC 4083*)",
@@ -1188,7 +1188,7 @@
     "full_family": "iPhone SE (3rd Gen)"
   },
   {
-    "full_name": "iPhone SE (3 - 4.7\" 2022 China A2785)",
+    "full_name": "iPhone SE (3 - 4.7 2022 China A2785)",
     "introduced": "March 8, 2022",
     "discontinued": "February 19, 2025",
     "model": "A2785* (EMC 8076*)",
@@ -1953,7 +1953,7 @@
     "full_family": "iPad mini 4 (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only)",
     "introduced": "September 9, 2015*",
     "discontinued": "June 5, 2017",
     "model": "A1584 (EMC 2838)",
@@ -1962,7 +1962,7 @@
     "full_family": "iPad Pro (Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cellular)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cellular)",
     "introduced": "September 9, 2015*",
     "discontinued": "June 5, 2017",
     "model": "A1652 (EMC 2827)",
@@ -1971,25 +1971,25 @@
     "full_family": "iPad Pro (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 9.7\" (Wi-Fi Only)",
+    "full_name": "iPad Pro 9.7 (Wi-Fi Only)",
     "introduced": "March 21, 2016*",
     "discontinued": "June 5, 2017",
     "model": "A1673 (EMC 2976)",
     "device_id": "iPad6,3",
     "order": "MLMP2LL/A*",
-    "full_family": "iPad Pro 9.7\" Wi-Fi"
+    "full_family": "iPad Pro 9.7 Wi-Fi"
   },
   {
-    "full_name": "iPad Pro 9.7\" (Wi-Fi/Cellular)",
+    "full_name": "iPad Pro 9.7 (Wi-Fi/Cellular)",
     "introduced": "March 21, 2016*",
     "discontinued": "June 5, 2017",
     "model": "A1674 (EMC 2977)",
     "device_id": "iPad6,4",
     "order": "MLPX2LL/A*",
-    "full_family": "iPad Pro 9.7\" Wi-Fi + Cellular"
+    "full_family": "iPad Pro 9.7 Wi-Fi + Cellular"
   },
   {
-    "full_name": "iPad 9.7\" 5th Gen (Wi-Fi Only)",
+    "full_name": "iPad 9.7 5th Gen (Wi-Fi Only)",
     "introduced": "March 21, 2017*",
     "discontinued": "March 27, 2018",
     "model": "A1822 (EMC 3017*)",
@@ -1998,7 +1998,7 @@
     "full_family": "iPad 5th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 9.7\" 5th Gen (Wi-Fi/Cellular)",
+    "full_name": "iPad 9.7 5th Gen (Wi-Fi/Cellular)",
     "introduced": "March 21, 2017*",
     "discontinued": "March 27, 2018",
     "model": "A1823 (EMC 3108*)",
@@ -2007,43 +2007,43 @@
     "full_family": "iPad 5th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 10.5\" (Wi-Fi Only)",
+    "full_name": "iPad Pro 10.5 (Wi-Fi Only)",
     "introduced": "June 5, 2017*",
     "discontinued": "March 18, 2019",
     "model": "A1701 (EMC 3140*)",
     "device_id": "iPad7,3",
     "order": "MQDW2LL/A*",
-    "full_family": "iPad Pro 10.5\" (Wi-Fi)"
+    "full_family": "iPad Pro 10.5 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 10.5\" (Wi-Fi/Cellular)",
+    "full_name": "iPad Pro 10.5 (Wi-Fi/Cellular)",
     "introduced": "June 5, 2017*",
     "discontinued": "March 18, 2019",
     "model": "A1709 (EMC 3141*)",
     "device_id": "iPad7,4",
     "order": "MQF02LL/A*",
-    "full_family": "iPad Pro 10.5\" (Wi-Fi + Cellular)"
+    "full_family": "iPad Pro 10.5 (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 2nd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only - 2nd Gen)",
     "introduced": "June 5, 2017*",
     "discontinued": "October 30, 2018",
     "model": "A1670 (EMC 3149*)",
     "device_id": "iPad7,1",
     "order": "MQDC2LL/A*",
-    "full_family": "iPad Pro 12.9\" (2nd Gen - Wi-Fi)"
+    "full_family": "iPad Pro 12.9 (2nd Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell - 2nd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell - 2nd Gen)",
     "introduced": "June 5, 2017*",
     "discontinued": "October 30, 2018",
     "model": "A1671 (EMC 3150*)",
     "device_id": "iPad7,2",
     "order": "MQEE2LL/A*",
-    "full_family": "iPad Pro 12.9\" (2nd Gen - Wi-Fi+Cell)"
+    "full_family": "iPad Pro 12.9 (2nd Gen - Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad 9.7\" 6th Gen (Wi-Fi Only)",
+    "full_name": "iPad 9.7 6th Gen (Wi-Fi Only)",
     "introduced": "March 27, 2018",
     "discontinued": "September 10, 2019",
     "model": "A1893 (EMC 3210*)",
@@ -2052,7 +2052,7 @@
     "full_family": "iPad 6th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 9.7\" 6th Gen (Wi-Fi/Cellular)",
+    "full_name": "iPad 9.7 6th Gen (Wi-Fi/Cellular)",
     "introduced": "March 27, 2018",
     "discontinued": "September 10, 2019",
     "model": "A1954 (EMC 3211*)",
@@ -2061,76 +2061,76 @@
     "full_family": "iPad 6th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi Only)",
+    "full_name": "iPad Pro 11 (Wi-Fi Only)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1980 (EMC 3221*)",
     "device_id": "iPad8,1, iPad8,2**",
     "order": "MTXP2LL/A*",
-    "full_family": "iPad Pro 11\" (Wi-Fi)"
+    "full_family": "iPad Pro 11 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - US/CA)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cellular - US/CA)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A2013 (EMC 3222*)",
     "device_id": "iPad8,3, iPad8,4**",
     "order": "MU0Y2LL/A*",
-    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+    "full_family": "iPad Pro 11 (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - Global)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cellular - Global)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1934 (EMC 3222*)",
     "device_id": "iPad8,3, iPad8,4**",
     "order": "MU0U2B/A*",
-    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+    "full_family": "iPad Pro 11 (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cellular - China)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cellular - China)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1979 (EMC 3222*)",
     "device_id": "iPad8,3, iPad8,4**",
     "order": "MU0X2CH/A*",
-    "full_family": "iPad Pro 11\" (Wi-Fi + Cellular)"
+    "full_family": "iPad Pro 11 (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 3rd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only - 3rd Gen)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1876 (EMC 3223*)",
     "device_id": "iPad8,5, iPad8,6**",
     "order": "MTEM2LL/A*",
-    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi)"
+    "full_family": "iPad Pro 12.9 (3rd Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell US/CA - 3rd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi+Cell US/CA - 3rd Gen)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A2014 (EMC 3224*)",
     "device_id": "iPad8,7, iPad8,8**",
     "order": "MTHU2LL/A*",
-    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (3rd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell Global - 3rd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi+Cell Global - 3rd Gen)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1895 (EMC 3224*)",
     "device_id": "iPad8,7, iPad8,8**",
     "order": "MTHP2B/A*",
-    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (3rd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi+Cell China - 3rd Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi+Cell China - 3rd Gen)",
     "introduced": "October 30, 2018*",
     "discontinued": "March 18, 2020",
     "model": "A1983 (EMC 3224*)",
     "device_id": "iPad8,7, iPad8,8**",
     "order": "MTHT2CH/A*",
-    "full_family": "iPad Pro 12.9\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (3rd Gen - Wi-Fi+C)"
   },
   {
     "full_name": "iPad Air 3rd Gen (Wi-Fi Only)",
@@ -2205,7 +2205,7 @@
     "full_family": "iPad mini 5th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi Only)",
+    "full_name": "iPad 10.2 7th Gen (Wi-Fi Only)",
     "introduced": "September 10, 2019",
     "discontinued": "September 15, 2020",
     "model": "A2197 (EMC 3323*)",
@@ -2214,7 +2214,7 @@
     "full_family": "iPad 7th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, US/CA)",
+    "full_name": "iPad 10.2 7th Gen (Wi-Fi/Cellular, US/CA)",
     "introduced": "September 10, 2019",
     "discontinued": "September 15, 2020",
     "model": "A2200 (EMC 3324*)",
@@ -2223,7 +2223,7 @@
     "full_family": "iPad 7th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, Global)",
+    "full_name": "iPad 10.2 7th Gen (Wi-Fi/Cellular, Global)",
     "introduced": "September 10, 2019",
     "discontinued": "September 15, 2020",
     "model": "A2198 (EMC 3324*)",
@@ -2232,7 +2232,7 @@
     "full_family": "iPad 7th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 7th Gen (Wi-Fi/Cellular, China)",
+    "full_name": "iPad 10.2 7th Gen (Wi-Fi/Cellular, China)",
     "introduced": "September 10, 2019",
     "discontinued": "September 15, 2020",
     "model": "A2199 (EMC 3324*)",
@@ -2241,79 +2241,79 @@
     "full_family": "iPad 7th Gen (Wi-Fi + Cellular, CN)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi Only - 2nd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi Only - 2nd Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2228 (EMC 3349)",
     "device_id": "iPad8,9",
     "order": "MY252LL/A*",
-    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi)"
+    "full_family": "iPad Pro 11 (2nd Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US/CA - 2nd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell US/CA - 2nd Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2068 (EMC 3350)",
     "device_id": "iPad8,10",
     "order": "MY342LL/A*",
-    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (2nd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 2nd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell Global - 2nd Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2230 (EMC 3350)",
     "device_id": "iPad8,10",
     "order": "MY2W2ZP/A*",
-    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (2nd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 2nd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell China - 2nd Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2231 (EMC 3350)",
     "device_id": "iPad8,10",
     "order": "MY322CH/A*",
-    "full_family": "iPad Pro 11\" (2nd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (2nd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 4th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only - 4th Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2229 (EMC 3353)",
     "device_id": "iPad8,11",
     "order": "MY2J2LL/A*",
-    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi)"
+    "full_family": "iPad Pro 12.9 (4th Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US/CA - 4th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell US/CA - 4th Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2069 (EMC 3354)",
     "device_id": "iPad8,12",
     "order": "MY3K2LL/A*",
-    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 4th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell Global - 4th Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2232 (EMC 3354)",
     "device_id": "iPad8,12",
     "order": "MY3D2ZP/A*",
-    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 4th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell China - 4th Gen)",
     "introduced": "March 18, 2020",
     "discontinued": "April 20, 2021",
     "model": "A2233 (EMC 3354)",
     "device_id": "iPad8,12",
     "order": "MY3H2CH/A*",
-    "full_family": "iPad Pro 12.9\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi Only)",
+    "full_name": "iPad 10.2 8th Gen (Wi-Fi Only)",
     "introduced": "September 15, 2020",
     "discontinued": "September 14, 2021",
     "model": "A2270 (EMC 3574*)",
@@ -2322,7 +2322,7 @@
     "full_family": "iPad 8th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, US/CA)",
+    "full_name": "iPad 10.2 8th Gen (Wi-Fi/Cellular, US/CA)",
     "introduced": "September 15, 2020",
     "discontinued": "September 14, 2021",
     "model": "A2428 (EMC 3575*)",
@@ -2331,7 +2331,7 @@
     "full_family": "iPad 8th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, Global)",
+    "full_name": "iPad 10.2 8th Gen (Wi-Fi/Cellular, Global)",
     "introduced": "September 15, 2020",
     "discontinued": "September 14, 2021",
     "model": "A2429 (EMC 3575*)",
@@ -2340,7 +2340,7 @@
     "full_family": "iPad 8th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 8th Gen (Wi-Fi/Cellular, China)",
+    "full_name": "iPad 10.2 8th Gen (Wi-Fi/Cellular, China)",
     "introduced": "September 15, 2020",
     "discontinued": "September 14, 2021",
     "model": "A2430 (EMC 3575*)",
@@ -2385,79 +2385,79 @@
     "full_family": "iPad Air 4th Gen (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi Only - 3rd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi Only - 3rd Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2377 (EMC 3681)",
     "device_id": "iPad13,4",
     "order": "MHQT3LL/A*",
-    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi)"
+    "full_family": "iPad Pro 11 (3rd Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US - 3rd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell US - 3rd Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2301 (EMC 3682)",
     "device_id": "iPad13,5",
     "order": "MHMU3LL/A*",
-    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (3rd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 3rd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell Global - 3rd Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2459 (EMC 3683)",
     "device_id": "iPad13,6",
     "order": "MHW63X/A*",
-    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (3rd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 3rd Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell China - 3rd Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2460 (EMC 3684)",
     "device_id": "iPad13,7",
     "order": "MHWH3CH/A*",
-    "full_family": "iPad Pro 11\" (3rd Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (3rd Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 5th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only - 5th Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2378 (EMC 3689)",
     "device_id": "iPad13,8",
     "order": "MHNG3LL/A*",
-    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi)"
+    "full_family": "iPad Pro 12.9 (5th Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US - 5th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell US - 5th Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2379 (EMC 3686)",
     "device_id": "iPad13,9",
     "order": "MHNT3LL/A*",
-    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (5th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 5th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell Global - 5th Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2461 (EMC 3687)",
     "device_id": "iPad13,10",
     "order": "MHR53X/A*",
-    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (5th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 5th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell China - 5th Gen)",
     "introduced": "April 20, 2021*",
     "discontinued": "October 18, 2022",
     "model": "A2462 (EMC 3688)",
     "device_id": "iPad13,11",
     "order": "MHRG3CH/A*",
-    "full_family": "iPad Pro 12.9\" (5th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (5th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi Only)",
+    "full_name": "iPad 10.2 9th Gen (Wi-Fi Only)",
     "introduced": "September 14, 2021*",
     "discontinued": "May 7, 2024",
     "model": "A2602 (EMC 4045*)",
@@ -2466,7 +2466,7 @@
     "full_family": "iPad 9th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, US/CA)",
+    "full_name": "iPad 10.2 9th Gen (Wi-Fi/Cellular, US/CA)",
     "introduced": "September 14, 2021*",
     "discontinued": "May 7, 2024",
     "model": "A2603 (EMC 4046*)",
@@ -2475,7 +2475,7 @@
     "full_family": "iPad 9th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, Global)",
+    "full_name": "iPad 10.2 9th Gen (Wi-Fi/Cellular, Global)",
     "introduced": "September 14, 2021*",
     "discontinued": "May 7, 2024",
     "model": "A2604 (EMC 4046*)",
@@ -2484,7 +2484,7 @@
     "full_family": "iPad 9th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.2\" 9th Gen (Wi-Fi/Cellular, China)",
+    "full_name": "iPad 10.2 9th Gen (Wi-Fi/Cellular, China)",
     "introduced": "September 14, 2021*",
     "discontinued": "May 7, 2024",
     "model": "A2605 (EMC 4046*)",
@@ -2547,7 +2547,7 @@
     "full_family": "iPad Air 5th Gen (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi Only)",
+    "full_name": "iPad 10.9 10th Gen (Wi-Fi Only)",
     "introduced": "October 18, 2022",
     "discontinued": "March 4, 2025",
     "model": "A2696 (EMC 8137*)",
@@ -2556,7 +2556,7 @@
     "full_family": "iPad 10th Gen (Wi-Fi)"
   },
   {
-    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi/Cellular)",
+    "full_name": "iPad 10.9 10th Gen (Wi-Fi/Cellular)",
     "introduced": "October 18, 2022",
     "discontinued": "March 4, 2025",
     "model": "A2757 (EMC 8135*)",
@@ -2565,7 +2565,7 @@
     "full_family": "iPad 10th Gen (Wi-Fi + Cellular)"
   },
   {
-    "full_name": "iPad 10.9\" 10th Gen (Wi-Fi/Cellular, China)",
+    "full_name": "iPad 10.9 10th Gen (Wi-Fi/Cellular, China)",
     "introduced": "October 18, 2022",
     "discontinued": "March 4, 2025",
     "model": "A2777 (EMC 8135*)",
@@ -2574,184 +2574,184 @@
     "full_family": "iPad 10th Gen (Wi-Fi + Cell, CN)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi Only - 4th Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi Only - 4th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2759 (EMC 8166*)",
     "device_id": "iPad14,3",
     "order": "MNXE3LL/A*",
-    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi)"
+    "full_family": "iPad Pro 11 (4th Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell US - 4th Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell US - 4th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2435 (EMC 8167*)",
     "device_id": "iPad14,4",
     "order": "MP563LL/A*",
-    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell Global - 4th Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell Global - 4th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2761 (EMC 8168*)",
     "device_id": "iPad14,4",
     "order": "MNYD3B/A*",
-    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 11\" (Wi-Fi/Cell China - 4th Gen)",
+    "full_name": "iPad Pro 11 (Wi-Fi/Cell China - 4th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2762 (EMC 8168*)",
     "device_id": "iPad14,4",
     "order": "MNYP3CH/A*",
-    "full_family": "iPad Pro 11\" (4th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 11 (4th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi Only - 6th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi Only - 6th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2436 (EMC 8169*)",
     "device_id": "iPad14,5",
     "order": "MNXQ3LL/A*",
-    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi)"
+    "full_family": "iPad Pro 12.9 (6th Gen - Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell US - 6th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell US - 6th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2764 (EMC 8176*)",
     "device_id": "iPad14,6",
     "order": "MP5Y3LL/A*",
-    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (6th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell Global - 6th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell Global - 6th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2437 (EMC 8177*)",
     "device_id": "iPad14,6",
     "order": "MP1Y3B/A*",
-    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (6th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Pro 12.9\" (Wi-Fi/Cell China - 6th Gen)",
+    "full_name": "iPad Pro 12.9 (Wi-Fi/Cell China - 6th Gen)",
     "introduced": "October 18, 2022",
     "discontinued": "May 7, 2024",
     "model": "A2766 (EMC 8177*)",
     "device_id": "iPad14,6",
     "order": "MP293CH/A*",
-    "full_family": "iPad Pro 12.9\" (6th Gen - Wi-Fi+C)"
+    "full_family": "iPad Pro 12.9 (6th Gen - Wi-Fi+C)"
   },
   {
-    "full_name": "iPad Air M2 11\" (Wi-Fi Only)",
+    "full_name": "iPad Air M2 11 (Wi-Fi Only)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2902 (EMC 8392*)",
     "device_id": "iPad14,8",
     "order": "MUWD3LL/A*",
-    "full_family": "iPad Air 11\" M2 (Wi-Fi)"
+    "full_family": "iPad Air 11 M2 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Air M2 11\" (Wi-Fi+Cell)",
+    "full_name": "iPad Air M2 11 (Wi-Fi+Cell)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2903 (EMC 8393*)",
     "device_id": "iPad14,9",
     "order": "MUXE3LL/A*",
-    "full_family": "iPad Air 11\" M2 (Wi-Fi+Cell)"
+    "full_family": "iPad Air 11 M2 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Air M2 11\" (Wi-Fi+Cell China)",
+    "full_name": "iPad Air M2 11 (Wi-Fi+Cell China)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2904 (EMC 8393*)",
     "device_id": "iPad14,9",
     "order": "MUXX3CH/A*",
-    "full_family": "iPad Air 11\" M2 (China)"
+    "full_family": "iPad Air 11 M2 (China)"
   },
   {
-    "full_name": "iPad Air M2 13\" (Wi-Fi Only)",
+    "full_name": "iPad Air M2 13 (Wi-Fi Only)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2898 (EMC 8394*)",
     "device_id": "iPad14,10",
     "order": "MV283LL/A*",
-    "full_family": "iPad Air 13\" M2 (Wi-Fi)"
+    "full_family": "iPad Air 13 M2 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Air M2 13\" (Wi-Fi+Cell)",
+    "full_name": "iPad Air M2 13 (Wi-Fi+Cell)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2899 (EMC 8395*)",
     "device_id": "iPad14,11",
     "order": "MV6R3LL/A*",
-    "full_family": "iPad Air 13\" M2 (Wi-Fi+Cell)"
+    "full_family": "iPad Air 13 M2 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Air M2 13\" (Wi-Fi+Cell China)",
+    "full_name": "iPad Air M2 13 (Wi-Fi+Cell China)",
     "introduced": "May 7, 2024",
     "discontinued": "March 4, 2025",
     "model": "A2900 (EMC 8395*)",
     "device_id": "iPad14,11",
     "order": "MV793CH/A*",
-    "full_family": "iPad Air 13\" M2 (China)"
+    "full_family": "iPad Air 13 M2 (China)"
   },
   {
-    "full_name": "iPad Pro M4 11\" (Wi-Fi Only)",
+    "full_name": "iPad Pro M4 11 (Wi-Fi Only)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A2836 (EMC 8472*)",
     "device_id": "iPad16,3",
     "order": "MVV93LL/A*",
-    "full_family": "iPad Pro 11\" M4 (Wi-Fi)"
+    "full_family": "iPad Pro 11 M4 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro M4 11\" (Wi-Fi+Cell)",
+    "full_name": "iPad Pro M4 11 (Wi-Fi+Cell)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A2837 (EMC 8473*)",
     "device_id": "iPad16,4",
     "order": "MVW23LL/A*",
-    "full_family": "iPad Pro 11\" M4 (Wi-Fi+Cell)"
+    "full_family": "iPad Pro 11 M4 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Pro M4 11\" (Wi-Fi+Cell China)",
+    "full_name": "iPad Pro M4 11 (Wi-Fi+Cell China)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A3006 (EMC 8473*)",
     "device_id": "iPad16,4",
     "order": "MVWA3CH/A*",
-    "full_family": "iPad Pro 11\" M4 (China)"
+    "full_family": "iPad Pro 11 M4 (China)"
   },
   {
-    "full_name": "iPad Pro M4 13\" (Wi-Fi Only)",
+    "full_name": "iPad Pro M4 13 (Wi-Fi Only)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A2925 (EMC 8474*)",
     "device_id": "iPad16,5",
     "order": "MVX33LL/A*",
-    "full_family": "iPad Pro 13\" M4 (Wi-Fi)"
+    "full_family": "iPad Pro 13 M4 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Pro M4 13\" (Wi-Fi+Cell)",
+    "full_name": "iPad Pro M4 13 (Wi-Fi+Cell)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A2926 (EMC 8475*)",
     "device_id": "iPad16,6",
     "order": "MVXT3LL/A*",
-    "full_family": "iPad Pro 13\" M4 (Wi-Fi+Cell)"
+    "full_family": "iPad Pro 13 M4 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Pro M4 13\" (Wi-Fi+Cell China)",
+    "full_name": "iPad Pro M4 13 (Wi-Fi+Cell China)",
     "introduced": "May 7, 2024",
     "discontinued": "N/A",
     "model": "A3007 (EMC 8475*)",
     "device_id": "iPad16,6",
     "order": "MVY23CH/A*",
-    "full_family": "iPad Pro 13\" M4 (China)"
+    "full_family": "iPad Pro 13 M4 (China)"
   },
   {
     "full_name": "iPad mini A17 Pro - 7th Gen (Wi-Fi Only)",
@@ -2808,58 +2808,58 @@
     "full_family": "iPad A16 (Wi-Fi + Cellular, China)"
   },
   {
-    "full_name": "iPad Air M3 11\" (Wi-Fi Only)",
+    "full_name": "iPad Air M3 11 (Wi-Fi Only)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3266 (EMC 8776*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 11\" M3 (Wi-Fi)"
+    "full_family": "iPad Air 11 M3 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Air M3 11\" (Wi-Fi+Cell)",
+    "full_name": "iPad Air M3 11 (Wi-Fi+Cell)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3267 (EMC 8777*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 11\" M3 (Wi-Fi+Cell)"
+    "full_family": "iPad Air 11 M3 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Air M3 11\" (Wi-Fi+Cell, China)",
+    "full_name": "iPad Air M3 11 (Wi-Fi+Cell, China)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3270 (EMC 8777*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 11\" M3 (China)"
+    "full_family": "iPad Air 11 M3 (China)"
   },
   {
-    "full_name": "iPad Air M3 13\" (Wi-Fi Only)",
+    "full_name": "iPad Air M3 13 (Wi-Fi Only)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3268 (EMC 8778*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 13\" M3 (Wi-Fi)"
+    "full_family": "iPad Air 13 M3 (Wi-Fi)"
   },
   {
-    "full_name": "iPad Air M3 13\" (Wi-Fi+Cell)",
+    "full_name": "iPad Air M3 13 (Wi-Fi+Cell)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3269 (EMC 8779*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 13\" M3 (Wi-Fi+Cell)"
+    "full_family": "iPad Air 13 M3 (Wi-Fi+Cell)"
   },
   {
-    "full_name": "iPad Air M3 13\" (Wi-Fi+Cell, China)",
+    "full_name": "iPad Air M3 13 (Wi-Fi+Cell, China)",
     "introduced": "March 4, 2025",
     "discontinued": "N/A",
     "model": "A3271 (EMC 8779*)",
     "device_id": "Pending",
     "order": "Pending",
-    "full_family": "iPad Air 13\" M3 (China)"
+    "full_family": "iPad Air 13 M3 (China)"
   },
   {
     "full_name": "Apple TV (Original/1st Gen)",
@@ -3003,7 +3003,7 @@
     "model": "A1553 (EMC 2870*)",
     "device_id": "Watch1,1",
     "order": "MLCN2LL/A*",
-    "full_family": "Watch Herm\u0018\u00aes 38mm"
+    "full_family": "Watch Herm\u0018®s 38mm"
   },
   {
     "full_name": "Apple Watch Series 0 Hermes (Steel, 42 mm)",
@@ -3012,7 +3012,7 @@
     "model": "A1554 (EMC 2871*)",
     "device_id": "Watch1,2",
     "order": "MLCC2LL/A*",
-    "full_family": "Watch Herm\u0018\u00aes 42mm"
+    "full_family": "Watch Herm\u0018®s 42mm"
   },
   {
     "full_name": "Apple Watch Series 1 (Aluminum, 38 mm)",
@@ -4678,5 +4678,365 @@
     "device_id": "RealityDevice14,1",
     "order": "MQL83LL/A*",
     "full_family": "Vision Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (US)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2848 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (CA/JP/MX/SA)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3101 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (Global)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3102 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro (China/HK/Macau)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3104 (EMC N/A*)",
+    "device_id": "iPhone16,1",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (US)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A2849 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (CA/JP/MX/SA)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3105 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (Global)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3106 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 15 Pro Max (China/HK/Macau)",
+    "introduced": "September 12, 2023",
+    "discontinued": "September 9, 2024",
+    "model": "A3108 (EMC N/A*)",
+    "device_id": "iPhone16,2",
+    "order": "N/A*",
+    "full_family": "iPhone 15 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3081 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3286 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3287 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3288 (EMC N/A*)",
+    "device_id": "iPhone17,4",
+    "order": "N/A*",
+    "full_family": "iPhone 16"
+  },
+  {
+    "full_name": "iPhone 16 Plus (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3080 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3290 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3291 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Plus (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3296 (EMC N/A*)",
+    "device_id": "iPhone17,5",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Plus"
+  },
+  {
+    "full_name": "iPhone 16 Pro (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3083 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3292 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3293 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3294 (EMC N/A*)",
+    "device_id": "iPhone17,1",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (US)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3084 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (CA/JP/MX/SA)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3295 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (Global)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3297 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPhone 16 Pro Max (China/HK/Macau)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3298 (EMC N/A*)",
+    "device_id": "iPhone17,2",
+    "order": "N/A*",
+    "full_family": "iPhone 16 Pro Max"
+  },
+  {
+    "full_name": "iPad Pro 11 (M4, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2836 (EMC N/A*)",
+    "device_id": "iPad16,3",
+    "order": "N/A*",
+    "full_family": "iPad Pro 11 (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 11 (M4, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2837 (EMC N/A*)",
+    "device_id": "iPad16,4",
+    "order": "N/A*",
+    "full_family": "iPad Pro 11 (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 13 (M4, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2923 (EMC N/A*)",
+    "device_id": "iPad16,5",
+    "order": "N/A*",
+    "full_family": "iPad Pro 13 (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Pro 13 (M4, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2924 (EMC N/A*)",
+    "device_id": "iPad16,6",
+    "order": "N/A*",
+    "full_family": "iPad Pro 13 (M4, 2024)"
+  },
+  {
+    "full_name": "iPad Air 11 (M2, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2902 (EMC N/A*)",
+    "device_id": "iPad14,8",
+    "order": "N/A*",
+    "full_family": "iPad Air 11 (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 11 (M2, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2903 (EMC N/A*)",
+    "device_id": "iPad14,9",
+    "order": "N/A*",
+    "full_family": "iPad Air 11 (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 13 (M2, 2024 Wi‑Fi)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2904 (EMC N/A*)",
+    "device_id": "iPad14,10",
+    "order": "N/A*",
+    "full_family": "iPad Air 13 (M2, 2024)"
+  },
+  {
+    "full_name": "iPad Air 13 (M2, 2024 Wi‑Fi + Cellular)",
+    "introduced": "May 7, 2024",
+    "discontinued": "N/A",
+    "model": "A2905 (EMC N/A*)",
+    "device_id": "iPad14,11",
+    "order": "N/A*",
+    "full_family": "iPad Air 13 (M2, 2024)"
+  },
+  {
+    "full_name": "iPad mini (7th Gen, 2024 Wi‑Fi)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A28xx (EMC N/A*)",
+    "device_id": "iPad16,1",
+    "order": "N/A*",
+    "full_family": "iPad mini (7th Gen)"
+  },
+  {
+    "full_name": "iPad mini (7th Gen, 2024 Wi‑Fi + Cellular)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A28xx (EMC N/A*)",
+    "device_id": "iPad16,2",
+    "order": "N/A*",
+    "full_family": "iPad mini (7th Gen)"
+  },
+  {
+    "full_name": "iPad (11th Gen, 2024 Wi‑Fi)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A29xx (EMC N/A*)",
+    "device_id": "iPad15,7",
+    "order": "N/A*",
+    "full_family": "iPad (11th Gen)"
+  },
+  {
+    "full_name": "iPad (11th Gen, 2024 Wi‑Fi + Cellular)",
+    "introduced": "October 29, 2024",
+    "discontinued": "N/A",
+    "model": "A29xx (EMC N/A*)",
+    "device_id": "iPad15,8",
+    "order": "N/A*",
+    "full_family": "iPad (11th Gen)"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (41mm, Aluminum)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2997 (EMC N/A*)",
+    "device_id": "Watch7,8",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (45/46mm, Aluminum)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A2999 (EMC N/A*)",
+    "device_id": "Watch7,9",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Series 10 (Titanium)",
+    "introduced": "September 9, 2024",
+    "discontinued": "N/A",
+    "model": "A3000 (EMC N/A*)",
+    "device_id": "Watch7,9",
+    "order": "N/A*",
+    "full_family": "Apple Watch Series 10"
+  },
+  {
+    "full_name": "Apple Watch Ultra 2",
+    "introduced": "September 12, 2023",
+    "discontinued": "N/A",
+    "model": "A2986 (EMC N/A*)",
+    "device_id": "Watch7,4",
+    "order": "N/A*",
+    "full_family": "Apple Watch Ultra 2"
   }
 ]
