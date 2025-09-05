@@ -141,7 +141,9 @@ const DOMNodeComponent = observer(({ node }: { node: DOMNode }) => {
 
       {hasChildren && !isCollapsed && (
         <div className={styles.children}>
-          {node.children?.map((child) => <DOMNodeComponent key={child.id} node={child} />)}
+          {node.children?.map((child) => (
+            <DOMNodeComponent key={child.id} node={child} />
+          ))}
         </div>
       )}
 

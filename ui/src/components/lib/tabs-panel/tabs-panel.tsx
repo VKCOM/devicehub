@@ -46,9 +46,8 @@ export const TabsPanel = <T extends boolean = false>({
     <>
       <PanelHeader className={cn(styles.tabsPanel, className)} transparent={mode === 'plain'}>
         <Tabs>
-          {content.map((tab) => {
-              return (
-                <ConditionalRender key={tab.id} conditions={[!tab.disabled]}>
+          {content.map((tab) => (
+              <ConditionalRender key={tab.id} conditions={[!tab.disabled]}>
                 <TabsItem
                   key={tab.id}
                   aria-controls={tab.ariaControls}
@@ -61,10 +60,8 @@ export const TabsPanel = <T extends boolean = false>({
                 >
                   {t(tab.title)}
                 </TabsItem>
-                </ConditionalRender>
-              )
-          }
-          )}
+              </ConditionalRender>
+            ))}
         </Tabs>
       </PanelHeader>
       {content.map((tab) => (
