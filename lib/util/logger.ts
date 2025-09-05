@@ -131,28 +131,26 @@ export class Log extends EventEmitter {
     }
 
     private _write(entry: LogEntry): void {
-        setImmediate(() => {
-            const output = this._format(entry)
+        const output = this._format(entry)
 
-            // Emit events immediately
-            this.emit('entry', entry)
-            innerLogger.emit('entry', entry)
+        // Emit events immediately
+        this.emit('entry', entry)
+        innerLogger.emit('entry', entry)
 
-            // Handle stdout backpressure
-            if (Log.stdoutBlocked) {
-                // If stdout is blocked, queue the output
-                Log.pendingWrites.push(output)
-                return
-            }
+        // Handle stdout backpressure
+        if (Log.stdoutBlocked) {
+            // If stdout is blocked, queue the output
+            Log.pendingWrites.push(output)
+            return
+        }
 
-            // Try to write directly to stdout
-            const success = process.stdout.write(output)
-            if (!success) {
-                // stdout buffer is full, set up drain listener if not already done
-                Log.stdoutBlocked = true
-                Log.setupDrainListener()
-            }
-        })
+        // Try to write directly to stdout
+        const success = process.stdout.write(output)
+        if (!success) {
+            // stdout buffer is full, set up drain listener if not already done
+            Log.stdoutBlocked = true
+            Log.setupDrainListener()
+        }
     }
 
     private static setupDrainListener(): void {
