@@ -154,6 +154,7 @@ export default (async function(options: Options) {
         log.info('Spawned a device worker')
 
         const exitListener = (code?: number, signal?: string) => {
+            ports.push(...allocatedPorts)
             proc.removeAllListeners('exit')
             proc.removeAllListeners('error')
             proc.removeAllListeners('message')
@@ -177,7 +178,7 @@ export default (async function(options: Options) {
 
         if (!workers[device.serial]) {
             procutil.gracefullyKill(proc, options.killTimeout)
-            return
+            onError(new Error('Device has been killed'))
         }
         workers[device.serial].terminate = () => exitListener(0)
 
@@ -221,8 +222,12 @@ export default (async function(options: Options) {
 
         log.info('Starting to work for device "%s"', device.serial)
         let resolveReady: () => void
+        let rejectReady: () => void
 
-        const ready = new Promise<void>(resolve => (resolveReady = resolve))
+        const ready = new Promise<void>((resolve, reject) => {
+            resolveReady = resolve
+            rejectReady = reject
+        })
         const resolveRegister = () => {
             if (workers[device.serial]?.resolveRegister) {
                 workers[device.serial].resolveRegister!()
@@ -232,7 +237,8 @@ export default (async function(options: Options) {
 
         const handleError = async(err: any) => {
             log.error('Failed start device worker "%s": %s', device.serial, err)
-            resolveReady()
+            rejectReady()
+            resolveRegister()
 
             if (err instanceof procutil.ExitError) {
                 log.error('Device worker "%s" died with code %s', device.serial, err.code)
@@ -240,21 +246,25 @@ export default (async function(options: Options) {
 
                 await new Promise(r => setTimeout(r, 2000))
                 work(device)
+                return
             }
-
-            resolveRegister()
         }
 
         const worker = spawn(device, resolveReady!, handleError)
 
-        await Promise.all([
-            workers[device.serial].register.then(() =>
-                log.info('Registered device "%s"', device.serial)
-            ),
-            ready.then(() =>
-                log.info('Device "%s" is ready', device.serial)
-            )
-        ])
+        try {
+            await Promise.all([
+                workers[device.serial].register.then(() =>
+                    log.info('Registered device "%s"', device.serial)
+                ),
+                ready.then(() =>
+                    log.info('Device "%s" is ready', device.serial)
+                )
+            ])
+        }
+        catch (e) {
+            return
+        }
 
         if (!workers[device.serial]) { // when device disconnected - stop restart loop
             return
@@ -265,7 +275,7 @@ export default (async function(options: Options) {
             resolveRegister()
             delete workers[device.serial]
 
-            worker?.kill?.() // if process exited - no effect
+            await worker?.kill?.() // if process exited - no effect
             log.info('Cleaning up device worker "%s"', device.serial)
 
             // Tell others the device is gone
