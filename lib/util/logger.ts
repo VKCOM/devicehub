@@ -131,6 +131,9 @@ export class Log extends EventEmitter {
     }
 
     private _write(entry: LogEntry): void {
+        if (!entry.args[0]) {
+            return
+        }
         const output = this._format(entry)
 
         // Emit events immediately
