@@ -68,7 +68,6 @@ const wireutil = {
         const messageType = message.__proto__.constructor.type as MessageType<object>
         // @ts-expect-error
         log.debug('sending message', message.typeName, message)
-        log.debug('old args', args)
         return this.pack(messageType, message, channel)
     },
 
