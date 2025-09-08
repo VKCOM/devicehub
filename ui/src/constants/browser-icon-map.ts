@@ -57,7 +57,8 @@ export const BROWSER_ICON_MAP: Record<string, string> = {
   [BrowserIcon.ASUS_BROWSER]: asusBrowserImage,
   [BrowserIcon.BAIDU]: baiduImage,
   [BrowserIcon.CHROME_BETA]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/chrome-beta/chrome-beta.svg',
-  [BrowserIcon.CHROME_CANARY]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/chrome-canary/chrome-canary.svg',
+  [BrowserIcon.CHROME_CANARY]:
+    'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/chrome-canary/chrome-canary.svg',
   [BrowserIcon.CHROME_DEV]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/chrome-dev/chrome-dev.svg',
   [BrowserIcon.CHROME]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/chrome/chrome.svg',
   [BrowserIcon.EXPLORE]: exploreImage,
@@ -71,13 +72,16 @@ export const BROWSER_ICON_MAP: Record<string, string> = {
   [BrowserIcon.NETSTAR_FAMILYSMILE]: netstarFamilysmileImage,
   [BrowserIcon.ONE]: oneImage,
   [BrowserIcon.OPERA_BETA]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/opera-beta/opera-beta.svg',
-  [BrowserIcon.OPERA_MINI_NATIVE]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/opera-mini/opera-mini_32x32',
+  [BrowserIcon.OPERA_MINI_NATIVE]:
+    'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/opera-mini/opera-mini_32x32',
   [BrowserIcon.OPERA_MINI]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/opera-mini/opera-mini_32x32',
   [BrowserIcon.OPERA]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/opera/opera.svg',
   [BrowserIcon.OPPO_BAIDU_SEARCHBOX]: oppoBaiduSearchboxImage,
   [BrowserIcon.PUFFIN_FREE]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/puffin/puffin_32x32.png',
-  [BrowserIcon.SAMSUNG_POPUPBROWSER]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/samsung-internet/samsung-internet.svg',
-  [BrowserIcon.SAMSUNG_SBROWSER]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/samsung-internet/samsung-internet.svg',
+  [BrowserIcon.SAMSUNG_POPUPBROWSER]:
+    'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/samsung-internet/samsung-internet.svg',
+  [BrowserIcon.SAMSUNG_SBROWSER]:
+    'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/samsung-internet/samsung-internet.svg',
   [BrowserIcon.SOFTBANK_PARENTALCONTROLS]: softbankParentalControlsImage,
   [BrowserIcon.UC_MINI]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/uc-mini/uc-mini_32x32.png',
   [BrowserIcon.UC]: 'https://cdnjs.cloudflare.com/ajax/libs/browser-logos/75.0.1/uc/uc.svg',
