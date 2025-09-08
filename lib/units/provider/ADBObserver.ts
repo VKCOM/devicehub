@@ -1,10 +1,9 @@
-import { DeviceType } from '@u4/adbkit'
 import EventEmitter from 'events'
 import net, {Socket} from 'net'
 
 interface ADBDevice {
     serial: string
-    type: DeviceType
+    type: 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
     reconnect: () => Promise<boolean>
 }
 
