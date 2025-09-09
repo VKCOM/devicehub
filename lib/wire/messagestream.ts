@@ -6,7 +6,7 @@ class DelimitedStream extends stream.Transform {
     private _readingLength = true
     private _buffer = Buffer.alloc(0)
 
-    _transform = (chunk, encoding, done) => {
+    _transform = (chunk: Buffer<ArrayBuffer>, encoding: any, done: () => void) => {
         this._buffer = Buffer.concat([this._buffer, chunk])
         while (this._buffer.length) {
             if (this._readingLength) {
@@ -40,7 +40,7 @@ class DelimitedStream extends stream.Transform {
 }
 
 class DelimitingStream extends stream.Transform {
-    _transform = (chunk, encoding, done) => {
+    _transform = (chunk: Buffer<ArrayBuffer>, encoding: any, done: () => void) => {
         let length = chunk.length
         const lengthBytes = []
         while (length > 0x7f) {
