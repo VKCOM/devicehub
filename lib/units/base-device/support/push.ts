@@ -3,12 +3,13 @@ import logger from '../../../util/logger.js'
 import srv from '../../../util/srv.ts'
 import lifecycle from '../../../util/lifecycle.js'
 import * as zmqutil from '../../../util/zmqutil.js'
+import {SocketWrapper} from '../../../util/zmqutil.js'
 export default syrup.serial().define(
     async(options: {
         endpoints: {
             push: string[];
         };
-    }) => {
+    }): Promise<SocketWrapper> => {
         const log = logger.createLogger('device:support:push')
         // Output
         try {
@@ -32,7 +33,11 @@ export default syrup.serial().define(
         }
         catch (err) {
             log.fatal('Unable to connect to sub endpoint', err)
-            lifecycle.fatal()
+            lifecycle.fatal() // kill process
+
+            return {
+                send: () => {}
+            } as SocketWrapper
         }
     }
 )
