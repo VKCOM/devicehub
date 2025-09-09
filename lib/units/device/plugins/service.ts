@@ -103,14 +103,12 @@ export default syrup.serial()
             try {
                 out = await adb.getDevice(options.serial).shell(util.format('am %s --user 0 %s', startServiceCmd, intent))
                 const line = await streamutil.findLine(out, /^Error/) // reject if no errors in stdout
-                log.info('[first attempt]  HUI\n %s', line)
                 if (!line?.includes('--user')) {
                     throw new Error(util.format('[first attempt] Service had an error: "%s"', line))
                 }
             }
             catch (err: any) {
                 if (err instanceof streamutil.NoSuchLineError) { // success
-                    log.info('[first attempt]  ZBS')
                     return true
                 }
                 throw err
@@ -126,12 +124,10 @@ export default syrup.serial()
             out = await adb.getDevice(options.serial).shell(command)
             try {
                 const line = await streamutil.findLine(out, /^Error/) // reject if no errors in stdout
-                log.info('[second attempt]  HUI')
                 throw new Error(util.format('[second attempt] Service had an error: "%s"', line))
             }
             catch (err: any) {
                 if (err instanceof streamutil.NoSuchLineError) { // success
-                    log.info('[second attempt]  ZBS')
                     return true
                 }
                 throw err
