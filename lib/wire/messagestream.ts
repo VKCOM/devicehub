@@ -43,10 +43,10 @@ class DelimitingStream extends stream.Transform {
     _transform = (chunk: Buffer<ArrayBuffer>, encoding: any, done: () => void) => {
         let length = chunk.length
         const lengthBytes = []
-        while (length > 0x7f) {
+        while (length > 0x7f) { // @ts-ignore
             lengthBytes.push((1 << 7) + (length & 0x7f))
             length >>= 7
-        }
+        } // @ts-ignore
         lengthBytes.push(length)
         this.push(Buffer.from(lengthBytes))
         this.push(chunk)
