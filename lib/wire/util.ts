@@ -37,10 +37,10 @@ const wireutil = {
         })
     },
     /**
-     * @deprecated Do not use raw envelope with a message type and an args list. Use `pack` for type safety
+     * @deprecated Do not use raw envelope with a message. Use `pack` for type safety
      */
-    envelope(message: object, ...args: unknown[]) {
-        return this.oldSend(message, args)
+    envelope(message: object) {
+        return this.oldSend(message)
     },
     // envelope(Message.create({...})) // <- forbidden - no way to extract the type
     // envelope(new wire.Message(...))
@@ -49,11 +49,8 @@ const wireutil = {
         return Envelope.toBinary({ message: Any.pack(message, messageType), channel} )
     },
 
-    /**
-     * Not deprecated yet..
-     */
     tr<T extends object>(channel: string, messageType: MessageType<T>, message: T) {
-        return this.oldSend(messageType, channel)
+        return Envelope.toBinary({ message: Any.pack(message, messageType), channel} )
     },
 
     /**
@@ -66,8 +63,6 @@ const wireutil = {
     oldSend(message: object, channel: string | undefined = undefined) {
         // @ts-expect-error
         const messageType = message.__proto__.constructor.type as MessageType<object>
-        // @ts-expect-error
-        log.debug('sending message', message.typeName, message)
         return this.pack(messageType, message, channel)
     },
 

@@ -55,12 +55,12 @@ export class WireRouter {
         return (channel: string, data: Buffer) => {
             const decoded = Envelope.fromBinary(data);
             if (!decoded.message) {
-                log.warn(`Message without message`, decoded)
+                log.warn(`Message without message %s`, decoded)
                 return
             }
             let target = decoded.message.typeUrl;
             if(!target) {
-                log.warn(`Message without typeUrl`, decoded)
+                log.warn(`Message without typeUrl %s`, decoded)
                 return
             }
             const messageType = this.registeredTypes.get(target);
@@ -85,11 +85,11 @@ export class WireRouter {
             //     throw e;
             // }
 
-            log.info(
-                'Received message with type "%s", and data %s',
-                messageType.typeName,
-                messageType.toJsonString(decodedMessage)
-            )
+            // log.info(
+            //     'Received message with type "%s", and data %s',
+            //     messageType.typeName,
+            //     messageType.toJsonString(decodedMessage)
+            // )
 
             this.emitter.emit(messageType.typeName, decoded.channel || channel, decodedMessage, data)
             this.emitter.emit('message', channel)
