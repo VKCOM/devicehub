@@ -148,7 +148,7 @@ export default class DbClient {
                         )
                     }
                     catch (err) {
-                        _log.fatal('Unable to connect to sub endpoint', err)
+                        _log.fatal('Unable to connect to sub endpoint: %s', err)
                         lifecycle.fatal()
                     }
                 })
@@ -173,7 +173,7 @@ export default class DbClient {
                         )
                     }
                     catch (err) {
-                        _log.fatal('Unable to connect to subdev endpoint', err)
+                        _log.fatal('Unable to connect to subdev endpoint: %s', err)
                         lifecycle.fatal()
                     }
                 })
@@ -195,7 +195,7 @@ export default class DbClient {
                         )
                     }
                     catch (err) {
-                        _log.fatal('Unable to connect to push endpoint', err)
+                        _log.fatal('Unable to connect to push endpoint: %s', err)
                         lifecycle.fatal()
                     }
                 })
@@ -218,7 +218,7 @@ export default class DbClient {
                     }
                     catch (err) {
                         _log.fatal(
-                            'Unable to connect to pushdev endpoint',
+                            'Unable to connect to pushdev endpoint: %s',
                             err
                         )
                         lifecycle.fatal()

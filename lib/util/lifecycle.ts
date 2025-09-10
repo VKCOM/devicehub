@@ -54,7 +54,7 @@ export default new (class Lifecycle {
         );
     }
 
-    fatal(err?: Error): never {
+    fatal(err?: Error | string): never {
         log.fatal(`Shutting down due to fatal error ${err || ''}`)
         this.ending = true;
         process.exit(1);

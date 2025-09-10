@@ -67,7 +67,7 @@ export default (async function(options: Options) {
         }))
     }
     catch (err) {
-        log.fatal('Unable to connect to push endpoint', err)
+        log.fatal('Unable to connect to push endpoint: %s', err)
         lifecycle.fatal()
     }
 
@@ -98,7 +98,7 @@ export default (async function(options: Options) {
         )
     }
     catch (err) {
-        log.fatal('Unable to connect to sub endpoint', err)
+        log.fatal('Unable to connect to sub endpoint: %s', err)
         lifecycle.fatal()
     }
 

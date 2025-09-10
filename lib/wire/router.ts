@@ -32,6 +32,10 @@ export class WireRouter {
         return this
     }
 
+    removeAllListeners<T extends object>(messageType: MessageType<T>) {
+        this.emitter.removeAllListeners(messageType.typeName)
+    }
+
     removeListener<T extends object>(eventName: string | symbol, fn: MessageHandler<T>, context?: object): this;
     removeListener<T extends object>(messageType: MessageType<T>, fn: MessageHandler<T>): this;
     removeListener<T extends object>(
