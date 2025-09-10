@@ -560,7 +560,7 @@ export default syrup.serial()
                 log.important('Agent connection ended, attempting to relaunch')
                 try {
                     await openAgent()
-                    log.important('Agent relaunched in %dms', Date.now() - startTime)
+                    log.important('Agent relaunched in %sms', Date.now() - startTime)
                     resolve()
                 }
                 catch (err: any) {
@@ -599,7 +599,7 @@ export default syrup.serial()
                 log.important('Service connection ended, attempting to relaunch')
                 await openAgent() // restart agent
                 await openService()
-                log.important('Service relaunched in %dms', Date.now() - startTime)
+                log.important('Service relaunched in %sms', Date.now() - startTime)
             }
             catch (err: any) {
                 log.fatal('[prepareForServiceDeath] Service connection could not be relaunched: %s', err?.message)

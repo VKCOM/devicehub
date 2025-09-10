@@ -1,9 +1,11 @@
 import EventEmitter from 'events'
 import net, {Socket} from 'net'
 
+export type ADBDeviceType = 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
+
 interface ADBDevice {
     serial: string
-    type: 'device' | 'unknown' | 'offline' | 'unauthorized' | 'recovery'
+    type: ADBDeviceType
     reconnect: () => Promise<boolean>
 }
 
@@ -240,7 +242,7 @@ class ADBObserver extends EventEmitter {
                 reject(new Error('Connection closed'))
             }
             this.pendingRequests.clear()
-            
+
             // Auto-reconnect if we should continue polling
             if (this.shouldContinuePolling && !this.isDestroyed) {
                 this.ensureConnection().catch(err => {
@@ -258,7 +260,7 @@ class ADBObserver extends EventEmitter {
     /**
      * Process ADB protocol responses and return remaining buffer
      */
-    private processADBResponses(buffer: Buffer): Buffer {
+    private processADBResponses(buffer: Buffer<ArrayBuffer>): Buffer<ArrayBuffer> {
         let offset = 0
 
         while (offset < buffer.length) {
@@ -277,7 +279,7 @@ class ADBObserver extends EventEmitter {
             }
 
             const responseData = buffer.subarray(offset + 8, offset + 8 + dataLength).toString('utf-8')
-            
+
             if (status === 'OKAY') {
                 // Find and resolve the corresponding request
                 const requestId = 'host:devices' // For now, we only handle device listing
@@ -308,7 +310,7 @@ class ADBObserver extends EventEmitter {
      */
     private async sendADBCommand(command: string): Promise<string> {
         const connection = await this.ensureConnection()
-        
+
         return new Promise((resolve, reject) => {
             // Store the request for response matching
             this.pendingRequests.set(command, {resolve, reject})
@@ -337,7 +339,7 @@ class ADBObserver extends EventEmitter {
             this.connection.destroy()
             this.connection = null
         }
-        
+
         // Reject any pending requests
         for (const [, {reject}] of this.pendingRequests) {
             reject(new Error('Connection closed'))
