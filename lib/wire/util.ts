@@ -4,17 +4,20 @@ import {DeviceRequirement, DeviceStatus, Envelope, RequirementType, TransactionD
 import { Any } from './google/protobuf/any.ts';
 import { createLogger } from '../util/logger.ts';
 import {MessageType} from "@protobuf-ts/runtime";
+import { ADBDeviceType } from '../units/provider/ADBObserver.js';
 
 const DEVICE_STATUS_MAP = {
     device: 'ONLINE',
-    emulator: 'ONLINE',
+    // emulator: 'ONLINE',
     unauthorized: 'UNAUTHORIZED',
     offline: 'OFFLINE',
-    connecting: 'CONNECTING',
-    authorizing: 'AUTHORIZING',
+    // connecting: 'CONNECTING',
+    // authorizing: 'AUTHORIZING',
     unknown: 'OFFLINE',
-    recovery: 'OFFLINE'
-} as const
+    recovery: 'OFFLINE',
+    bootloader: 'OFFLINE',
+    sideload: 'OFFLINE'
+} as const satisfies Record<ADBDeviceType, string> // TODO: replace value type with proper type once it's ready
 
 const log = createLogger('wireutil')
 

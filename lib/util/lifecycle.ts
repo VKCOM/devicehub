@@ -14,7 +14,7 @@ export default new (class Lifecycle {
         process.on("SIGTERM", this.graceful.bind(this));
     }
 
-    share(name, emitter: EventEmitter, options) {
+    share(name: string, emitter: EventEmitter) {
         emitter.on("end", () => {
             if (!this.ending) {
                 log.fatal(`${name} ended; we shall share its fate`)
@@ -29,9 +29,11 @@ export default new (class Lifecycle {
             }
         });
 
-        if (emitter.end) {
+        if ('end' in emitter) {
             this.observe(() => {
-                emitter.end();
+                if(typeof emitter.end === 'function') {
+                    emitter.end();
+                }
             });
         }
         return emitter;

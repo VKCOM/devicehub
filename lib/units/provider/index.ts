@@ -161,8 +161,7 @@ export default (async function(options: Options) {
             proc.removeAllListeners('message')
 
             if (signal) {
-                log.warn('Device worker "%s" was killed with signal %s, assuming ' +
-                    'deliberate action and not restarting', device.serial, signal)
+                log.warn('Device worker "%s" was killed with signal %s, assuming deliberate action and not restarting', device.serial, signal)
 
                 if (workers[device.serial].state === 'running') {
                     workers[device.serial].terminate()

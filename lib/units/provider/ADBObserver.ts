@@ -1,9 +1,11 @@
 import EventEmitter from 'events'
 import net, {Socket} from 'net'
 
+export type ADBDeviceType = 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
+
 interface ADBDevice {
     serial: string
-    type: 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
+    type: ADBDeviceType
     reconnect: () => Promise<boolean>
 }
 
