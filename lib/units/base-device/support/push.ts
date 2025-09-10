@@ -33,11 +33,7 @@ export default syrup.serial().define(
         }
         catch (err) {
             log.fatal('Unable to connect to sub endpoint', err)
-            lifecycle.fatal() // kill process
-
-            return {
-                send: () => {}
-            } as SocketWrapper
+            return lifecycle.fatal() // kill process
         }
     }
 )
