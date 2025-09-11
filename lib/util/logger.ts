@@ -14,17 +14,7 @@ export enum LogLevel {
 
 const innerLogger = new EventEmitter()
 
-type BuildLog<
-  N extends number,
-  S extends any[] = [] // counter
-> =
-  S['length'] extends N
-    ? [string, []] // base: just string + no args
-    : [`${BuildLog<N, [...S, any]>[0]}%s${string}`, [...BuildLog<N, [...S, any]>[1], any]];
-
-type NLog<T extends number> = [BuildLog<T>[0], ...BuildLog<T>[1]]
-
-type LogArguments = NLog<0> | NLog<1> | NLog<2> | NLog<3> | NLog<4>
+type LogArguments = [string, ...any[]]
 
 export interface LogEntry {
     unit: string;
@@ -127,8 +117,7 @@ export class Log extends EventEmitter {
     }
 
     private _format(entry: LogEntry): string {
-        const args = entry.args as [string, ...any[]]
-        entry.message = printf(...args)
+        entry.message = printf(...entry.args)
         const [fg, bg] = Log.unitColors[entry.unit] ?? [chalk.yellow, chalk.bgYellow]
         return (
             `${chalk.grey(entry.timestamp.toJSON())} ${fg(bg(entry.unit))} ${this._name(entry.priority)}/${chalk.bold(entry.tag)} ${entry.pid} [${entry.identifier}] ${entry.message}\n`

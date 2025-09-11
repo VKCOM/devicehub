@@ -32,7 +32,7 @@ export default syrup.serial().define(
             return push
         }
         catch (err) {
-            log.fatal('Unable to connect to sub endpoint: %s', err)
+            log.fatal('Unable to connect to sub endpoint', err)
             return lifecycle.fatal() // kill process
         }
     }

@@ -10,7 +10,6 @@ import db from '../../db/index.js'
 import dbapi from '../../db/api.js'
 import {ChildProcess} from 'node:child_process'
 import ADBObserver, {ADBDevice} from './ADBObserver.js'
-import { DeviceRegisteredMessage } from '../../wire/wire.ts'
 
 interface DeviceWorker {
     state: 'waiting' | 'running'
@@ -67,7 +66,7 @@ export default (async function(options: Options) {
         }))
     }
     catch (err) {
-        log.fatal('Unable to connect to push endpoint: %s', err)
+        log.fatal('Unable to connect to push endpoint', err)
         lifecycle.fatal()
     }
 
@@ -88,7 +87,7 @@ export default (async function(options: Options) {
         })
 
         sub.on('message', new WireRouter()
-            .on(DeviceRegisteredMessage, (channel, message) => {
+            .on(wire.DeviceRegisteredMessage, (channel, message) => {
                 if (workers[message.serial]?.resolveRegister) {
                     workers[message.serial].resolveRegister!()
                     delete workers[message.serial]?.resolveRegister
@@ -98,7 +97,7 @@ export default (async function(options: Options) {
         )
     }
     catch (err) {
-        log.fatal('Unable to connect to sub endpoint: %s', err)
+        log.fatal('Unable to connect to sub endpoint', err)
         lifecycle.fatal()
     }
 
@@ -161,7 +160,8 @@ export default (async function(options: Options) {
             proc.removeAllListeners('message')
 
             if (signal) {
-                log.warn('Device worker "%s" was killed with signal %s, assuming deliberate action and not restarting', device.serial, signal)
+                log.warn('Device worker "%s" was killed with signal %s, assuming ' +
+                    'deliberate action and not restarting', device.serial, signal)
 
                 if (workers[device.serial].state === 'running') {
                     workers[device.serial].terminate()

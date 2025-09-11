@@ -30,9 +30,9 @@ export class DeviceConnection {
   async useDevice(): Promise<void> {
     const device = await this.deviceBySerialStore.fetch()
 
-    try {
-      if (!device?.channel) throw new Error('Device is not cooperating.')
+    if (!device?.channel) return
 
+    try {
       const startRemoteConnectResult = await this.deviceControlStore.startRemoteConnect()
 
       startRemoteConnectResult.donePromise.then(({ data }) => {

@@ -10,7 +10,7 @@ class DelimitedStream extends stream.Transform {
         this._buffer = Buffer.concat([this._buffer, chunk])
         while (this._buffer.length) {
             if (this._readingLength) {
-                const byte = this._buffer[0]
+                var byte = this._buffer[0]
                 this._length += (byte & 0x7f) << (7 * this._lengthIndex)
                 if (byte & (1 << 7)) {
                     this._lengthIndex += 1
