@@ -16,6 +16,15 @@ import service from '../resources/service.js'
 import {Duplex} from 'node:stream'
 import EventEmitter from 'events'
 import {GRPC_WAIT_TIMEOUT} from '../../../util/apiutil.js'
+import {
+    PhysicalIdentifyMessage,
+    KeyDownMessage,
+    KeyUpMessage,
+    KeyPressMessage,
+    TypeMessage,
+    RotateMessage,
+    UnlockDeviceMessage
+} from "../../../wire/wire.js";
 
 interface Service {
     socket: Duplex | null
@@ -230,7 +239,6 @@ export default syrup.serial()
             getDisplay = (id: string) =>
                 runServiceCommand(apk.wire.MessageType.GET_DISPLAY, new apk.wire.GetDisplayRequest(id))
                     .then((data) => {
-                        log.info('DISPLAY RESPONSE !')
                         const response = apk.wire.GetDisplayResponse.decode(data)
                         if (response.success) {
                             return {
@@ -367,8 +375,10 @@ export default syrup.serial()
                         }
 
                         const mapped = response.properties.reduce(
-                            (acc: any, property: any) =>
-                                acc[property.name] = property.value, {}
+                            (acc: any, property: any) => {
+                                acc[property.name] = property.value
+                                return acc
+                            }, {}
                         )
                         if (mapped.imei) {
                             return mapped
@@ -636,14 +646,14 @@ export default syrup.serial()
         await openService()
 
         router
-            .on(wire.PhysicalIdentifyMessage, (channel) => {
+            .on(PhysicalIdentifyMessage, (channel) => {
                 plugin.identity()
                 push.send([
                     channel,
                     wireutil.reply(options.serial).okay()
                 ])
             })
-            .on(wire.KeyDownMessage, (channel, message) => {
+            .on(KeyDownMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.DOWN,
@@ -654,7 +664,7 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.KeyUpMessage, (channel, message) => {
+            .on(KeyUpMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.UP,
@@ -665,7 +675,7 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.KeyPressMessage, (channel, message) => {
+            .on(KeyPressMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.PRESS,
@@ -676,13 +686,13 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.TypeMessage, (channel, message) =>
+            .on(TypeMessage, (channel, message) =>
                 plugin.type(message.text)
             )
-            .on(wire.RotateMessage, (channel, message) =>
+            .on(RotateMessage, (channel, message) =>
                 plugin.rotate(message.rotation)
             )
-            .on(wire.UnlockDeviceMessage, (channel, message) =>
+            .on(UnlockDeviceMessage, (channel, message) =>
                 plugin.unlockDevice()
             )
         return plugin
