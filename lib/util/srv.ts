@@ -3,7 +3,6 @@ import util from 'util'
 import dns from 'dns/promises'
 import {SrvRecord} from 'dns'
 import _ from 'lodash'
-var srv = Object.create(null)
 function groupByPriority(records: SrvRecord[]) {
     return records
         .sort((a, b) => a.priority - b.priority)
@@ -27,7 +26,7 @@ function shuffleWeighted(records: SrvRecord[]) {
     function pick(records: SrvRecord[], sum: number): SrvRecord[] {
         const rand = Math.random() * sum
         let counter = 0
-        for (var i = 0, l = records.length; i < l; ++i) {
+        for (let i = 0, l = records.length; i < l; ++i) {
             counter += records[i].weight
             if (rand < counter) {
                 const picked = records.splice(i, 1)
