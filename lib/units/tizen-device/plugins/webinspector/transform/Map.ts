@@ -1,4 +1,4 @@
-import { Transform } from './index.js'
+import {Transform} from './index.js'
 
 /**
  * Serialized Map data structure
@@ -42,7 +42,7 @@ const MapTransform: Transform = {
 
     // Convert serialized data back to object (not actual Map for compatibility)
     fromSerializable: (data: SerializedMap): Record<string, any> => {
-        const obj = { ...data.body }
+        const obj = {...data.body}
 
         // Restore constructor information if available
         if (typeof data.proto === 'string') {
