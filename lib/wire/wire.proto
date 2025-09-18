@@ -134,6 +134,9 @@ enum MessageType {
     GetAppAssetsList = 9009;
     GetAppHTML = 9010;
     GetAppInspectServerUrl = 9011;
+    DeviceStatusChange = 9012;
+    DeviceGetIsInOrigin = 9013;
+    GetPresentDevices = 9014;
 }
 
 message UpdateAccessTokenMessage {
@@ -406,7 +409,7 @@ message DeviceIntroductionMessage {
   required string serial = 1;
   required DeviceStatus status = 2;
   required ProviderMessage provider = 3;
-//   optional DeviceGroupMessage group = 4;
+  optional string deviceType = 4;
 }
 
 message DeviceIosIntroductionMessage {
@@ -559,6 +562,7 @@ message GroupMessage {
   optional uint32 timeout = 2;
   repeated DeviceRequirement requirements = 3;
   optional string usage = 4;
+  repeated string keys = 5;
 }
 
 message AutoGroupMessage {
@@ -574,6 +578,7 @@ message JoinGroupMessage {
   required string serial = 1;
   required OwnerMessage owner = 2;
   optional string usage = 3;
+  optional uint32 timeout = 4;
 }
 
 message JoinGroupByAdbFingerprintMessage {
@@ -1023,4 +1028,16 @@ message GetAppHTML {
 }
 
 message GetAppInspectServerUrl {
+}
+
+message DeviceStatusChange {
+  required string serial = 1;
+  required uint32 timeout = 2;
+}
+
+message DeviceGetIsInOrigin {
+    required string serial = 1;
+}
+
+message GetPresentDevices {
 }

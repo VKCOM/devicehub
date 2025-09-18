@@ -9,32 +9,36 @@ import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
 
-export default db.ensureConnectivity(async function(options) {
+interface Options {
+    name: string
+
+    // TODO: keep only appDealer & devDealer
+    endpoints: {
+        appDealer: string[]
+        devDealer: string[]
+    }
+    publicIp: string
+}
+
+export default db.ensureConnectivity(async(options: Options) => {
     const log = logger.createLogger('processor')
     if (options.name) {
         logger.setGlobalIdentifier(options.name)
     }
 
-    const {
-        push
-        , pushdev
-        , sub
-        , subdev
-        , channelRouter
-    } = await db.createZMQSockets(options.endpoints, log)
-    await db.connect({push, pushdev, channelRouter})
+    await db.connect()
 
     // App side
     const appDealer = zmqutil.socket('dealer')
-    Promise.all(options.endpoints.appDealer.map(async(endpoint) => {
+    await Promise.all(options.endpoints.appDealer.map(async(endpoint: string) => {
         try {
-            return srv.resolve(endpoint).then(function(records) {
-                return srv.attempt(records, async function(record) {
+            return await srv.resolve(endpoint).then((records) =>
+                srv.attempt(records, (record) => {
                     log.info('App dealer connected to "%s"', record.url)
                     appDealer.connect(record.url)
                     return true
                 })
-            })
+            )
         }
         catch (err) {
             log.fatal('Unable to connect to app dealer endpoint', err)
@@ -44,18 +48,20 @@ export default db.ensureConnectivity(async function(options) {
 
     // Device side
     const devDealer = zmqutil.socket('dealer')
-    appDealer.on('message', function(channel, data) {
+    appDealer.on('message', (channel, data) => {
         devDealer.send([channel, data])
     })
-    Promise.all(options.endpoints.devDealer.map(async(endpoint) => {
+
+    const reply = wireutil.reply(wireutil.global)
+    await Promise.all(options.endpoints.devDealer.map(async(endpoint: string) => {
         try {
-            return srv.resolve(endpoint).then(function(records) {
-                return srv.attempt(records, async function(record) {
+            return await srv.resolve(endpoint).then((records) =>
+                srv.attempt(records, (record) => {
                     log.info('Device dealer connected to "%s"', record.url)
                     devDealer.connect(record.url)
                     return true
                 })
-            })
+            )
         }
         catch (err) {
             log.fatal('Unable to connect to dev dealer endpoint', err)
@@ -63,12 +69,11 @@ export default db.ensureConnectivity(async function(options) {
         }
     }))
 
-    const defaultWireHandler = (channel, _, data) => appDealer.send([channel, data])
+    const defaultWireHandler =
+        (channel: string, _: any, data: any) =>
+            appDealer.send([channel, data])
 
     const router = new WireRouter()
-        .on(wire.UpdateAccessTokenMessage, defaultWireHandler)
-        .on(wire.DeleteUserMessage, defaultWireHandler)
-        .on(wire.DeviceChangeMessage, defaultWireHandler)
         .on(wire.UserChangeMessage, defaultWireHandler)
         .on(wire.GroupChangeMessage, defaultWireHandler)
         .on(wire.DeviceGroupChangeMessage, defaultWireHandler)
@@ -113,7 +118,7 @@ export default db.ensureConnectivity(async function(options) {
             devDealer.send([message.channel, wireutil.envelope(new wire.ProbeMessage())])
             appDealer.send([channel, data])
         })
-        .on(wire.JoinGroupByAdbFingerprintMessage, async(channel, message, data) => {
+        .on(wire.JoinGroupByAdbFingerprintMessage, async(channel, message) => {
             try {
                 const user = await dbapi.lookupUserByAdbFingerprint(message.fingerprint)
                 if (user) {
@@ -128,11 +133,11 @@ export default db.ensureConnectivity(async function(options) {
                     wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(message.serial, message.fingerprint, message.comment))
                 ])
             }
-            catch (/** @type any */ err) {
-                log.error('Unable to lookup user by ADB fingerprint "%s"', message.fingerprint, err.stack)
+            catch (err: any) {
+                log.error('Unable to lookup user by ADB fingerprint "%s": %s', message.fingerprint, err?.message)
             }
         })
-        .on(wire.JoinGroupByVncAuthResponseMessage, async(channel, message, data) => {
+        .on(wire.JoinGroupByVncAuthResponseMessage, async(channel, message) => {
             try {
                 const user = await dbapi.lookupUserByVncAuthResponse(message.response, message.serial)
                 if (user) {
@@ -148,8 +153,8 @@ export default db.ensureConnectivity(async function(options) {
                     wireutil.envelope(new wire.JoinGroupByVncAuthResponseMessage(message.serial, message.response))
                 ])
             }
-            catch (/** @type any */ err) {
-                log.error('Unable to lookup user by VNC auth response "%s"', message.response, err.stack)
+            catch (err: any) {
+                log.error('Unable to lookup user by VNC auth response "%s": %s', message.response, err?.message)
             }
         })
         .on(wire.ConnectStartedMessage, async(channel, message, data) => {
@@ -162,11 +167,7 @@ export default db.ensureConnectivity(async function(options) {
         })
         .on(wire.JoinGroupMessage, async(channel, message, data) => {
             await Promise.all([
-                dbapi.setDeviceOwner(message.serial, message.owner),
-
-                message.usage &&
-                    dbapi.setDeviceUsage(message.serial, message.usage),
-
+                dbapi.setDeviceState(message.serial, message),
                 dbapi.sendEvent(`device_${message.usage || 'use'}`
                     , {}
                     , {deviceSerial: message.serial, userEmail: message.owner.email, groupId: message.owner.group}
@@ -177,8 +178,7 @@ export default db.ensureConnectivity(async function(options) {
         })
         .on(wire.LeaveGroupMessage, async(channel, message, data) => {
             await Promise.all([
-                dbapi.unsetDeviceOwner(message.serial),
-                dbapi.unsetDeviceUsage(message.serial),
+                dbapi.setDeviceState(message.serial, {owner: null, usage: null, timeout: 0}),
                 dbapi.sendEvent('device_leave'
                     , {}
                     , {deviceSerial: message.serial, userEmail: message.owner.email, groupId: message.owner.group}
@@ -186,6 +186,14 @@ export default db.ensureConnectivity(async function(options) {
                 )
             ])
             appDealer.send([channel, data])
+        })
+        .on(wire.DeviceGetIsInOrigin, async(channel, message) => {
+            const device = await dbapi.loadDeviceBySerial(message.serial)
+            const isInOrigin = device.group.id === device.group.origin
+            devDealer.send([
+                channel,
+                reply.okay('success', {isInOrigin})
+            ])
         })
         .on(wire.DeviceIdentityMessage, (channel, message, data) => {
             dbapi.saveDeviceIdentity(message.serial, message)
@@ -223,68 +231,42 @@ export default db.ensureConnectivity(async function(options) {
             dbapi.setDeviceReverseForwards(message.serial, message.forwards)
             appDealer.send([channel, data])
         })
-        .on(wire.SetDeviceDisplay, (channel, message, data) => {
-            dbapi
-                .setDeviceSocketDisplay(message)
-                .then(function(response) {
-                    log.info('setDeviceSocketDisplay response: %s', response)
-                })
-                .catch(function(err) {
-                    log.error('setDeviceSocketDisplay', err)
-                })
-        })
-        .on(wire.UpdateIosDevice, (channel, message, data) => {
-            dbapi
-                .updateIosDevice(message)
-                .then(result => {
-                    log.info('UpdateIosDevice: %s', result)
-                })
-                .catch(err => {
-                    log.info('UpdateIosDevice error: %s', err?.message)
-                })
-        })
+        .on(wire.UpdateIosDevice, (channel, message, data) =>
+            dbapi.updateIosDevice(message)
+        )
         .on(wire.SdkIosVersion, (channel, message, data) => {
-            dbapi
-                .setDeviceIosVersion(message)
-                .then(result => {
-                    log.info('SdkIosVersion: %s', result)
-                })
-                .catch(err => {
-                    log.info('SdkIosVersion error: %s', err?.message)
-                })
+            dbapi.setDeviceIosVersion(message)
         })
         .on(wire.SizeIosDevice, (channel, message, data) => {
-            dbapi.sizeIosDevice(message.id, message.height, message.width, message.scale).then(result => {
-                log.info('SizeIosDevice: %s', result)
-            }).catch(err => {
-                log.info('SizeIosDevice: %s', err?.message)
-            })
+            dbapi.sizeIosDevice(message.id, message.height, message.width, message.scale)
             appDealer.send([channel, data])
         })
         .on(wire.DeviceTypeMessage, (channel, message, data) => {
             dbapi.setDeviceType(message.serial, message.type)
         })
-        .on(wire.DeleteDevice, (channel, message, data) => {
-            dbapi.deleteDevice(message.serial)
-        })
-        .on(wire.SetAbsentDisconnectedDevices, (channel, message, data) => {
-            dbapi.setAbsentDisconnectedDevices()
-        })
         .on(wire.GetServicesAvailabilityMessage, (channel, message, data) => {
             dbapi.setDeviceServicesAvailability(message.serial, message)
             appDealer.send([channel, data])
+        })
+        .on(wire.GetPresentDevices, async(channel, message, data) => {
+            const devices = await dbapi.loadPresentDevices()
+                .then(devices => devices.map(d => d.serial))
+            devDealer.send([
+                channel,
+                reply.okay('success', {devices})
+            ])
         })
         .handler()
 
     devDealer.on('message', router)
 
-    lifecycle.observe(function() {
-        [appDealer, devDealer, push, pushdev, sub, subdev].forEach(function(sock) {
+    lifecycle.observe(() => {
+        ;[appDealer, devDealer].forEach(function(sock) {
             try {
                 sock.close()
             }
-            catch (err) {
-                log.error('Error while closing socket "%s"', err.stack)
+            catch (err: any) {
+                log.error('Error while closing socket "%s"', err?.message)
             }
         })
     })

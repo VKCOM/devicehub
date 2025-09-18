@@ -12,7 +12,16 @@ interface ADBDeviceEntry {
     state: ADBDevice['type']
 }
 
-class ADBObserver extends EventEmitter {
+type PrevADBDeviceType = ADBDevice['type']
+
+interface ADBEvents {
+    connect: [ADBDevice]
+    update: [ADBDevice, PrevADBDeviceType]
+    disconnect: [ADBDevice]
+    error: [Error]
+}
+
+class ADBObserver extends EventEmitter<ADBEvents> {
     static instance: ADBObserver | null = null
 
     private readonly intervalMs: number = 1000 // Default 1 second polling
@@ -26,7 +35,10 @@ class ADBObserver extends EventEmitter {
     private shouldContinuePolling: boolean = false
     private connection: Socket | null = null
     private isConnecting: boolean = false
-    private pendingRequests: Map<string, {resolve: (value: string) => void; reject: (error: Error) => void}> = new Map()
+    private pendingRequests: Map<string, {
+        resolve: (value: string) => void
+        reject: (error: Error) => void
+    }> = new Map()
 
     constructor(options?: {intervalMs?: number; host?: string; port?: number}) {
         if (ADBObserver.instance) {
@@ -134,7 +146,7 @@ class ADBObserver extends EventEmitter {
                 }
             }
         }
-        catch (error) {
+        catch (error: any) {
             this.emit('error', error)
         }
         finally {
@@ -240,7 +252,7 @@ class ADBObserver extends EventEmitter {
                 reject(new Error('Connection closed'))
             }
             this.pendingRequests.clear()
-            
+
             // Auto-reconnect if we should continue polling
             if (this.shouldContinuePolling && !this.isDestroyed) {
                 this.ensureConnection().catch(err => {
@@ -277,7 +289,7 @@ class ADBObserver extends EventEmitter {
             }
 
             const responseData = buffer.subarray(offset + 8, offset + 8 + dataLength).toString('utf-8')
-            
+
             if (status === 'OKAY') {
                 // Find and resolve the corresponding request
                 const requestId = 'host:devices' // For now, we only handle device listing
@@ -308,7 +320,7 @@ class ADBObserver extends EventEmitter {
      */
     private async sendADBCommand(command: string): Promise<string> {
         const connection = await this.ensureConnection()
-        
+
         return new Promise((resolve, reject) => {
             // Store the request for response matching
             this.pendingRequests.set(command, {resolve, reject})
@@ -337,7 +349,7 @@ class ADBObserver extends EventEmitter {
             this.connection.destroy()
             this.connection = null
         }
-        
+
         // Reject any pending requests
         for (const [, {reject}] of this.pendingRequests) {
             reject(new Error('Connection closed'))

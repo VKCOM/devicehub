@@ -142,6 +142,7 @@
     "@types/http-proxy": "^1.17.16",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.17",
+    "@types/semver": "^7.7.1",
     "@types/split": "^1.0.5",
     "@types/temp": "^0.9.4",
     "@types/tmp": "^0.2.6",
