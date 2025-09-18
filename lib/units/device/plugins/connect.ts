@@ -14,6 +14,7 @@ import urlformat from '../../base-device/support/urlformat.js'
 import identity from './util/identity.js'
 import data from './util/data.js'
 import type TcpUsbServer from '@u4/adbkit/dist/adb/tcpusb/server.d.ts'
+import {AdbKeysUpdatedMessage} from '../../../wire/wire.js'
 
 interface Key {
     fingerprint: string
@@ -62,7 +63,7 @@ export default syrup.serial()
                 // TODO: fix
                 const auth = (key: Key) => new Promise<void>(async(resolve, reject) => {
                     // TODO: Dangerous, discuss and remove
-                    router.once(wire.AdbKeysUpdatedMessage, () => notify(key))
+                    router.once(AdbKeysUpdatedMessage, () => notify(key))
                     await notify(key)
 
                     if (plugin.auth(key)) {
