@@ -270,7 +270,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     /**
      * Process ADB protocol responses and return remaining buffer
      */
-    private processADBResponses(buffer: Buffer): Buffer {
+    private processADBResponses(buffer: Buffer<ArrayBuffer>): Buffer<ArrayBuffer> {
         let offset = 0
 
         while (offset < buffer.length) {
