@@ -94,7 +94,6 @@ export default syrup.serial()
                     })
 
                 activeServer!.listen(plugin.port)
-                lifecycle.share('Remote ADB', activeServer)
 
                 log.info(util.format('Listening on port %d', plugin.port))
                 resolve(plugin.url)
