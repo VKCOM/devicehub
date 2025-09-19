@@ -22,6 +22,10 @@ USER_PRIVILEGE = 'user'
 
 STF_SECRET = 'kute kittykat'
 
+DEFAULT_GROUPS_NUMBER = 10
+DEFAULT_GROUPS_DURATION = 1296000000
+DEFAULT_GROUPS_REPETITIONS = 10
+
 
 def pytest_addoption(parser):
     parser.addoption("--token", action="store")
@@ -440,3 +444,17 @@ def failure_response_check():
         return response_content
 
     return failure_response_check_func
+
+class Quotas:
+    def __init__(self, number, duration, repetitions):
+        self.number = number
+        self.duration = duration
+        self.repetitions = repetitions
+
+@pytest.fixture()
+def default_quotas():
+    return Quotas(
+        DEFAULT_GROUPS_NUMBER,
+        DEFAULT_GROUPS_DURATION,
+        DEFAULT_GROUPS_REPETITIONS
+    )

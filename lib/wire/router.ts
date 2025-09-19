@@ -6,7 +6,7 @@ import { Any } from "./google/protobuf/any.ts";
 
 const log = logger.createLogger("wire:router");
 
-type MessageHandler<T extends object> = (channel: string, message: T) => unknown
+type MessageHandler<T extends object> = (channel: string, message: T, data: Buffer) => unknown
 
 export class WireRouter {
     emitter = new EventEmitter()

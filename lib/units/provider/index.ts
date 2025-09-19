@@ -6,8 +6,6 @@ import * as procutil from '../../util/procutil.js'
 import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
-import db from '../../db/index.js'
-import dbapi from '../../db/api.js'
 import {ChildProcess} from 'node:child_process'
 import ADBObserver, {ADBDevice} from './ADBObserver.js'
 import { DeviceRegisteredMessage } from '../../wire/wire.ts'
@@ -39,7 +37,6 @@ export interface Options {
 
 export default (async function(options: Options) {
     const log = logger.createLogger('provider')
-    await db.connect()
 
     // Check whether the ipv4 address contains a port indication
     if (options.adbHost.includes(':')) {
@@ -133,10 +130,9 @@ export default (async function(options: Options) {
         // Tell others we found a device
         push.send([
             wireutil.global,
-            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name)))
+            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name), options.deviceType))
         ])
 
-        dbapi.setDeviceType(device.serial, options.deviceType)
         process.nextTick(() => { // after creating workers[device.serial] obj
             if (workers[device.serial]) {
                 workers[device.serial].resolveRegister = () => resolve()

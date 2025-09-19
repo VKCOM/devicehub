@@ -12,7 +12,7 @@ class TestUserLifecycleManagement:
     """Test suite for user creation, modification, and deletion"""
 
     def test_create_and_delete_user_complete_flow(self, api_client, random_user, successful_response_check,
-                                                  common_group_id):
+                                                  common_group_id, default_quotas):
         """Test complete user lifecycle from creation to deletion"""
         user = random_user()
 
@@ -46,11 +46,11 @@ class TestUserLifecycleManagement:
 
         # Validate user quotas
         quotas = user_dict.get('groups').get('quotas')
-        equal(quotas.get('allocated').get('number'), quotas.get('defaultGroupsNumber'))
-        equal(quotas.get('allocated').get('duration'), quotas.get('defaultGroupsDuration'))
+        equal(quotas.get('allocated').get('number'), default_quotas.number)
+        equal(quotas.get('allocated').get('duration'), default_quotas.duration)
         equal(quotas.get('consumed').get('number'), 0)
         equal(quotas.get('consumed').get('duration'), 0)
-        equal(quotas.get('repetitions'), quotas.get('defaultGroupsRepetitions'))
+        equal(quotas.get('repetitions'), default_quotas.repetitions)
 
         # Delete created user
         response = delete_user.sync_detailed(client=api_client, email=user.email)

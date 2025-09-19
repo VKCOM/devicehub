@@ -18,7 +18,10 @@
     "moduleResolution": "nodenext",
     "target": "es2022",
     "rewriteRelativeImportExtensions": true,
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
+    "paths": {
+      "@u4/adbkit/*": ["./node_modules/@u4/adbkit/*"]
+    },
     "types": ["node"]
   },
   "include": [
