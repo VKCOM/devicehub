@@ -1,5 +1,10 @@
 import logger from '../../util/logger.js'
-import wire from '../../wire/index.js'
+import {
+    DeviceAbsentMessage,
+    DeviceHeartbeatMessage,
+    DeviceIntroductionMessage, DevicePresentMessage,
+    GetPresentDevices
+} from '../../wire/wire.js'
 import wireutil from '../../wire/util.js'
 import {WireRouter} from '../../wire/router.js'
 import lifecycle from '../../util/lifecycle.js'
@@ -50,7 +55,7 @@ export default (async(options: Options) => {
             })
         )
     )).catch((err) => {
-        log.fatal('Unable to connect to push endpoint', err)
+        log.fatal('Unable to connect to push endpoint: %s', err?.message)
         lifecycle.fatal()
     })
 
@@ -58,7 +63,7 @@ export default (async(options: Options) => {
         log.info('Device "%s" is present', serial)
         push.send([
             wireutil.global,
-            wireutil.envelope(new wire.DevicePresentMessage(serial))
+            wireutil.pack(DevicePresentMessage, {serial})
         ])
     })
 
@@ -66,7 +71,7 @@ export default (async(options: Options) => {
         log.info('Reaping device "%s" due to heartbeat timeout', serial)
         push.send([
             wireutil.global,
-            wireutil.envelope(new wire.DeviceAbsentMessage(serial))
+            wireutil.pack(DeviceAbsentMessage, {serial})
         ])
     })
 
@@ -86,14 +91,14 @@ export default (async(options: Options) => {
         log.info('Reaping devices with no heartbeat')
 
         const router = new WireRouter()
-            .on(wire.DeviceIntroductionMessage, (channel, message) => {
+            .on(DeviceIntroductionMessage, (channel, message) => {
                 ttlset.drop(message.serial, TTLSet.SILENT)
                 ttlset.bump(message.serial, Date.now())
             })
-            .on(wire.DeviceHeartbeatMessage, (channel, message) => {
+            .on(DeviceHeartbeatMessage, (channel, message) => {
                 ttlset.bump(message.serial, Date.now())
             })
-            .on(wire.DeviceAbsentMessage, (channel, message) => {
+            .on(DeviceAbsentMessage, (channel, message) => {
                 ttlset.drop(message.serial, TTLSet.SILENT)
             })
 
@@ -101,7 +106,7 @@ export default (async(options: Options) => {
         sub.on('message', router.handler())
 
         // Load initial state
-        const {devices} = await runTransactionDev(wireutil.global, new wire.GetPresentDevices(), {sub, push, router})
+        const {devices} = await runTransactionDev(wireutil.global, GetPresentDevices, {}, {sub, push, router})
 
         const now = Date.now()
         devices.forEach((serial: string) => {

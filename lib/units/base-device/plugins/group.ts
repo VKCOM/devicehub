@@ -1,6 +1,12 @@
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
-import wire from '../../../wire/index.js'
+import {
+    AutoGroupMessage,
+    DeviceStatusChange,
+    GroupMessage,
+    JoinGroupMessage,
+    LeaveGroupMessage, UngroupMessage
+} from '../../../wire/wire.js'
 import wireutil from '../../../wire/util.js'
 import * as grouputil from '../../../util/grouputil.js'
 import lifecycle from '../../../util/lifecycle.js'
@@ -72,7 +78,10 @@ export default syrup.serial()
                         const newTimeout = channels.getTimeout(this.currentGroup.group)
                         push.send([
                             wireutil.global,
-                            wireutil.envelope(new wire.DeviceStatusChange(options.serial, newTimeout))
+                            wireutil.pack(DeviceStatusChange, {
+                                serial: options.serial,
+                                timeout: newTimeout || undefined
+                            })
                         ])
 
                         return this.currentGroup
@@ -95,7 +104,12 @@ export default syrup.serial()
 
                     push.send([
                         wireutil.global,
-                        wireutil.envelope(new wire.JoinGroupMessage(options.serial, this.currentGroup, usage, timeout))
+                        wireutil.pack(JoinGroupMessage, {
+                            serial: options.serial,
+                            owner: this.currentGroup,
+                            usage,
+                            timeout
+                        })
                     ])
 
                     return this.currentGroup
@@ -116,7 +130,11 @@ export default syrup.serial()
 
                 push.send([
                     wireutil.global,
-                    wireutil.envelope(new wire.LeaveGroupMessage(options.serial, this.currentGroup, reason))
+                    wireutil.pack(LeaveGroupMessage, {
+                        serial: options.serial,
+                        owner: this.currentGroup,
+                        reason
+                    })
                 ])
 
                 channels.unregister(this.currentGroup.group)
@@ -151,14 +169,14 @@ export default syrup.serial()
         }()
 
         router
-            .on(wire.GroupMessage, async(channel, message) => {
+            .on(GroupMessage, async(channel, message) => {
                 const reply = wireutil.reply(options.serial)
                 try {
                     if (!await plugin.checkBeforeAction('GroupMessage', message, channel, reply)) {
                         return
                     }
 
-                    await plugin.join(message.owner, message.timeout, message.usage, message.keys)
+                    await plugin.join(message.owner!, message.timeout!, message.usage!, message.keys)
                     push.send([
                         channel,
                         reply.okay()
@@ -174,9 +192,9 @@ export default syrup.serial()
                     }
                 }
             })
-            .on(wire.AutoGroupMessage, async(channel, message) => {
+            .on(AutoGroupMessage, async(channel, message) => {
                 try {
-                    await plugin.join(message.owner, message.timeout, message.identifier, [])
+                    await plugin.join(message.owner!, 0, message.identifier, [])
                     plugin.emit('autojoin', message.identifier, true)
                 }
                 catch (err: any) {
@@ -186,7 +204,7 @@ export default syrup.serial()
                     }
                 }
             })
-            .on(wire.UngroupMessage, async(channel, message) => {
+            .on(UngroupMessage, async(channel, message) => {
                 const reply = wireutil.reply(options.serial)
                 try {
                     if (!await plugin.checkBeforeAction('UngroupMessage', message, channel, reply)) {

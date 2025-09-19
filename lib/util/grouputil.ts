@@ -1,7 +1,7 @@
 import util from 'util'
 import semver from 'semver' // @ts-ignore
 import minimatch from 'minimatch' // TODO: update
-import wire from '../wire/index.js'
+import {RequirementType} from '../wire/wire.js'
 
 export class RequirementMismatchError extends Error {
     constructor(name: string) {
@@ -30,12 +30,6 @@ export class NoGroupError extends Error {
     }
 }
 
-enum RequirementType {
-    SEMVER = 1,
-    GLOB,
-    EXACT
-}
-
 interface Requirements {
     name: string
     value: string
@@ -50,17 +44,17 @@ export const match = async(capabilities: any, requirements: Requirements[]) => {
         }
 
         switch (req.type) {
-        case wire.RequirementType.SEMVER:
+        case RequirementType.SEMVER:
             if (!semver.satisfies(capability, req.value)) {
                 throw new RequirementMismatchError(req.name)
             }
             break
-        case wire.RequirementType.GLOB:
+        case RequirementType.GLOB:
             if (!minimatch(capability, req.value)) {
                 throw new RequirementMismatchError(req.name)
             }
             break
-        case wire.RequirementType.EXACT:
+        case RequirementType.EXACT:
             if (capability !== req.value) {
                 throw new RequirementMismatchError(req.name)
             }

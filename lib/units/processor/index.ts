@@ -8,12 +8,55 @@ import dbapi from '../../db/models/all/index.js'
 import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
-import {UpdateAccessTokenMessage, DeleteUserMessage, DeviceChangeMessage, UserChangeMessage, GroupChangeMessage, DeviceGroupChangeMessage, GroupUserChangeMessage, DeviceHeartbeatMessage, DeviceLogMessage, TransactionProgressMessage, TransactionDoneMessage, TransactionTreeMessage, InstallResultMessage, DeviceLogcatEntryMessage, TemporarilyUnavailableMessage, UpdateRemoteConnectUrl, InstalledApplications, DeviceIntroductionMessage, InitializeIosDeviceState, DevicePresentMessage, DeviceAbsentMessage, DeviceStatusMessage, DeviceReadyMessage, JoinGroupByAdbFingerprintMessage, JoinGroupByVncAuthResponseMessage, ConnectStartedMessage, ConnectStoppedMessage, JoinGroupMessage, LeaveGroupMessage, DeviceIdentityMessage, AirplaneModeEvent, BatteryEvent, DeviceBrowserMessage, ConnectivityEvent, PhoneStateEvent, RotationEvent, CapabilitiesMessage, ReverseForwardsEvent, SetDeviceDisplay, UpdateIosDevice, SdkIosVersion, SizeIosDevice, DeviceTypeMessage, DeleteDevice, SetAbsentDisconnectedDevices, GetServicesAvailabilityMessage} from '../../wire/wire.js'
+import {
+    UserChangeMessage,
+    GroupChangeMessage,
+    DeviceGroupChangeMessage,
+    GroupUserChangeMessage,
+    DeviceHeartbeatMessage,
+    DeviceLogMessage,
+    TransactionProgressMessage,
+    TransactionDoneMessage,
+    TransactionTreeMessage,
+    InstallResultMessage,
+    DeviceLogcatEntryMessage,
+    TemporarilyUnavailableMessage,
+    UpdateRemoteConnectUrl,
+    InstalledApplications,
+    DeviceIntroductionMessage,
+    InitializeIosDeviceState,
+    DevicePresentMessage,
+    DeviceAbsentMessage,
+    DeviceStatusMessage,
+    DeviceReadyMessage,
+    JoinGroupByAdbFingerprintMessage,
+    JoinGroupByVncAuthResponseMessage,
+    ConnectStartedMessage,
+    ConnectStoppedMessage,
+    JoinGroupMessage,
+    LeaveGroupMessage,
+    DeviceIdentityMessage,
+    AirplaneModeEvent,
+    BatteryEvent,
+    DeviceBrowserMessage,
+    ConnectivityEvent,
+    PhoneStateEvent,
+    RotationEvent,
+    CapabilitiesMessage,
+    ReverseForwardsEvent,
+    SetDeviceDisplay,
+    UpdateIosDevice,
+    SdkIosVersion,
+    SizeIosDevice,
+    DeviceTypeMessage,
+    DeleteDevice,
+    SetAbsentDisconnectedDevices,
+    GetServicesAvailabilityMessage,
+    DeviceRegisteredMessage, GetPresentDevices, DeviceGetIsInOrigin
+} from '../../wire/wire.js'
 
 interface Options {
     name: string
-
-    // TODO: keep only appDealer & devDealer
     endpoints: {
         appDealer: string[]
         devDealer: string[]
@@ -41,8 +84,8 @@ export default db.ensureConnectivity(async(options: Options) => {
                 })
             )
         }
-        catch (err) {
-            log.fatal('Unable to connect to app dealer endpoint', err)
+        catch (err: any) {
+            log.fatal('Unable to connect to app dealer endpoint %s', err?.message)
             lifecycle.fatal()
         }
     }))
@@ -64,8 +107,8 @@ export default db.ensureConnectivity(async(options: Options) => {
                 })
             )
         }
-        catch (err) {
-            log.fatal('Unable to connect to dev dealer endpoint', err)
+        catch (err: any) {
+            log.fatal('Unable to connect to dev dealer endpoint %s', err?.message)
             lifecycle.fatal()
         }
     }))
@@ -89,37 +132,35 @@ export default db.ensureConnectivity(async(options: Options) => {
         .on(TemporarilyUnavailableMessage, defaultWireHandler)
         .on(UpdateRemoteConnectUrl, defaultWireHandler)
         .on(InstalledApplications, defaultWireHandler)
-        .on(DeviceIntroductionMessage, async(channel, message, data) => {
+        .on(DeviceIntroductionMessage, async (channel, message, data) => {
             await dbapi.saveDeviceInitialState(message.serial, message)
             devDealer.send([
-                message.provider.channel,
-                wireutil.envelope(new wire.DeviceRegisteredMessage(message.serial))
+                message.provider!.channel,
+                wireutil.pack(DeviceRegisteredMessage, {serial: message.serial})
             ])
             appDealer.send([channel, data])
         })
         .on(InitializeIosDeviceState, (channel, message, data) => {
             dbapi.initializeIosDeviceState(options.publicIp, message)
         })
-        .on(DevicePresentMessage, async(channel, message, data) => {
+        .on(DevicePresentMessage, async (channel, message, data) => {
             await dbapi.setDevicePresent(message.serial)
             appDealer.send([channel, data])
         })
-        .on(DeviceAbsentMessage, async(channel, message, data) => {
-            if (!message.applications) {
-                await dbapi.setDeviceAbsent(message.serial)
-                appDealer.send([channel, data])
-            }
+        .on(DeviceAbsentMessage, async (channel, message, data) => {
+            await dbapi.setDeviceAbsent(message.serial)
+            appDealer.send([channel, data])
         })
         .on(DeviceStatusMessage, (channel, message, data) => {
             dbapi.saveDeviceStatus(message.serial, message.status)
             appDealer.send([channel, data])
         })
-        .on(DeviceReadyMessage, async(channel, message, data) => {
+        .on(DeviceReadyMessage, async (channel, message, data) => {
             await dbapi.setDeviceReady(message.serial, message.channel)
             devDealer.send([message.channel, wireutil.envelope(new wire.ProbeMessage())])
             appDealer.send([channel, data])
         })
-        .on(JoinGroupByAdbFingerprintMessage, async(channel, message) => {
+        .on(JoinGroupByAdbFingerprintMessage, async (channel, message) => {
             try {
                 const user = await dbapi.lookupUserByAdbFingerprint(message.fingerprint)
                 if (user) {
@@ -133,12 +174,11 @@ export default db.ensureConnectivity(async(options: Options) => {
                     message.currentGroup,
                     wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(message.serial, message.fingerprint, message.comment))
                 ])
-            }
-            catch (err: any) {
+            } catch (err: any) {
                 log.error('Unable to lookup user by ADB fingerprint "%s": %s', message.fingerprint, err?.message)
             }
         })
-        .on(JoinGroupByVncAuthResponseMessage, async(channel, message) => {
+        .on(JoinGroupByVncAuthResponseMessage, async (channel, message) => {
             try {
                 const user = await dbapi.lookupUserByVncAuthResponse(message.response, message.serial)
                 if (user) {
@@ -153,42 +193,41 @@ export default db.ensureConnectivity(async(options: Options) => {
                     message.currentGroup,
                     wireutil.envelope(new wire.JoinGroupByVncAuthResponseMessage(message.serial, message.response))
                 ])
-            }
-            catch (err: any) {
+            } catch (err: any) {
                 log.error('Unable to lookup user by VNC auth response "%s": %s', message.response, err?.message)
             }
         })
-        .on(ConnectStartedMessage, async(channel, message, data) => {
+        .on(ConnectStartedMessage, async (channel, message, data) => {
             await dbapi.setDeviceConnectUrl(message.serial, message.url)
             appDealer.send([channel, data])
         })
-        .on(ConnectStoppedMessage, async(channel, message, data) => {
+        .on(ConnectStoppedMessage, async (channel, message, data) => {
             await dbapi.unsetDeviceConnectUrl(message.serial)
             appDealer.send([channel, data])
         })
-        .on(JoinGroupMessage, async(channel, message, data) => {
-            await Promise.all([
+        .on(JoinGroupMessage, async (channel, message, data) => {
+            await Promise.all([ // @ts-ignore
                 dbapi.setDeviceState(message.serial, message),
                 dbapi.sendEvent(`device_${message.usage || 'use'}`
                     , {}
-                    , {deviceSerial: message.serial, userEmail: message.owner.email, groupId: message.owner.group}
+                    , {deviceSerial: message.serial, userEmail: message.owner!.email, groupId: message.owner!.group}
                     , Date.now()
                 )
             ])
             appDealer.send([channel, data])
         })
-        .on(LeaveGroupMessage, async(channel, message, data) => {
+        .on(LeaveGroupMessage, async (channel, message, data) => {
             await Promise.all([
                 dbapi.setDeviceState(message.serial, {owner: null, usage: null, timeout: 0}),
                 dbapi.sendEvent('device_leave'
                     , {}
-                    , {deviceSerial: message.serial, userEmail: message.owner.email, groupId: message.owner.group}
+                    , {deviceSerial: message.serial, userEmail: message.owner!.email, groupId: message.owner!.group}
                     , Date.now()
                 )
             ])
             appDealer.send([channel, data])
         })
-        .on(DeviceGetIsInOrigin, async(channel, message) => {
+        .on(DeviceGetIsInOrigin, async (channel, message) => {
             const device = await dbapi.loadDeviceBySerial(message.serial)
             const isInOrigin = device.group.id === device.group.origin
             devDealer.send([
@@ -249,7 +288,7 @@ export default db.ensureConnectivity(async(options: Options) => {
             dbapi.setDeviceServicesAvailability(message.serial, message)
             appDealer.send([channel, data])
         })
-        .on(GetPresentDevices, async(channel, message, data) => {
+        .on(GetPresentDevices, async (channel, message, data) => {
             const devices = await dbapi.loadPresentDevices()
                 .then(devices => devices.map(d => d.serial))
             devDealer.send([
@@ -257,7 +296,7 @@ export default db.ensureConnectivity(async(options: Options) => {
                 reply.okay('success', {devices})
             ])
         })
-        .handler()
+        .handler();
 
     devDealer.on('message', router)
 

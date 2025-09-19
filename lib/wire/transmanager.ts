@@ -1,11 +1,12 @@
 import {v4 as uuidv4} from 'uuid'
 import apiutil from '../util/apiutil.js'
-import wire from './index.js'
+import {TransactionDoneMessage} from './wire.js'
 import {WireRouter} from './router.js'
 import * as Sentry from '@sentry/node'
 import wireutil from './util.js'
 import type {SocketWrapper} from '../util/zmqutil.js'
 import EventEmitter from 'events'
+import {MessageType} from '@protobuf-ts/runtime'
 
 const sentryTransactionSpan = <T = Promise<any>>(channel: string, message: any, timeout: number, cb: () => T): T =>
     Sentry.startSpan({
@@ -36,7 +37,7 @@ interface TransactionTransportOptions {
     timeout?: number
 }
 
-export const runTransaction = (channel: string, message: any, {sub, push, channelRouter, timeout = apiutil.GRPC_WAIT_TIMEOUT}: TransactionTransportOptions) =>
+export const runTransaction = <T extends object>(channel: string, messageType: MessageType<T>, message: T, {sub, push, channelRouter, timeout = apiutil.GRPC_WAIT_TIMEOUT}: TransactionTransportOptions) =>
     sentryTransactionSpan(
         channel,
         message,
@@ -46,7 +47,7 @@ export const runTransaction = (channel: string, message: any, {sub, push, channe
             sub.subscribe(responseChannel)
             return new Promise((resolve, reject) => {
                 const messageListener = new WireRouter()
-                    .on(wire.TransactionDoneMessage, (channel: string, message: any) => {
+                    .on(TransactionDoneMessage, (channel: string, message: any) => {
                         clearTimeout(trTimeout)
                         sub.unsubscribe(responseChannel)
                         channelRouter.removeListener(responseChannel, messageListener)
@@ -70,7 +71,7 @@ export const runTransaction = (channel: string, message: any, {sub, push, channe
                 channelRouter.on(responseChannel, messageListener)
                 push.send([
                     channel,
-                    wireutil.transaction(responseChannel, message)
+                    wireutil.tr(responseChannel, messageType, message)
                 ])
             })
         }
@@ -80,7 +81,7 @@ type TransactionDevTransportOptions = Omit<TransactionTransportOptions, 'channel
     router: WireRouter
 }
 
-export const runTransactionDev = <R = any>(channel: string, message: any, {sub, push, router, timeout = apiutil.GRPC_WAIT_TIMEOUT}: TransactionDevTransportOptions): Promise<R> =>
+export const runTransactionDev = <T extends object>(channel: string, messageType: MessageType<T>, message: T, {sub, push, router, timeout = apiutil.GRPC_WAIT_TIMEOUT}: TransactionDevTransportOptions): Promise<any> =>
     sentryTransactionSpan(
         channel,
         message,
@@ -92,7 +93,7 @@ export const runTransactionDev = <R = any>(channel: string, message: any, {sub, 
                 const messageListener = (channel: string, message: any) => {
                     clearTimeout(trTimeout)
                     sub.unsubscribe(responseChannel)
-                    router.removeListener(wire.TransactionDoneMessage, messageListener)
+                    router.removeListener(TransactionDoneMessage, messageListener)
 
                     const body = message.body ? JSON.parse(message.body) : {}
                     if (message.success) {
@@ -102,10 +103,10 @@ export const runTransactionDev = <R = any>(channel: string, message: any, {sub, 
                         reject(body)
                     }
                 }
-                router.on(wire.TransactionDoneMessage, messageListener)
+                router.on(TransactionDoneMessage, messageListener)
 
                 const trTimeout = setTimeout(() => {
-                    router.removeListener(wire.TransactionDoneMessage, messageListener)
+                    router.removeListener(TransactionDoneMessage, messageListener)
                     sub.unsubscribe(responseChannel)
 
                     sentryCaptureTimeout(channel, message, timeout)
@@ -114,7 +115,7 @@ export const runTransactionDev = <R = any>(channel: string, message: any, {sub, 
 
                 push.send([
                     channel,
-                    wireutil.transaction(responseChannel, message)
+                    wireutil.tr(responseChannel, messageType, message)
                 ])
             })
         }

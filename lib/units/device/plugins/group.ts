@@ -1,6 +1,6 @@
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
-import wire from '../../../wire/index.js'
+import {DeviceGetIsInOrigin} from '../../../wire/wire.js'
 import wireutil from '../../../wire/util.js'
 import * as grouputil from '../../../util/grouputil.js'
 import solo from './solo.js'
@@ -41,12 +41,12 @@ export default syrup.serial()
                     service.pressKey('home')
                     service.thawRotation()
 
-                    const {isInOrigin} = await runTransactionDev<{ isInOrigin: boolean }>(
+                    const {isInOrigin} = await runTransactionDev(
                         wireutil.global,
-                        new wire.DeviceGetIsInOrigin(options.serial),
+                        DeviceGetIsInOrigin,
+                        {serial: options.serial},
                         {sub, push, router}
-                    ) || {}
-
+                    ) as { isInOrigin: boolean }
 
                     if (isInOrigin) {
                         log.warn('Cleaning device')

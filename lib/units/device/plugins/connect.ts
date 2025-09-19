@@ -1,7 +1,7 @@
 import util from 'util'
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
-import wire from '../../../wire/index.js'
+import {JoinGroupByAdbFingerprintMessage} from '../../../wire/wire.js'
 import wireutil from '../../../wire/util.js'
 import lifecycle from '../../../util/lifecycle.js'
 import adb from '../support/adb.js'
@@ -40,13 +40,22 @@ export default syrup.serial()
                 const currentGroup = await group.get()
                 push.send([
                     solo.channel,
-                    wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(options.serial, key.fingerprint, key.comment, currentGroup?.group))
+                    wireutil.pack(JoinGroupByAdbFingerprintMessage, {
+                        serial: options.serial,
+                        fingerprint: key.fingerprint,
+                        comment: key.comment,
+                        currentGroup: currentGroup?.group
+                    })
                 ])
             }
             catch(e) {
                 push.send([
                     solo.channel,
-                    wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(options.serial, key.fingerprint, key.comment))
+                    wireutil.pack(JoinGroupByAdbFingerprintMessage, {
+                        serial: options.serial,
+                        fingerprint: key.fingerprint,
+                        comment: key.comment
+                    })
                 ])
             }
         }
@@ -63,7 +72,7 @@ export default syrup.serial()
                 // TODO: fix
                 const auth = (key: Key) => new Promise<void>(async(resolve, reject) => {
                     // TODO: Dangerous, discuss and remove
-                    router.once(AdbKeysUpdatedMessage, () => notify(key))
+                    router.on(AdbKeysUpdatedMessage, () => notify(key))
                     await notify(key)
 
                     if (plugin.auth(key)) {
@@ -96,20 +105,19 @@ export default syrup.serial()
                 }
 
                 log.info('Stop connect plugin')
-                let resolveClose = () => {}
 
-                const waitCloseServer = new Promise((resolve) => {
-                    // @ts-ignore
-                    resolveClose = resolve
-                })
+                // TODO: Not ideal way, need WireRouter.once
+                router.removeAllListeners(AdbKeysUpdatedMessage)
 
-                activeServer.on('close', () => {
-                    resolveClose()
+                const waitServerClose = new Promise<void>((resolve) => {
+                    activeServer!.on('close', () => {
+                        resolve()
+                    })
                 })
 
                 activeServer.end()
                 activeServer.close()
-                await waitCloseServer
+                await waitServerClose
 
                 activeServer = null
             },
