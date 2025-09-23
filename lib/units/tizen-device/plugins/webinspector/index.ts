@@ -2,7 +2,6 @@ import push from '../../../base-device/support/push.js'
 import router from '../../../base-device/support/router.js'
 import group from '../../../base-device/plugins/group.js'
 import cdp, {CDPClient} from '../cdp/index.js'
-import wire from '../../../../wire/index.js'
 import wireutil from '../../../../wire/util.js'
 import logger from '../../../../util/logger.js'
 
@@ -12,6 +11,7 @@ import _ from 'lodash'
 import urlformat from '../../../base-device/support/urlformat.js'
 import MyReplicator from './Replicator.js'
 import * as transform from './transform/index.js'
+import {GetAppAsset, GetAppAssetsList, GetAppHTML, GetAppInspectServerUrl} from "../../../../wire/wire.js";
 
 const consoleListeners = new Map()
 const replicator = new MyReplicator()
@@ -113,32 +113,35 @@ export default syrup.serial()
         }
 
         const wsUrl = urlformat(options.updWsUrlPattern, options.publicPort)
-
-        const handlers = {
-
-            // TODO: Create download endpoint
-            [wire.GetAppAsset .$code]: (channel: string, message: any) => getAsset(message.url).then(asset =>
-                success(channel, asset)
-            ).catch(err =>
-                fail(channel, err)
-            ),
-
-            [wire.GetAppAssetsList .$code]: (channel: string) => getAssetsList().then(list =>
-                success(channel, list)
-            ).catch(err =>
-                fail(channel, err)
-            ),
-
-            [wire.GetAppHTML .$code]: (channel: string) => cdp.getHTML().then(content =>
-                success(channel, {content, base64Encoded: false})
-            ).catch(err =>
-                fail(channel, err)
-            ),
-
-            [wire.GetAppInspectServerUrl .$code]: (channel: string) =>
-                success(channel, wsUrl)
-        }
         let inspServer: webSocketServer.Server | null = null
+
+        router
+            // TODO: Create download endpoint
+            .on(GetAppAsset, (channel: string, message: any) => !!inspServer &&
+                getAsset(message.url).then(asset =>
+                    success(channel, asset)
+                ).catch(err =>
+                    fail(channel, err)
+                ))
+
+            .on(GetAppAssetsList, (channel: string) => !!inspServer &&
+                getAssetsList().then(list =>
+                    success(channel, list)
+                ).catch(err =>
+                    fail(channel, err)
+                ))
+
+            .on(GetAppHTML, (channel: string) => !!inspServer &&
+                cdp.getHTML().then(content =>
+                    success(channel, {content, base64Encoded: false})
+                ).catch(err =>
+                    fail(channel, err)
+                ))
+
+            .on(GetAppInspectServerUrl, (channel: string) =>
+                !!inspServer && success(channel, wsUrl)
+            )
+
         const plugin = {
             host: '',
             port: 0,
@@ -151,15 +154,9 @@ export default syrup.serial()
                 if (!inspServer) {
                     inspServer = inspectServer(options.publicPort, cdp, log)
                 }
-
-                Object.entries(handlers)
-                    .map(([event, handler]) => router.on(event, handler))
             },
 
             stop: async() => {
-                Object.entries(handlers)
-                    .map(([event, handler]) => router.removeListener(event, handler))
-
                 frameId = null
                 await new Promise(r => {
                     inspServer?.close(() => r)
