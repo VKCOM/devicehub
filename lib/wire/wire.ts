@@ -792,7 +792,11 @@ export interface DeviceIntroductionMessage {
     /**
      * @generated from protobuf field: required ProviderMessage provider = 3
      */
-    provider?: ProviderMessage; //   optional DeviceGroupMessage group = 4;
+    provider?: ProviderMessage;
+    /**
+     * @generated from protobuf field: optional string deviceType = 4
+     */
+    deviceType?: string;
 }
 /**
  * @generated from protobuf message DeviceIosIntroductionMessage
@@ -1189,6 +1193,10 @@ export interface GroupMessage {
      * @generated from protobuf field: optional string usage = 4
      */
     usage?: string;
+    /**
+     * @generated from protobuf field: repeated string keys = 5
+     */
+    keys: string[];
 }
 /**
  * @generated from protobuf message AutoGroupMessage
@@ -1228,6 +1236,10 @@ export interface JoinGroupMessage {
      * @generated from protobuf field: optional string usage = 3
      */
     usage?: string;
+    /**
+     * @generated from protobuf field: optional uint32 timeout = 4
+     */
+    timeout?: number;
 }
 /**
  * @generated from protobuf message JoinGroupByAdbFingerprintMessage
@@ -2357,6 +2369,33 @@ export interface GetAppHTML {
  * @generated from protobuf message GetAppInspectServerUrl
  */
 export interface GetAppInspectServerUrl {
+}
+/**
+ * @generated from protobuf message DeviceStatusChange
+ */
+export interface DeviceStatusChange {
+    /**
+     * @generated from protobuf field: required string serial = 1
+     */
+    serial: string;
+    /**
+     * @generated from protobuf field: required uint32 timeout = 2
+     */
+    timeout: number;
+}
+/**
+ * @generated from protobuf message DeviceGetIsInOrigin
+ */
+export interface DeviceGetIsInOrigin {
+    /**
+     * @generated from protobuf field: required string serial = 1
+     */
+    serial: string;
+}
+/**
+ * @generated from protobuf message GetPresentDevices
+ */
+export interface GetPresentDevices {
 }
 /**
  * @generated from protobuf enum DeviceStatus
@@ -5072,7 +5111,8 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
         super("DeviceIntroductionMessage", [
             { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "status", kind: "enum", T: () => ["DeviceStatus", DeviceStatus] },
-            { no: 3, name: "provider", kind: "message", T: () => ProviderMessage }
+            { no: 3, name: "provider", kind: "message", T: () => ProviderMessage },
+            { no: 4, name: "deviceType", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<DeviceIntroductionMessage>): DeviceIntroductionMessage {
@@ -5097,6 +5137,9 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
                 case /* required ProviderMessage provider */ 3:
                     message.provider = ProviderMessage.internalBinaryRead(reader, reader.uint32(), options, message.provider);
                     break;
+                case /* optional string deviceType */ 4:
+                    message.deviceType = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -5118,6 +5161,9 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
         /* required ProviderMessage provider = 3; */
         if (message.provider)
             ProviderMessage.internalBinaryWrite(message.provider, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* optional string deviceType = 4; */
+        if (message.deviceType !== undefined)
+            writer.tag(4, WireType.LengthDelimited).string(message.deviceType);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -6416,12 +6462,14 @@ class GroupMessage$Type extends MessageType<GroupMessage> {
             { no: 1, name: "owner", kind: "message", T: () => OwnerMessage },
             { no: 2, name: "timeout", kind: "scalar", opt: true, T: 13 /*ScalarType.UINT32*/ },
             { no: 3, name: "requirements", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => DeviceRequirement },
-            { no: 4, name: "usage", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "usage", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "keys", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<GroupMessage>): GroupMessage {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.requirements = [];
+        message.keys = [];
         if (value !== undefined)
             reflectionMergePartial<GroupMessage>(this, message, value);
         return message;
@@ -6442,6 +6490,9 @@ class GroupMessage$Type extends MessageType<GroupMessage> {
                     break;
                 case /* optional string usage */ 4:
                     message.usage = reader.string();
+                    break;
+                case /* repeated string keys */ 5:
+                    message.keys.push(reader.string());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -6467,6 +6518,9 @@ class GroupMessage$Type extends MessageType<GroupMessage> {
         /* optional string usage = 4; */
         if (message.usage !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.usage);
+        /* repeated string keys = 5; */
+        for (let i = 0; i < message.keys.length; i++)
+            writer.tag(5, WireType.LengthDelimited).string(message.keys[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -6584,7 +6638,8 @@ class JoinGroupMessage$Type extends MessageType<JoinGroupMessage> {
         super("JoinGroupMessage", [
             { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "owner", kind: "message", T: () => OwnerMessage },
-            { no: 3, name: "usage", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "usage", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "timeout", kind: "scalar", opt: true, T: 13 /*ScalarType.UINT32*/ }
         ]);
     }
     create(value?: PartialMessage<JoinGroupMessage>): JoinGroupMessage {
@@ -6608,6 +6663,9 @@ class JoinGroupMessage$Type extends MessageType<JoinGroupMessage> {
                 case /* optional string usage */ 3:
                     message.usage = reader.string();
                     break;
+                case /* optional uint32 timeout */ 4:
+                    message.timeout = reader.uint32();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -6629,6 +6687,9 @@ class JoinGroupMessage$Type extends MessageType<JoinGroupMessage> {
         /* optional string usage = 3; */
         if (message.usage !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.usage);
+        /* optional uint32 timeout = 4; */
+        if (message.timeout !== undefined)
+            writer.tag(4, WireType.Varint).uint32(message.timeout);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -11543,3 +11604,143 @@ class GetAppInspectServerUrl$Type extends MessageType<GetAppInspectServerUrl> {
  * @generated MessageType for protobuf message GetAppInspectServerUrl
  */
 export const GetAppInspectServerUrl = new GetAppInspectServerUrl$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeviceStatusChange$Type extends MessageType<DeviceStatusChange> {
+    constructor() {
+        super("DeviceStatusChange", [
+            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "timeout", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<DeviceStatusChange>): DeviceStatusChange {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.serial = "";
+        message.timeout = 0;
+        if (value !== undefined)
+            reflectionMergePartial<DeviceStatusChange>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeviceStatusChange): DeviceStatusChange {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string serial */ 1:
+                    message.serial = reader.string();
+                    break;
+                case /* required uint32 timeout */ 2:
+                    message.timeout = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeviceStatusChange, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string serial = 1; */
+        if (message.serial !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serial);
+        /* required uint32 timeout = 2; */
+        if (message.timeout !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.timeout);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message DeviceStatusChange
+ */
+export const DeviceStatusChange = new DeviceStatusChange$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeviceGetIsInOrigin$Type extends MessageType<DeviceGetIsInOrigin> {
+    constructor() {
+        super("DeviceGetIsInOrigin", [
+            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<DeviceGetIsInOrigin>): DeviceGetIsInOrigin {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.serial = "";
+        if (value !== undefined)
+            reflectionMergePartial<DeviceGetIsInOrigin>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeviceGetIsInOrigin): DeviceGetIsInOrigin {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string serial */ 1:
+                    message.serial = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeviceGetIsInOrigin, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string serial = 1; */
+        if (message.serial !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serial);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message DeviceGetIsInOrigin
+ */
+export const DeviceGetIsInOrigin = new DeviceGetIsInOrigin$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetPresentDevices$Type extends MessageType<GetPresentDevices> {
+    constructor() {
+        super("GetPresentDevices", []);
+    }
+    create(value?: PartialMessage<GetPresentDevices>): GetPresentDevices {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<GetPresentDevices>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetPresentDevices): GetPresentDevices {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetPresentDevices, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message GetPresentDevices
+ */
+export const GetPresentDevices = new GetPresentDevices$Type();

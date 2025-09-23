@@ -117,21 +117,18 @@ export default class DbClient {
             pushdev,
             channelRouter,
         }: {
-            sub: SocketWrapper | string[];
-            subdev: SocketWrapper | string[];
+            sub?: SocketWrapper | string[];
+            subdev?: SocketWrapper | string[];
             push: SocketWrapper | string[];
             pushdev: SocketWrapper | string[];
             channelRouter?: EventEmitter;
         },
         _log: ReturnType<typeof logger.createLogger> | undefined = log
-    ): Promise<{
-        sub: SocketWrapper;
-        subdev: SocketWrapper;
-        push: SocketWrapper;
-        pushdev: SocketWrapper;
-        channelRouter: EventEmitter;
-    }> {
-        if (Array.isArray(sub)) {
+    ) {
+        let finalSub: SocketWrapper | undefined
+        let finalSubdev: SocketWrapper | undefined
+
+        if (sub && Array.isArray(sub)) {
             const _sub = zmqutil.socket('sub')
             await Promise.all(
                 sub.map(async(endpoint) => {
@@ -153,10 +150,13 @@ export default class DbClient {
                     }
                 })
             )
-            sub = _sub
+            finalSub = _sub
+        }
+        else if (sub) {
+            finalSub = sub as SocketWrapper
         }
 
-        if (Array.isArray(subdev)) {
+        if (subdev && Array.isArray(subdev)) {
             const _subdev = zmqutil.socket('sub')
             await Promise.all(
                 subdev.map(async(endpoint) => {
@@ -178,12 +178,15 @@ export default class DbClient {
                     }
                 })
             )
-            subdev = _subdev
+            finalSubdev = _subdev
+        }
+        else if (subdev) {
+            finalSubdev = subdev as SocketWrapper
         }
 
         if (Array.isArray(push)) {
             const _push = zmqutil.socket('push')
-            Promise.all(
+            await Promise.all(
                 push.map(async(endpoint) => {
                     try {
                         srv.attempt(
@@ -205,7 +208,7 @@ export default class DbClient {
 
         if (Array.isArray(pushdev)) {
             const _pushdev = zmqutil.socket('push')
-            Promise.all(
+            await Promise.all(
                 pushdev.map(async(endpoint) => {
                     try {
                         srv.attempt(
@@ -229,23 +232,48 @@ export default class DbClient {
         }
 
         if (!channelRouter) {
-            channelRouter = new EventEmitter();
-            [wireutil.global].forEach((channel) => {
-                _log.info('Subscribing to permanent channel "%s"', channel)
-                sub.subscribe(channel)
-                subdev.subscribe(channel)
-            })
+            channelRouter = new EventEmitter()
 
-            sub.on('message', (channel, data) => {
-                channelRouter?.emit(channel.toString(), channel, data)
-            })
+            if (finalSub || finalSubdev) {
+                ;[wireutil.global].forEach((channel) => {
+                    _log.info('Subscribing to permanent channel "%s"', channel)
+                    if (finalSub) {
+                        finalSub.subscribe(channel)
+                    }
+                    if (finalSubdev) {
+                        finalSubdev.subscribe(channel)
+                    }
+                })
 
-            subdev.on('message', (channel, data) => {
-                channelRouter?.emit(channel.toString(), channel, data)
-            })
+                if (finalSub) {
+                    finalSub.on('message', (channel, data) => {
+                        channelRouter?.emit(channel.toString(), channel, data)
+                    })
+                }
+
+                if (finalSubdev) {
+                    finalSubdev.on('message', (channel, data) => {
+                        channelRouter?.emit(channel.toString(), channel, data)
+                    })
+                }
+            }
         }
 
-        return {sub, subdev, push, pushdev, channelRouter}
+        const result: {
+            sub?: SocketWrapper;
+            subdev?: SocketWrapper;
+            push: SocketWrapper;
+            pushdev: SocketWrapper;
+            channelRouter: EventEmitter;
+        } = {
+            push,
+            pushdev,
+            channelRouter,
+            ... !!finalSub && {sub: finalSub},
+            ... !!finalSubdev && {subdev: finalSubdev}
+        }
+
+        return result
     }
 
     // Verifies that we can form a connection. Useful if it's necessary to make
@@ -254,11 +282,12 @@ export default class DbClient {
     // an issue with the processor unit, as it started processing messages before
     // it was actually truly able to save anything to the database. This lead to
     // lost messages in certain situations.
-    static ensureConnectivity = async <T extends Function>(fn: T) => {
-        await DbClient.connect()
-        log.info("Db is up")
-        return fn
-    }
+    static ensureConnectivity = <T extends (...args: any[]) => any>(fn: T) =>
+        async(...args: Parameters<T>): Promise<ReturnType<T>> => {
+            await DbClient.connect();
+            log.info("Db is up");
+            return fn(...args);
+        }
 
     // Sets up the database
     static setup = () => DbClient.connect().then((conn) => _setup(conn))

@@ -5,13 +5,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     python3 \
-    build-essential \
     git \
-    graphicsmagick \
-    openjdk-11-jdk \
-    yasm \
-    libzmq3-dev \
-    libprotobuf-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .

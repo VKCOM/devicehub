@@ -373,13 +373,13 @@ export default syrup.serial()
                         if (!response.success) {
                             throw new Error('Unable to get properties')
                         }
-
                         const mapped = response.properties.reduce(
                             (acc: any, property: any) => {
                                 acc[property.name] = property.value
                                 return acc
                             }, {}
                         )
+
                         if (mapped.imei) {
                             return mapped
                         }
