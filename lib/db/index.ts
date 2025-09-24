@@ -3,6 +3,7 @@ import _setup from './setup.js'
 import srv from '../util/srv.js'
 import EventEmitter from 'events'
 import GroupChangeHandler from './handlers/group/index.js'
+import UserChangeHandler from './handlers/user/index.js'
 import * as zmqutil from '../util/zmqutil.js'
 import lifecycle from '../util/lifecycle.js'
 import logger from '../util/logger.js'
@@ -27,7 +28,7 @@ const handlers: {
         channelRouter?: EventEmitter
     ) => Promise<void> | void;
     isPrepared: boolean;
-}[] = [GroupChangeHandler]
+}[] = [GroupChangeHandler, UserChangeHandler]
 
 export default class DbClient {
     static connection: mongo.Db
