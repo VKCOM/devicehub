@@ -397,7 +397,8 @@ export default syrup.serial()
                         catch (err: any) {
                             log.error('Get device properties error: %s', err.message)
                             log.info('setting secured imei because of error')
-                            return {imei: 'secured', ...(mapped || {})}
+                            mapped.imei = 'secured'
+                            return mapped
                         }
                     })
 
