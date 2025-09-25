@@ -226,7 +226,7 @@ class ADBObserver extends EventEmitter {
      * Setup event handlers for persistent connection
      */
     private setupConnectionHandlers(client: Socket): void {
-        let responseBuffer = Buffer.alloc(0)
+        let responseBuffer: Buffer = Buffer.alloc(0)
 
         client.on('data', (data) => {
             responseBuffer = Buffer.concat([responseBuffer, data])
@@ -240,7 +240,7 @@ class ADBObserver extends EventEmitter {
                 reject(new Error('Connection closed'))
             }
             this.pendingRequests.clear()
-            
+
             // Auto-reconnect if we should continue polling
             if (this.shouldContinuePolling && !this.isDestroyed) {
                 this.ensureConnection().catch(err => {
@@ -277,7 +277,7 @@ class ADBObserver extends EventEmitter {
             }
 
             const responseData = buffer.subarray(offset + 8, offset + 8 + dataLength).toString('utf-8')
-            
+
             if (status === 'OKAY') {
                 // Find and resolve the corresponding request
                 const requestId = 'host:devices' // For now, we only handle device listing
@@ -308,7 +308,7 @@ class ADBObserver extends EventEmitter {
      */
     private async sendADBCommand(command: string): Promise<string> {
         const connection = await this.ensureConnection()
-        
+
         return new Promise((resolve, reject) => {
             // Store the request for response matching
             this.pendingRequests.set(command, {resolve, reject})
@@ -337,7 +337,7 @@ class ADBObserver extends EventEmitter {
             this.connection.destroy()
             this.connection = null
         }
-        
+
         // Reject any pending requests
         for (const [, {reject}] of this.pendingRequests) {
             reject(new Error('Connection closed'))
