@@ -85,7 +85,7 @@ export default (async function(options: Options) {
         })
 
         sub.on('message', new WireRouter()
-            .on(DeviceRegisteredMessage, (channel, message) => {
+            .on(DeviceRegisteredMessage, (channel, message: {serial: string}) => {
                 if (workers[message.serial]?.resolveRegister) {
                     workers[message.serial].resolveRegister!()
                     delete workers[message.serial]?.resolveRegister
@@ -130,7 +130,7 @@ export default (async function(options: Options) {
         // Tell others we found a device
         push.send([
             wireutil.global,
-            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name), options.deviceType))
+            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type) || 1, new wire.ProviderMessage(solo, options.name), options.deviceType))
         ])
 
         process.nextTick(() => { // after creating workers[device.serial] obj
