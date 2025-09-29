@@ -132,7 +132,7 @@ export default (async function(options: Options) {
         // Tell others we found a device
         push.send([
             wireutil.global,
-            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type), new wire.ProviderMessage(solo, options.name)))
+            wireutil.envelope(new wire.DeviceIntroductionMessage(device.serial, wireutil.toDeviceStatus(device.type) || 1, new wire.ProviderMessage(solo, options.name)))
         ])
 
         dbapi.setDeviceType(device.serial, options.deviceType)
