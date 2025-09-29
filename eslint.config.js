@@ -51,7 +51,8 @@ export default tseslint.config(
         },
     },
     {
-        ignores: ['dist'],
+        files: ['lib/**/*.js'],
+        // ignores: ['dist'],
         languageOptions: {
             ecmaVersion: 2025,
             sourceType: 'module',
@@ -213,10 +214,17 @@ export default tseslint.config(
             'no-restricted-modules': 0,
             'no-sync': 0,
             'no-async-promise-executor': 0,
+
+            "no-restricted-imports": ["error", {
+                "patterns": [{
+                    "regex": ".*\\.ts",
+                    "message": "Do not import typescript files. Import them with *.js"
+                }]
+            }]
         },
     },
     {
-    languageOptions: {
+        languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
                 projectService: true,
@@ -224,4 +232,10 @@ export default tseslint.config(
             },
         },
     },
+    tseslint.configs.eslintRecommended,
+    {
+        rules: {
+            "prefer-const": "off"
+        }
+    }
 )

@@ -16,6 +16,15 @@ import service from '../resources/service.js'
 import {Duplex} from 'node:stream'
 import EventEmitter from 'events'
 import {GRPC_WAIT_TIMEOUT} from '../../../util/apiutil.js'
+import {
+    PhysicalIdentifyMessage,
+    KeyDownMessage,
+    KeyUpMessage,
+    KeyPressMessage,
+    TypeMessage,
+    RotateMessage,
+    UnlockDeviceMessage
+} from "../../../wire/wire.js";
 
 interface Service {
     socket: Duplex | null
@@ -230,7 +239,6 @@ export default syrup.serial()
             getDisplay = (id: string) =>
                 runServiceCommand(apk.wire.MessageType.GET_DISPLAY, new apk.wire.GetDisplayRequest(id))
                     .then((data) => {
-                        log.info('DISPLAY RESPONSE !')
                         const response = apk.wire.GetDisplayResponse.decode(data)
                         if (response.success) {
                             return {
@@ -562,7 +570,7 @@ export default syrup.serial()
                 log.important('Agent connection ended, attempting to relaunch')
                 try {
                     await openAgent()
-                    log.important('Agent relaunched in %dms', Date.now() - startTime)
+                    log.important('Agent relaunched in %sms', Date.now() - startTime)
                     resolve()
                 }
                 catch (err: any) {
@@ -601,7 +609,7 @@ export default syrup.serial()
                 log.important('Service connection ended, attempting to relaunch')
                 await openAgent() // restart agent
                 await openService()
-                log.important('Service relaunched in %dms', Date.now() - startTime)
+                log.important('Service relaunched in %sms', Date.now() - startTime)
             }
             catch (err: any) {
                 log.fatal('[prepareForServiceDeath] Service connection could not be relaunched: %s', err?.message)
@@ -638,14 +646,14 @@ export default syrup.serial()
         await openService()
 
         router
-            .on(wire.PhysicalIdentifyMessage, (channel) => {
+            .on(PhysicalIdentifyMessage, (channel) => {
                 plugin.identity()
                 push.send([
                     channel,
                     wireutil.reply(options.serial).okay()
                 ])
             })
-            .on(wire.KeyDownMessage, (channel, message) => {
+            .on(KeyDownMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.DOWN,
@@ -656,7 +664,7 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.KeyUpMessage, (channel, message) => {
+            .on(KeyUpMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.UP,
@@ -667,7 +675,7 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.KeyPressMessage, (channel, message) => {
+            .on(KeyPressMessage, (channel, message) => {
                 try {
                     keyEvent({
                         event: apk.wire.KeyEvent.PRESS,
@@ -678,13 +686,13 @@ export default syrup.serial()
                     log.warn(e.message)
                 }
             })
-            .on(wire.TypeMessage, (channel, message) =>
+            .on(TypeMessage, (channel, message) =>
                 plugin.type(message.text)
             )
-            .on(wire.RotateMessage, (channel, message) =>
+            .on(RotateMessage, (channel, message) =>
                 plugin.rotate(message.rotation)
             )
-            .on(wire.UnlockDeviceMessage, (channel, message) =>
+            .on(UnlockDeviceMessage, (channel, message) =>
                 plugin.unlockDevice()
             )
         return plugin

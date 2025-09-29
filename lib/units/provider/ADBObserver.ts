@@ -1,9 +1,11 @@
 import EventEmitter from 'events'
 import net, {Socket} from 'net'
 
+export type ADBDeviceType = 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
+
 interface ADBDevice {
     serial: string
-    type: 'device' | 'unknown' | 'offline' | 'unauthorized' | 'recovery'
+    type: ADBDeviceType
     reconnect: () => Promise<boolean>
 }
 
@@ -12,7 +14,16 @@ interface ADBDeviceEntry {
     state: ADBDevice['type']
 }
 
-class ADBObserver extends EventEmitter {
+type PrevADBDeviceType = ADBDevice['type']
+
+interface ADBEvents {
+    connect: [ADBDevice]
+    update: [ADBDevice, PrevADBDeviceType]
+    disconnect: [ADBDevice]
+    error: [Error]
+}
+
+class ADBObserver extends EventEmitter<ADBEvents> {
     static instance: ADBObserver | null = null
 
     private readonly intervalMs: number = 1000 // Default 1 second polling
@@ -26,7 +37,10 @@ class ADBObserver extends EventEmitter {
     private shouldContinuePolling: boolean = false
     private connection: Socket | null = null
     private isConnecting: boolean = false
-    private pendingRequests: Map<string, {resolve: (value: string) => void; reject: (error: Error) => void}> = new Map()
+    private pendingRequests: Map<string, {
+        resolve: (value: string) => void
+        reject: (error: Error) => void
+    }> = new Map()
 
     constructor(options?: {intervalMs?: number; host?: string; port?: number}) {
         if (ADBObserver.instance) {
@@ -134,7 +148,7 @@ class ADBObserver extends EventEmitter {
                 }
             }
         }
-        catch (error) {
+        catch (error: any) {
             this.emit('error', error)
         }
         finally {
@@ -258,7 +272,7 @@ class ADBObserver extends EventEmitter {
     /**
      * Process ADB protocol responses and return remaining buffer
      */
-    private processADBResponses(buffer: Buffer): Buffer {
+    private processADBResponses(buffer: Buffer<ArrayBuffer>): Buffer<ArrayBuffer> {
         let offset = 0
 
         while (offset < buffer.length) {
