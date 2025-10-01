@@ -1,9 +1,11 @@
 import EventEmitter from 'events'
 import net, {Socket} from 'net'
 
+export type ADBDeviceType = 'unknown' | 'bootloader' | 'device' | 'recovery' | 'sideload' | 'offline' | 'unauthorized' | 'unknown' // https://android.googlesource.com/platform/system/core/+/android-4.4_r1/adb/adb.c#394
+
 interface ADBDevice {
     serial: string
-    type: 'device' | 'unknown' | 'offline' | 'unauthorized' | 'recovery'
+    type: ADBDeviceType
     reconnect: () => Promise<boolean>
 }
 
@@ -12,7 +14,16 @@ interface ADBDeviceEntry {
     state: ADBDevice['type']
 }
 
-class ADBObserver extends EventEmitter {
+type PrevADBDeviceType = ADBDevice['type']
+
+interface ADBEvents {
+    connect: [ADBDevice]
+    update: [ADBDevice, PrevADBDeviceType]
+    disconnect: [ADBDevice]
+    error: [Error]
+}
+
+class ADBObserver extends EventEmitter<ADBEvents> {
     static instance: ADBObserver | null = null
 
     private readonly intervalMs: number = 1000 // Default 1 second polling
@@ -26,7 +37,17 @@ class ADBObserver extends EventEmitter {
     private shouldContinuePolling: boolean = false
     private connection: Socket | null = null
     private isConnecting: boolean = false
-    private pendingRequests: Map<string, {resolve: (value: string) => void; reject: (error: Error) => void}> = new Map()
+    private requestQueue: Array<{
+        command: string
+        resolve: (value: string) => void
+        reject: (error: Error) => void
+        timer?: NodeJS.Timeout // Set when request is in-flight
+    }> = []
+    private readonly requestTimeoutMs: number = 5000 // 5 second timeout per request
+    private readonly maxReconnectAttempts: number = 8
+    private readonly initialReconnectDelayMs: number = 100
+    private reconnectAttempt: number = 0
+    private isReconnecting: boolean = false
 
     constructor(options?: {intervalMs?: number; host?: string; port?: number}) {
         if (ADBObserver.instance) {
@@ -56,9 +77,7 @@ class ADBObserver extends EventEmitter {
         this.shouldContinuePolling = true
 
         // Initial poll
-        this.pollDevices().catch(err => {
-            this.emit('error', err)
-        })
+        this.pollDevices()
 
         this.scheduleNextPoll()
     }
@@ -134,7 +153,7 @@ class ADBObserver extends EventEmitter {
                 }
             }
         }
-        catch (error) {
+        catch (error: any) {
             this.emit('error', error)
         }
         finally {
@@ -151,9 +170,7 @@ class ADBObserver extends EventEmitter {
         }
 
         this.pollTimeout = setTimeout(async() => {
-            await this.pollDevices().catch(err => {
-                this.emit('error', err)
-            })
+            await this.pollDevices()
 
             if (this.shouldContinuePolling && !this.isDestroyed) {
                 this.scheduleNextPoll()
@@ -179,14 +196,14 @@ class ADBObserver extends EventEmitter {
             return this.connection
         }
 
-        if (this.isConnecting) {
-            // Wait for ongoing connection attempt
+        if (this.isConnecting || this.isReconnecting) {
+            // Wait for ongoing connection or reconnection attempt
             return new Promise((resolve, reject) => {
                 const checkConnection = () => {
                     if (this.connection && !this.connection.destroyed) {
                         resolve(this.connection)
                     }
-                    else if (!this.isConnecting) {
+                    else if (!this.isConnecting && !this.isReconnecting) {
                         reject(new Error('Connection failed'))
                     }
                     else {
@@ -210,6 +227,7 @@ class ADBObserver extends EventEmitter {
             const client = net.createConnection(this.port, this.host, () => {
                 this.connection = client
                 this.isConnecting = false
+                this.reconnectAttempt = 0 // Reset reconnection counter on successful connection
                 this.setupConnectionHandlers(client)
                 resolve(client)
             })
@@ -226,7 +244,7 @@ class ADBObserver extends EventEmitter {
      * Setup event handlers for persistent connection
      */
     private setupConnectionHandlers(client: Socket): void {
-        let responseBuffer: Buffer = Buffer.alloc(0)
+        let responseBuffer = Buffer.alloc(0) as Buffer
 
         client.on('data', (data) => {
             responseBuffer = Buffer.concat([responseBuffer, data])
@@ -235,17 +253,23 @@ class ADBObserver extends EventEmitter {
 
         client.on('close', () => {
             this.connection = null
-            // Reject any pending requests
-            for (const [, {reject}] of this.pendingRequests) {
-                reject(new Error('Connection closed'))
-            }
-            this.pendingRequests.clear()
 
-            // Auto-reconnect if we should continue polling
+            // Clear the timeout of in-flight request but keep it for potential retry
+            if (this.requestQueue.length > 0 && this.requestQueue[0].timer) {
+                clearTimeout(this.requestQueue[0].timer)
+                delete this.requestQueue[0].timer
+            }
+
+            // Attempt to reconnect if we should continue polling
             if (this.shouldContinuePolling && !this.isDestroyed) {
-                this.ensureConnection().catch(err => {
-                    this.emit('error', err)
-                })
+                this.attemptReconnect()
+            }
+            else {
+                // Reject all queued requests (including in-flight one)
+                for (const {reject} of this.requestQueue) {
+                    reject(new Error('Connection closed'))
+                }
+                this.requestQueue = []
             }
         })
 
@@ -279,20 +303,27 @@ class ADBObserver extends EventEmitter {
             const responseData = buffer.subarray(offset + 8, offset + 8 + dataLength).toString('utf-8')
 
             if (status === 'OKAY') {
-                // Find and resolve the corresponding request
-                const requestId = 'host:devices' // For now, we only handle device listing
-                const pending = this.pendingRequests.get(requestId)
-                if (pending) {
-                    this.pendingRequests.delete(requestId)
-                    pending.resolve(responseData)
+                // Resolve the in-flight request (first in queue)
+                if (this.requestQueue.length > 0) {
+                    const request = this.requestQueue.shift()!
+                    if (request.timer) {
+                        clearTimeout(request.timer)
+                    }
+                    request.resolve(responseData)
+                    // Process next request in queue
+                    this.processNextRequest()
                 }
             }
             else if (status === 'FAIL') {
-                const requestId = 'host:devices'
-                const pending = this.pendingRequests.get(requestId)
-                if (pending) {
-                    this.pendingRequests.delete(requestId)
-                    pending.reject(new Error(responseData || 'ADB command failed'))
+                // Reject the in-flight request (first in queue)
+                if (this.requestQueue.length > 0) {
+                    const request = this.requestQueue.shift()!
+                    if (request.timer) {
+                        clearTimeout(request.timer)
+                    }
+                    request.reject(new Error(responseData || 'ADB command failed'))
+                    // Process next request in queue
+                    this.processNextRequest()
                 }
             }
 
@@ -305,28 +336,130 @@ class ADBObserver extends EventEmitter {
 
     /**
      * Send command to ADB server using persistent connection
+     * Requests are queued and processed sequentially
      */
     private async sendADBCommand(command: string): Promise<string> {
-        const connection = await this.ensureConnection()
+        await this.ensureConnection()
 
         return new Promise((resolve, reject) => {
-            // Store the request for response matching
-            this.pendingRequests.set(command, {resolve, reject})
+            // Add request to the queue
+            this.requestQueue.push({command, resolve, reject})
 
-            const commandBuffer = Buffer.from(command, 'utf-8')
-            const lengthHex = commandBuffer.length.toString(16).padStart(4, '0')
-            const message = Buffer.concat([
-                Buffer.from(lengthHex, 'ascii'),
-                commandBuffer
-            ])
-
-            connection.write(message, (err) => {
-                if (err) {
-                    this.pendingRequests.delete(command)
-                    reject(err)
-                }
-            })
+            // Try to process the queue if no request is currently in-flight
+            this.processNextRequest()
         })
+    }
+
+    /**
+     * Process the next request in the queue if no request is currently in-flight
+     */
+    private processNextRequest(): void {
+        // Don't process if queue is empty or first request already in-flight
+        if (this.requestQueue.length === 0 || this.requestQueue[0].timer) {
+            return
+        }
+
+        // Don't process if connection is not available
+        if (!this.connection || this.connection.destroyed) {
+            return
+        }
+
+        // Get the first request in queue (don't shift yet - only shift on response)
+        const request = this.requestQueue[0]
+        const {command, reject} = request
+
+        // Set up timeout for this request
+        const timer = setTimeout(() => {
+            if (this.requestQueue.length > 0 && this.requestQueue[0] === request) {
+                this.requestQueue.shift() // Remove the timed-out request
+                reject(new Error(`Request timeout after ${this.requestTimeoutMs}ms: ${command}`))
+                // Process next request in queue
+                this.processNextRequest()
+            }
+        }, this.requestTimeoutMs)
+
+        // Mark request as in-flight by setting its timer
+        request.timer = timer
+
+        // Send the command
+        const commandBuffer = Buffer.from(command, 'utf-8')
+        const lengthHex = commandBuffer.length.toString(16).padStart(4, '0')
+        const message = Buffer.concat([
+            Buffer.from(lengthHex, 'ascii'),
+            commandBuffer
+        ])
+
+        this.connection.write(message, (err) => {
+            if (err && this.requestQueue.length > 0 && this.requestQueue[0] === request) {
+                clearTimeout(request.timer!)
+                this.requestQueue.shift() // Remove the failed request
+                reject(err)
+                // Process next request in queue
+                this.processNextRequest()
+            }
+        })
+    }
+
+    /**
+     * Attempt to reconnect with exponential backoff
+     */
+    private async attemptReconnect(): Promise<void> {
+        if (this.isReconnecting || this.isDestroyed) {
+            return
+        }
+
+        this.isReconnecting = true
+
+        for (let attempt = 0; attempt < this.maxReconnectAttempts; attempt++) {
+            this.reconnectAttempt = attempt + 1
+
+            // Calculate exponential backoff delay
+            const delay = this.initialReconnectDelayMs * Math.pow(2, attempt)
+
+            // Wait before attempting reconnection
+            await new Promise(resolve => setTimeout(resolve, delay))
+
+            if (!this.shouldContinuePolling || this.isDestroyed) {
+                this.isReconnecting = false
+                return
+            }
+
+            try {
+                // Attempt to create a new connection
+                await this.createConnection()
+                this.reconnectAttempt = 0
+                this.isReconnecting = false
+
+                // Resend the in-flight request if it exists
+                if (this.requestQueue.length > 0 && !this.requestQueue[0].timer) {
+                    // The first request was in-flight but timer was cleared on disconnect
+                    // Resend it by calling processNextRequest
+                    this.processNextRequest()
+                }
+
+                return // Successfully reconnected
+            }
+            catch {
+                // Continue to next attempt
+                continue
+            }
+        }
+
+        // All reconnection attempts failed
+        this.isReconnecting = false
+        this.reconnectAttempt = 0
+
+        const error = new Error(`Failed to reconnect to ADB server after ${this.maxReconnectAttempts} attempts`)
+        this.emit('error', error)
+
+        // Reject all queued requests (including in-flight one)
+        for (const request of this.requestQueue) {
+            if (request.timer) {
+                clearTimeout(request.timer)
+            }
+            request.reject(error)
+        }
+        this.requestQueue = []
     }
 
     /**
@@ -338,11 +471,18 @@ class ADBObserver extends EventEmitter {
             this.connection = null
         }
 
-        // Reject any pending requests
-        for (const [, {reject}] of this.pendingRequests) {
-            reject(new Error('Connection closed'))
+        // Reset reconnection state
+        this.isReconnecting = false
+        this.reconnectAttempt = 0
+
+        // Reject all queued requests (including in-flight one)
+        for (const request of this.requestQueue) {
+            if (request.timer) {
+                clearTimeout(request.timer)
+            }
+            request.reject(new Error('Connection closed'))
         }
-        this.pendingRequests.clear()
+        this.requestQueue = []
     }
 
     /**
