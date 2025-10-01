@@ -299,7 +299,7 @@ export default (async function(options: Options) {
 
     // Track and manage devices
     const tracker = new ADBObserver({
-        intervalMs: 2000,
+        intervalMs: 3000,
         port: options.adbPort,
         host: options.adbHost
     })
