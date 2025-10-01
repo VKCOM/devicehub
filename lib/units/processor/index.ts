@@ -8,6 +8,7 @@ import dbapi from '../../db/models/all/index.js'
 import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
+import UserModel from '../../db/models/user/index.js'
 import {
     UserChangeMessage,
     GroupChangeMessage,
@@ -162,7 +163,7 @@ export default db.ensureConnectivity(async(options: Options) => {
         })
         .on(JoinGroupByAdbFingerprintMessage, async (channel, message) => {
             try {
-                const user = await dbapi.lookupUserByAdbFingerprint(message.fingerprint)
+                const user = await UserModel.lookupUserByAdbFingerprint(message.fingerprint)
                 if (user) {
                     devDealer.send([
                         channel,
