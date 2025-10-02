@@ -123,7 +123,6 @@ export default db.ensureConnectivity(async(options: Options) => {
         .on(GroupChangeMessage, defaultWireHandler)
         .on(DeviceGroupChangeMessage, defaultWireHandler)
         .on(GroupUserChangeMessage, defaultWireHandler)
-        .on(DeviceHeartbeatMessage, defaultWireHandler)
         .on(DeviceLogMessage, defaultWireHandler)
         .on(TransactionProgressMessage, defaultWireHandler)
         .on(TransactionDoneMessage, defaultWireHandler)
@@ -296,6 +295,9 @@ export default db.ensureConnectivity(async(options: Options) => {
                 channel,
                 reply.okay('success', {devices})
             ])
+        })
+        .on(DeviceHeartbeatMessage, (channel, message, data) => {
+            devDealer.send([ channel, data ])
         })
         .handler();
 
