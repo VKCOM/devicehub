@@ -1,8 +1,9 @@
 import logger from '../../util/logger.js'
 import {
+    DeleteDevice,
     DeviceAbsentMessage,
     DeviceHeartbeatMessage,
-    DeviceIntroductionMessage, DevicePresentMessage,
+    DeviceIntroductionMessage, DevicePresentMessage, GetDeadDevices,
     GetPresentDevices
 } from '../../wire/wire.js'
 import wireutil from '../../wire/util.js'
@@ -17,6 +18,7 @@ const log = logger.createLogger('reaper')
 
 interface Options {
     heartbeatTimeout: number
+    timeToDeviceCleanup: number // in seconds
     endpoints: {
         sub: string[]
         push: string[]
@@ -87,20 +89,64 @@ export default (async(options: Options) => {
         ttlset.stop()
     })
 
+    const router = new WireRouter()
+        .on(DeviceIntroductionMessage, (channel, message) => {
+            ttlset.drop(message.serial, TTLSet.SILENT)
+            ttlset.bump(message.serial, Date.now())
+        })
+        .on(DeviceHeartbeatMessage, (channel, message) => {
+            ttlset.bump(message.serial, Date.now())
+        })
+        .on(DeviceAbsentMessage, (channel, message) => {
+            ttlset.drop(message.serial, TTLSet.SILENT)
+        })
+
+    if (options.timeToDeviceCleanup) {
+        log.info('deviceCleanerLoop enabled')
+
+        // This functionality is implemented in the Reaper unit because this unit cannot be replicated
+        const deviceCleanerLoop = async() => {
+            try {
+                await new Promise(r => setTimeout(r, 120_000)) // 2 min delay
+                const absenceDuration = options.timeToDeviceCleanup
+                const {deadDevices} = await runTransactionDev(wireutil.global, GetDeadDevices, {
+                    time: options.timeToDeviceCleanup * 1000
+                }, {sub, push, router})
+
+                for (const {serial, present} of deadDevices) {
+                    if (present) {
+                        continue
+                    }
+
+                    log.info( // @ts-ignore
+                        'Removing a dead device [serial: %s, absence_duration: %.1f %s]',
+                        serial,
+                        ... (
+                            absenceDuration >= 3600 // if more 1 hour
+                                ? [absenceDuration / 3600, 'hrs']
+                                : absenceDuration >= 60 // if more 1 minute
+                                    ? [absenceDuration / 60, 'min']
+                                    : [absenceDuration, 'sec']
+                        )
+                    )
+
+                    push.send([
+                        wireutil.global,
+                        wireutil.pack(DeleteDevice, {serial})
+                    ])
+                }
+            } catch (err: any) {
+                log.error('Dead device check failed with error: %s', err?.message)
+            } finally {
+                return deviceCleanerLoop()
+            }
+        }
+
+        deviceCleanerLoop()
+    }
+
     try {
         log.info('Reaping devices with no heartbeat')
-
-        const router = new WireRouter()
-            .on(DeviceIntroductionMessage, (channel, message) => {
-                ttlset.drop(message.serial, TTLSet.SILENT)
-                ttlset.bump(message.serial, Date.now())
-            })
-            .on(DeviceHeartbeatMessage, (channel, message) => {
-                ttlset.bump(message.serial, Date.now())
-            })
-            .on(DeviceAbsentMessage, (channel, message) => {
-                ttlset.drop(message.serial, TTLSet.SILENT)
-            })
 
         // Listen to changes
         sub.on('message', router.handler())

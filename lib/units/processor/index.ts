@@ -9,6 +9,7 @@ import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
 import UserModel from '../../db/models/user/index.js'
+import DeviceModel from '../../db/models/device/index.js'
 import {
     UserChangeMessage,
     GroupChangeMessage,
@@ -53,8 +54,9 @@ import {
     DeleteDevice,
     SetAbsentDisconnectedDevices,
     GetServicesAvailabilityMessage,
-    DeviceRegisteredMessage, GetPresentDevices, DeviceGetIsInOrigin
+    DeviceRegisteredMessage, GetPresentDevices, DeviceGetIsInOrigin, GetDeadDevices
 } from '../../wire/wire.js'
+import {getDeadDevice} from "../../db/models/device/model.js";
 
 interface Options {
     name: string
@@ -228,8 +230,8 @@ export default db.ensureConnectivity(async(options: Options) => {
             appDealer.send([channel, data])
         })
         .on(DeviceGetIsInOrigin, async (channel, message) => {
-            const device = await dbapi.loadDeviceBySerial(message.serial)
-            const isInOrigin = device.group.id === device.group.origin
+            const device = await DeviceModel.loadDeviceBySerial(message.serial)
+            const isInOrigin = device ? device.group.id === device.group.origin : false
             devDealer.send([
                 channel,
                 reply.okay('success', {isInOrigin})
@@ -289,7 +291,7 @@ export default db.ensureConnectivity(async(options: Options) => {
             appDealer.send([channel, data])
         })
         .on(GetPresentDevices, async (channel, message, data) => {
-            const devices = await dbapi.loadPresentDevices()
+            const devices = await DeviceModel.loadPresentDevices()
                 .then(devices => devices.map(d => d.serial))
             devDealer.send([
                 channel,
@@ -298,6 +300,17 @@ export default db.ensureConnectivity(async(options: Options) => {
         })
         .on(DeviceHeartbeatMessage, (channel, message, data) => {
             devDealer.send([ channel, data ])
+        })
+        .on(GetDeadDevices, async(channel, message, data) => {
+            const deadDevices = await DeviceModel.getDeadDevice(message.time)
+            console.log('govno', {deadDevices})
+            devDealer.send([
+                channel,
+                reply.okay('success', {deadDevices})
+            ])
+        })
+        .on(DeleteDevice, async(channel, message, data) => {
+            DeviceModel.deleteDevice(message.serial)
         })
         .handler();
 
