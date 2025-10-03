@@ -106,6 +106,9 @@
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^3.0.9"
   },
+  "overrides": {
+    "linkifyjs": "4.3.2"
+  },
   "msw": {
     "workerDirectory": [
       "public"
