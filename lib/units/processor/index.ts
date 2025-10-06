@@ -303,7 +303,6 @@ export default db.ensureConnectivity(async(options: Options) => {
         })
         .on(GetDeadDevices, async(channel, message, data) => {
             const deadDevices = await DeviceModel.getDeadDevice(message.time)
-            console.log('govno', {deadDevices})
             devDealer.send([
                 channel,
                 reply.okay('success', {deadDevices})

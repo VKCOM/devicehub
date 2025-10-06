@@ -18,7 +18,8 @@ const log = logger.createLogger('reaper')
 
 interface Options {
     heartbeatTimeout: number
-    timeToDeviceCleanup: number // in seconds
+    timeToDeviceCleanup: number // in minutes
+    deviceCleanupInterval: number // in minutes
     endpoints: {
         sub: string[]
         push: string[]
@@ -105,12 +106,12 @@ export default (async(options: Options) => {
         log.info('deviceCleanerLoop enabled')
 
         // This functionality is implemented in the Reaper unit because this unit cannot be replicated
-        const deviceCleanerLoop = async() => {
+        const deviceCleanerLoop = () => setTimeout(async() => {
+            log.info('Checking dead devices [interval: %s]', options.deviceCleanupInterval)
             try {
-                await new Promise(r => setTimeout(r, 120_000)) // 2 min delay
                 const absenceDuration = options.timeToDeviceCleanup
                 const {deadDevices} = await runTransactionDev(wireutil.global, GetDeadDevices, {
-                    time: options.timeToDeviceCleanup * 1000
+                    time: options.timeToDeviceCleanup * 60 * 1000
                 }, {sub, push, router})
 
                 for (const {serial, present} of deadDevices) {
@@ -122,11 +123,9 @@ export default (async(options: Options) => {
                         'Removing a dead device [serial: %s, absence_duration: %.1f %s]',
                         serial,
                         ... (
-                            absenceDuration >= 3600 // if more 1 hour
-                                ? [absenceDuration / 3600, 'hrs']
-                                : absenceDuration >= 60 // if more 1 minute
-                                    ? [absenceDuration / 60, 'min']
-                                    : [absenceDuration, 'sec']
+                            absenceDuration >= 60 // if more 1 hour
+                                ? [absenceDuration / 60, 'hrs']
+                                : [absenceDuration, 'min']
                         )
                     )
 
@@ -138,29 +137,38 @@ export default (async(options: Options) => {
             } catch (err: any) {
                 log.error('Dead device check failed with error: %s', err?.message)
             } finally {
-                return deviceCleanerLoop()
+                deviceCleanerLoop()
             }
-        }
+        }, options.deviceCleanupInterval * 60 * 1000)
 
         deviceCleanerLoop()
     }
 
-    try {
-        log.info('Reaping devices with no heartbeat')
+    const init = async() => {
+        try {
+            log.info('Reaping devices with no heartbeat')
 
-        // Listen to changes
-        sub.on('message', router.handler())
+            // Listen to changes
+            sub.on('message', router.handler())
 
-        // Load initial state
-        const {devices} = await runTransactionDev(wireutil.global, GetPresentDevices, {}, {sub, push, router})
+            // Load initial state
+            const {devices} = await runTransactionDev(wireutil.global, GetPresentDevices, {}, {sub, push, router})
 
-        const now = Date.now()
-        devices.forEach((serial: string) => {
-            ttlset.bump(serial, now, TTLSet.SILENT)
-        })
+            const now = Date.now()
+            devices?.forEach((serial: string) => {
+                ttlset.bump(serial, now, TTLSet.SILENT)
+            })
+        }
+        catch (err: any) {
+            if (err?.message === 'Timeout when running transaction') {
+                log.error('Load initial state error: Timeout when running transaction, retry')
+                setTimeout(init, 2000)
+                return
+            }
+            log.fatal('Unable to load initial state: %s', err?.message)
+            lifecycle.fatal()
+        }
     }
-    catch (err: any) {
-        log.fatal('Unable to load initial state: %s', err?.message)
-        lifecycle.fatal()
-    }
+
+    init()
 })
