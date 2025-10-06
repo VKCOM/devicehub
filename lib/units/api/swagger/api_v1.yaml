@@ -2759,7 +2759,7 @@ paths:
       summary: Adds devices into an origin group
       description: Adds devices into an origin group along with updating each added
         device; returns the updated devices
-      operationId: addDeviceToOriginGroup
+      operationId: addOriginGroupDevices
       parameters:
         - name: id
           in: path
@@ -2815,7 +2815,7 @@ paths:
       summary: Removes devices from an origin group
       description: Removes devices from an origin group along with updating each removed
         device; returns the updated devices
-      operationId: removeDeviceFromOriginGroup
+      operationId: removeOriginGroupDevices
       parameters:
         - name: id
           in: path
@@ -3045,7 +3045,7 @@ paths:
       summary: Adds a device into an origin group
       description: Adds a device into an origin group along with updating the added
         device; returns the updated device
-      operationId: addDeviceToOriginGroup
+      operationId: addOriginGroupDevice
       parameters:
         - name: serial
           in: path
@@ -3086,7 +3086,7 @@ paths:
       summary: Removes a device from an origin group
       description: Removes a device from an origin group along with updating the removed
         device; returns the updated device
-      operationId: removeDeviceFromOriginGroup
+      operationId: removeOriginGroupDevice
       parameters:
         - name: serial
           in: path
