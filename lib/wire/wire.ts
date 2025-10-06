@@ -2398,6 +2398,15 @@ export interface DeviceGetIsInOrigin {
 export interface GetPresentDevices {
 }
 /**
+ * @generated from protobuf message GetDeadDevices
+ */
+export interface GetDeadDevices {
+    /**
+     * @generated from protobuf field: required uint32 time = 1
+     */
+    time: number;
+}
+/**
  * @generated from protobuf enum DeviceStatus
  */
 export enum DeviceStatus {
@@ -11744,3 +11753,50 @@ class GetPresentDevices$Type extends MessageType<GetPresentDevices> {
  * @generated MessageType for protobuf message GetPresentDevices
  */
 export const GetPresentDevices = new GetPresentDevices$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetDeadDevices$Type extends MessageType<GetDeadDevices> {
+    constructor() {
+        super("GetDeadDevices", [
+            { no: 1, name: "time", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetDeadDevices>): GetDeadDevices {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.time = 0;
+        if (value !== undefined)
+            reflectionMergePartial<GetDeadDevices>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetDeadDevices): GetDeadDevices {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required uint32 time */ 1:
+                    message.time = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetDeadDevices, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required uint32 time = 1; */
+        if (message.time !== 0)
+            writer.tag(1, WireType.Varint).uint32(message.time);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message GetDeadDevices
+ */
+export const GetDeadDevices = new GetDeadDevices$Type();

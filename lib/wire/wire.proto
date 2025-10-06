@@ -909,3 +909,7 @@ message DeviceGetIsInOrigin {
 
 message GetPresentDevices {
 }
+
+message GetDeadDevices {
+    required uint32 time = 1;
+}

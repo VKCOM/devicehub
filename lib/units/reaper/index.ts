@@ -1,8 +1,9 @@
 import logger from '../../util/logger.js'
 import {
+    DeleteDevice,
     DeviceAbsentMessage,
     DeviceHeartbeatMessage,
-    DeviceIntroductionMessage, DevicePresentMessage,
+    DeviceIntroductionMessage, DevicePresentMessage, GetDeadDevices,
     GetPresentDevices
 } from '../../wire/wire.js'
 import wireutil from '../../wire/util.js'
@@ -17,6 +18,8 @@ const log = logger.createLogger('reaper')
 
 interface Options {
     heartbeatTimeout: number
+    timeToDeviceCleanup: number // in minutes
+    deviceCleanupInterval: number // in minutes
     endpoints: {
         sub: string[]
         push: string[]
@@ -87,34 +90,85 @@ export default (async(options: Options) => {
         ttlset.stop()
     })
 
-    try {
-        log.info('Reaping devices with no heartbeat')
-
-        const router = new WireRouter()
-            .on(DeviceIntroductionMessage, (channel, message) => {
-                ttlset.drop(message.serial, TTLSet.SILENT)
-                ttlset.bump(message.serial, Date.now())
-            })
-            .on(DeviceHeartbeatMessage, (channel, message) => {
-                ttlset.bump(message.serial, Date.now())
-            })
-            .on(DeviceAbsentMessage, (channel, message) => {
-                ttlset.drop(message.serial, TTLSet.SILENT)
-            })
-
-        // Listen to changes
-        sub.on('message', router.handler())
-
-        // Load initial state
-        const {devices} = await runTransactionDev(wireutil.global, GetPresentDevices, {}, {sub, push, router})
-
-        const now = Date.now()
-        devices.forEach((serial: string) => {
-            ttlset.bump(serial, now, TTLSet.SILENT)
+    const router = new WireRouter()
+        .on(DeviceIntroductionMessage, (channel, message) => {
+            ttlset.drop(message.serial, TTLSet.SILENT)
+            ttlset.bump(message.serial, Date.now())
         })
+        .on(DeviceHeartbeatMessage, (channel, message) => {
+            ttlset.bump(message.serial, Date.now())
+        })
+        .on(DeviceAbsentMessage, (channel, message) => {
+            ttlset.drop(message.serial, TTLSet.SILENT)
+        })
+
+    if (options.timeToDeviceCleanup) {
+        log.info('deviceCleanerLoop enabled')
+
+        // This functionality is implemented in the Reaper unit because this unit cannot be replicated
+        const deviceCleanerLoop = () => setTimeout(async() => {
+            log.info('Checking dead devices [interval: %s]', options.deviceCleanupInterval)
+            try {
+                const absenceDuration = options.timeToDeviceCleanup
+                const {deadDevices} = await runTransactionDev(wireutil.global, GetDeadDevices, {
+                    time: options.timeToDeviceCleanup * 60 * 1000
+                }, {sub, push, router})
+
+                for (const {serial, present} of deadDevices) {
+                    if (present) {
+                        continue
+                    }
+
+                    log.info( // @ts-ignore
+                        'Removing a dead device [serial: %s, absence_duration: %.1f %s]',
+                        serial,
+                        ... (
+                            absenceDuration >= 60 // if more 1 hour
+                                ? [absenceDuration / 60, 'hrs']
+                                : [absenceDuration, 'min']
+                        )
+                    )
+
+                    push.send([
+                        wireutil.global,
+                        wireutil.pack(DeleteDevice, {serial})
+                    ])
+                }
+            } catch (err: any) {
+                log.error('Dead device check failed with error: %s', err?.message)
+            } finally {
+                deviceCleanerLoop()
+            }
+        }, options.deviceCleanupInterval * 60 * 1000)
+
+        deviceCleanerLoop()
     }
-    catch (err: any) {
-        log.fatal('Unable to load initial state: %s', err?.message)
-        lifecycle.fatal()
+
+    const init = async() => {
+        try {
+            log.info('Reaping devices with no heartbeat')
+
+            // Listen to changes
+            sub.on('message', router.handler())
+
+            // Load initial state
+            const {devices} = await runTransactionDev(wireutil.global, GetPresentDevices, {}, {sub, push, router})
+
+            const now = Date.now()
+            devices?.forEach((serial: string) => {
+                ttlset.bump(serial, now, TTLSet.SILENT)
+            })
+        }
+        catch (err: any) {
+            if (err?.message === 'Timeout when running transaction') {
+                log.error('Load initial state error: Timeout when running transaction, retry')
+                setTimeout(init, 2000)
+                return
+            }
+            log.fatal('Unable to load initial state: %s', err?.message)
+            lifecycle.fatal()
+        }
     }
+
+    init()
 })
