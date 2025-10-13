@@ -32,7 +32,7 @@ LABEL org.opencontainers.image.description="Control and manage Android and iOS d
 LABEL org.opencontainers.image.licenses=Apache-2.0
 
 ENV PATH=/app/bin:$PATH
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NODE_OPTIONS="--max-old-space-size=32768"
 
 EXPOSE 3000
 WORKDIR /app
