@@ -9,7 +9,13 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [react({ tsDecorators: true }), tsconfigPaths(), svgr()],
   resolve: {
-    alias: [{ find: /^@vkontakte\/vkui$/, replacement: '@vkontakte/vkui/dist/cssm' }],
+    alias: [
+      { find: /^@vkontakte\/vkui$/, replacement: '@vkontakte/vkui/dist/cssm' },
+
+      // TODO: REMOVE AFTER REPLACING `console-feed` WITH `chii`
+      { find: /^linkifyjs\/html$/, replacement: 'linkify-html' },
+      { find: /^linkifyjs\/react$/, replacement: 'linkify-react' }
+    ],
   },
   preview: {
     port: 5173,
