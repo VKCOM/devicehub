@@ -34,5 +34,5 @@ export default <T extends Record<string, any>>(model: T) => Object.keys(model).r
         , () => model[method](...args)
     )
     return proxiedModel
-}, {} as T)
+}, {} as any) as T
 
