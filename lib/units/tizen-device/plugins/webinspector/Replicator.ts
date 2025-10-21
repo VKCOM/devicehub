@@ -7,7 +7,6 @@ const KEY_REQUIRE_ESCAPING_RE = /^#*@(t|r)$/
 const REMAINING_KEY = '__console_feed_remaining__'
 const GLOBAL = (function getGlobal() {
     // NOTE: see http://www.ecma-international.org/ecma-262/6.0/index.html#sec-performeval step 10
-    // eslint-disable-next-line no-eval
     const savedEval = eval
     return savedEval('this')
 })()
@@ -128,7 +127,6 @@ class EncodingTransformer {
         }
 
         const remaining = total - counter
-        // eslint-disable-next-line no-proto
         const name = obj?.__proto__?.constructor?.name
 
         if (name && name !== 'Object') {

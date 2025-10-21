@@ -1,10 +1,9 @@
 import util from 'util'
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
-import wire from '../../../wire/index.js'
+import {JoinGroupByAdbFingerprintMessage} from '../../../wire/wire.js'
 import wireutil from '../../../wire/util.js'
 import lifecycle from '../../../util/lifecycle.js'
-import db from '../../../db/index.js'
 import adb from '../support/adb.js'
 import connector, {DEVICE_TYPE} from '../../base-device/support/connector.js'
 import push from '../../base-device/support/push.js'
@@ -14,17 +13,13 @@ import solo from './solo.js'
 import urlformat from '../../base-device/support/urlformat.js'
 import identity from './util/identity.js'
 import data from './util/data.js'
-import {GRPC_WAIT_TIMEOUT} from '../../../util/apiutil.js'
+import type TcpUsbServer from '@u4/adbkit/dist/adb/tcpusb/server.d.ts'
+import {AdbKeysUpdatedMessage} from '../../../wire/wire.js'
 
-// The promise passed as an argument will not be cancelled after the time has elapsed,
-// only the second promise will be rejected.
-const promiseTimeout = (promise, ms, message = 'Timeout exceeded') => Promise.race([
-    promise,
-    new Promise((_, reject) => {
-        const id = setTimeout(() => reject(new Error(message)), ms)
-        promise.finally(() => clearTimeout(id))
-    })
-])
+interface Key {
+    fingerprint: string
+    comment: string
+}
 
 export default syrup.serial()
     .dependency(adb)
@@ -36,40 +31,32 @@ export default syrup.serial()
     .dependency(connector)
     .dependency(identity)
     .dependency(data)
-    .define(async function(options, adb, router, push, group, solo, urlformat, connector, identity, data) {
+    .define(async(options, adb, router, push, group, solo, urlformat, connector, identity, data) => {
         const log = logger.createLogger('device:plugins:connect')
-        let activeServer = null
+        let activeServer: TcpUsbServer | null = null
 
-        await db.connect()
-
-        const notify = async(key) => {
+        const notify = async(key: Key) => {
             try {
-                const currentGroup = group.get()
+                const currentGroup = await group.get()
                 push.send([
                     solo.channel,
-                    wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(options.serial, key.fingerprint, key.comment, currentGroup.group))
+                    wireutil.pack(JoinGroupByAdbFingerprintMessage, {
+                        serial: options.serial,
+                        fingerprint: key.fingerprint,
+                        comment: key.comment,
+                        currentGroup: currentGroup?.group
+                    })
                 ])
             }
             catch(e) {
                 push.send([
                     solo.channel,
-                    wireutil.envelope(new wire.JoinGroupByAdbFingerprintMessage(options.serial, key.fingerprint, key.comment))
+                    wireutil.pack(JoinGroupByAdbFingerprintMessage, {
+                        serial: options.serial,
+                        fingerprint: key.fingerprint,
+                        comment: key.comment
+                    })
                 ])
-            }
-        }
-
-        const joinListener = (_, identifier, key, reject) => {
-            if (identifier !== key.fingerprint) {
-                reject(new Error('Somebody else took the device'))
-            }
-        }
-
-        const autojoinListener = (identifier, joined, key, resolve, reject) => {
-            if (identifier === key.fingerprint) {
-                if (joined) {
-                    return resolve()
-                }
-                reject(new Error('Device is already in use'))
             }
         }
 
@@ -77,15 +64,25 @@ export default syrup.serial()
             serial: options.serial,
             port: options.connectPort,
             url: urlformat(options.connectUrlPattern, options.connectPort, identity.model, data ? data.name.id : ''),
-            auth: (key, resolve, reject) => reject(),
+            auth: (key: Key): boolean => false,
             start: () => new Promise((resolve, reject) => {
                 log.info('Starting connect plugin')
 
-                const auth = key => promiseTimeout(new Promise((resolve, reject) => {
-                    plugin.auth(key, resolve, reject)
-                    router.on(wire.AdbKeysUpdatedMessage, () => notify(key))
-                    notify(key)
-                }), GRPC_WAIT_TIMEOUT) // reject after 2 minutes if autojoin event doesn't fire
+                // If Auth failed - the entire unit device will fall
+                // TODO: fix
+                const auth = (key: Key) => new Promise<void>(async(resolve, reject) => {
+                    // TODO: Dangerous, discuss and remove
+                    router.on(AdbKeysUpdatedMessage, () => notify(key))
+                    await notify(key)
+
+                    if (plugin.auth(key)) {
+                        resolve()
+                        return
+                    }
+
+                    // Connection rejected by user-defined auth handler
+                    reject('Auth failed')
+                })
 
                 activeServer = adb.createTcpUsbBridge(plugin.serial, {auth})
                     .on('listening', () => resolve(plugin.url))
@@ -96,8 +93,7 @@ export default syrup.serial()
                         conn.on('userActivity', () => group.keepalive())
                     })
 
-                activeServer.listen(plugin.port)
-                lifecycle.share('Remote ADB', activeServer)
+                activeServer!.listen(plugin.port)
 
                 log.info(util.format('Listening on port %d', plugin.port))
                 resolve(plugin.url)
@@ -108,22 +104,19 @@ export default syrup.serial()
                 }
 
                 log.info('Stop connect plugin')
-                router.removeAllListeners(wire.AdbKeysUpdatedMessage)
 
-                let resolveClose = () => {}
+                // TODO: Not ideal way, need WireRouter.once
+                router.removeAllListeners(AdbKeysUpdatedMessage)
 
-                const waitCloseServer = new Promise((resolve) => {
-                    // @ts-ignore
-                    resolveClose = resolve
-                })
-
-                activeServer.on('close', () => {
-                    resolveClose()
+                const waitServerClose = new Promise<void>((resolve) => {
+                    activeServer!.on('close', () => {
+                        resolve()
+                    })
                 })
 
                 activeServer.end()
                 activeServer.close()
-                await waitCloseServer
+                await waitServerClose
 
                 activeServer = null
             },
@@ -134,13 +127,24 @@ export default syrup.serial()
             }
         }
 
-        group.on('join', (g, id) =>
-            plugin.auth = (key, resolve, reject) =>
-                joinListener(g, id, key, resolve, reject)
+        group.on('join', (group, keys) =>
+            plugin.auth = key => {
+                if (keys?.length && !keys.includes(key.fingerprint)) {
+                    log.error('Invalid RSA key. Somebody else took the device')
+                    return false
+                }
+                return true
+            }
         )
+
         group.on('autojoin', (id, joined) =>
-            plugin.auth = (key, resolve, reject) =>
-                autojoinListener(id, joined, key, resolve, reject)
+            plugin.auth = key => {
+                if (id === key.fingerprint && joined) {
+                    return true
+                }
+                log.error('Device is already in use')
+                return false
+            }
         )
 
         connector.init({
@@ -154,6 +158,6 @@ export default syrup.serial()
         lifecycle.observe(() => connector.stop())
         group.on('leave', () => {
             connector.stop()
-            plugin.auth = (key, resolve, reject) => reject()
+            plugin.auth = (key) => false
         })
     })

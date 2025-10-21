@@ -124,7 +124,7 @@ services:
         container_name: devicehub-processor
         env_file:
             - scripts/variables.env
-        command: stf processor --name processor --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260 --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
+        command: stf processor --name processor --connect-app-dealer tcp://devicehub-triproxy-app:7160 --connect-dev-dealer tcp://devicehub-triproxy-dev:7260
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully
@@ -137,7 +137,7 @@ services:
         container_name: devicehub-reaper
         env_file:
             - scripts/variables.env
-        command: stf reaper --name reaper001 --connect-push tcp://devicehub-triproxy-dev:7270 --connect-sub tcp://devicehub-triproxy-app:7150 --heartbeat-timeout 30000
+        command: stf reaper --name reaper001 --connect-push tcp://devicehub-triproxy-dev:7270 --connect-sub tcp://devicehub-triproxy-dev:7250 --heartbeat-timeout 30000
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully
@@ -249,7 +249,7 @@ services:
         container_name: devicehub-api-groups-engine
         env_file:
             - scripts/variables.env
-        command: stf groups-engine --connect-sub tcp://devicehub-triproxy-app:7150 --connect-push tcp://devicehub-triproxy-app:7170 --connect-sub-dev tcp://devicehub-triproxy-dev:7250 --connect-push-dev tcp://devicehub-triproxy-dev:7270
+        command: stf groups-engine --connect-push tcp://devicehub-triproxy-app:7170 --connect-push-dev tcp://devicehub-triproxy-dev:7270
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully

@@ -45,6 +45,8 @@
     "i18next-http-backend": "^2.6.2",
     "inversify": "^6.2.1",
     "inversify-react": "^1.2.0",
+    "linkify-html": "^4.3.2",
+    "linkify-react": "^4.3.2",
     "lodash": "^4.17.21",
     "mobx": "^6.13.5",
     "mobx-persist-store": "^1.1.5",
@@ -105,6 +107,9 @@
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^3.0.9"
+  },
+  "overrides": {
+    "linkifyjs": "4.3.2"
   },
   "msw": {
     "workerDirectory": [
