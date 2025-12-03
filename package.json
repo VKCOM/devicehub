@@ -33,6 +33,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.772.0",
     "@aws-sdk/credential-providers": "^3.772.0",
+    "@cwasm/webp": "^0.1.5",
     "@devicefarmer/adbkit-apkreader": "3.2.4",
     "@devicefarmer/adbkit-monkey": "1.2.1",
     "@devicefarmer/minicap-prebuilt": "file:minicap-prebuilt",

@@ -28,12 +28,13 @@ import sd from './plugins/sd.js'
 import filesystem from './plugins/filesystem.js'
 import mobileService from './plugins/mobile-service.js'
 import remotedebug from './plugins/remotedebug.js'
+import vnc from './plugins/vnc/index.js'
 import {trackModuleReadyness} from './readyness.js'
-import wireutil from '../../wire/util.js'
-import wire from '../../wire/index.js'
+import wireutil, {DEVICE_STATUS_MAP} from '../../wire/util.js'
 import push from '../base-device/support/push.js'
 import adb from './support/adb.js'
 import router from '../base-device/support/router.js'
+import {DeviceIntroductionMessage, DeviceRegisteredMessage, ProviderMessage} from "../../wire/wire.js";
 
 export default (function(options: any) {
     return syrup.serial()
@@ -51,7 +52,7 @@ export default (function(options: any) {
                 let listener: ((...args: any[]) => void) | null = null
                 const waitRegister = Promise.race([
                     new Promise(resolve =>
-                        router.on(wire.DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
+                        router.on(DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
                     ),
                     new Promise(r => setTimeout(r, 15000))
                 ])
@@ -59,11 +60,20 @@ export default (function(options: any) {
                 const type = await adb.getDevice(options.serial).getState()
                 push?.send([
                     wireutil.global,
-                    wireutil.envelope(new wire.DeviceIntroductionMessage(options.serial, wireutil.toDeviceStatus(type), new wire.ProviderMessage(solo.channel, `standalone-${options.serial}`)))
+                    wireutil.pack(DeviceIntroductionMessage, {
+                        serial: options.serial,
+
+                        // TODO: Verify that @u4/adbkit statuses are correct
+                        status: wireutil.toDeviceStatus(type as keyof typeof DEVICE_STATUS_MAP),
+                        provider: ProviderMessage.create({
+                            channel: solo.channel,
+                            name: `standalone-${options.serial}`
+                        })
+                    })
                 ])
 
                 await waitRegister
-                router.removeListener(wire.DeviceRegisteredMessage, listener!)
+                router.removeListener(DeviceRegisteredMessage, listener!)
                 listener = null
             }
 
@@ -72,17 +82,18 @@ export default (function(options: any) {
                 .dependency(trackModuleReadyness('stream', stream))
                 .dependency(trackModuleReadyness('capture', capture))
                 .dependency(trackModuleReadyness('service', service))
+                .dependency(trackModuleReadyness('shell', shell))
+                .dependency(trackModuleReadyness('touch', touch))
+                .dependency(trackModuleReadyness('group', group))
+                .dependency(trackModuleReadyness('vnc', vnc))
                 .dependency(trackModuleReadyness('browser', browser))
                 .dependency(trackModuleReadyness('store', store))
                 .dependency(trackModuleReadyness('airplane', airplane))
                 .dependency(trackModuleReadyness('clipboard', clipboard))
                 .dependency(trackModuleReadyness('logcat', logcat))
                 .dependency(trackModuleReadyness('mute', mute))
-                .dependency(trackModuleReadyness('shell', shell))
-                .dependency(trackModuleReadyness('touch', touch))
                 .dependency(trackModuleReadyness('install', install))
                 .dependency(trackModuleReadyness('forward', forward))
-                .dependency(trackModuleReadyness('group', group))
                 .dependency(trackModuleReadyness('cleanup', cleanup))
                 .dependency(trackModuleReadyness('reboot', reboot))
                 .dependency(trackModuleReadyness('connect', connect))
@@ -94,7 +105,11 @@ export default (function(options: any) {
                 .dependency(trackModuleReadyness('filesystem', filesystem))
                 .dependency(trackModuleReadyness('mobileService', mobileService))
                 .dependency(trackModuleReadyness('remotedebug', remotedebug))
-                .define((options, heartbeat) => {
+                .define((options, heartbeat, stream, capture, service, shell, touch, group, vnc) => {
+                    if (options.needVnc) {
+                        vnc.start()
+                    }
+
                     if (process.send) {
                         // Only if we have a parent process
                         process.send('ready')

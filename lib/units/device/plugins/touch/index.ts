@@ -113,7 +113,7 @@ class TouchConsumer extends EventEmitter {
         this._queueWrite(() => {
             const x = Math.ceil(this.touchConfig.origin.x(point) * this.banner!.maxX)
             const y = Math.ceil(this.touchConfig.origin.y(point) * this.banner!.maxY)
-            const p = Math.ceil((point.pressure || 0.5) * this.banner!.maxPressure)
+            const p = Math.max(1, Math.ceil((point.pressure || 0.5) * this.banner!.maxPressure))
             return this._write(`d ${point.contact} ${x} ${y} ${p}\n`)
         })
     }
@@ -122,7 +122,7 @@ class TouchConsumer extends EventEmitter {
         this._queueWrite(() => {
             const x = Math.ceil(this.touchConfig.origin.x(point) * this.banner!.maxX)
             const y = Math.ceil(this.touchConfig.origin.y(point) * this.banner!.maxY)
-            const p = Math.ceil((point.pressure || 0.5) * this.banner!.maxPressure)
+            const p = Math.max(1, Math.ceil((point.pressure || 0.5) * this.banner!.maxPressure))
             return this._write(`m ${point.contact} ${x} ${y} ${p}\n`)
         })
     }
@@ -151,7 +151,7 @@ class TouchConsumer extends EventEmitter {
         this.touchUp(point)
         this.touchCommit()
     }
-    
+
     private async startState(): Promise<void> {
         if (this.desiredState.next() !== STATE_STARTED) {
             this.ensureStateLock = false
@@ -164,19 +164,19 @@ class TouchConsumer extends EventEmitter {
             const out = await this._startService()
             this.output = new RiskyStream(out)
                 .on('unexpectedEnd', this._outputEnded.bind(this))
-            
+
             this._readOutput(this.output.stream)
-            
+
             const socket = await this._connectService()
             this.socket = new RiskyStream(socket)
                 .on('unexpectedEnd', this._socketEnded.bind(this))
-            
+
             const banner = await this._readBanner(this.socket.stream)
             this.banner = banner
-            
+
             this._readUnexpected(this.socket.stream)
             this._processWriteQueue()
-            
+
             this.runningState = STATE_STARTED
             this.emit('start')
         } catch (err: any) {
@@ -217,7 +217,7 @@ class TouchConsumer extends EventEmitter {
             log.warn('Will not apply desired state due to too many failures')
             return
         }
-        
+
         // Prevent concurrent execution
         if (this.ensureStateLock) {
             return
@@ -295,7 +295,7 @@ class TouchConsumer extends EventEmitter {
             this.splitStream.removeAllListeners('data')
             this.splitStream.destroy()
         }
-        
+
         this.splitStream = out.pipe(split()).on('data', (line: any) => {
             const trimmed = line.toString().trim()
             if (trimmed === '') {
@@ -352,7 +352,7 @@ class TouchConsumer extends EventEmitter {
                 this.splitStream.destroy()
                 this.splitStream = null
             }
-            
+
             this.output = null
             this.socket = null
             this.banner = null
@@ -361,13 +361,13 @@ class TouchConsumer extends EventEmitter {
 
     private async _disconnectService(socket: RiskyStream | null): Promise<boolean> {
         log.info('Disconnecting from minitouch service')
-        
+
         if (!socket || socket.ended) {
             return true
         }
 
         socket.stream.removeListener('readable', this.readableListener)
-        
+
         return new Promise<boolean>((resolve) => {
             const endListener = () => {
                 socket.removeListener('end', endListener)
@@ -376,7 +376,7 @@ class TouchConsumer extends EventEmitter {
             socket.on('end', endListener)
             socket.stream.resume()
             socket.end()
-            
+
             // Add timeout
             setTimeout(() => {
                 socket.removeListener('end', endListener)
@@ -387,7 +387,7 @@ class TouchConsumer extends EventEmitter {
 
     private async _stopService(output: RiskyStream | null): Promise<boolean> {
         log.info('Stopping minitouch service')
-        
+
         if (!output || output.ended) {
             return true
         }
@@ -402,9 +402,9 @@ class TouchConsumer extends EventEmitter {
                 SIGTERM: -15,
                 SIGKILL: -9
             }[signal]
-            
+
             log.info('Sending %s to minitouch', signal)
-            
+
             await Promise.race([
                 Promise.all([
                     output.waitForEnd(),
@@ -413,7 +413,7 @@ class TouchConsumer extends EventEmitter {
                 ]),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
             ])
-            
+
             return true
         }
 
@@ -441,7 +441,7 @@ class TouchConsumer extends EventEmitter {
 
     private async _readBanner(socket: any): Promise<Banner> {
         log.info('Reading minitouch banner')
-        
+
         const parser = new Parser(socket)
         const banner: Banner = {
             pid: -1,
@@ -521,14 +521,14 @@ class TouchConsumer extends EventEmitter {
         if (!this.socket?.stream) {
             return
         }
-        
+
         // Handle backpressure
         const canWrite = this.socket.stream.write(chunk)
         if (!canWrite) {
             log.warn('Socket buffer is full, experiencing backpressure')
         }
     }
-    
+
     destroy(): void {
         // Clean up all resources
         if (this.splitStream) {
@@ -536,16 +536,16 @@ class TouchConsumer extends EventEmitter {
             this.splitStream.destroy()
             this.splitStream = null
         }
-        
+
         if (this.socket) {
             this.socket.stream.removeListener('readable', this.readableListener)
             this.socket.removeAllListeners()
         }
-        
+
         if (this.output) {
             this.output.removeAllListeners()
         }
-        
+
         this.failCounter.removeAllListeners()
         this.removeAllListeners()
         this.writeQueue = []
@@ -583,7 +583,7 @@ export default syrup.serial()
 
             // Use Promise.race with once() for cleaner event handling
             touchConsumer.start()
-            
+
             return Promise.race([
                 new Promise<TouchConsumer>((resolve) => {
                     touchConsumer.once('start', () => resolve(touchConsumer))
@@ -595,7 +595,9 @@ export default syrup.serial()
         }
 
         const touchConsumer = await startConsumer()
-        const queue = new SeqQueue(100, 4)
+
+        // TODO: refactoring SeqQueue
+        // const queue = new SeqQueue(100, 4)
 
         touchConsumer.on('error', (err: Error) => {
             log.fatal('Touch consumer had an error %s: %s', err?.message, err?.stack)
@@ -604,37 +606,25 @@ export default syrup.serial()
 
         router
             .on(GestureStartMessage, (channel: any, message: any) => {
-                queue.start(message.seq)
+                touchConsumer.start()
             })
             .on(GestureStopMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    queue.stop()
-                })
+                touchConsumer.stop()
             })
             .on(TouchDownMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    touchConsumer.touchDown(message)
-                })
+                touchConsumer.touchDown(message)
             })
             .on(TouchMoveMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    touchConsumer.touchMove(message)
-                })
+                touchConsumer.touchMove(message)
             })
             .on(TouchUpMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    touchConsumer.touchUp(message)
-                })
+                touchConsumer.touchUp(message)
             })
             .on(TouchCommitMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    touchConsumer.touchCommit()
-                })
+                touchConsumer.touchCommit()
             })
             .on(TouchResetMessage, (channel: any, message: any) => {
-                queue.push(message.seq, () => {
-                    touchConsumer.touchReset()
-                })
+                touchConsumer.touchReset()
             })
 
         return touchConsumer

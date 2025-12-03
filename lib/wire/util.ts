@@ -6,7 +6,7 @@ import { createLogger } from '../util/logger.ts';
 import {MessageType} from "@protobuf-ts/runtime";
 import { ADBDeviceType } from '../units/provider/ADBObserver.js';
 
-const DEVICE_STATUS_MAP = {
+export const DEVICE_STATUS_MAP = {
     device: 'ONLINE',
     // emulator: 'ONLINE',
     unauthorized: 'UNAUTHORIZED',
