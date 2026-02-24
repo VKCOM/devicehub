@@ -1,5 +1,5 @@
 # -------- BUILDER --------
-FROM node:20.18.0-bullseye-slim AS builder
+FROM --platform=linux/amd64 node:20.19.0-bullseye-slim AS builder
 
 WORKDIR /app
 
@@ -11,18 +11,10 @@ RUN apt-get update && apt-get install -y \
 COPY . .
 
 RUN npm ci --python="/usr/bin/python3" --loglevel http && \
-    npm run build && \
     npm prune --production
 
-
-WORKDIR /app/ui
-
-RUN npm ci && \
-    npx tsc -b && \
-    npx vite build
-
 # -------- RUNTIME --------
-FROM node:20.18.0-bullseye-slim
+FROM --platform=linux/amd64 node:20.19.0-bullseye-slim
 
 LABEL org.opencontainers.image.source=https://github.com/VKCOM/devicehub
 LABEL org.opencontainers.image.title=DeviceHub

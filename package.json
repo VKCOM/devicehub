@@ -1,6 +1,6 @@
 {
   "name": "vk-devicehub",
-  "version": "1.5.0",
+  "version": "1.5.2",
   "description": "Smartphone Test Farm",
   "type": "module",
   "keywords": [
@@ -30,7 +30,7 @@
     "protoc": "npx protoc --ts_out ./lib/wire --ts_opt generate_dependencies --proto_path ./lib/wire ./lib/wire/wire.proto",
     "copy-assets": "copyfiles -e '**/*.ts' -e '**/*.tsx' -e '**/*.js' -e '**/*.mjs' -e '**/*.jsx' 'lib/**/*' .build",
     "chmod-bin": "node -e \"require('fs').chmodSync('.build/bin/stf.mjs', 0o755)\"",
-    "postinstall": "tsc -p ./tsconfig.node.json && npm run copy-assets && npm run chmod-bin && cd ./ui && npm i",
+    "postinstall": "tsc -p ./tsconfig.node.json && npm run copy-assets && npm run chmod-bin && cd ./ui && npm ci",
     "prepare-wda-bundle-id": "LC_ALL=C sed -i '' -e 's/com\\.facebook\\.WebDriverAgentRunner/com.dhub.WebDriverAgentRunner/g' -e 's/com\\.facebook/com.dh/g' node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj/project.pbxproj",
     "setup-wda": "npm run prepare-wda-bundle-id && echo \"Enable 'Automatically manage signing' for all targets and select your Development Team.\n\nOpening xcode project...\n\" && open node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj",
     "save-wda-sign": "npx patch-package appium-webdriveragent",
