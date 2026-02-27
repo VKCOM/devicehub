@@ -3,7 +3,7 @@ import fs from 'fs'
 import syrup from '@devicefarmer/stf-syrup'
 import type {Client} from '@u4/adbkit'
 import logger from '../../../util/logger.js'
-import * as pathutil from '../../../util/pathutil.cjs'
+import {requiredMatch, module} from '../../../util/pathutil.js'
 import devutil from '../../../util/devutil.js'
 import Resource from './util/resource.js'
 import adb from '../support/adb.js'
@@ -31,8 +31,8 @@ export default syrup.serial()
         const log = logger.createLogger('device:resources:minitouch')
         const resources: MinitouchResource = {
             bin: new Resource({
-                src: pathutil.requiredMatch(abi.all.map((supportedAbi: string) =>
-                    pathutil.module(util.format('@devicefarmer/minitouch-prebuilt/prebuilt/%s/bin/minitouch%s', supportedAbi, abi.pie ? '' : '-nopie'))
+                src: requiredMatch(abi.all.map((supportedAbi: string) =>
+                    module(util.format('@devicefarmer/minitouch-prebuilt/prebuilt/%s/bin/minitouch%s', supportedAbi, abi.pie ? '' : '-nopie'))
                 )),
                 dest: [
                     '/data/local/tmp/minitouch',

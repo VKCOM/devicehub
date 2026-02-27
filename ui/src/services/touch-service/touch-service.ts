@@ -26,7 +26,6 @@ import type { MouseEvent as ReactMouseEvent } from 'react'
 @deviceConnectionRequired()
 export class TouchService {
   private readonly cycle = 100
-  private prevCoords: { x: number; y: number } = { x: 0, y: 0 }
   private slotted: Record<string, number> = {}
   private seq = -1
   private fakePinch = false
@@ -93,11 +92,6 @@ export class TouchService {
       screenBoundingRect,
     })
 
-    this.prevCoords = {
-      x: scaled.coords.xP,
-      y: scaled.coords.yP,
-    }
-
     const pressure = 0.5
 
     this.deviceControlStore.touchDown({
@@ -145,46 +139,13 @@ export class TouchService {
     this.lastPossiblyBuggyMouseUpEvent = null
   }
 
-  mouseUpListener({ isRightButtonPressed, mousePageX, mousePageY }: MouseUpListener): void {
+  mouseUpListener({ isRightButtonPressed }: MouseUpListener): void {
     if (!this.isMouseDown) return
 
     this.isMouseDown = false
 
     // NOTE: Skip right button click
     if (isRightButtonPressed) return
-
-    const { data: device } = this.deviceBySerialStore.deviceQueryResult()
-
-    if (!device?.display?.width || !device.display?.height || !this.deviceScreenStore.getCanvasWrapper) return
-
-    const screenBoundingRect = this.deviceScreenStore.getCanvasWrapper.getBoundingClientRect()
-
-    const scaled = this.getScaledCoords({
-      displayWidth: device.display.width,
-      displayHeight: device.display.height,
-      isIosDevice: device.manufacturer === 'Apple',
-      mousePageX,
-      mousePageY,
-      screenBoundingRect,
-    })
-
-    const pressure = 0.5
-
-    if (
-      (Math.abs(this.prevCoords.x - scaled.coords.xP) >= 0.1 ||
-        Math.abs(this.prevCoords.y - scaled.coords.yP) >= 0.1) &&
-      device.manufacturer === 'Apple'
-    ) {
-      this.deviceControlStore.touchMoveIos({
-        x: scaled.coords.xP,
-        y: scaled.coords.yP,
-        pX: this.prevCoords.x,
-        pY: this.prevCoords.y,
-        pressure,
-        seq: this.nextSeq(),
-        contact: 0,
-      })
-    }
 
     this.deviceControlStore.touchUp(this.nextSeq(), 0)
 

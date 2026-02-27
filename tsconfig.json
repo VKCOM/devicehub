@@ -5,6 +5,7 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "strictBindCallApply": true,
+    "skipLibCheck": true,
     "noImplicitThis": true,
     "noImplicitReturns": false,
     "alwaysStrict": true,
@@ -28,7 +29,8 @@
     "./lib/**/*.js",
     "./lib/**/*.mjs",
     "./lib/types/**/*.d.ts",
-    "./lib/**/*.ts"
+    "./lib/**/*.ts",
+    "./bin/**/*.mjs"
   ],
   "exclude": ["node_modules/**"],
   "verbose": true

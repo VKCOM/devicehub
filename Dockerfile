@@ -1,5 +1,5 @@
 # -------- BUILDER --------
-FROM node:20.18.0-bullseye-slim AS builder
+FROM --platform=linux/amd64 node:20.19.0-bullseye-slim AS builder
 
 WORKDIR /app
 
@@ -10,20 +10,11 @@ RUN apt-get update && apt-get install -y \
 
 COPY . .
 
-RUN sed -i 's%./node_modules/.bin/tsx%node%g' ./bin/stf.mjs && \
-    npm ci --python="/usr/bin/python3" --loglevel http && \
-    ./node_modules/.bin/tsc -p tsconfig.node.json && \
+RUN npm ci --python="/usr/bin/python3" --loglevel http && \
     npm prune --production
 
-
-WORKDIR /app/ui
-
-RUN npm ci && \
-    npx tsc -b && \
-    npx vite build
-
 # -------- RUNTIME --------
-FROM node:20.18.0-bullseye-slim
+FROM --platform=linux/amd64 node:20.19.0-bullseye-slim
 
 LABEL org.opencontainers.image.source=https://github.com/VKCOM/devicehub
 LABEL org.opencontainers.image.title=DeviceHub
@@ -31,7 +22,7 @@ LABEL org.opencontainers.image.vendor=VKCOM
 LABEL org.opencontainers.image.description="Control and manage Android and iOS devices from your browser."
 LABEL org.opencontainers.image.licenses=Apache-2.0
 
-ENV PATH=/app/bin:$PATH
+ENV PATH=/app/.build/bin:$PATH
 ENV NODE_OPTIONS="--max-old-space-size=32768"
 
 EXPOSE 3000
@@ -47,9 +38,9 @@ COPY --from=builder /app .
 RUN rm -rf ./ui
 COPY --from=builder /app/ui/dist ./ui/dist
 
-RUN ln -s /app/bin/stf.mjs /app/bin/stf && \
-    ln -s /app/bin/stf.mjs /app/bin/devicehub && \
-    ln -s /app/bin/stf.mjs /app/bin/dh
+RUN ln -s /app/.build/bin/stf.mjs /app/.build/bin/stf && \
+    ln -s /app/.build/bin/stf.mjs /app/.build/bin/devicehub && \
+    ln -s /app/.build/bin/stf.mjs /app/.build/bin/dh
 
 USER devicehub-user
 

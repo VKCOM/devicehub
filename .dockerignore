@@ -16,3 +16,4 @@ WebDriverAgent/
 .eslintcache
 scripts/
 .mypy_cache
+.build

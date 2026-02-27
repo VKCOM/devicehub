@@ -1,11 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
     "checkJs": false,
     "noImplicitAny": false,
-    "skipLibCheck": true
-  },
-  "include": ["./lib/**/*.ts"],
-  "exclude": ["./lib/**/*.js"]
+    "outDir": "./.build"
+  }
 }

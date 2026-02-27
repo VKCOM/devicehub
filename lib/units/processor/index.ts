@@ -284,7 +284,7 @@ export default db.ensureConnectivity(async(options: Options) => {
             dbapi.setDeviceIosVersion(message)
         })
         .on(SizeIosDevice, (channel, message, data) => {
-            dbapi.sizeIosDevice(message.id, message.height, message.width, message.scale)
+            dbapi.sizeIosDevice(message.id, message.height, message.width, message.scale, message.url)
             appDealer.send([channel, data])
         })
         .on(DeviceTypeMessage, (channel, message, data) => {

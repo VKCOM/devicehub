@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "noEmit": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "checkJs": false,
+    "allowJs": true
+  },
+  "exclude": ["./lib/**/*.js"]
 }
