@@ -30,10 +30,10 @@ import mobileService from './plugins/mobile-service.js'
 import remotedebug from './plugins/remotedebug.js'
 import {trackModuleReadyness} from './readyness.js'
 import wireutil from '../../wire/util.js'
-import wire from '../../wire/index.js'
 import push from '../base-device/support/push.js'
 import adb from './support/adb.js'
 import router from '../base-device/support/router.js'
+import {DeviceIntroductionMessage, DeviceRegisteredMessage, ProviderMessage} from "../../wire/wire.js";
 
 export default (function(options: any) {
     return syrup.serial()
@@ -51,7 +51,7 @@ export default (function(options: any) {
                 let listener: ((...args: any[]) => void) | null = null
                 const waitRegister = Promise.race([
                     new Promise(resolve =>
-                        router.on(wire.DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
+                        router.on(DeviceRegisteredMessage, listener = (...args: any[]) => resolve(args))
                     ),
                     new Promise(r => setTimeout(r, 15000))
                 ])
@@ -59,11 +59,19 @@ export default (function(options: any) {
                 const type = await adb.getDevice(options.serial).getState()
                 push?.send([
                     wireutil.global,
-                    wireutil.envelope(new wire.DeviceIntroductionMessage(options.serial, wireutil.toDeviceStatus(type), new wire.ProviderMessage(solo.channel, `standalone-${options.serial}`)))
+                    wireutil.pack(DeviceIntroductionMessage, {
+                        serial: options.serial,
+                        // @ts-ignore
+                        status: wireutil.toDeviceStatus(type),
+                        provider: {
+                            channel: solo.channel,
+                            name: `standalone-${options.serial}`
+                        }
+                    })
                 ])
 
                 await waitRegister
-                router.removeListener(wire.DeviceRegisteredMessage, listener!)
+                router.removeListener(DeviceRegisteredMessage, listener!)
                 listener = null
             }
 

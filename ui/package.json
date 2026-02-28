@@ -1,7 +1,7 @@
 {
   "name": "vk-devicehub-ui",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.5.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,7 +25,8 @@
     "bundle-analyzer": "npx vite-bundle-visualizer --config ./vite.config.ts",
     "generate-code": "plop",
     "generate-api": "orval --config ./orval.config.ts",
-    "type-checking": "tsc --p ./tsconfig.app.json --noEmit"
+    "type-checking": "tsc --p ./tsconfig.app.json --noEmit",
+    "postinstall": "npm run build:prod"
   },
   "dependencies": {
     "@lukemorales/query-key-factory": "^1.3.4",

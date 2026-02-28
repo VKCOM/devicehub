@@ -103,7 +103,7 @@ export class ProcessManager<TContext = any, TResources = any> {
             initialState?: ProcessState
             resourceCount?: number
         } = {}
-    ): Promise<boolean> {
+    ) {
         if (this.processes.has(id)) {
             this.log.warn('Process "%s" already exists', id)
             return false
@@ -116,7 +116,7 @@ export class ProcessManager<TContext = any, TResources = any> {
             if (!allocated) {
                 // TODO: emit resource allocation error event
                 this.log.error(`Failed to allocate ${options.resourceCount} resources for process "${id}"`)
-                return false
+                return null
             }
             resources = allocated
         }
@@ -132,7 +132,7 @@ export class ProcessManager<TContext = any, TResources = any> {
         this.processes.set(id, process)
         this.log.info('Created process "%s" with state "%s"', id, process.state)
 
-        return true
+        return process
     }
 
     // Start a process (spawn child process)

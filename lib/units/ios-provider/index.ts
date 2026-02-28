@@ -1,10 +1,8 @@
 import _ from 'lodash'
 import logger from '../../util/logger.js'
 import lifecycle from '../../util/lifecycle.js'
-import * as usbmux from '@irdk/usbmux'
-import {openPort} from './redirect-ports.js'
 import {Esp32Touch} from '../ios-device/plugins/touch/esp32touch.js'
-import IOSSimObserver from './IOSSimObserver.js'
+import IOSObserver from './IOSObserver.js'
 import {ChildProcess} from 'node:child_process'
 import {ProcessManager, ResourcePool} from '../../util/ProcessManager.js'
 import wireutil from '../../wire/util.js'
@@ -13,7 +11,8 @@ import {
     DeviceAbsentMessage,
     DeviceStatusMessage,
     DeviceIosIntroductionMessage,
-    ProviderIosMessage
+    ProviderIosMessage,
+    DeviceStatus
 } from '../../wire/wire.js'
 import srv from '../../util/srv.js'
 import * as zmqutil from '../../util/zmqutil.js'
@@ -25,8 +24,6 @@ interface DeviceContext {
     isSimulator: boolean
     register: Promise<void>
     resolveRegister?: () => void
-    wdaStopForwarding?: () => void
-    screenStopForwarding?: () => void
 }
 
 interface ResourceType {
@@ -59,6 +56,7 @@ interface Options {
     filter: null | ((serial: string) => boolean)
     screenWsUrlPattern: string
     killTimeout: number
+    publicIp: string
     endpoints: {
         push: string[]
         sub: string[]
@@ -159,22 +157,18 @@ export default async (options: Options): Promise<void> => {
     const processManager = new ProcessManager<DeviceContext, ResourceType>({
         spawn: async(id, context, [resource]) => {
             log.info('Spawning device process "%s" with ports [%s]', id, Object.values(resource).join(', '))
+            push.send([
+                wireutil.global,
+                wireutil.pack(DeviceStatusMessage, {
+                    serial: id,
+                    status: DeviceStatus.PREPARING
+                })
+            ])
+
             const esp32ToUse = _.sample(_.differenceBy(curEsp32, usedEsp32, 'path'))
             if (esp32ToUse) {
                 usedEsp32.push(esp32ToUse)
                 log.info(`Using ${esp32ToUse.path} ESP32`)
-            }
-
-            if (!context.isSimulator) {
-                log.info(`Starting port forwarding for device ${id}`)
-
-                const [wdaStopForwarding, screenStopForwarding] = await Promise.all([
-                    openPort(8100, resource.wdaPort, id, options.usbmuxPath),
-                    openPort(9100, resource.screenPort, id, options.usbmuxPath)
-                ])
-
-                context.wdaStopForwarding = wdaStopForwarding
-                context.screenStopForwarding = screenStopForwarding
             }
 
             return options.fork(id, {
@@ -192,9 +186,6 @@ export default async (options: Options): Promise<void> => {
         onCleanup: (id, context) => {
             // Resolve register if pending
             context.resolveRegister?.()
-
-            context.wdaStopForwarding?.()
-            context.screenStopForwarding?.()
 
             // Tell others the device is gone
             push.send([
@@ -272,8 +263,7 @@ export default async (options: Options): Promise<void> => {
                     status: wireutil.toDeviceStatus('device'),
                     provider: ProviderIosMessage.create({
                         channel: solo,
-                        name: options.name,
-                        screenWsUrlPattern: options.screenWsUrlPattern
+                        name: options.name
                     })
                 })
             ])
@@ -330,15 +320,6 @@ export default async (options: Options): Promise<void> => {
         }
 
         stats()
-
-        // Tell others the device state changed
-        push.send([
-            wireutil.global,
-            wireutil.pack(DeviceStatusMessage, {
-                serial: udid,
-                status: wireutil.toDeviceStatus('device')
-            })
-        ])
     }
 
     const onAttach = filterDevice(
@@ -352,22 +333,22 @@ export default async (options: Options): Promise<void> => {
 
             // Create device context with registration promise
             const deviceContext: DeviceContext = {
-                udid, isSimulator,
-
-                // Register device immediately, before 'running' state
-                register: register(udid)
+                udid, isSimulator, register: Promise.resolve()
             }
 
             // Create managed process
-            const created = await processManager.create(udid, deviceContext, {
+            const process = await processManager.create(udid, deviceContext, {
                 initialState: 'waiting',
                 resourceCount: 1
             })
 
-            if (!created) {
+            if (!process) {
                 log.error('Failed to create process for device "%s"', udid)
                 return
             }
+
+            // Register device immediately, before 'running' state
+            deviceContext.register = register(udid)
 
             stats()
             startDeviceWork(udid)
@@ -383,16 +364,10 @@ export default async (options: Options): Promise<void> => {
     )
 
     // TODO: add option.disallowSimulators (default: false)
-    const simObserver = new IOSSimObserver()
-    simObserver.on('attached', udid => onAttach(udid, true))
-    simObserver.on('detached', udid => onDetach(udid, true))
-
-    simObserver.listen()
-
-    // TODO: add option.onlySimulators (default: false)
-    const usbObserver = usbmux.createListener()
-    usbObserver.on('attached', onAttach)
-    usbObserver.on('detached', onDetach)
+    const iosObserver = new IOSObserver()
+    iosObserver.on('attached', onAttach)
+    iosObserver.on('detached', onDetach)
+    iosObserver.listen()
 
     log.info('Listening for devices')
 
@@ -402,7 +377,6 @@ export default async (options: Options): Promise<void> => {
         clearTimeout(statsTimer)
 
         stats(false)
-        usbObserver.destroy()
 
         ;[push, sub].forEach((sock) =>
             sock.close()

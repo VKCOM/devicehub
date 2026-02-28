@@ -197,7 +197,7 @@ message FileSystemListMessage {
 
 message FileSystemGetMessage {
   required string file = 1;
-  optional string jwt = 2;
+  required string jwt = 2;
 }
 
 message TransactionProgressMessage {
@@ -283,13 +283,12 @@ message DeviceIntroductionMessage {
 message DeviceIosIntroductionMessage {
   required string serial = 1;
   required DeviceStatus status = 2;
-  required ProviderMessage provider = 3;
+  required ProviderIosMessage provider = 3;
 }
 
 message InitializeIosDeviceState {
   required string serial = 1;
   required DeviceStatus status = 2;
-  required ProviderIosMessage provider = 3;
   required IosDevicePorts ports = 4;
   required UpdateIosDevice options = 5;
 }
@@ -664,6 +663,7 @@ message StoreOpenMessage {
 }
 
 message ScreenCaptureMessage {
+  required string jwt = 1;
 }
 
 message ConnectStartMessage {
@@ -842,7 +842,8 @@ message UpdateIosDevice{
   required string platform = 3;
   required string architecture = 4;
   required string sdk = 5;
-  required IosServiceMessage service = 6;
+  required string marketName = 6;
+  required IosServiceMessage service = 7;
 }
 
 message SdkIosVersion{
@@ -854,6 +855,7 @@ message SizeIosDevice{
   required double height = 2;
   required double width = 3;
   required int32 scale = 4;
+  required string url = 5;
 }
 message DashboardOpenMessage {
 }

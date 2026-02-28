@@ -21,7 +21,7 @@ export const AuthLdapPage = () => {
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [formError, setFormError] = useState('')
-  const { data: authData, error, mutate: auth, isSuccess } = useLdapAuth()
+  const { data: authData, error, mutate: auth, isSuccess, isPending } = useLdapAuth()
   const { data: authContact } = useGetAuthContact()
 
   const onFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -51,8 +51,8 @@ export const AuthLdapPage = () => {
   }, [authData])
 
   useEffect(() => {
-    if (error?.response?.data.error === 'ValidationError') {
-      for (const item of error.response.data.validationErrors) {
+    if (error?.data.error === 'ValidationError') {
+      for (const item of error.data.validationErrors) {
         if (item.param === 'username') {
           setUsernameError(item.msg)
         }
@@ -65,13 +65,13 @@ export const AuthLdapPage = () => {
       return
     }
 
-    if (error?.response?.data.error === 'InvalidCredentialsError') {
+    if (error?.data.error === 'InvalidCredentialsError') {
       setFormError('Incorrect login details')
 
       return
     }
 
-    if (error?.response?.data.error) {
+    if (error?.data.error) {
       setFormError('We do not recognize you. Please check your spelling and try again or use another login option')
     }
   }, [error])
@@ -113,7 +113,8 @@ export const AuthLdapPage = () => {
                 <Spacing size='xl' />
                 <FormItem>
                   <Button
-                    disabled={!username || !password || !!usernameError || !!passwordError || !!formError}
+                    disabled={!username || !password || !!usernameError || !!passwordError || isPending}
+                    loading={isPending}
                     size='l'
                     type='submit'
                     stretched

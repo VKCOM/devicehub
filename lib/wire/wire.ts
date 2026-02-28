@@ -567,9 +567,9 @@ export interface FileSystemGetMessage {
      */
     file: string;
     /**
-     * @generated from protobuf field: optional string jwt = 2
+     * @generated from protobuf field: required string jwt = 2
      */
-    jwt?: string;
+    jwt: string;
 }
 /**
  * @generated from protobuf message TransactionProgressMessage
@@ -811,9 +811,9 @@ export interface DeviceIosIntroductionMessage {
      */
     status: DeviceStatus;
     /**
-     * @generated from protobuf field: required ProviderMessage provider = 3
+     * @generated from protobuf field: required ProviderIosMessage provider = 3
      */
-    provider?: ProviderMessage;
+    provider?: ProviderIosMessage;
 }
 /**
  * @generated from protobuf message InitializeIosDeviceState
@@ -827,10 +827,6 @@ export interface InitializeIosDeviceState {
      * @generated from protobuf field: required DeviceStatus status = 2
      */
     status: DeviceStatus;
-    /**
-     * @generated from protobuf field: required ProviderIosMessage provider = 3
-     */
-    provider?: ProviderIosMessage;
     /**
      * @generated from protobuf field: required IosDevicePorts ports = 4
      */
@@ -1785,6 +1781,10 @@ export interface StoreOpenMessage {
  * @generated from protobuf message ScreenCaptureMessage
  */
 export interface ScreenCaptureMessage {
+    /**
+     * @generated from protobuf field: required string jwt = 1
+     */
+    jwt: string;
 }
 /**
  * @generated from protobuf message ConnectStartMessage
@@ -2243,7 +2243,11 @@ export interface UpdateIosDevice {
      */
     sdk: string;
     /**
-     * @generated from protobuf field: required IosServiceMessage service = 6
+     * @generated from protobuf field: required string marketName = 6
+     */
+    marketName: string;
+    /**
+     * @generated from protobuf field: required IosServiceMessage service = 7
      */
     service?: IosServiceMessage;
 }
@@ -2280,6 +2284,10 @@ export interface SizeIosDevice {
      * @generated from protobuf field: required int32 scale = 4
      */
     scale: number;
+    /**
+     * @generated from protobuf field: required string url = 5
+     */
+    url: string;
 }
 /**
  * @generated from protobuf message DashboardOpenMessage
@@ -4379,12 +4387,13 @@ class FileSystemGetMessage$Type extends MessageType<FileSystemGetMessage> {
     constructor() {
         super("FileSystemGetMessage", [
             { no: 1, name: "file", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "jwt", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "jwt", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<FileSystemGetMessage>): FileSystemGetMessage {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.file = "";
+        message.jwt = "";
         if (value !== undefined)
             reflectionMergePartial<FileSystemGetMessage>(this, message, value);
         return message;
@@ -4397,7 +4406,7 @@ class FileSystemGetMessage$Type extends MessageType<FileSystemGetMessage> {
                 case /* required string file */ 1:
                     message.file = reader.string();
                     break;
-                case /* optional string jwt */ 2:
+                case /* required string jwt */ 2:
                     message.jwt = reader.string();
                     break;
                 default:
@@ -4415,8 +4424,8 @@ class FileSystemGetMessage$Type extends MessageType<FileSystemGetMessage> {
         /* required string file = 1; */
         if (message.file !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.file);
-        /* optional string jwt = 2; */
-        if (message.jwt !== undefined)
+        /* required string jwt = 2; */
+        if (message.jwt !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.jwt);
         let u = options.writeUnknownFields;
         if (u !== false)
@@ -5189,7 +5198,7 @@ class DeviceIosIntroductionMessage$Type extends MessageType<DeviceIosIntroductio
         super("DeviceIosIntroductionMessage", [
             { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "status", kind: "enum", T: () => ["DeviceStatus", DeviceStatus] },
-            { no: 3, name: "provider", kind: "message", T: () => ProviderMessage }
+            { no: 3, name: "provider", kind: "message", T: () => ProviderIosMessage }
         ]);
     }
     create(value?: PartialMessage<DeviceIosIntroductionMessage>): DeviceIosIntroductionMessage {
@@ -5211,8 +5220,8 @@ class DeviceIosIntroductionMessage$Type extends MessageType<DeviceIosIntroductio
                 case /* required DeviceStatus status */ 2:
                     message.status = reader.int32();
                     break;
-                case /* required ProviderMessage provider */ 3:
-                    message.provider = ProviderMessage.internalBinaryRead(reader, reader.uint32(), options, message.provider);
+                case /* required ProviderIosMessage provider */ 3:
+                    message.provider = ProviderIosMessage.internalBinaryRead(reader, reader.uint32(), options, message.provider);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -5232,9 +5241,9 @@ class DeviceIosIntroductionMessage$Type extends MessageType<DeviceIosIntroductio
         /* required DeviceStatus status = 2; */
         if (message.status !== 0)
             writer.tag(2, WireType.Varint).int32(message.status);
-        /* required ProviderMessage provider = 3; */
+        /* required ProviderIosMessage provider = 3; */
         if (message.provider)
-            ProviderMessage.internalBinaryWrite(message.provider, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+            ProviderIosMessage.internalBinaryWrite(message.provider, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -5251,7 +5260,6 @@ class InitializeIosDeviceState$Type extends MessageType<InitializeIosDeviceState
         super("InitializeIosDeviceState", [
             { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "status", kind: "enum", T: () => ["DeviceStatus", DeviceStatus] },
-            { no: 3, name: "provider", kind: "message", T: () => ProviderIosMessage },
             { no: 4, name: "ports", kind: "message", T: () => IosDevicePorts },
             { no: 5, name: "options", kind: "message", T: () => UpdateIosDevice }
         ]);
@@ -5274,9 +5282,6 @@ class InitializeIosDeviceState$Type extends MessageType<InitializeIosDeviceState
                     break;
                 case /* required DeviceStatus status */ 2:
                     message.status = reader.int32();
-                    break;
-                case /* required ProviderIosMessage provider */ 3:
-                    message.provider = ProviderIosMessage.internalBinaryRead(reader, reader.uint32(), options, message.provider);
                     break;
                 case /* required IosDevicePorts ports */ 4:
                     message.ports = IosDevicePorts.internalBinaryRead(reader, reader.uint32(), options, message.ports);
@@ -5302,9 +5307,6 @@ class InitializeIosDeviceState$Type extends MessageType<InitializeIosDeviceState
         /* required DeviceStatus status = 2; */
         if (message.status !== 0)
             writer.tag(2, WireType.Varint).int32(message.status);
-        /* required ProviderIosMessage provider = 3; */
-        if (message.provider)
-            ProviderIosMessage.internalBinaryWrite(message.provider, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* required IosDevicePorts ports = 4; */
         if (message.ports)
             IosDevicePorts.internalBinaryWrite(message.ports, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
@@ -8978,10 +8980,13 @@ export const StoreOpenMessage = new StoreOpenMessage$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ScreenCaptureMessage$Type extends MessageType<ScreenCaptureMessage> {
     constructor() {
-        super("ScreenCaptureMessage", []);
+        super("ScreenCaptureMessage", [
+            { no: 1, name: "jwt", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
     }
     create(value?: PartialMessage<ScreenCaptureMessage>): ScreenCaptureMessage {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.jwt = "";
         if (value !== undefined)
             reflectionMergePartial<ScreenCaptureMessage>(this, message, value);
         return message;
@@ -8991,6 +8996,9 @@ class ScreenCaptureMessage$Type extends MessageType<ScreenCaptureMessage> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* required string jwt */ 1:
+                    message.jwt = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -9003,6 +9011,9 @@ class ScreenCaptureMessage$Type extends MessageType<ScreenCaptureMessage> {
         return message;
     }
     internalBinaryWrite(message: ScreenCaptureMessage, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string jwt = 1; */
+        if (message.jwt !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.jwt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -10862,7 +10873,8 @@ class UpdateIosDevice$Type extends MessageType<UpdateIosDevice> {
             { no: 3, name: "platform", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "architecture", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "sdk", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "service", kind: "message", T: () => IosServiceMessage }
+            { no: 6, name: "marketName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 7, name: "service", kind: "message", T: () => IosServiceMessage }
         ]);
     }
     create(value?: PartialMessage<UpdateIosDevice>): UpdateIosDevice {
@@ -10872,6 +10884,7 @@ class UpdateIosDevice$Type extends MessageType<UpdateIosDevice> {
         message.platform = "";
         message.architecture = "";
         message.sdk = "";
+        message.marketName = "";
         if (value !== undefined)
             reflectionMergePartial<UpdateIosDevice>(this, message, value);
         return message;
@@ -10896,7 +10909,10 @@ class UpdateIosDevice$Type extends MessageType<UpdateIosDevice> {
                 case /* required string sdk */ 5:
                     message.sdk = reader.string();
                     break;
-                case /* required IosServiceMessage service */ 6:
+                case /* required string marketName */ 6:
+                    message.marketName = reader.string();
+                    break;
+                case /* required IosServiceMessage service */ 7:
                     message.service = IosServiceMessage.internalBinaryRead(reader, reader.uint32(), options, message.service);
                     break;
                 default:
@@ -10926,9 +10942,12 @@ class UpdateIosDevice$Type extends MessageType<UpdateIosDevice> {
         /* required string sdk = 5; */
         if (message.sdk !== "")
             writer.tag(5, WireType.LengthDelimited).string(message.sdk);
-        /* required IosServiceMessage service = 6; */
+        /* required string marketName = 6; */
+        if (message.marketName !== "")
+            writer.tag(6, WireType.LengthDelimited).string(message.marketName);
+        /* required IosServiceMessage service = 7; */
         if (message.service)
-            IosServiceMessage.internalBinaryWrite(message.service, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+            IosServiceMessage.internalBinaryWrite(message.service, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -11001,7 +11020,8 @@ class SizeIosDevice$Type extends MessageType<SizeIosDevice> {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "height", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "width", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "scale", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 4, name: "scale", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "url", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<SizeIosDevice>): SizeIosDevice {
@@ -11010,6 +11030,7 @@ class SizeIosDevice$Type extends MessageType<SizeIosDevice> {
         message.height = 0;
         message.width = 0;
         message.scale = 0;
+        message.url = "";
         if (value !== undefined)
             reflectionMergePartial<SizeIosDevice>(this, message, value);
         return message;
@@ -11030,6 +11051,9 @@ class SizeIosDevice$Type extends MessageType<SizeIosDevice> {
                     break;
                 case /* required int32 scale */ 4:
                     message.scale = reader.int32();
+                    break;
+                case /* required string url */ 5:
+                    message.url = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -11055,6 +11079,9 @@ class SizeIosDevice$Type extends MessageType<SizeIosDevice> {
         /* required int32 scale = 4; */
         if (message.scale !== 0)
             writer.tag(4, WireType.Varint).int32(message.scale);
+        /* required string url = 5; */
+        if (message.url !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.url);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
