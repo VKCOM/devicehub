@@ -66,7 +66,7 @@ export default (async(options: Options) => {
         log.info('Device "%s" is present', serial)
         push.send([
             wireutil.global,
-            wireutil.pack(DevicePresentMessage, {serial})
+            wireutil.pack(DevicePresentMessage, {serial, presenceChangedAt: Date.now()})
         ])
     })
 
@@ -74,7 +74,7 @@ export default (async(options: Options) => {
         log.info('Reaping device "%s" due to heartbeat timeout', serial)
         push.send([
             wireutil.global,
-            wireutil.pack(DeviceAbsentMessage, {serial})
+            wireutil.pack(DeviceAbsentMessage, {serial, presenceChangedAt: Date.now()})
         ])
     })
 

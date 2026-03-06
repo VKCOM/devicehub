@@ -853,6 +853,10 @@ export interface DevicePresentMessage {
      * @generated from protobuf field: required string serial = 1
      */
     serial: string;
+    /**
+     * @generated from protobuf field: optional double presenceChangedAt = 2
+     */
+    presenceChangedAt?: number;
 }
 /**
  * @generated from protobuf message DeviceAbsentMessage
@@ -862,6 +866,10 @@ export interface DeviceAbsentMessage {
      * @generated from protobuf field: required string serial = 1
      */
     serial: string;
+    /**
+     * @generated from protobuf field: optional double presenceChangedAt = 2
+     */
+    presenceChangedAt?: number;
 }
 /**
  * @generated from protobuf message DeviceReadyMessage
@@ -5374,7 +5382,8 @@ export const DeviceRegisteredMessage = new DeviceRegisteredMessage$Type();
 class DevicePresentMessage$Type extends MessageType<DevicePresentMessage> {
     constructor() {
         super("DevicePresentMessage", [
-            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "presenceChangedAt", kind: "scalar", opt: true, T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<DevicePresentMessage>): DevicePresentMessage {
@@ -5392,6 +5401,9 @@ class DevicePresentMessage$Type extends MessageType<DevicePresentMessage> {
                 case /* required string serial */ 1:
                     message.serial = reader.string();
                     break;
+                case /* optional double presenceChangedAt */ 2:
+                    message.presenceChangedAt = reader.double();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -5407,6 +5419,9 @@ class DevicePresentMessage$Type extends MessageType<DevicePresentMessage> {
         /* required string serial = 1; */
         if (message.serial !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.serial);
+        /* optional double presenceChangedAt = 2; */
+        if (message.presenceChangedAt !== undefined)
+            writer.tag(2, WireType.Bit64).double(message.presenceChangedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -5421,7 +5436,8 @@ export const DevicePresentMessage = new DevicePresentMessage$Type();
 class DeviceAbsentMessage$Type extends MessageType<DeviceAbsentMessage> {
     constructor() {
         super("DeviceAbsentMessage", [
-            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "presenceChangedAt", kind: "scalar", opt: true, T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<DeviceAbsentMessage>): DeviceAbsentMessage {
@@ -5439,6 +5455,9 @@ class DeviceAbsentMessage$Type extends MessageType<DeviceAbsentMessage> {
                 case /* required string serial */ 1:
                     message.serial = reader.string();
                     break;
+                case /* optional double presenceChangedAt */ 2:
+                    message.presenceChangedAt = reader.double();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -5454,6 +5473,9 @@ class DeviceAbsentMessage$Type extends MessageType<DeviceAbsentMessage> {
         /* required string serial = 1; */
         if (message.serial !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.serial);
+        /* optional double presenceChangedAt = 2; */
+        if (message.presenceChangedAt !== undefined)
+            writer.tag(2, WireType.Bit64).double(message.presenceChangedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

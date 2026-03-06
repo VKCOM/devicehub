@@ -1,6 +1,7 @@
 import { t } from 'i18next'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { inject, injectable } from 'inversify'
+import { backOff } from 'exponential-backoff'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { DeviceBySerialStore } from '@/store/device-by-serial-store'
@@ -14,12 +15,8 @@ import type { Device } from '@/generated/types'
 @injectable()
 @deviceConnectionRequired()
 export class DeviceScreenStore {
-  private readonly websocketReconnectionInterval = 5000 // NOTE: 5s
-  private readonly websocketReconnectionMaxAttempts = 3 // NOTE: 5s * 3 -> 15s total delay
   private websocket: WebSocket | null = null
-  private websocketReconnecting = false
-  private websocketReconnectionAttempt = 0
-  private websocketReconnectionTimeoutID: ReturnType<typeof setTimeout> | null = null
+  private backoffPromise: Promise<void> | null = null
   private disposed = false
 
   private context: ImageBitmapRenderingContext | null = null
@@ -45,7 +42,6 @@ export class DeviceScreenStore {
   constructor(@inject(CONTAINER_IDS.deviceBySerialStore) private deviceBySerialStore: DeviceBySerialStore) {
     this.updateBounds = this.updateBounds.bind(this)
     this.messageListener = this.messageListener.bind(this)
-    this.openListener = this.openListener.bind(this)
 
     makeAutoObservable(this)
   }
@@ -75,7 +71,6 @@ export class DeviceScreenStore {
       this.setIsScreenLoading(true)
     })
 
-    // NOTE: Prevents ws connection if stopScreenStreaming was called earlier
     if (this.disposed) {
       this.disposed = false
 
@@ -85,16 +80,17 @@ export class DeviceScreenStore {
     this.context = canvas.getContext('bitmaprenderer')
     this.canvasWrapper = canvasWrapper
 
-    this.connectWebsocket()
+    this.connectWithBackoff()
   }
 
   stopScreenStreaming(): void {
     this.disposed = true
-    this.stopWebsocket()
+    this.backoffPromise = null
 
-    if (this.websocketReconnectionTimeoutID) {
-      clearTimeout(this.websocketReconnectionTimeoutID)
-      this.websocketReconnectionTimeoutID = null
+    if (this.websocket) {
+      this.websocket.onclose = null
+      this.websocket.close()
+      this.websocket = null
     }
   }
 
@@ -129,14 +125,10 @@ export class DeviceScreenStore {
 
   private shouldUpdateScreen(): boolean {
     return Boolean(
-      // NO if the user has disabled the screen.
       this.showScreen &&
-        // NO if the page is not visible (e.g. background tab).
         document.visibilityState === 'visible' &&
-        // NO if we don't have a connection yet.
         this.websocket &&
         this.websocket.readyState === WebSocket.OPEN
-      // YES otherwise
     )
   }
 
@@ -231,49 +223,97 @@ export class DeviceScreenStore {
     this.determineAspectRatioMode()
   }
 
-  private connectWebsocket(): void {
-    if (!this.device?.display?.url) {
-      throw new Error('No display url')
-    }
+  private connectWebsocket(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.device?.display?.url) {
+        reject(new Error('No display url'))
 
-    if (!authStore.jwt) {
-      console.warn('No JWT token available in authStore')
-      throw new Error('Authentication token required')
-    }
+        return
+      }
 
-    // Pass JWT token securely via WebSocket subprotocol
-    this.websocket = new WebSocket(this.device.display.url, `access_token.${authStore.jwt}`)
+      if (!authStore.jwt) {
+        reject(new Error('Authentication token required'))
 
-    this.websocket.binaryType = 'blob'
-    this.websocket.onopen = this.openListener.bind(this)
-    this.websocket.onmessage = this.messageListener.bind(this)
-    this.websocket.onerror = this.errorListener.bind(this)
-    this.websocket.onclose = this.closeListener.bind(this)
+        return
+      }
+
+      const ws = new WebSocket(this.device.display.url, `access_token.${authStore.jwt}`)
+
+      ws.binaryType = 'blob'
+
+      ws.onopen = () => {
+        this.websocket = ws
+        ws.onmessage = this.messageListener.bind(this)
+        ws.onerror = () => {}
+        ws.onclose = this.handleUnexpectedClose.bind(this)
+
+        this.isScreenStreamingJustStarted = true
+        resolve()
+      }
+
+      ws.onerror = () => {}
+
+      ws.onclose = (event: CloseEvent) => {
+        if (event.code === 1008) {
+          reject(new AuthError())
+
+          return
+        }
+
+        reject(new Error(`WebSocket closed before opening: ${event.code}`))
+      }
+    })
   }
 
-  private stopWebsocket(): void {
-    if (this.websocket) {
-      this.websocket.close()
-      this.websocket = null
-    }
+  private connectWithBackoff(): Promise<void> {
+    if (this.backoffPromise) return this.backoffPromise
+
+    this.backoffPromise = backOff(() => this.connectWebsocket(), {
+      numOfAttempts: 8,
+      startingDelay: 1000,
+      maxDelay: 16000,
+      jitter: 'full',
+      retry: (err) => {
+        if (this.disposed) return false
+        if (err instanceof AuthError) return false
+
+        return true
+      },
+    })
+      .catch((err) => {
+        if (this.disposed) return
+
+        runInAction(() => {
+          if (err instanceof AuthError) {
+            deviceErrorModalStore.setError(t('Unauthorized'))
+          } else {
+            deviceErrorModalStore.setError(t('Service is currently unavailable'))
+          }
+        })
+      })
+      .finally(() => {
+        this.backoffPromise = null
+      })
+
+    return this.backoffPromise
   }
 
-  private reconnectWebsocket(): void {
-    // NOTE: No need reconnect if it is already in progress
-    if (this.websocketReconnecting || this.websocketReconnectionTimeoutID) return
+  private handleUnexpectedClose(event: CloseEvent): void {
+    this.websocket = null
 
-    this.websocketReconnecting = true
-    this.websocketReconnectionAttempt += 1
-    this.connectWebsocket()
-  }
+    runInAction(() => {
+      this.setIsScreenLoading(true)
+    })
 
-  private openListener(): void {
-    if (this.websocketReconnecting) {
-      this.websocketReconnecting = false
-      this.websocketReconnectionAttempt = 0
+    if (event.code === 1008) {
+      deviceErrorModalStore.setError(t('Unauthorized'))
+
+      return
     }
 
-    this.isScreenStreamingJustStarted = true
+    if (!event.wasClean && !this.disposed) {
+      this.connectWithBackoff()
+    }
   }
 
   private messageListener(message: MessageEvent<Blob | string>): void {
@@ -297,12 +337,9 @@ export class DeviceScreenStore {
     }
 
     if (message.data === 'secure_on') {
-      // NOTE: The current view is marked secure and cannot be viewed remotely
-
       return
     }
 
-    // Handle authentication messages
     if (typeof message.data === 'string') {
       try {
         const authMessage = JSON.parse(message.data)
@@ -342,30 +379,11 @@ export class DeviceScreenStore {
       this.screenRotation = startData.orientation
     }
   }
+}
 
-  private errorListener(): void {}
-
-  private closeListener(event: CloseEvent): void {
-    this.setIsScreenLoading(true)
-    this.websocketReconnecting = false
-
-    if (event.code === 1008) {
-      deviceErrorModalStore.setError(t('Unauthorized'))
-
-      return
-    }
-
-    if (!event.wasClean && this.websocketReconnectionAttempt < this.websocketReconnectionMaxAttempts) {
-      this.websocketReconnectionTimeoutID = setTimeout(() => {
-        this.websocketReconnectionTimeoutID = null
-        this.reconnectWebsocket()
-      }, this.websocketReconnectionInterval)
-
-      return
-    }
-
-    if (this.websocketReconnectionAttempt >= this.websocketReconnectionMaxAttempts) {
-      deviceErrorModalStore.setError(t('Service is currently unavailable'))
-    }
+class AuthError extends Error {
+  constructor() {
+    super('Unauthorized')
+    this.name = 'AuthError'
   }
 }

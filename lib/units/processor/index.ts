@@ -150,11 +150,11 @@ export default db.ensureConnectivity(async(options: Options) => {
             dbapi.initializeIosDeviceState(options.publicIp, message)
         })
         .on(DevicePresentMessage, async (channel, message, data) => {
-            await dbapi.setDevicePresent(message.serial)
+            await dbapi.setDevicePresent(message.serial, message.presenceChangedAt)
             appDealer.send([channel, data])
         })
         .on(DeviceAbsentMessage, async (channel, message, data) => {
-            await dbapi.setDeviceAbsent(message.serial)
+            await dbapi.setDeviceAbsent(message.serial, message.presenceChangedAt)
             appDealer.send([channel, data])
         })
         .on(DeviceStatusMessage, (channel, message, data) => {
