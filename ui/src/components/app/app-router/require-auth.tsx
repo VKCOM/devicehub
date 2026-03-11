@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
-import { socket } from '@/api/socket'
+import { connectWithBackoff } from '@/api/socket'
 
 import { authStore } from '@/store/auth-store'
 import { variablesConfig } from '@/config/variables.config'
@@ -30,7 +30,7 @@ export const RequireAuth = observer(() => {
 
   useEffect(() => {
     if (authStore.isHydrated && authStore.isAuthed) {
-      socket.connect()
+      connectWithBackoff()
     }
   }, [authStore.isHydrated, authStore.isAuthed])
 

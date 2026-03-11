@@ -3,50 +3,72 @@
 //
 // This wrapper is designed to make 0MQ v6 backwards compatible with v5
 
-import * as zmq from 'zeromq'
+import {
+    Publisher,
+    Subscriber,
+    Push,
+    Pull,
+    Dealer,
+    Router,
+    Pair,
+    Request,
+    Reply,
+    Context
+} from 'zeromq'
 import logger from './logger.js'
 import {EventEmitter} from 'events'
 const log = logger.createLogger('util:zmqutil')
 
 const socketTypeMap = {
-    pub: zmq.Publisher,
-    sub: zmq.Subscriber,
-    push: zmq.Push,
-    pull: zmq.Pull,
-    dealer: zmq.Dealer,
-    router: zmq.Router,
-    pair: zmq.Pair,
-    req: zmq.Request,
-    reply: zmq.Reply
-}
+    pub: Publisher,
+    sub: Subscriber,
+    push: Push,
+    pull: Pull,
+    dealer: Dealer,
+    router: Router,
+    pair: Pair,
+    req: Request,
+    reply: Reply
+} as const
 
-// Shared ZMQ context to avoid creating multiple contexts with thread pools
-// Each context creates ioThreads (4 by default), so sharing saves resources
-/** @type {zmq.Context | null} */
-let sharedContext = null
-const getSharedContext = () => {
-    if (!sharedContext) {
-        sharedContext = new zmq.Context({
-            blocky: true,
-            ioThreads: 4,
-            ipv6: true,
-            maxSockets: 8192,
-        })
-    }
-    return sharedContext
-}
+const sendHwmByType = {
+    pub: 5000,
+    push: 1000,
+    dealer: 5000,
+    router: 5000,
+    req: 1000,
+    pair: 1000
+} as const satisfies Partial<Record<SocketType, number>>
+
+type SocketType = keyof typeof socketTypeMap
 
 export class SocketWrapper extends EventEmitter {
-    #sendQueue = Promise.resolve()
+    static sharedContext: Context
 
-    /** @type {AsyncIterator<any, any, undefined> | null} */
-    #iterator = null
+    // Shared ZMQ context to avoid creating multiple contexts with thread pools
+    // Each context creates ioThreads (4 by default), so sharing saves resources
+    static getSharedContext = () => {
+        if (!SocketWrapper.sharedContext) {
+            SocketWrapper.sharedContext = new Context({
+                blocky: true,
+                ioThreads: 4,
+                ipv6: true,
+                maxSockets: 8192,
+            })
+        }
 
-    /**
-     * @param {string} type
-     * @param {number} keepAliveInterval
-     */
-    constructor(type, keepAliveInterval = 30) {
+        return SocketWrapper.sharedContext
+    }
+
+    private sendQueue = Promise.resolve()
+    private iterator: AsyncIterator<any, any, undefined> | null = null
+
+    public type: string
+    public isActive = true
+    public endpoints = new Set()
+    public socket: InstanceType<typeof socketTypeMap[SocketType]>
+
+    constructor(type: SocketType, keepAliveInterval = 30) {
         super()
 
         if (!(type in socketTypeMap)) {
@@ -54,22 +76,26 @@ export class SocketWrapper extends EventEmitter {
         }
 
         this.type = type
-        this.isActive = true
-        this.endpoints = new Set()
 
-        // @ts-ignore
         const SocketClass = socketTypeMap[type]
         this.socket = new SocketClass({
+            linger: 2000,
             tcpKeepalive: 1,
             tcpKeepaliveIdle: keepAliveInterval,
             tcpKeepaliveInterval: keepAliveInterval,
-            tcpKeepaliveCount: 100
-        }, getSharedContext())
+            tcpKeepaliveCount: 100,
+            context: SocketWrapper.getSharedContext(),
+            ...(
+                type in sendHwmByType && {
+                    sendHighWaterMark: sendHwmByType[type as keyof typeof sendHwmByType]
+                }
+            )
+        })
     }
 
-    bindSync = (address) => this.socket.bindSync(address)
+    bindSync = (address: string) => this.socket.bindSync(address)
 
-    connect(endpoint) {
+    connect(endpoint: string) {
         this.socket.connect(endpoint)
         this.endpoints.add(endpoint)
         log.verbose(`Socket connected to: ${endpoint}`)
@@ -77,9 +103,9 @@ export class SocketWrapper extends EventEmitter {
         return this
     }
 
-    subscribe(topic) {
+    subscribe(topic: string | Buffer) {
         if (this.type === 'sub') {
-            this.socket.subscribe(
+            (this.socket as Subscriber).subscribe(
                 typeof topic === 'string' ? Buffer.from(topic) : topic
             )
         }
@@ -87,33 +113,30 @@ export class SocketWrapper extends EventEmitter {
         return this
     }
 
-    unsubscribe(topic) {
+    unsubscribe(topic: string | Buffer) {
         if (this.type === 'sub') {
-            this.socket.unsubscribe(
+            (this.socket as Subscriber).unsubscribe(
                 typeof topic === 'string' ? Buffer.from(topic) : topic
             )
         }
         return this
     }
 
-    async sendAsync(args) {
+    async sendAsync(args: any | Array<any>) {
         try {
-            await this.socket.send(
+            await (this.socket as Publisher).send(
                 (Array.isArray(args) ? args : [args])
                     .map(arg => Buffer.isBuffer(arg) || ArrayBuffer.isView(arg) ? arg : Buffer.from(String(arg)))
             )
         }
-        catch (/** @type {any} */ err) {
+        catch (err: any) {
             log.error('Error on send: %s', err?.message || err?.toString() || JSON.stringify(err))
             throw err // Re-throw to properly handle in the promise chain
         }
     }
 
-    /**
-     * @param {any} args
-     */
-    send(args) {
-        this.#sendQueue = this.#sendQueue.then(() => this.sendAsync(args))
+    send(args: any | Array<any>) {
+        this.sendQueue = this.sendQueue.then(() => this.sendAsync(args))
         return this
     }
 
@@ -121,19 +144,19 @@ export class SocketWrapper extends EventEmitter {
         this.isActive = false
 
         // Close async iterator if it exists
-        if (this.#iterator && typeof this.#iterator.return === 'function') {
+        if (this.iterator && typeof this.iterator.return === 'function') {
             try {
-                await this.#iterator.return()
+                await this.iterator.return()
             }
             catch {
                 // Ignore errors during cleanup
             }
-            this.#iterator = null
+            this.iterator = null
         }
 
         // Wait for send queue to drain before closing socket
         try {
-            await this.#sendQueue.catch(() => {})
+            await this.sendQueue.catch(() => {})
         }
         catch {
             // Ignore errors during cleanup
@@ -145,27 +168,24 @@ export class SocketWrapper extends EventEmitter {
         return this
     }
 
-    /**
-     *
-     * @returns {Promise<void>}
-     */
-    async startReceiveLoop() {
-        const isValidType =
-            this.type === 'sub' ||
-            this.type === 'pull' ||
-            this.type === 'dealer' ||
-            this.type === 'router' ||
-            this.type === 'reply'
+    async startReceiveLoop(): Promise<void> {
+        const isValidType = [
+            'sub',
+            'pull',
+            'dealer',
+            'router',
+            'reply'
+        ].includes(this.type)
 
         if (!this.isActive || !isValidType) {
             return
         }
 
         try {
-            this.#iterator = this.socket[Symbol.asyncIterator]()
+            this.iterator = (this.socket as Subscriber)[Symbol.asyncIterator]() as typeof this.iterator
             let result
 
-            while (this.isActive && this.#iterator && !(result = await this.#iterator.next()).done) {
+            while (this.isActive && this.iterator && !(result = await this.iterator.next()).done) {
                 const message = result.value
 
                 if (Array.isArray(message) && !!message[0]?.toString) {
@@ -177,14 +197,14 @@ export class SocketWrapper extends EventEmitter {
                 }
             }
         }
-        catch (/** @type {any} */ err) {
+        catch (err: any) {
             log.error('Error in message receive loop: %s, %s', err?.message || err?.toString() || err, err.stack)
             return this.startReceiveLoop()
         }
     }
 }
 
-export const socket = (type) => {
+export const socket = (type: SocketType) => {
     if (!(type in socketTypeMap)) {
         throw new Error(`Unsupported socket type: ${type}`)
     }

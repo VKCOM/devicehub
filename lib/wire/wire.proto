@@ -299,10 +299,12 @@ message DeviceRegisteredMessage {
 
 message DevicePresentMessage {
   required string serial = 1;
+  optional double presenceChangedAt = 2;
 }
 
 message DeviceAbsentMessage {
   required string serial = 1;
+  optional double presenceChangedAt = 2;
 }
 
 message DeviceReadyMessage {
