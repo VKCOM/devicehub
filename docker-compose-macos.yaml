@@ -233,7 +233,7 @@ services:
         container_name: devicehub-api-groups-engine
         env_file:
             - scripts/variables.env
-        command: stf groups-engine --connect-push tcp://devicehub-triproxy-app:7170 --connect-push-dev tcp://devicehub-triproxy-dev:7270
+        command: stf groups-engine --connect-push tcp://devicehub-triproxy-app:7170 --connect-push-dev tcp://devicehub-triproxy-dev:7270 --connect-sub tcp://devicehub-triproxy-app:7150
         depends_on:
             devicehub-migrate:
                 condition: service_completed_successfully
