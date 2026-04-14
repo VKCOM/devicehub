@@ -80,17 +80,38 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
         return serial
     }
 
+    private isValidIosUsbSerial(rawSerial: string): boolean {
+        // Raw iOS UDID often comes as 24 hex chars from usb-hotplug.
+        const raw24 = /^[0-9A-Fa-f]{24}$/
+        // Some tools expose 40-char lower/upper hex.
+        const raw40 = /^[0-9A-Fa-f]{40}$/
+        // After formatting 24-char UDID becomes XXXXXXXX-XXXXXXXXXXXXXXXX.
+        const formatted8x16 = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{16}$/
+        // Simulator UUID format (kept for completeness in case usb source changes).
+        const simUuid = /^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$/
+
+        const formatted = this.formatUDID(rawSerial)
+        return raw24.test(rawSerial) ||
+            raw40.test(rawSerial) ||
+            formatted8x16.test(formatted) ||
+            simUuid.test(formatted)
+    }
+
     listen = (): void => {
         new Promise(async() => {
             if (!this.usbListenerStarted) {
                 const currentDevices = usb.listDevices()
                 for (const device of currentDevices) {
                     if (!device.serialNumber || device.vendorId !== 1452) continue
+                    if (!this.isValidIosUsbSerial(device.serialNumber)) continue
                     this.emit('attached', this.formatUDID(device.serialNumber), false)
                 }
 
                 usb.watchDevices((err, event) => {
                     if (!event.serialNumber) {
+                        return
+                    }
+                    if (!this.isValidIosUsbSerial(event.serialNumber)) {
                         return
                     }
 
@@ -117,4 +138,3 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
         clearTimeout(this.listnerInterval)
     }
 }
-
