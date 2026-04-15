@@ -90,8 +90,12 @@ const wireutil = {
                     body: body ? JSON.stringify(body) : undefined
                 })
             },
-            progress(data: string, progress: number) {
-                if (!Number.isInteger(progress)) {
+            progress(data: string, progress = 0) {
+                if (!Number.isFinite(progress)) {
+                    log.warn('Somebody is sending non finite progress: %s', data)
+                    progress = 0
+                }
+                else if (!Number.isInteger(progress)) {
                     log.warn('Somebody is sending non integer as progress: %s', data)
                     progress = Math.round(progress)
                 }
