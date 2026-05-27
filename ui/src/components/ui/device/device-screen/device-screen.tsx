@@ -1,5 +1,6 @@
 import { useInjection } from 'inversify-react'
-import { useEffect, useRef, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useRef } from 'react'
 import { Spinner } from '@vkontakte/vkui'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
@@ -17,27 +18,25 @@ enum DeviceType {
   TIZEN,
 }
 
-export const DeviceScreen = () => {
+const resolveDeviceType = (
+  manufacturer: string | undefined,
+  platform: string | undefined
+): DeviceType => {
+  if (!manufacturer && !platform) return DeviceType.FETCHING
+
+  if (manufacturer === 'Apple') return DeviceType.APPLE
+
+  if (platform === 'Tizen') return DeviceType.TIZEN
+
+  return DeviceType.ANDROID
+}
+
+export const DeviceScreen = observer(() => {
   const canvasWrapperRef = useRef<HTMLDivElement>(null)
-  const deviceScreenStore = useInjection(CONTAINER_IDS.deviceScreenStore)
-  const [deviceType, setDeviceType] = useState<DeviceType>(DeviceType.FETCHING)
+  const deviceBySerialStore = useInjection(CONTAINER_IDS.deviceBySerialStore)
 
-  useEffect(() => {
-    deviceScreenStore.init().then(() => {
-      const device = deviceScreenStore.getDevice
-
-      return (
-        device &&
-        setDeviceType(
-          device.manufacturer === 'Apple'
-            ? DeviceType.APPLE
-            : device.platform === 'Tizen'
-              ? DeviceType.TIZEN
-              : DeviceType.ANDROID
-        )
-      )
-    })
-  }, [])
+  const { data: device } = deviceBySerialStore.deviceQueryResult()
+  const deviceType = resolveDeviceType(device?.manufacturer, device?.platform)
 
   return (
     <div ref={canvasWrapperRef} className={styles.deviceScreen} role='none'>
@@ -54,4 +53,4 @@ export const DeviceScreen = () => {
       </ConditionalRender>
     </div>
   )
-}
+})

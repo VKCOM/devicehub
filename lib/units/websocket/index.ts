@@ -117,7 +117,8 @@ import {
     StoreOpenMessage,
     ScreenCaptureMessage,
     FileSystemGetMessage,
-    FileSystemListMessage
+    FileSystemListMessage,
+    SizeIosDevice
 } from '../../wire/wire.js'
 import AllModel from '../../db/models/all/index.js'
 import UserModel from '../../db/models/user/index.js'
@@ -427,6 +428,26 @@ export default (async (options: Options) => {
                 io.emit('device.change', {
                     important: true,
                     data: message
+                })
+            })
+            .on(SizeIosDevice, (_channel: string, message: {
+                id: string
+                width: number
+                height: number
+                scale: number
+                url: string
+            }) => {
+                io.emit('device.change', {
+                    important: true,
+                    data: {
+                        serial: message.id,
+                        display: {
+                            width: message.width,
+                            height: message.height,
+                            scale: message.scale,
+                            url: message.url
+                        }
+                    }
                 })
             })
             .on(TransactionProgressMessage, (channel: string, message: any) => {
