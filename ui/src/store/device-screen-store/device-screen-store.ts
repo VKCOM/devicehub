@@ -1,5 +1,5 @@
 import { t } from 'i18next'
-import { makeAutoObservable, runInAction } from 'mobx'
+import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { inject, injectable } from 'inversify'
 import { backOff } from 'exponential-backoff'
 
@@ -10,7 +10,13 @@ import { deviceConnectionRequired } from '@/config/inversify/decorators'
 import { authStore } from '@/store/auth-store'
 
 import type { ElementBoundSize, StartScreenStreamingMessage } from './types'
-import type { Device } from '@/generated/types'
+
+class AuthError extends Error {
+  constructor() {
+    super('Unauthorized')
+    this.name = 'AuthError'
+  }
+}
 
 @injectable()
 @deviceConnectionRequired()
@@ -21,19 +27,31 @@ export class DeviceScreenStore {
 
   private context: ImageBitmapRenderingContext | null = null
   private canvasWrapper: HTMLDivElement | null = null
-  private device: Device | null = null
   private showScreen = true
   private options = {
     autoScaleForRetina: true,
     density: Math.max(1, Math.min(1.5, devicePixelRatio || 1)),
     minScale: 0.36,
   }
-  private adjustedBoundSize = {
+  private adjustedBoundSize: ElementBoundSize = {
     width: 0,
     height: 0,
   }
   private screenRotation = 0
   private isScreenStreamingJustStarted = false
+
+  /**
+   * Native (device-side framebuffer) dimensions. Seeded from the screen-streaming
+   * WebSocket's `start { realWidth, realHeight }` banner, and as a defence-in-depth
+   * fallback from the first decoded image frame. Independent of `device.display.*`,
+   * which can be transiently undefined right after device introduction.
+   */
+  private nativeWidth = 0
+  private nativeHeight = 0
+  private hasNativeSize = false
+
+  /** MobX autorun disposer, used to re-trigger connect when display.url becomes available. */
+  private urlReactionDisposer: (() => void) | null = null
 
   isAspectRatioModeLetterbox = false
   isScreenLoading = false
@@ -46,10 +64,6 @@ export class DeviceScreenStore {
     makeAutoObservable(this)
   }
 
-  get getDevice(): Device | null {
-    return this.device
-  }
-
   get getCanvasWrapper(): HTMLDivElement | null {
     return this.canvasWrapper
   }
@@ -60,10 +74,6 @@ export class DeviceScreenStore {
 
   setIsScreenLoading(value: boolean): void {
     this.isScreenLoading = value
-  }
-
-  async init(): Promise<void> {
-    this.device = await this.deviceBySerialStore.fetch()
   }
 
   async startScreenStreaming(canvas: HTMLCanvasElement, canvasWrapper: HTMLDivElement): Promise<void> {
@@ -80,12 +90,31 @@ export class DeviceScreenStore {
     this.context = canvas.getContext('bitmaprenderer')
     this.canvasWrapper = canvasWrapper
 
-    this.connectWithBackoff()
+    // Watch for display.url becoming available; trigger (re)connection when it appears
+    // while we're not already connected. This decouples the streaming WS lifecycle
+    // from a possibly-stale initial fetch.
+    this.urlReactionDisposer?.()
+    this.urlReactionDisposer = autorun(() => {
+      const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
+
+      if (!url) return
+
+      if (this.disposed) return
+
+      if (this.websocket && this.websocket.readyState === WebSocket.OPEN) return
+
+      if (this.backoffPromise) return
+
+      this.connectWithBackoff()
+    })
   }
 
   stopScreenStreaming(): void {
     this.disposed = true
     this.backoffPromise = null
+
+    this.urlReactionDisposer?.()
+    this.urlReactionDisposer = null
 
     if (this.websocket) {
       this.websocket.onclose = null
@@ -150,25 +179,35 @@ export class DeviceScreenStore {
     }
   }
 
+  /**
+   * Compute the bound size the minicap projection should be re-encoded to.
+   *
+   * If the native (framebuffer) dimensions are not yet known (banner / first frame
+   * haven't arrived), we send the raw wrapper size multiplied by density. minicap
+   * accepts arbitrary projections, and as soon as `nativeWidth`/`nativeHeight` are
+   * known the next call clamps to `minScale` of the native size.
+   *
+   * This function intentionally never throws so that the WS auth_success path
+   * and ResizeObserver callbacks remain side-effect-safe even when `device.display`
+   * is transiently undefined right after device introduction.
+   */
   private adjustBoundedSize(width: number, height: number): ElementBoundSize {
-    if (!this.device?.display?.width || !this.device?.display?.height) {
-      throw new Error('No display width or height')
-    }
-
-    const scaledWidth = this.device.display.width * this.options.minScale
-    const scaledHeight = this.device.display.height * this.options.minScale
-
     let sw = width * this.options.density
     let sh = height * this.options.density
 
-    if (sw < scaledWidth) {
-      sw *= scaledWidth / sw
-      sh *= scaledWidth / sh
-    }
+    if (this.hasNativeSize && this.nativeWidth > 0 && this.nativeHeight > 0) {
+      const scaledWidth = this.nativeWidth * this.options.minScale
+      const scaledHeight = this.nativeHeight * this.options.minScale
 
-    if (sh < scaledHeight) {
-      sw *= scaledHeight / sw
-      sh *= scaledHeight / sh
+      if (sw < scaledWidth) {
+        sw *= scaledWidth / sw
+        sh *= scaledWidth / sh
+      }
+
+      if (sh < scaledHeight) {
+        sw *= scaledHeight / sw
+        sh *= scaledHeight / sh
+      }
     }
 
     return {
@@ -193,6 +232,20 @@ export class DeviceScreenStore {
 
   private isRotated(): boolean {
     return this.screenRotation === 90 || this.screenRotation === 270
+  }
+
+  private setNativeSize(width: number, height: number): void {
+    if (!width || !height) return
+
+    if (this.isRotated()) {
+      this.nativeWidth = height
+      this.nativeHeight = width
+    } else {
+      this.nativeWidth = width
+      this.nativeHeight = height
+    }
+
+    this.hasNativeSize = true
   }
 
   private updateImageArea(imageWidth: number, imageHeight: number): void {
@@ -220,12 +273,25 @@ export class DeviceScreenStore {
       this.isScreenRotated = false
     }
 
+    if (!this.hasNativeSize) {
+      this.setNativeSize(imageWidth, imageHeight)
+
+      // Re-send a size message now that we know the native dimensions.
+      try {
+        this.updateBounds()
+      } catch {
+        /* canvasWrapper not yet set, harmless */
+      }
+    }
+
     this.determineAspectRatioMode()
   }
 
   private connectWebsocket(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!this.device?.display?.url) {
+      const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
+
+      if (!url) {
         reject(new Error('No display url'))
 
         return
@@ -237,23 +303,24 @@ export class DeviceScreenStore {
         return
       }
 
-      const ws = new WebSocket(this.device.display.url, `access_token.${authStore.jwt}`)
+      const ws = new WebSocket(url, `access_token.${authStore.jwt}`)
 
       ws.binaryType = 'blob'
 
-      ws.onopen = () => {
+      ws.onopen = (): void => {
         this.websocket = ws
         ws.onmessage = this.messageListener.bind(this)
-        ws.onerror = () => {}
+        ws.onerror = (): void => {}
+
         ws.onclose = this.handleUnexpectedClose.bind(this)
 
         this.isScreenStreamingJustStarted = true
         resolve()
       }
 
-      ws.onerror = () => {}
+      ws.onerror = (): void => {}
 
-      ws.onclose = (event: CloseEvent) => {
+      ws.onclose = (event: CloseEvent): void => {
         if (event.code === 1008) {
           reject(new AuthError())
 
@@ -275,6 +342,7 @@ export class DeviceScreenStore {
       jitter: 'full',
       retry: (err) => {
         if (this.disposed) return false
+
         if (err instanceof AuthError) return false
 
         return true
@@ -348,8 +416,16 @@ export class DeviceScreenStore {
           console.info('WebSocket authentication successful')
 
           if (this.shouldUpdateScreen()) {
-            this.updateBounds()
+            // IMPORTANT: signal interest first so the server emits the `start` banner.
+            // The banner contains real device-side dimensions, after which a
+            // subsequent updateBounds() will apply the correct minScale floor.
             this.onScreenInterestGained()
+
+            try {
+              this.updateBounds()
+            } catch (err) {
+              console.warn('updateBounds skipped:', err)
+            }
 
             return
           }
@@ -371,19 +447,34 @@ export class DeviceScreenStore {
 
     const startRegex = /^start /
 
-    if (startRegex.test(message.data)) {
-      const startData: StartScreenStreamingMessage = JSON.parse(message.data.replace(startRegex, ''))
+    if (startRegex.test(message.data as string)) {
+      const payload = (message.data as string).replace(startRegex, '')
+      let startData: StartScreenStreamingMessage | null = null
+
+      try {
+        startData = JSON.parse(payload) as StartScreenStreamingMessage | null
+      } catch {
+        startData = null
+      }
 
       this.isScreenStreamingJustStarted = true
 
-      this.screenRotation = startData.orientation
-    }
-  }
-}
+      if (startData) {
+        this.screenRotation = startData.orientation ?? this.screenRotation
 
-class AuthError extends Error {
-  constructor() {
-    super('Unauthorized')
-    this.name = 'AuthError'
+        const sourceWidth = startData.realWidth || startData.virtualWidth || 0
+        const sourceHeight = startData.realHeight || startData.virtualHeight || 0
+
+        if (sourceWidth && sourceHeight) {
+          this.setNativeSize(sourceWidth, sourceHeight)
+
+          try {
+            this.updateBounds()
+          } catch {
+            /* empty */
+          }
+        }
+      }
+    }
   }
 }

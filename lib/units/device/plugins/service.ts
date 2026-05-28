@@ -236,7 +236,7 @@ export default syrup.serial()
 
             copy = () => this.getClipboard()
 
-            getDisplay = (id: string) =>
+            getDisplay = (id: number) =>
                 runServiceCommand(apk.wire.MessageType.GET_DISPLAY, new apk.wire.GetDisplayRequest(id))
                     .then((data) => {
                         const response = apk.wire.GetDisplayResponse.decode(data)
