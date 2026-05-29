@@ -80,21 +80,16 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
         return serial
     }
 
-    private isValidIosUsbSerial(rawSerial: string): boolean {
-        // Raw iOS UDID often comes as 24 hex chars from usb-hotplug.
-        const raw24 = /^[0-9A-Fa-f]{24}$/
-        // Some tools expose 40-char lower/upper hex.
-        const raw40 = /^[0-9A-Fa-f]{40}$/
-        // After formatting 24-char UDID becomes XXXXXXXX-XXXXXXXXXXXXXXXX.
-        const formatted8x16 = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{16}$/
-        // Simulator UUID format (kept for completeness in case usb source changes).
-        const simUuid = /^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$/
+    private isIosUsbDevice(vendorId?: number, deviceClass?: number): boolean {
+        const APPLE_VENDOR_ID = 1452
+        const HID_DEVICE_CLASS = 0x03
 
-        const formatted = this.formatUDID(rawSerial)
-        return raw24.test(rawSerial) ||
-            raw40.test(rawSerial) ||
-            formatted8x16.test(formatted) ||
-            simUuid.test(formatted)
+        if (vendorId !== APPLE_VENDOR_ID) {
+            return false
+        }
+
+        // Apple devices may report class 0 (defined by interfaces), so we only exclude explicit HID.
+        return deviceClass !== HID_DEVICE_CLASS
     }
 
     listen = (): void => {
@@ -102,8 +97,8 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
             if (!this.usbListenerStarted) {
                 const currentDevices = usb.listDevices()
                 for (const device of currentDevices) {
-                    if (!device.serialNumber || device.vendorId !== 1452) continue
-                    if (!this.isValidIosUsbSerial(device.serialNumber)) continue
+                    if (!device.serialNumber) continue
+                    if (!this.isIosUsbDevice(device.vendorId, device.deviceClass)) continue
                     this.emit('attached', this.formatUDID(device.serialNumber), false)
                 }
 
@@ -111,11 +106,11 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
                     if (!event.serialNumber) {
                         return
                     }
-                    if (!this.isValidIosUsbSerial(event.serialNumber)) {
+                    if (!this.isIosUsbDevice(event.device?.vendorId, event.device?.deviceClass)) {
                         return
                     }
 
-                    if (event.eventType === 'Connected' && event.device?.vendorId === 1452) {
+                    if (event.eventType === 'Connected') {
                         this.emit('attached', this.formatUDID(event.serialNumber), false)
                     } else {
                         this.emit('detached', this.formatUDID(event.serialNumber), false)
