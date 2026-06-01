@@ -80,25 +80,12 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
         return serial
     }
 
-    private isIosUsbDevice(vendorId?: number, deviceClass?: number): boolean {
-        const APPLE_VENDOR_ID = 1452
-        const HID_DEVICE_CLASS = 0x03
-
-        if (vendorId !== APPLE_VENDOR_ID) {
-            return false
-        }
-
-        // Apple devices may report class 0 (defined by interfaces), so we only exclude explicit HID.
-        return deviceClass !== HID_DEVICE_CLASS
-    }
-
     listen = (): void => {
         new Promise(async() => {
             if (!this.usbListenerStarted) {
                 const currentDevices = usb.listDevices()
                 for (const device of currentDevices) {
-                    if (!device.serialNumber) continue
-                    if (!this.isIosUsbDevice(device.vendorId, device.deviceClass)) continue
+                    if (!device.serialNumber || device.interfaces.length) continue
                     this.emit('attached', this.formatUDID(device.serialNumber), false)
                 }
 
@@ -106,14 +93,17 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
                     if (!event.serialNumber) {
                         return
                     }
-                    if (!this.isIosUsbDevice(event.device?.vendorId, event.device?.deviceClass)) {
+
+                    if (event.eventType === 'Disconnected') {
+                        this.emit('detached', this.formatUDID(event.serialNumber), false)
                         return
                     }
 
-                    if (event.eventType === 'Connected') {
+                    if (event.device
+                        && !event.device.interfaces.length
+                        && event.device.vendorId === 1452
+                    ) {
                         this.emit('attached', this.formatUDID(event.serialNumber), false)
-                    } else {
-                        this.emit('detached', this.formatUDID(event.serialNumber), false)
                     }
                 })
 
