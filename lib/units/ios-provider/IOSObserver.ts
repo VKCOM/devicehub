@@ -10,6 +10,7 @@ interface IOSSimEvents {
 }
 
 export default class IOSObserver extends EventEmitter<IOSSimEvents> {
+    private readonly APPLE_VENDOR_ID = 1452
 
     private sims = new Set<string>()
     private usbListenerStarted = false
@@ -85,7 +86,12 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
             if (!this.usbListenerStarted) {
                 const currentDevices = usb.listDevices()
                 for (const device of currentDevices) {
-                    if (!device.serialNumber || device.vendorId !== 1452) continue
+                    if (!device.serialNumber
+                        || device.interfaces.length
+                        || device.vendorId !== this.APPLE_VENDOR_ID
+                    ) {
+                        continue
+                    }
                     this.emit('attached', this.formatUDID(device.serialNumber), false)
                 }
 
@@ -94,10 +100,16 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
                         return
                     }
 
-                    if (event.eventType === 'Connected' && event.device?.vendorId === 1452) {
-                        this.emit('attached', this.formatUDID(event.serialNumber), false)
-                    } else {
+                    if (event.eventType === 'Disconnected') {
                         this.emit('detached', this.formatUDID(event.serialNumber), false)
+                        return
+                    }
+
+                    if (event.device
+                        && !event.device.interfaces.length
+                        && event.device.vendorId === this.APPLE_VENDOR_ID
+                    ) {
+                        this.emit('attached', this.formatUDID(event.serialNumber), false)
                     }
                 })
 
@@ -117,4 +129,3 @@ export default class IOSObserver extends EventEmitter<IOSSimEvents> {
         clearTimeout(this.listnerInterval)
     }
 }
-
