@@ -25,6 +25,8 @@ tags:
   description: Privileged Operations
 - name: autotests
   description: Autotests Operations
+- name: metrics
+  description: Metrics Operations
 paths:
   /groups:
     get:
@@ -3426,6 +3428,35 @@ paths:
                 $ref: '#/components/schemas/UnexpectedErrorResponse'
       x-codegen-request-body-name: serial
     x-swagger-router-controller: autotests
+  /metrics:
+    get:
+      tags:
+        - metrics
+        - admin
+      summary: Gets the platform metrics
+      description: Returns the device, user and group counters of the whole platform using the
+        Prometheus text exposition format; this is a privileged operation reserved to the
+        administrator user because the returned counters cover all the objects of the platform,
+        whatever the group they belong to
+      operationId: getMetrics
+      responses:
+        "200":
+          description: Platform metrics using the Prometheus text exposition format
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: |
+            Unexpected Error:
+              * 401: Unauthorized => bad credentials
+              * 403: Forbidden => privileged operation (admin)
+              * 500: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
+    x-swagger-router-controller: metrics
   /stats:
     post:
       tags:

@@ -217,6 +217,11 @@ If you want use scrcpy instead minicap run app with next command(Scrcpy function
 stf local --need-scrcpy true
 ```
 
+## Monitoring
+
+DeviceHub exposes the platform counters in the Prometheus format. Refer to
+[METRICS.md](doc/METRICS.md) for the exposed metrics and the scrape setup.
+
 ## Testing
 
 Refer to [TESTING.md](doc/TESTING.md) for testing instructions.
