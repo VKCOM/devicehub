@@ -30,7 +30,6 @@ import type { SaveLogsService } from '@/services/save-logs-service/save-logs-ser
 import type { GroupItemService } from '@/services/group-item-service/group-item-service'
 import type { DeviceScreenStore } from '@/store/device-screen-store/device-screen-store'
 import type { LogsTrackerService } from '@/services/logs-tracker-service/logs-tracker-service'
-import type { PortForwardingService } from '@/services/port-forwarding-service/port-forwarding-service'
 import type { ApplicationInstallationService } from '@/services/application-installation/application-installation-service'
 import type { TeamSettingsService } from '@/services/team-settings-service'
 import type { TeamItemService } from '@/services/team-item-service'
@@ -68,7 +67,6 @@ export const CONTAINER_IDS = {
   shellSettingsService: Symbol.for('ShellSettingsService') as interfaces.ServiceIdentifier<ShellSettingsService>,
   groupSettingsService: Symbol.for('GroupSettingsService') as interfaces.ServiceIdentifier<GroupSettingsService>,
   teamSettingsService: Symbol.for('TeamSettingsService') as interfaces.ServiceIdentifier<TeamSettingsService>,
-  portForwardingService: Symbol.for('PortForwardingService') as interfaces.ServiceIdentifier<PortForwardingService>,
   deviceSettingsService: Symbol.for('DeviceSettingsService') as interfaces.ServiceIdentifier<DeviceSettingsService>,
   deviceLifecycleService: Symbol.for('DeviceLifecycleService') as interfaces.ServiceIdentifier<DeviceLifecycleService>,
   factoryTransactionService: Symbol.for(

@@ -1,4 +1,4 @@
-import push from '../../../base-device/support/push.js'
+import transport from '../../../base-device/support/transport.js'
 import router from '../../../base-device/support/router.js'
 import group from '../../../base-device/plugins/group.js'
 import cdp, {CDPClient} from '../cdp/index.js'
@@ -81,20 +81,20 @@ const inspectServer = (port: number, cdp: CDPClient, log: any) =>
         })
 
 export default syrup.serial()
-    .dependency(push)
+    .dependency(transport)
     .dependency(router)
     .dependency(cdp)
     .dependency(group)
     .dependency(urlformat)
-    .define((options, push, router, cdp, group, urlformat) => {
+    .define((options, transport, router, cdp, group, urlformat) => {
         const log = logger.createLogger('tizen-device:plugins:webinspector')
         const reply = wireutil.reply(options.serial)
         let frameId: string | null = null
 
         const success = (channel: string, body: any) =>
-            push.send([channel, reply.okay('success', body)])
+            transport.send([channel, reply.okay('success', body)])
         const fail = (channel: string, err: any) =>
-            push.send([channel, reply.fail('fail', err?.message || err)])
+            transport.send([channel, reply.fail('fail', err?.message || err)])
 
         const getAssetsList = async() => {
             const result = await cdp.getAssetsList()

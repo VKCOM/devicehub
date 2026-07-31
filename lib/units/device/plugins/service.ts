@@ -10,7 +10,7 @@ import * as ms from '../../../wire/messagestream.js'
 import lifecycle from '../../../util/lifecycle.js'
 import adb from '../support/adb.js'
 import router from '../../base-device/support/router.js'
-import push from '../../base-device/support/push.js'
+import transport from '../../base-device/support/transport.js'
 import sdk from '../support/sdk.js'
 import service from '../resources/service.js'
 import {Duplex} from 'node:stream'
@@ -78,11 +78,11 @@ class MessageResolver {
 export default syrup.serial()
     .dependency(adb)
     .dependency(router)
-    .dependency(push)
+    .dependency(transport)
     .dependency(sdk)
     .dependency(service)
     .dependency(devutil)
-    .define(async(options, adb, router, push, sdk, apk, devutil) => {
+    .define(async(options, adb, router, transport, sdk, apk, devutil) => {
         const log = logger.createLogger('device:plugins:service')
         const messageResolver = new MessageResolver()
         const agent: Service = {
@@ -158,7 +158,7 @@ export default syrup.serial()
             switch (envelope.type) {
             case apk.wire.MessageType.EVENT_AIRPLANE_MODE:
                 message = apk.wire.AirplaneModeEvent.decode(envelope.message) as any
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.envelope(new wire.AirplaneModeEvent(options.serial, message.enabled))
                 ])
@@ -166,7 +166,7 @@ export default syrup.serial()
                 break
             case apk.wire.MessageType.EVENT_BATTERY:
                 message = apk.wire.BatteryEvent.decode(envelope.message)
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.envelope(new wire.BatteryEvent(options.serial, message.status, message.health, message.source, message.level, message.scale, message.temp, message.voltage))
                 ])
@@ -178,7 +178,7 @@ export default syrup.serial()
                 break
             case apk.wire.MessageType.EVENT_CONNECTIVITY:
                 message = apk.wire.ConnectivityEvent.decode(envelope.message)
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.envelope(new wire.ConnectivityEvent(options.serial, message.connected, message.type, message.subtype, message.failover, message.roaming))
                 ])
@@ -186,7 +186,7 @@ export default syrup.serial()
                 break
             case apk.wire.MessageType.EVENT_PHONE_STATE:
                 message = apk.wire.PhoneStateEvent.decode(envelope.message)
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.envelope(new wire.PhoneStateEvent(options.serial, message.state, message.manual, message.operator))
                 ])
@@ -194,7 +194,7 @@ export default syrup.serial()
                 break
             case apk.wire.MessageType.EVENT_ROTATION:
                 message = apk.wire.RotationEvent.decode(envelope.message)
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.envelope(new wire.RotationEvent(options.serial, message.rotation))
                 ])
@@ -648,7 +648,7 @@ export default syrup.serial()
         router
             .on(PhysicalIdentifyMessage, (channel) => {
                 plugin.identity()
-                push.send([
+                transport.send([
                     channel,
                     wireutil.reply(options.serial).okay()
                 ])

@@ -11,7 +11,7 @@ export class DeviceDisconnection {
     makeAutoObservable(this)
   }
 
-  async stopUsingDevice(serial: string, channel: string): Promise<unknown> {
-    return this.groupService.kick(serial, channel)
+  async stopUsingDevice(serial: string): Promise<unknown> {
+    return this.groupService.kick(serial)
   }
 }

@@ -15,19 +15,16 @@ import type { ListDevice } from '@/types/list-device.type'
 
 type DeviceStatusCellProps = {
   serial: ListDevice['serial']
-  channel: ListDevice['channel']
   deviceState: DeviceState
 }
 
-export const DeviceStatusCell = memo(({ serial, channel, deviceState }: DeviceStatusCellProps) => {
+export const DeviceStatusCell = memo(({ serial, deviceState }: DeviceStatusCellProps) => {
   const { t } = useTranslation()
 
   const deviceDisconnection = useInjection(CONTAINER_IDS.deviceDisconnection)
 
   const onStopUsing = () => {
-    if (!channel) return
-
-    deviceDisconnection.stopUsingDevice(serial, channel)
+    deviceDisconnection.stopUsingDevice(serial)
   }
 
   return (

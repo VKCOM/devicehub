@@ -1,20 +1,17 @@
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
 import {
-    AutoGroupMessage,
-    DeviceStatusChange,
     GroupMessage,
     JoinGroupMessage,
-    LeaveGroupMessage, UngroupMessage
+    LeaveGroupMessage,
+    UngroupMessage
 } from '../../../wire/wire.js'
 import wireutil from '../../../wire/util.js'
 import * as grouputil from '../../../util/grouputil.js'
 import lifecycle from '../../../util/lifecycle.js'
-import * as apiutil from '../../../util/apiutil.js'
 import solo from './solo.js'
 import router from '../support/router.js'
-import push from '../support/push.js'
-import sub from '../support/sub.js'
+import transport from '../support/transport.js'
 import channels from '../support/channels.js'
 import EventEmitter from 'events'
 
@@ -36,10 +33,9 @@ interface GroupEvents {
 export default syrup.serial()
     .dependency(solo)
     .dependency(router)
-    .dependency(push)
-    .dependency(sub)
+    .dependency(transport)
     .dependency(channels)
-    .define(async(options, solo, router, push, sub, channels) => {
+    .define(async(options, solo, router, transport, channels) => {
         const log = logger.createLogger('base-device:plugins:group')
 
         const plugin = new class GroupManager extends EventEmitter<GroupEvents> {
@@ -60,31 +56,19 @@ export default syrup.serial()
                 return this.currentGroup
             }
 
-            join = async(newGroup: GroupState, timeout: number, usage: string, keys: string[]) => {
+            join = (newGroup: GroupState, timeout: number, usage: string, keys: string[]) => {
                 try {
                     if (!newGroup?.group) {
                         throw new Error(`New group is not valid: ${JSON.stringify(newGroup)}`)
                     }
 
                     if (!!this.currentGroup?.group) { // if device in group
-                        if (this.currentGroup.group !== newGroup.group) { // and is not same
-                            log.error(`Cannot join group ${JSON.stringify(newGroup)} since this device is in group ${JSON.stringify(this.currentGroup)}`)
-                            throw new grouputil.AlreadyGroupedError()
+                        if (this.currentGroup.group === newGroup.group) { // and is not same
+                            this.keepalive()
+                            return this.currentGroup
                         }
 
-                        log.info('Update timeout for %s', apiutil.QUARTER_MINUTES)
-                        channels.updateTimeout(this.currentGroup.group, apiutil.QUARTER_MINUTES)
-
-                        const newTimeout = channels.getTimeout(this.currentGroup.group)
-                        push.send([
-                            wireutil.global,
-                            wireutil.pack(DeviceStatusChange, {
-                                serial: options.serial,
-                                timeout: newTimeout || undefined
-                            })
-                        ])
-
-                        return this.currentGroup
+                        this.leave('takeover', false)
                     }
 
                     this.currentGroup = newGroup
@@ -99,10 +83,9 @@ export default syrup.serial()
                         alias: solo.channel
                     })
 
-                    sub.subscribe(this.currentGroup.group)
                     plugin.emit('join', this.currentGroup, keys)
 
-                    push.send([
+                    transport.send([
                         wireutil.global,
                         wireutil.pack(JoinGroupMessage, {
                             serial: options.serial,
@@ -120,29 +103,30 @@ export default syrup.serial()
                 }
             }
 
-            leave = async(reason: string) => {
+            leave = (reason: string, send = true) => {
                 if (!this.currentGroup) {
-                    throw new grouputil.NoGroupError()
+                    return null
                 }
 
                 log.important('No longer owned by "%s"', this.currentGroup.email)
-                log.info('Unsubscribing from group channel "%s"', this.currentGroup.group)
-
-                push.send([
-                    wireutil.global,
-                    wireutil.pack(LeaveGroupMessage, {
-                        serial: options.serial,
-                        owner: this.currentGroup,
-                        reason
-                    })
-                ])
 
                 channels.unregister(this.currentGroup.group)
-                sub.unsubscribe(this.currentGroup.group)
+
+                if (send) {
+                    transport.send([
+                        wireutil.global,
+                        wireutil.pack(LeaveGroupMessage, {
+                            serial: options.serial,
+                            owner: this.currentGroup,
+                            reason
+                        })
+                    ])
+                }
 
                 this.currentGroup = null
-                plugin.emit('leave', this.currentGroup)
-                return this.currentGroup
+                plugin.emit('leave', null)
+
+                return null
             }
 
             beforeActionCheck =
@@ -159,7 +143,7 @@ export default syrup.serial()
                     this.beforeActionCheck(message)
                         .catch((err: any) => {
                             log.error('Error before processing %s: %s', msgName, err?.message)
-                            push.send([
+                            transport.send([
                                 channel,
                                 reply.fail(err.message)
                             ])
@@ -176,8 +160,8 @@ export default syrup.serial()
                         return
                     }
 
-                    await plugin.join(message.owner!, message.timeout!, message.usage!, message.keys)
-                    push.send([
+                    plugin.join(message.owner!, message.timeout!, message.usage!, message.keys)
+                    transport.send([
                         channel,
                         reply.okay()
                     ])
@@ -185,22 +169,10 @@ export default syrup.serial()
                 catch (err: any) {
                     log.error('Failed processing GroupMessage: %s', err?.message)
                     if (err instanceof grouputil.AlreadyGroupedError) {
-                        push.send([
+                        transport.send([
                             channel,
                             reply.fail(err.message)
                         ])
-                    }
-                }
-            })
-            .on(AutoGroupMessage, async(channel, message) => {
-                try {
-                    await plugin.join(message.owner!, 0, message.identifier, [])
-                    plugin.emit('autojoin', message.identifier, true)
-                }
-                catch (err: any) {
-                    log.error('Failed processing AutoGroupMessage: %s', err?.message)
-                    if (err instanceof grouputil.AlreadyGroupedError) {
-                        plugin.emit('autojoin', message.identifier, false)
                     }
                 }
             })
@@ -211,8 +183,8 @@ export default syrup.serial()
                         return
                     }
 
-                    await plugin.leave('ungroup_request')
-                    push.send([
+                    plugin.leave('ungroup_request')
+                    transport.send([
                         channel,
                         reply.okay()
                     ])
@@ -220,7 +192,7 @@ export default syrup.serial()
                 catch (err: any) {
                     log.error('Failed processing UngroupMessage: %s', err?.message)
                     if (err instanceof grouputil.NoGroupError) {
-                        push.send([
+                        transport.send([
                             channel,
                             reply.fail(err.message)
                         ])
@@ -228,7 +200,16 @@ export default syrup.serial()
                 }
             })
 
-        // @ts-ignore
+        // Any inbound device message counts as activity: refresh the current
+        // group's lease so an actively-used device doesn't time out. Under
+        // ROUTER/DEALER the router no longer sees a per-channel subscription, so
+        // this activity-based keepalive lives here where the current group is
+        // known (the router's emitted "channel" is a correlationId, not a group
+        // channel). The lease is refreshed, not extended (see ChannelManager).
+        router.on('message', () => {
+            plugin.keepalive()
+        })
+
         channels.on('timeout', async(channel) => {
             const currentGroup = await plugin.get()
             if (currentGroup && channel === currentGroup.group) {
@@ -238,7 +219,7 @@ export default syrup.serial()
 
         lifecycle.observe(async() => {
             try {
-                await plugin.leave('device_absent')
+                plugin.leave('device_absent')
             }
             catch (err: any) {
                 log.error('Failed leave from group on process exit: %s', err?.message)

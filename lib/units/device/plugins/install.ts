@@ -7,7 +7,7 @@ import * as promiseutil from '../../../util/promiseutil.js'
 import {Utils} from '@u4/adbkit'
 import adb from '../support/adb.js'
 import router from '../../base-device/support/router.js'
-import push from '../../base-device/support/push.js'
+import transport from '../../base-device/support/transport.js'
 import storage from '../../base-device/support/storage.js'
 import {InstallMessage, InstallResultMessage, UninstallMessage} from '../../../wire/wire.js'
 
@@ -28,9 +28,9 @@ interface Manifest {
 export default syrup.serial()
     .dependency(adb)
     .dependency(router)
-    .dependency(push)
+    .dependency(transport)
     .dependency(storage)
-    .define((options: InstallOptions, adb: any, router: any, push: any, storage: any) => {
+    .define((options: InstallOptions, adb: any, router: any, transport: any, storage: any) => {
         const log = logger.createLogger('device:plugins:install')
         const reply = wireutil.reply(options.serial)
 
@@ -45,7 +45,7 @@ export default syrup.serial()
 
             const sendProgress = (data: string, progress: number): void => {
                 if (!isApi) {
-                    push.send([
+                    transport.send([
                         channel,
                         reply.progress(data, progress)
                     ])
@@ -109,11 +109,11 @@ export default syrup.serial()
                     const result = buffer.toString()
                     log.info('Installing result ' + result)
                     if (result.includes('Success')) {
-                        push.send([
+                        transport.send([
                             channel,
                             reply.okay('Installed successfully')
                         ])
-                        push.send([
+                        transport.send([
                             channel,
                             wireutil.pack(InstallResultMessage, {
                                 serial: options.serial,
@@ -134,12 +134,12 @@ export default syrup.serial()
                         else {
                             log.error('Tried to install package "%s", got "%s"', pkg, result)
 
-                            push.send([
+                            transport.send([
                                 channel,
                                 reply.fail(result)
                             ])
 
-                            push.send([
+                            transport.send([
                                 channel,
                                 wireutil.pack(InstallResultMessage, {
                                     serial: options.serial,
@@ -205,7 +205,7 @@ export default syrup.serial()
                 // Check for timeout-like errors
                 if (err?.name === 'TimeoutError' || err?.message?.includes('timeout')) {
                     log.error('Installation of package "%s" failed: %s', pkg, err.stack)
-                    push.send([
+                    transport.send([
                         channel,
                         reply.fail('INSTALL_ERROR_TIMEOUT')
                     ])
@@ -213,7 +213,7 @@ export default syrup.serial()
                 }
 
                 log.error('Installation of package "%s" failed: %s', pkg, err)
-                push.send([
+                transport.send([
                     channel,
                     reply.fail('INSTALL_ERROR_UNKNOWN')
                 ])
@@ -224,14 +224,14 @@ export default syrup.serial()
             log.info('Uninstalling "%s"', message.packageName)
             try {
                 await adb.getDevice(options.serial).uninstall(message.packageName)
-                push.send([
+                transport.send([
                     channel,
                     reply.okay('success')
                 ])
             }
             catch (err: any) {
                 log.error('Uninstallation failed: %s', err)
-                push.send([
+                transport.send([
                     channel,
                     reply.fail('fail')
                 ])

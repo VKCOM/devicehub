@@ -46,7 +46,7 @@ export class DeviceConnection {
                 : 'Error'
       })
 
-      await this.groupService.invite(this.serial, device.channel, device.group)
+      await this.groupService.invite(this.serial, device.group)
 
       this.settingsService.updateLastUsedDevice(this.serial)
     } catch (error) {

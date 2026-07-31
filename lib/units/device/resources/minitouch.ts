@@ -21,6 +21,7 @@ interface MinitouchResource {
 interface MinitouchResult {
     bin: string
     run: (cmd?: string) => Promise<NodeJS.ReadableStream>
+    stop: () => Promise<void>
 }
 
 export default syrup.serial()
@@ -87,7 +88,17 @@ export default syrup.serial()
                 if (!pid?.length) return;
 
                 log.info('Stopping minitouch process %s', pid)
-                return adb.getDevice(options.serial).execOut(['kill', '-9', pid])
+                await adb.getDevice(options.serial).execOut(['kill', '-9', pid])
+
+                // Wait until localabstract:minitouch is actually released.
+                // STFService's MinitouchAgent may hold the socket after the process
+                // is gone. ensureUnusedLocalSocket returns the socket name once free.
+                const deadline = Date.now() + 5000
+                while (Date.now() < deadline) {
+                    await new Promise(r => setTimeout(r, 100))
+                    const free = await devutil.ensureUnusedLocalSocket('localabstract:minitouch')
+                    if (free) break
+                }
             }
         }
 

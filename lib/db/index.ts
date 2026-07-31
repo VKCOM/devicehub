@@ -1,14 +1,11 @@
 import mongo from 'mongodb'
 import _setup from './setup.js'
 import srv from '../util/srv.js'
-import EventEmitter from 'events'
 import GroupChangeHandler from './handlers/group/index.js'
 import UserChangeHandler from './handlers/user/index.js'
-import * as zmqutil from '../util/zmqutil.js'
-import lifecycle from '../util/lifecycle.js'
 import logger from '../util/logger.js'
-import wireutil from '../wire/util.js'
-import {type SocketWrapper} from '../util/zmqutil.js'
+import type {AppTransport} from '../wire/app-transport.js'
+import type {TransactionManager} from '../wire/transmanager.js'
 
 const log = logger.createLogger('db')
 
@@ -23,9 +20,8 @@ const options = {
 
 const handlers: {
     init: (
-        push?: SocketWrapper,
-        pushdev?: SocketWrapper,
-        channelRouter?: EventEmitter
+        transport: AppTransport,
+        txmanager?: TransactionManager
     ) => Promise<void> | void;
     isPrepared: boolean;
 }[] = [GroupChangeHandler, UserChangeHandler]
@@ -35,36 +31,40 @@ export default class DbClient {
 
     static async connect(): Promise<mongo.Db>;
     static async connect(opts: {
-        push?: SocketWrapper;
-        pushdev?: SocketWrapper;
-        channelRouter?: EventEmitter;
+        transport?: AppTransport;
+        txmanager?: TransactionManager;
         groupsScheduler?: boolean;
     }): Promise<mongo.Db>;
 
     /**
-     * Create a connection and initialize the change handlers for entities. \
-     * Called once. \
-     * \
-     * Note: No longer needed to get collection. \
-     * Use `DbClient.collection('name')` \
+     * Create a connection and initialize the change handlers for entities.
+     * Called once.
+     *
+     * The change handlers publish broadcast-to-app events
+     * (GroupChange UserChange) over the app-side ROUTER/DEALER transport, and the group
+     * handler runs device transactions (Ungroup) via the TransactionManager. A
+     * unit that owns those handlers passes its `transport` (and `txmanager`);
+     * units that only read the DB call `connect()` with no transport, leaving the
+     * handlers as no-ops.
+     *
+     * Note: No longer needed to get collection.
+     * Use `DbClient.collection('name')`
      * Or  `DbClient.groups`
      */
     static async connect(
         opts: {
-            push?: SocketWrapper;
-            pushdev?: SocketWrapper;
-            channelRouter?: EventEmitter;
+            transport?: AppTransport;
+            txmanager?: TransactionManager;
             groupsScheduler?: boolean;
         } = {}
     ): Promise<mongo.Db> {
         // Init entities change handlers
-        if (opts.push && opts.pushdev && opts.channelRouter) {
+        if (opts.transport) {
             for (const changeHandler of handlers) {
                 if (!changeHandler.isPrepared) {
                     await changeHandler.init(
-                        opts.push,
-                        opts.pushdev,
-                        opts.channelRouter
+                        opts.transport,
+                        opts.txmanager
                     )
                 }
             }
@@ -108,173 +108,6 @@ export default class DbClient {
 
     static get teams() {
         return DbClient.collection('teams')
-    }
-
-    static async createZMQSockets(
-        {
-            sub,
-            subdev,
-            push,
-            pushdev,
-            channelRouter,
-        }: {
-            sub?: SocketWrapper | string[];
-            subdev?: SocketWrapper | string[];
-            push: SocketWrapper | string[];
-            pushdev: SocketWrapper | string[];
-            channelRouter?: EventEmitter;
-        },
-        _log: ReturnType<typeof logger.createLogger> | undefined = log
-    ) {
-        let finalSub: SocketWrapper | undefined
-        let finalSubdev: SocketWrapper | undefined
-
-        if (sub && Array.isArray(sub)) {
-            const _sub = zmqutil.socket('sub')
-            await Promise.all(
-                sub.map(async(endpoint) => {
-                    try {
-                        srv.attempt(
-                            await srv.resolve(endpoint),
-                            async(record) => {
-                                _log.info(
-                                    'Receiving input from "%s"',
-                                    record.url
-                                )
-                                _sub.connect(record.url)
-                            }
-                        )
-                    }
-                    catch (err) {
-                        _log.fatal('Unable to connect to sub endpoint: %s', err)
-                        lifecycle.fatal()
-                    }
-                })
-            )
-            finalSub = _sub
-        }
-        else if (sub) {
-            finalSub = sub as SocketWrapper
-        }
-
-        if (subdev && Array.isArray(subdev)) {
-            const _subdev = zmqutil.socket('sub')
-            await Promise.all(
-                subdev.map(async(endpoint) => {
-                    try {
-                        srv.attempt(
-                            await srv.resolve(endpoint),
-                            async(record) => {
-                                _log.info(
-                                    'Receiving input from "%s"',
-                                    record.url
-                                )
-                                _subdev.connect(record.url)
-                            }
-                        )
-                    }
-                    catch (err) {
-                        _log.fatal('Unable to connect to subdev endpoint: %s', err)
-                        lifecycle.fatal()
-                    }
-                })
-            )
-            finalSubdev = _subdev
-        }
-        else if (subdev) {
-            finalSubdev = subdev as SocketWrapper
-        }
-
-        if (Array.isArray(push)) {
-            const _push = zmqutil.socket('push')
-            await Promise.all(
-                push.map(async(endpoint) => {
-                    try {
-                        srv.attempt(
-                            await srv.resolve(endpoint),
-                            async(record) => {
-                                _log.info('Sending output to "%s"', record.url)
-                                _push.connect(record.url)
-                            }
-                        )
-                    }
-                    catch (err) {
-                        _log.fatal('Unable to connect to push endpoint: %s', err)
-                        lifecycle.fatal()
-                    }
-                })
-            )
-            push = _push
-        }
-
-        if (Array.isArray(pushdev)) {
-            const _pushdev = zmqutil.socket('push')
-            await Promise.all(
-                pushdev.map(async(endpoint) => {
-                    try {
-                        srv.attempt(
-                            await srv.resolve(endpoint),
-                            async(record) => {
-                                _log.info('Sending output to "%s"', record.url)
-                                _pushdev.connect(record.url)
-                            }
-                        )
-                    }
-                    catch (err) {
-                        _log.fatal(
-                            'Unable to connect to pushdev endpoint: %s',
-                            err
-                        )
-                        lifecycle.fatal()
-                    }
-                })
-            )
-            pushdev = _pushdev
-        }
-
-        if (!channelRouter) {
-            channelRouter = new EventEmitter()
-
-            if (finalSub || finalSubdev) {
-                ;[wireutil.global].forEach((channel) => {
-                    _log.info('Subscribing to permanent channel "%s"', channel)
-                    if (finalSub) {
-                        finalSub.subscribe(channel)
-                    }
-                    if (finalSubdev) {
-                        finalSubdev.subscribe(channel)
-                    }
-                })
-
-                if (finalSub) {
-                    finalSub.on('message', (channel, data) => {
-                        channelRouter?.emit(channel.toString(), channel, data)
-                    })
-                }
-
-                if (finalSubdev) {
-                    finalSubdev.on('message', (channel, data) => {
-                        channelRouter?.emit(channel.toString(), channel, data)
-                    })
-                }
-            }
-        }
-
-        const result: {
-            sub?: SocketWrapper;
-            subdev?: SocketWrapper;
-            push: SocketWrapper;
-            pushdev: SocketWrapper;
-            channelRouter: EventEmitter;
-        } = {
-            push,
-            pushdev,
-            channelRouter,
-            ... !!finalSub && {sub: finalSub},
-            ... !!finalSubdev && {subdev: finalSubdev}
-        }
-
-        return result
     }
 
     // Verifies that we can form a connection. Useful if it's necessary to make

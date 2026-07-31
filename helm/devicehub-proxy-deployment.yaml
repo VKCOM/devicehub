@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-proxy
+  name: devicehub-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: devicehub-proxy
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: devicehub-proxy
+    spec:
+      containers:
+        - args:
+            - stf
+            - proxy
+            - proxy001
+            - --bind-router
+            - tcp://*:7110
+          envFrom:
+            - configMapRef:
+                name: scripts-variables-env
+          image: vkcom/devicehub
+          name: devicehub-proxy
+          ports:
+            - containerPort: 7110
+              protocol: TCP
+      restartPolicy: Always

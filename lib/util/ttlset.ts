@@ -12,8 +12,15 @@ class TTLItem {
 class TTLSet extends EventEmitter {
     private head: TTLItem | null = null
     private tail: TTLItem | null = null
-    private mapping: Record<string, TTLItem> = {}
+    // Map preserves a stable hidden class on delete (no V8 dictionary-mode
+    // thrash when devices disconnect). Record<string,…> degrades to dictionary
+    // mode on the first `delete`, making every subsequent access megamorphic.
+    private mapping = new Map<string, TTLItem>()
     private timer: NodeJS.Timeout | null = null
+    // Track the absolute timestamp of the next scheduled expiry so we can skip
+    // clearTimeout+setTimeout on bumps that don't advance the deadline (the
+    // common case: bumping a device that is not near the head).
+    private nextExpiry = Infinity
 
     static SILENT = 1
 
@@ -23,36 +30,58 @@ class TTLSet extends EventEmitter {
         super()
     }
 
+    // Move `value` to the tail (freshest end) with a new timestamp, inserting
+    // it if unknown. remove() nulls both links, so the item is always re-linked
+    // from scratch; the list is kept ordered oldest-first (head) to newest (tail).
     bump(value: string, time: number, flags?: any) {
-        const item =
-            this.remove(this.mapping[value]) ||
-            this.create(value, this.tail, flags)
+        const existing = this.mapping.get(value)
+        const item = existing
+            ? this.remove(existing)!
+            : this.create(value, flags)
 
         item.time = time || Date.now()
-        this.tail = item
-        if (item.prev) {
-            item.prev.next = item
+
+        // Append at the tail: the list must stay ordered oldest-first, because
+        // check() only ever walks it from the head and stops at the first live
+        // item.
+        item.prev = this.tail
+        item.next = null
+        if (this.tail) {
+            this.tail.next = item
         }
         else {
             this.head = item
         }
+        this.tail = item
 
         this.scheduleCheck()
     }
 
     drop(value: string, flags?: any) {
-        this._drop(this.mapping[value], flags)
+        this._drop(this.mapping.get(value), flags)
     }
 
     stop() {
         clearTimeout(this.timer!)
     }
 
+    // Only arm a new timer when the new head expiry is EARLIER than the one
+    // already scheduled. On a steady stream of heartbeats the head barely moves —
+    // most bump() calls skip clearTimeout+setTimeout entirely, eliminating O(N)
+    // timer allocations per heartbeat cycle.
     private scheduleCheck() {
-        clearTimeout(this.timer!)
-        if (this.head) {
-            const delay = Math.max(0, this.ttl - (Date.now() - this.head.time))
-            this.timer = setTimeout(this.check.bind(this), delay)
+        if (!this.head) {
+            return
+        }
+        const nextDue = this.head.time + this.ttl
+        if (nextDue < this.nextExpiry) {
+            clearTimeout(this.timer!)
+            this.nextExpiry = nextDue
+            const delay = Math.max(0, nextDue - Date.now())
+            this.timer = setTimeout(() => {
+                this.nextExpiry = Infinity
+                this.check()
+            }, delay)
         }
     }
 
@@ -70,21 +99,29 @@ class TTLSet extends EventEmitter {
         this.scheduleCheck()
     }
 
-    private create(value: string, prev: TTLItem | null, flags: any) {
-        const item = new TTLItem(value, 0, prev, null)
-        this.mapping[value] = item
+    // Create a detached item; bump() links it into the list.
+    private create(value: string, flags: any) {
+        const item = new TTLItem(value, 0, null, null)
+        this.mapping.set(value, item)
         if ((flags & TTLSet.SILENT) !== TTLSet.SILENT) {
             this.emit('insert', value)
         }
         return item
     }
 
-    private _drop(item: TTLItem, flags?: any) {
+    private _drop(item: TTLItem | undefined | null, flags?: any) {
         if (item) {
+            // If we are removing the current head the next-due deadline
+            // changes; reset nextExpiry so scheduleCheck() recalculates it
+            // against the new head.
+            const wasHead = item === this.head
             this.remove(item)
-            delete this.mapping[item.value]
+            this.mapping.delete(item.value)
             if ((flags & TTLSet.SILENT) !== TTLSet.SILENT) {
                 this.emit('drop', item.value)
+            }
+            if (wasHead) {
+                this.nextExpiry = Infinity
             }
         }
     }

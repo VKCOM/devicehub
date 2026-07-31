@@ -5,25 +5,12 @@ import {Esp32Touch} from '../ios-device/plugins/touch/esp32touch.js'
 import IOSObserver from './IOSObserver.js'
 import {ChildProcess} from 'node:child_process'
 import {ProcessManager, ResourcePool} from '../../util/ProcessManager.js'
-import wireutil from '../../wire/util.js'
-import {
-    DeviceRegisteredMessage,
-    DeviceAbsentMessage,
-    DeviceStatusMessage,
-    DeviceIosIntroductionMessage,
-    ProviderIosMessage,
-    DeviceStatus
-} from '../../wire/wire.js'
 import srv from '../../util/srv.js'
-import * as zmqutil from '../../util/zmqutil.js'
-import {WireRouter} from "../../wire/router.js";
 
 // Device-specific context for process management
 interface DeviceContext {
     udid: string
     isSimulator: boolean
-    register: Promise<void>
-    resolveRegister?: () => void
 }
 
 interface ResourceType {
@@ -58,8 +45,10 @@ interface Options {
     killTimeout: number
     publicIp: string
     endpoints: {
-        push: string[]
-        sub: string[]
+        // processor ROUTER endpoint(s) — resolved once at startup to fail fast
+        // on misconfiguration. Each forked ios-device connects over its own
+        // DEALER (identity = deviceKey); the processor derives presence from that.
+        processor: string[]
     }
     fork: (serial: string, opts: {
         wdaPort: number
@@ -78,7 +67,9 @@ export default async (options: Options): Promise<void> => {
     const STARTUP_TIMEOUT_MS = 10 * 60 * 1000
     const BASE_DELAY = 10_000
 
-    let usedEsp32: PortInfo[] = []
+    // ESP32 touch devices currently handed to a running ios-device, keyed by
+    // udid for O(1) release in onCleanup.
+    const usedEsp32 = new Map<string, PortInfo>()
     let curEsp32: PortInfo[] = []
 
     // TODO: refactoring needed
@@ -107,40 +98,20 @@ export default async (options: Options): Promise<void> => {
         espTimer = setTimeout(() => espObserver(), 2500)
     }
 
-    const solo = wireutil.makePrivateChannel()
-
-    // Output
-    const push = zmqutil.socket('push')
+    // The provider spawns and supervises ios-device processes but opens no ZMQ
+    // socket itself. Devices self-register over their own DEALER on startup.
+    // Resolve the processor endpoint once so a bad configuration fails loudly.
     try {
-        await Promise.all(options.endpoints.push.map(async(endpoint) => {
+        await Promise.all(options.endpoints.processor.map(async(endpoint) => {
             const records = await srv.resolve(endpoint)
             return srv.attempt(records, (record) => {
-                log.info('Sending output to "%s"', record.url)
-                push.connect(record.url)
+                log.info('iOS devices will connect to processor "%s"', record.url)
+                return true
             })
         }))
     }
-    catch (err) {
-        log.fatal('Unable to connect to push endpoint: %s', err)
-        lifecycle.fatal()
-    }
-
-    // Input
-    const sub = zmqutil.socket('sub')
-    try {
-        await Promise.all(options.endpoints.sub.map(async(endpoint) => {
-            const records = await srv.resolve(endpoint)
-            return srv.attempt(records, (record) => {
-                log.info('Receiving input to "%s"', record.url)
-                sub.connect(record.url)
-            })
-        }))
-
-        log.info('Subscribing to permanent channel "%s"', solo)
-        sub.subscribe(solo)
-    }
-    catch (err) {
-        log.fatal('Unable to connect to sub endpoint: %s', err)
+    catch (err: any) {
+        log.fatal('Unable to resolve processor endpoint: %s', err?.message || err)
         lifecycle.fatal()
     }
 
@@ -157,17 +128,10 @@ export default async (options: Options): Promise<void> => {
     const processManager = new ProcessManager<DeviceContext, ResourceType>({
         spawn: async(id, context, [resource]) => {
             log.info('Spawning device process "%s" with ports [%s]', id, Object.values(resource).join(', '))
-            push.send([
-                wireutil.global,
-                wireutil.pack(DeviceStatusMessage, {
-                    serial: id,
-                    status: DeviceStatus.PREPARING
-                })
-            ])
 
-            const esp32ToUse = _.sample(_.differenceBy(curEsp32, usedEsp32, 'path'))
+            const esp32ToUse = _.sample(_.differenceBy(curEsp32, [...usedEsp32.values()], 'path'))
             if (esp32ToUse) {
-                usedEsp32.push(esp32ToUse)
+                usedEsp32.set(id, esp32ToUse)
                 log.info(`Using ${esp32ToUse.path} ESP32`)
             }
 
@@ -183,15 +147,17 @@ export default async (options: Options): Promise<void> => {
         onError: (id, context, error) => {
             log.error('iOS Device process "%s" error: %s', id, error.message)
         },
-        onCleanup: (id, context) => {
-            // Resolve register if pending
-            context.resolveRegister?.()
-
-            // Tell others the device is gone
-            push.send([
-                wireutil.global,
-                wireutil.pack(DeviceAbsentMessage, { serial: id })
-            ])
+        onCleanup: (id) => {
+            // Release the ESP32 this device held back to the pool.
+            // onCleanup runs from ProcessManager.stop() on every removal path.
+            const freed = usedEsp32.get(id)
+            if (freed) {
+                usedEsp32.delete(id)
+                log.info(`Released ESP32 ${freed.path} from device "${id}"`)
+            }
+            // The ios-device's own heartbeat stops when its process dies;
+            // the processor reaps it on timeout.
+            log.info('iOS device process "%s" cleaned up', id)
         }
     }, {
         killTimeout: options.killTimeout,
@@ -200,15 +166,6 @@ export default async (options: Options): Promise<void> => {
         },
         resourcePool: portPool
     })
-
-    // Handle device registration messages
-    sub.on('message', new WireRouter()
-        .on(DeviceRegisteredMessage, (channel, message: {serial: string}) => {
-            const process = processManager.get(message.serial)
-            process?.context?.resolveRegister?.()
-        })
-        .handler()
-    )
 
     let statsTimer: NodeJS.Timeout
     const stats = (twice = true) => {
@@ -251,72 +208,26 @@ export default async (options: Options): Promise<void> => {
         }
     }
 
-    // Tell others we found a device
-    const register = (udid: string) => new Promise<void>(
-        async(resolve, reject) => {
-            log.info('Registering device "%s"', udid)
-
-            push.send([
-                wireutil.global,
-                wireutil.pack(DeviceIosIntroductionMessage, {
-                    serial: udid,
-                    status: wireutil.toDeviceStatus('device'),
-                    provider: ProviderIosMessage.create({
-                        channel: solo,
-                        name: options.name
-                    })
-                })
-            ])
-
-            process.nextTick(() => { // after creating process context
-                const managedProcess = processManager.get(udid)
-                if (!managedProcess) return
-
-                const timeout = setTimeout(() => reject('Register timeout'), BASE_DELAY)
-                managedProcess.context.resolveRegister = () => {
-                    clearTimeout(timeout)
-                    delete managedProcess?.context?.resolveRegister
-                    resolve()
-                }
-            })
-        }
-    )
-
-    const startDeviceWork = async(udid: string, restart = false, reRegister = false) => {
+    const startDeviceWork = async(udid: string, restart = false) => {
         if (!processManager.has(udid)) return stats(false)
 
         const managedProcess = processManager.get(udid)
         if (!managedProcess) return
 
-        if (restart || reRegister) {
-            log.warn('Trying to %s device again, delay 10 sec [%s]', restart ? 'start' : 'register', udid)
+        if (restart) {
+            log.warn('Trying to start device again, delay 10 sec [%s]', udid)
             await new Promise(r => setTimeout(r, BASE_DELAY))
         }
 
         log.info('Starting work for device "%s"', udid)
 
-        if (reRegister) {
-            managedProcess.context.register = register(udid)
-        }
-
-        if (!restart) {
-            try {
-                // Wait for registration
-                await managedProcess.context.register
-                log.info('Device "%s" registered successfully', udid)
-            }
-            catch (err: any) {
-                log.error('Device "%s" registration failed: %s', udid, err?.message)
-                return startDeviceWork(udid, false, true)
-            }
-        }
-
-        // Start the process (this will spawn and wait for ready)
+        // Start the process (spawn and wait for ready). The ios-device
+        // self-registers over its own DEALER once it comes up.
         const started = await processManager.start(udid)
 
         if (!started) {
             log.error('Failed to start device process [%s]', udid)
-            return startDeviceWork(udid, true, false)
+            return startDeviceWork(udid, true)
         }
 
         stats()
@@ -331,13 +242,8 @@ export default async (options: Options): Promise<void> => {
 
             log.info('Connected device "%s" [%s]', udid, isSimulator ? 'simulator' : 'physical')
 
-            // Create device context with registration promise
-            const deviceContext: DeviceContext = {
-                udid, isSimulator, register: Promise.resolve()
-            }
-
             // Create managed process
-            const process = await processManager.create(udid, deviceContext, {
+            const process = await processManager.create(udid, {udid, isSimulator}, {
                 initialState: 'waiting',
                 resourceCount: 1
             })
@@ -346,9 +252,6 @@ export default async (options: Options): Promise<void> => {
                 log.error('Failed to create process for device "%s"', udid)
                 return
             }
-
-            // Register device immediately, before 'running' state
-            deviceContext.register = register(udid)
 
             stats()
             startDeviceWork(udid)
@@ -377,10 +280,6 @@ export default async (options: Options): Promise<void> => {
         clearTimeout(statsTimer)
 
         stats(false)
-
-        ;[push, sub].forEach((sock) =>
-            sock.close()
-        )
 
         // Clean up all processes
         return processManager.cleanup()

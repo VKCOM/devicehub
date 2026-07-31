@@ -7,5 +7,5 @@
     "checkJs": false,
     "allowJs": true
   },
-  "exclude": ["./lib/**/*.js"]
+  "exclude": ["./lib/**/*.js", "./test/**"]
 }

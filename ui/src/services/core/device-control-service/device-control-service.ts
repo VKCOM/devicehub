@@ -13,7 +13,6 @@ import type { FSListMessage } from '@/types/fs-list-message.type'
 import type { TransactionFactory } from '@/types/transaction-factory.type'
 import type { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import type { TouchDownArgs, TouchMoveArgs, TouchMoveIosArgs } from './types'
-import type { PortForwardEntry } from '@/services/port-forwarding-service/types'
 import type { InitializeTransactionReturn, InstallOptions } from '@/services/core/transaction-service/types'
 
 export class DeviceControlService {
@@ -284,28 +283,6 @@ export class DeviceControlService {
     return this.sendTwoWay('logcat.stop')
   }
 
-  testForward({ targetHost, targetPort }: PortForwardEntry): Promise<InitializeTransactionReturn> {
-    return this.sendTwoWay('forward.test', {
-      targetHost,
-      targetPort,
-    })
-  }
-
-  createForward({ id, devicePort, targetHost, targetPort }: PortForwardEntry): Promise<InitializeTransactionReturn> {
-    return this.sendTwoWay('forward.create', {
-      id,
-      devicePort,
-      targetHost,
-      targetPort,
-    })
-  }
-
-  removeForward({ id }: PortForwardEntry): Promise<InitializeTransactionReturn> {
-    return this.sendTwoWay('forward.remove', {
-      id,
-    })
-  }
-
   shell(command: string): Promise<InitializeTransactionReturn> {
     return this.sendTwoWay('shell.command', {
       command,
@@ -316,7 +293,7 @@ export class DeviceControlService {
   private sendOneWay<T>(action: string, data?: T): void {
     const { data: device } = this.deviceBySerialStore.deviceQueryResult()
 
-    socket.emit(action, device?.channel, data)
+    socket.emit(action, device?.serial, data)
   }
 
   private async sendTwoWay<T, R>(action: string, data?: T): Promise<InitializeTransactionReturn<R>> {
@@ -327,7 +304,7 @@ export class DeviceControlService {
 
     const platformSpecificAction = device?.manufacturer === 'Apple' ? `${action}Ios` : action
 
-    socket.emit(platformSpecificAction, device?.channel, initializeTransaction.channel, data)
+    socket.emit(platformSpecificAction, device?.serial, initializeTransaction.channel, data)
 
     return initializeTransaction
   }

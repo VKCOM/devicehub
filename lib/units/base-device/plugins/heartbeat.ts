@@ -1,12 +1,12 @@
 import syrup from '@devicefarmer/stf-syrup'
 import lifecycle from '../../../util/lifecycle.js'
 import wireutil from '../../../wire/util.js'
-import push from '../support/push.js'
+import transport from '../support/transport.js'
 import EventEmitter from 'events'
 import {DeviceHeartbeatMessage} from "../../../wire/wire.js"
 export default syrup.serial()
-    .dependency(push)
-    .define((options, push) => {
+    .dependency(transport)
+    .define((options, transport) => {
         const emitter = new EventEmitter<{
             beat: []
         }>()
@@ -18,7 +18,7 @@ export default syrup.serial()
         let timer: NodeJS.Timeout
         const beat = () => (
             timer = setTimeout(() => {
-                push.send(payload)
+                transport.send(payload)
                 beat()
                 emitter.emit('beat')
             }, options.heartbeatInterval)

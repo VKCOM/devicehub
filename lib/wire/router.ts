@@ -69,8 +69,8 @@ export class WireRouter {
             }
             const messageType = this.registeredTypes.get(target);
             if (!messageType) {
-                // log.warn(`Unknown message type:`, decoded)
-                // Nobody is expecting such message type.. Ignoring..
+            // log.warn(`Unknown message type:`, decoded)
+            // Nobody is expecting such message type.. Ignoring..
                 return
             }
             const decodedMessage = Any.unpack(decoded.message, messageType)
