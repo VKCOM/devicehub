@@ -96,15 +96,22 @@ describe('RouterSocket / DealerSocket', () => {
 
         const router = new RouterSocket()
         await router.bind(addr)
+        open.push(router)
 
         const dealer = new DealerSocket({routingId: 'processor-1', probeRouter: true})
         let reconnects = 0
         dealer.watchReconnect().on('reconnect', () => reconnects++)
         dealer.connect(addr)
+        open.push(dealer)
 
         await nextFrames(router)
         await dealer.close()
         await router.close()
+        open.splice(open.indexOf(router), 1)
+        open.splice(open.indexOf(dealer), 1)
+
+        // Give the OS time to release the port from TIME_WAIT before rebinding.
+        await new Promise(r => setTimeout(r, 200))
 
         // Rebinding must not resurrect events on a closed socket.
         const revived = new RouterSocket()
