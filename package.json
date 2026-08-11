@@ -22,8 +22,8 @@
   "scripts": {
     "doc": "cli-docs-generator --cli=stf --pretty_cli_name=stf -o ./units.md",
     "lint": "eslint ./lib",
-    "test:unit": "vitest run --config vitest.config.ts",
-    "test:unit:watch": "vitest --config vitest.config.ts",
+    "test:unit": "vitest run --config ./vitest.config.ts",
+    "test:unit:watch": "vitest --config ./vitest.config.ts",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "build:swagger:tests": "cd ./test/api && poetry run just regen-schema",
     "build:swagger:ui": "cd ./ui && npm run generate-api",
