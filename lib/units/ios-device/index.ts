@@ -1,3 +1,4 @@
+import os from 'os'
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../util/logger.js'
 import lifecycle from '../../util/lifecycle.js'
@@ -6,8 +7,8 @@ import solo from '../base-device/plugins/solo.js'
 import info from './plugins/info.js'
 import wdaClient from './plugins/wda/client.js'
 import wda from './plugins/wda/index.js'
-import push from '../base-device/support/push.js'
-import sub from '../base-device/support/sub.js'
+import transport from '../base-device/support/transport.js'
+import router from '../base-device/support/router.js'
 import group from '../base-device/plugins/group.js'
 import storage from '../base-device/support/storage.js'
 import devicelog from './plugins/devicelog.js'
@@ -18,7 +19,7 @@ import clipboard from './plugins/clipboard.js'
 import remotedebug from './plugins/remotedebug.js'
 import filesystem from './plugins/filesystem.js'
 import connect from './plugins/wda/connect.js'
-import {DeviceAbsentMessage, DeviceStatus, DeviceStatusMessage} from "../../wire/wire.js"
+import {DeviceAbsentMessage, DeviceStatus, DeviceStatusMessage, DeviceIosIntroductionMessage, DeviceRegisteredMessage, ProviderIosMessage} from "../../wire/wire.js"
 import wireutil from "../../wire/util.js"
 import {WebDriverAgent} from "appium-webdriveragent"
 import { openPort } from "./redirect-ports.js"
@@ -34,8 +35,7 @@ interface Options {
 
     publicIp: string,
     endpoints: {
-        sub: string[]
-        push: string[]
+        processor: string[]
     },
     groupTimeout: number
     storageUrl: string
@@ -126,13 +126,13 @@ export default (async(options: Options) => {
     return syrup.serial()
         .dependency(heartbeat)
         .dependency(wdaClient)
-        .dependency(push)
+        .dependency(transport)
         .dependency(wda)
-        .define(async(options, heartbeat, wdaClient, push) => {
+        .define(async(options, heartbeat, wdaClient, transport) => {
             const log = logger.createLogger('ios-device')
             log.info('Preparing device options: %s', JSON.stringify(options))
 
-            push.send([
+            transport.send([
                 wireutil.global,
                 wireutil.pack(DeviceStatusMessage, {
                     serial: options.serial,
@@ -141,7 +141,7 @@ export default (async(options: Options) => {
             ])
 
             const absentDevice = () =>
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.pack(DeviceAbsentMessage, { serial: options.serial })
                 ])
@@ -166,7 +166,7 @@ export default (async(options: Options) => {
                 .dependency(info)
                 .dependency(connect)
                 .dependency(group)
-                .dependency(sub)
+                .dependency(router)
                 .dependency(storage)
                 .dependency(devicelog)
                 .dependency(stream)
@@ -175,8 +175,35 @@ export default (async(options: Options) => {
                 .dependency(clipboard)
                 .dependency(remotedebug)
                 .dependency(filesystem)
-                .define(async(options, solo, info, connect, group) => {
+                .define(async(options, solo, info, connect, group, router) => {
                     try {
+                        // Self-register over our own DEALER: the introduction
+                        // must come from the device so the processor derives
+                        // presence from the DEALER identity (deviceKey), not
+                        // from the provider (see MIGRATION-PROGRESS §1.8). The
+                        // ios-provider no longer speaks the wire protocol.
+                        const providerName = options.provider ?? os.hostname()
+                        let regListener: ((...args: any[]) => void) | null = null
+                        const waitRegister = Promise.race([
+                            new Promise(resolve =>
+                                router.on(DeviceRegisteredMessage, regListener = (...args: any[]) => resolve(args))
+                            ),
+                            new Promise(r => setTimeout(r, 15000))
+                        ])
+                        transport.send([
+                            wireutil.global,
+                            wireutil.pack(DeviceIosIntroductionMessage, {
+                                serial: options.serial,
+                                status: wireutil.toDeviceStatus('device'),
+                                provider: ProviderIosMessage.create({
+                                    channel: solo.channel,
+                                    name: providerName
+                                })
+                            })
+                        ])
+                        await waitRegister
+                        router.removeListener(DeviceRegisteredMessage, regListener!)
+                        regListener = null
 
                         // one-time session for init additional device info
                         await new Promise<void>(resolve => {
@@ -200,7 +227,7 @@ export default (async(options: Options) => {
                         connect()
                         solo.poke()
 
-                        push.send([
+                        transport.send([
                             wireutil.global,
                             wireutil.pack(DeviceStatusMessage, {
                                 serial: options.serial,

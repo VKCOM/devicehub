@@ -3,8 +3,7 @@ import syrup from '@devicefarmer/stf-syrup'
 import {WireRouter} from '../../../../wire/router.js'
 import wireutil from '../../../../wire/util.js'
 import * as iosutil from '../util/iosutil.js'
-import push from '../../../base-device/support/push.js'
-import sub from '../../../base-device/support/sub.js'
+import transport from '../../../base-device/support/transport.js'
 import wdaClient from './client.js'
 import {Esp32Touch} from '../touch/esp32touch.js'
 import {
@@ -27,11 +26,10 @@ import {Readable} from 'stream'
 import storage from '../../../base-device/support/storage.js'
 
 export default syrup.serial()
-    .dependency(push)
-    .dependency(sub)
+    .dependency(transport)
     .dependency(wdaClient)
     .dependency(storage)
-    .define((options, push, sub, wdaClient, storage) => {
+    .define((options, transport, wdaClient, storage) => {
         const log = logger.createLogger('wda:index')
 
         let cursorDevice: Esp32Touch | null = null
@@ -42,7 +40,7 @@ export default syrup.serial()
 
             cursorDevice.on('paired', () => {
                 cursorIsPaired = true
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.pack(CapabilitiesMessage, {
                         serial: options.serial,
@@ -55,7 +53,7 @@ export default syrup.serial()
             cursorDevice.on('disconnected', () => {
                 cursorIsPaired = false
                 cursorDevice?.reboot()
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.pack(CapabilitiesMessage, {
                         serial: options.serial,
@@ -144,7 +142,7 @@ export default syrup.serial()
                 const orientation = iosutil.degreesToOrientation(message.rotation)
                 await wdaClient.rotation(orientation)
 
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.pack(RotationEvent, {
                         serial: options.serial,
@@ -172,14 +170,14 @@ export default syrup.serial()
             .handler()
 
         wdaClient.on('connected', () => {
-            sub.on('message', router)
+            transport.on('message', router)
         })
 
         wdaClient.on('disconnected', () => {
-            sub.removeListener('message', router)
+            transport.removeListener('message', router)
         })
 
-        push.send([
+        transport.send([
             wireutil.global,
             wireutil.pack(CapabilitiesMessage, {
                 serial: options.serial,

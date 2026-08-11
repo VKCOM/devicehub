@@ -9,7 +9,6 @@ import { ScalingService } from '@/services/scaling-service/scaling-service'
 import { DeviceLifecycleService } from '@/services/device-lifecycle-service'
 import { KeyboardService } from '@/services/keyboard-service/keyboard-service'
 import { SaveLogsService } from '@/services/save-logs-service/save-logs-service'
-import { PortForwardingService } from '@/services/port-forwarding-service/port-forwarding-service'
 import { ApplicationInstallationService } from '@/services/application-installation/application-installation-service'
 
 import { LinkOpenerStore } from '@/store/link-opener-store'
@@ -27,8 +26,8 @@ import { DeviceScreenStore } from '@/store/device-screen-store/device-screen-sto
 */
 export const createDeviceContainer = (serial: string): Container => {
   /* NOTE:
-    Inversify-react automatically establishes a hierarchy of containers 
-    (https://github.com/inversify/InversifyJS/blob/master/wiki/hierarchical_di.md) 
+    Inversify-react automatically establishes a hierarchy of containers
+    (https://github.com/inversify/InversifyJS/blob/master/wiki/hierarchical_di.md)
     within the React tree when multiple Providers are used.
     This means that if the device container lacks bindings, it passes the request up to its parent
     container (in our case, globalContainer)
@@ -51,7 +50,6 @@ export const createDeviceContainer = (serial: string): Container => {
   deviceContainer.bind(CONTAINER_IDS.deviceControlStore).to(DeviceControlStore)
   deviceContainer.bind(CONTAINER_IDS.deviceBySerialStore).to(DeviceBySerialStore)
   deviceContainer.bind(CONTAINER_IDS.fileExplorerService).to(FileExplorerService)
-  deviceContainer.bind(CONTAINER_IDS.portForwardingService).to(PortForwardingService)
   deviceContainer.bind(CONTAINER_IDS.deviceLifecycleService).to(DeviceLifecycleService)
   deviceContainer.bind(CONTAINER_IDS.applicationInstallationService).to(ApplicationInstallationService)
 

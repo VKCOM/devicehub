@@ -7,6 +7,7 @@ type LifecycleObserver = () => Promise<unknown> | unknown
 
 export default new (class Lifecycle {
     cleanups: LifecycleObserver[] = []
+    cleanupsFatal: LifecycleObserver[] = []
     ending = false
 
     constructor() {
@@ -54,13 +55,21 @@ export default new (class Lifecycle {
         )
     }
 
+    // @ts-ignore
     fatal(err?: Error | string): never {
         log.fatal(`Shutting down due to fatal error ${err || ''}`)
         this.ending = true
-        process.exit(1)
+        // process.exit(1)
+        Promise.all(this.cleanupsFatal.map((fn) => fn())).then(() =>
+            process.exit(1)
+        )
     }
 
     observe(cleanupFn: LifecycleObserver) {
         this.cleanups.push(cleanupFn)
+    }
+
+    observeFatal(cleanupFn: LifecycleObserver) {
+        this.cleanupsFatal.push(cleanupFn)
     }
 })()

@@ -7,7 +7,6 @@ import { ConditionalRender } from '@/components/lib/conditional-render'
 import { connectWithBackoff } from '@/api/socket'
 
 import { authStore } from '@/store/auth-store'
-import { variablesConfig } from '@/config/variables.config'
 
 import { getAuthRoute } from '@/constants/route-paths'
 
@@ -18,7 +17,7 @@ export const RequireAuth = observer(() => {
       const jwt = params.get('jwt')
 
       if (!jwt) {
-        window.location.assign(`${variablesConfig[import.meta.env.MODE].openStfApiHostUrl}${getAuthRoute()}`)
+        window.location.assign(`${getAuthRoute()}`)
 
         return
       }

@@ -70,19 +70,19 @@ export const resolve = async function(domain: string) {
         ])
     }
 }
-export const attempt = <R extends Array<unknown>>(
+export const attempt = <R extends Array<unknown>, T>(
     records: R,
-    fn: (record: R[0]) => Promise<unknown> | unknown
-) => {
-    async function next(i: number) {
+    fn: (record: R[0]) => Promise<T> | T
+): Promise<T> => {
+    async function next(i: number): Promise<T> {
         if (i >= records.length) {
             throw new Error('No more records left to try')
         }
         try {
-            await fn(records[i])
+            return await fn(records[i])
         }
         catch (err) {
-            next(i + 1)
+            return next(i + 1)
         }
     }
     return next(0)

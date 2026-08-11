@@ -37,9 +37,9 @@ export const ErrorModal = ({ ...props }: Omit<BaseModalProps, 'actions' | 'icon'
             size='l'
             stretched
             onClick={() => {
-              if (!device?.channel || !device?.serial) return
+              if (!device?.serial) return
 
-              deviceDisconnection.stopUsingDevice(device.serial, device.channel)
+              deviceDisconnection.stopUsingDevice(device.serial)
 
               navigate(getDevicesRoute(), { replace: true })
             }}

@@ -24,14 +24,8 @@ spec:
         - args:
             - stf
             - groups-engine
-            - --connect-sub
-            - tcp://devicehub-triproxy-app:7150
-            - --connect-push
-            - tcp://devicehub-triproxy-app:7170
-            - --connect-sub-dev
-            - tcp://devicehub-triproxy-dev:7250
-            - --connect-push-dev
-            - tcp://devicehub-triproxy-dev:7270
+            - --connect-proxy
+            - tcp://devicehub-proxy:7110
           envFrom:
             - configMapRef:
                 name: scripts-variables-env

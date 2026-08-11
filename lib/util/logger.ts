@@ -51,7 +51,7 @@ export class Log extends EventEmitter {
         'groups-engine': [chalk.gray, chalk.bgBlack],
         poorxy: [chalk.gray, chalk.bgBlack],
         api: [chalk.green, chalk.bgGreen],
-        triproxy: [chalk.magenta, chalk.bgMagenta],
+        proxy: [chalk.magenta, chalk.bgMagenta],
         processor: [chalk.red, chalk.bgRed],
         provider: [chalk.blue, chalk.bgBlue],
         device: [chalk.cyan, chalk.bgCyan],

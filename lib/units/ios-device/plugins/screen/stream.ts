@@ -8,16 +8,16 @@ import logger from '../../../../util/logger.js'
 import * as iosutil from '../util/iosutil.js'
 import solo from '../../../base-device/plugins/solo.js'
 import wdaClient from '../wda/client.js'
-import push from '../../../base-device/support/push.js'
+import transport from '../../../base-device/support/transport.js'
 import group from '../../../base-device/plugins/group.js'
 import {NoGroupError} from '../../../../util/grouputil.js'
 import {decode} from '../../../../util/jwtutil.js'
 export default syrup.serial()
     .dependency(solo)
     .dependency(wdaClient)
-    .dependency(push)
+    .dependency(transport)
     .dependency(group)
-    .define(function(options, solo, WdaClient, push, group) {
+    .define(function(options, solo, WdaClient, transport, group) {
         const log = logger.createLogger('device:plugins:screen:stream')
         const wss = new webSocketServer.Server({port: options.screenPort})
         const url = iosutil.getUri(options.wdaHost, options.mjpegPort)

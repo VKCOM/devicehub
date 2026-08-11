@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose-prod.yaml convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: devicehub-proxy
+  name: devicehub-proxy
+spec:
+  ports:
+    - name: "7110"
+      port: 7110
+      targetPort: 7110
+  selector:
+    io.kompose.service: devicehub-proxy

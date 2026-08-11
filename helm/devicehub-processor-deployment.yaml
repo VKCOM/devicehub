@@ -7,8 +7,14 @@ metadata:
   labels:
     io.kompose.service: devicehub-processor
   name: devicehub-processor
+# NOTE: helm manifests are kompose-generated and were long unmaintained; this
+# is a structural migration to the proxy/processor topology and has NOT been
+# validated against a live cluster. Multiple processor replicas each need their
+# own device-facing ROUTER identity/endpoint (providers connect per-processor
+# via --connect-processor), which a single Service cannot fan out; running more
+# than one processor here requires a StatefulSet + headless service. Kept at 1.
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: devicehub-processor
@@ -26,21 +32,18 @@ spec:
             - processor
             - --name
             - processor
-            - --connect-app-dealer
-            - tcp://devicehub-triproxy-app:7160
-            - --connect-dev-dealer
-            - tcp://devicehub-triproxy-dev:7260
-            - --connect-sub
-            - tcp://devicehub-triproxy-app:7150
-            - --connect-push
-            - tcp://devicehub-triproxy-app:7170
-            - --connect-sub-dev
-            - tcp://devicehub-triproxy-dev:7250
-            - --connect-push-dev
-            - tcp://devicehub-triproxy-dev:7270
+            - --connect-proxy
+            - tcp://devicehub-proxy:7110
+            - --bind-router
+            - tcp://*:7160
+            - --heartbeat-timeout
+            - "30000"
           envFrom:
             - configMapRef:
                 name: scripts-variables-env
           image: vkcom/devicehub
           name: devicehub-processor
+          ports:
+            - containerPort: 7160
+              protocol: TCP
       restartPolicy: Always

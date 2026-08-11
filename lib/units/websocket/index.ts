@@ -2,7 +2,6 @@
 * Copyright 2019 contains code contributed by Orange SA, authors: Denis Barbaron - Licensed under the Apache license 2.0
 **/
 
-import crypto from 'node:crypto'
 import http from 'http'
 import _ from 'lodash'
 import {Adb} from '@u4/adbkit'
@@ -11,14 +10,21 @@ import wireutil from '../../wire/util.js'
 import {WireRouter} from '../../wire/router.js'
 import datautil from '../../util/datautil.js'
 import lifecycle from '../../util/lifecycle.js'
-import cookieSession from './middleware/cookie-session.js'
-import ip from './middleware/remote-ip.js'
+import srv from '../../util/srv.js'
+import cookieSession from './middleware/cookieSession.js'
+import ip from './middleware/remoteIp.js'
 import auth from './middleware/auth.js'
 import * as apiutil from '../../util/apiutil.js'
 import {Server} from 'socket.io'
 import db from '../../db/index.js'
-import EventEmitter from 'events'
+import dbapi from '../../db/api.js'
 import generateToken from '../api/helpers/generateToken.js'
+import {DealerSocket} from '../../util/zmqsocket.js'
+import {AppTransport} from '../../wire/app-transport.js'
+import {TransactionManager} from '../../wire/transmanager.js'
+import {ClientDispatcher} from './support/clientDispatcher.js'
+import {DeviceOwnership} from './support/deviceOwnership.js'
+import {OwnershipCache} from './support/ownershipCache.js'
 import {
     UpdateAccessTokenMessage,
     DeleteUserMessage,
@@ -38,10 +44,8 @@ import {
     LeaveGroupMessage,
     DeviceStatusMessage,
     DeviceIdentityMessage,
-    TransactionProgressMessage,
-    TransactionDoneMessage,
-    TransactionTreeMessage,
     DeviceLogcatEntryMessage,
+    ShellCommandMessage,
     AirplaneModeEvent,
     BatteryEvent,
     GetServicesAvailabilityMessage,
@@ -50,7 +54,7 @@ import {
     PhoneStateEvent,
     RotationEvent,
     CapabilitiesMessage,
-    ReverseForwardsEvent,
+
     TemporarilyUnavailableMessage,
     UpdateRemoteConnectUrl,
     KeyDownMessage,
@@ -69,7 +73,6 @@ import {
     RotateMessage,
     ChangeQualityMessage,
     AdbKeysUpdatedMessage,
-    ShellCommandMessage,
     ShellKeepAliveMessage,
     UninstallIosMessage,
     UnlockDeviceMessage,
@@ -105,9 +108,7 @@ import {
     GetAppAsset,
     GetAppHTML,
     GetAppInspectServerUrl,
-    ForwardTestMessage,
-    ForwardCreateMessage,
-    ForwardRemoveMessage,
+
     LogcatStartMessage,
     LogcatStopMessage,
     ConnectStartMessage,
@@ -130,10 +131,7 @@ interface Options {
     ssid: string
     storageUrl: string
     endpoints: {
-        sub: string[]
-        push: string[]
-        subdev: string[]
-        pushdev: string[]
+        proxy: string[]
     }
 }
 
@@ -148,21 +146,85 @@ export default (async (options: Options) => {
         pingInterval: 30000
     })
 
-    const channelRouter = new EventEmitter()
-    const zmqSockets = await db.createZMQSockets({...options.endpoints}, log)
-    const sub = zmqSockets.sub!
-    const subdev = zmqSockets.subdev!
-    const push = zmqSockets.push!
-    const pushdev = zmqSockets.pushdev!
-    await db.connect({push, pushdev, channelRouter})
+    // One DEALER to the proxy. AppTransport wraps it; TransactionManager owns
+    // request/reply correlation with optional progress streaming.
+    const dealer = new DealerSocket({probeRouter: true})
+    try {
+        await Promise.all(options.endpoints.proxy.map((endpoint) =>
+            srv.resolve(endpoint).then((records) =>
+                srv.attempt(records, (record) => {
+                    log.info('Sending to proxy "%s"', record.url)
+                    dealer.connect(record.url)
+                    return Promise.resolve(true)
+                })
+            )
+        ))
+    }
+    catch (err: any) {
+        log.fatal('Unable to connect to proxy endpoint: %s', (err && err.message) || err)
+        return lifecycle.fatal()
+    }
 
-    ;[wireutil.global].forEach((channel) => {
-        log.info('Subscribing to permanent webosocket channel "%s"', channel)
-        sub.subscribe(channel)
-    })
-    sub.on('message', (channel: any, data: any) => {
-        channelRouter.emit(channel.toString(), channel, data)
-    })
+    const transport = new AppTransport(dealer)
+    const txmanager = new TransactionManager(transport)
+    await db.connect()
+
+    // Short-lived cache: collapses burst of reconnects for the same user into
+    // one DB query.  TTL 10 s is enough to cover a page-refresh burst while
+    // staying fresh for normal group changes.
+    const ownedCache = new OwnershipCache(10_000)
+
+    // Resolve provider.name from Mongo for a given serial.
+    const resolveProvider = async (serial: string): Promise<string | undefined> => {
+        try {
+            const device = await dbapi.loadDeviceBySerial(serial)
+            return device?.provider?.name
+        }
+        catch (err: any) {
+            log.warn('Could not resolve provider for %s: %s', serial, err?.message)
+            return undefined
+        }
+    }
+
+    // One WireRouter decodes each inbound broadcast once and dispatches the
+    // One ClientDispatcher decodes each inbound broadcast once and dispatches the
+    // decoded message to every connection's per-type handler.
+    const hub = new ClientDispatcher()
+    const route = new WireRouter()
+        .on(UpdateAccessTokenMessage, (ch, m) => hub.dispatch('UpdateAccessTokenMessage', ch, m))
+        .on(DeleteUserMessage, (ch, m) => hub.dispatch('DeleteUserMessage', ch, m))
+        .on(DeviceChangeMessage, (ch, m) => hub.dispatch('DeviceChangeMessage', ch, m))
+        .on(UserChangeMessage, (ch, m) => hub.dispatch('UserChangeMessage', ch, m))
+        .on(GroupChangeMessage, (ch, m) => hub.dispatch('GroupChangeMessage', ch, m))
+        .on(DeviceGroupChangeMessage, (ch, m) => hub.dispatch('DeviceGroupChangeMessage', ch, m))
+        .on(GroupUserChangeMessage, (ch, m) => hub.dispatch('GroupUserChangeMessage', ch, m))
+        .on(DeviceLogMessage, (ch, m) => hub.dispatch('DeviceLogMessage', ch, m))
+        .on(DeviceIntroductionMessage, (ch, m) => hub.dispatch('DeviceIntroductionMessage', ch, m))
+        .on(DeviceReadyMessage, (ch, m) => hub.dispatch('DeviceReadyMessage', ch, m))
+        .on(DevicePresentMessage, (ch, m) => hub.dispatch('DevicePresentMessage', ch, m))
+        .on(DeviceAbsentMessage, (ch, m) => hub.dispatch('DeviceAbsentMessage', ch, m))
+        .on(InstalledApplications, (ch, m) => hub.dispatch('InstalledApplications', ch, m))
+        .on(JoinGroupMessage, (ch, m) => hub.dispatch('JoinGroupMessage', ch, m))
+        .on(JoinGroupByAdbFingerprintMessage, (ch, m) => hub.dispatch('JoinGroupByAdbFingerprintMessage', ch, m))
+        .on(LeaveGroupMessage, (ch, m) => hub.dispatch('LeaveGroupMessage', ch, m))
+        .on(DeviceStatusMessage, (ch, m) => hub.dispatch('DeviceStatusMessage', ch, m))
+        .on(DeviceIdentityMessage, (ch, m) => hub.dispatch('DeviceIdentityMessage', ch, m))
+        .on(SizeIosDevice, (ch, m) => hub.dispatch('SizeIosDevice', ch, m))
+        .on(DeviceLogcatEntryMessage, (ch, m) => hub.dispatch('DeviceLogcatEntryMessage', ch, m))
+        .on(AirplaneModeEvent, (ch, m) => hub.dispatch('AirplaneModeEvent', ch, m))
+        .on(BatteryEvent, (ch, m) => hub.dispatch('BatteryEvent', ch, m))
+        .on(GetServicesAvailabilityMessage, (ch, m) => hub.dispatch('GetServicesAvailabilityMessage', ch, m))
+        .on(DeviceBrowserMessage, (ch, m) => hub.dispatch('DeviceBrowserMessage', ch, m))
+        .on(ConnectivityEvent, (ch, m) => hub.dispatch('ConnectivityEvent', ch, m))
+        .on(PhoneStateEvent, (ch, m) => hub.dispatch('PhoneStateEvent', ch, m))
+        .on(RotationEvent, (ch, m) => hub.dispatch('RotationEvent', ch, m))
+        .on(CapabilitiesMessage, (ch, m) => hub.dispatch('CapabilitiesMessage', ch, m))
+        .on(TemporarilyUnavailableMessage, (ch, m) => hub.dispatch('TemporarilyUnavailableMessage', ch, m))
+        .on(UpdateRemoteConnectUrl, (ch, m) => hub.dispatch('UpdateRemoteConnectUrl', ch, m))
+        .handler()
+
+    transport.on('broadcast', (body: Buffer) => route('', body))
+    transport.registerBroadcast()
 
     io.use(cookieSession({
         name: options.ssid,
@@ -176,58 +238,109 @@ export default (async (options: Options) => {
     io.on('connection', (socket) => {
         const req = socket.request as any
         const user = req.user
-        const channels: string[] = []
+        const ownership = new DeviceOwnership()
 
         user.ip = socket.handshake.query.uip || req.ip
         socket.emit('socket.ip', user.ip)
 
-        const joinChannel = (channel: string) => {
-            channels.push(channel)
-            log.info('Subscribing to permanent websocket joinChannel channel "%s"', channel)
-            channelRouter.on(channel, messageListener)
-            sub.subscribe(channel)
+        // Seed ownership from DB so that touch/commands work immediately after
+        // a page refresh (ownership is otherwise empty until the next
+        // JoinGroupMessage broadcast, which the device won't re-send if it's
+        // already in the group).
+        ownedCache.get(user.email, async () => {
+            const devices = await dbapi.loadUserDevices(user.email)
+            return devices
+                .filter((d: any) => d.provider?.name)
+                .map((d: any) => ({serial: d.serial, providerName: d.provider.name}))
+        }).then((owned) => {
+            for (const {serial, providerName} of owned) {
+                ownership.claim(serial, providerName)
+            }
+        }).catch(() => {/* non-fatal: ownership stays empty, next JoinGroup will fix it */})
+
+        // Resolves provider.name for a serial, checking the ownership cache first.
+        const providerFor = async (serial: string): Promise<string | undefined> => {
+            const cached = ownership.providerOf(serial)
+            if (cached) {
+                return cached
+            }
+            const providerName = await resolveProvider(serial)
+            if (providerName) {
+                ownership.rememberProvider(serial, providerName)
+            }
+            return providerName
         }
 
-        const leaveChannel = (channel: string) => {
-            const idx = channels.indexOf(channel)
-            if (idx !== -1) channels.splice(idx, 1)
-            channelRouter.removeListener(channel, messageListener)
-            sub.unsubscribe(channel)
+        // Fire-and-forget command to the owned device.
+        const sendOwned = async (serial: string, envelope: Uint8Array) => {
+            if (!ownership.isOwned(serial)) {
+                return
+            }
+            const providerName = await providerFor(serial)
+            if (!providerName) {
+                return
+            }
+            transport.sendCommand(providerName, serial, envelope)
         }
 
-        const deviceIsOwned = (channel: string) => user?.ownedChannels?.has(channel)
-
-        const serialToChannel = (serial: string) =>
-            crypto.createHash('sha1').update(serial).digest('base64')
-
-        const trySendPush = (args: any[]) => {
-            if (deviceIsOwned(args[0])) {
-                return push.send(args)
+        // Runs a device transaction and relays progress/result to the client's
+        // response channel via tx.progress / tx.done events.
+        const runTx = async <T extends object>(
+            serial: string,
+            responseChannel: string,
+            messageType: MessageType<T>,
+            message: T,
+            {timeout, requireOwned = true}: {timeout?: number; requireOwned?: boolean} = {}
+        ) => {
+            if (requireOwned && !ownership.isOwned(serial)) {
+                return
+            }
+            const providerName = await providerFor(serial)
+            if (!providerName) {
+                socket.emit('tx.done', responseChannel, {success: false, data: 'no_provider'})
+                return
+            }
+            try {
+                const result = await txmanager.runTransaction(providerName, serial, messageType, message, {
+                    timeout,
+                    onProgress: (data, progress, seq) =>
+                        socket.emit('tx.progress', responseChannel, {source: serial, seq, data, progress})
+                })
+                socket.emit('tx.done', responseChannel, {
+                    source: serial,
+                    success: result.success,
+                    data: result.data,
+                    body: result.body && Object.keys(result.body).length ? JSON.stringify(result.body) : undefined
+                })
+            }
+            catch (err: any) {
+                socket.emit('tx.done', responseChannel, {
+                    source: serial,
+                    success: false,
+                    data: (err && err.data) || 'fail'
+                })
             }
         }
 
         const createKeyHandler = (Klass: MessageType<any>) =>
-            (channel: string, data: any) => {
-                try {
-                    if (deviceIsOwned(channel)) {
-                        push.send([channel, wireutil.pack(Klass, {
-                            key: data.key
-                        })])
-                    }
-                }
-                catch {}
+            (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(Klass, {key: data.key})).catch(() => {})
             }
 
         let disconnectSocket!: (value?: any) => void
 
-        const messageListener = new WireRouter()
-            .on(UpdateAccessTokenMessage, () => {
+        // Per-connection broadcast handler map registered into the hub.
+        const handlers = {
+            UpdateAccessTokenMessage: () => {
                 socket.emit('user.keys.accessToken.updated')
-            })
-            .on(DeleteUserMessage, () => {
-                disconnectSocket(true)
-            })
-            .on(DeviceChangeMessage, (channel: string, message: any) => {
+            },
+            // Only disconnect the socket of the user that was actually deleted.
+            DeleteUserMessage: (_ch: string, message: any) => {
+                if (message.email === user.email) {
+                    disconnectSocket(true)
+                }
+            },
+            DeviceChangeMessage: (_ch: string, message: any) => {
                 if (user.groups.subscribed.indexOf(message.device.group.id) > -1) {
                     socket.emit('device.change', {
                         important: true,
@@ -241,13 +354,13 @@ export default (async (options: Options) => {
                     user.groups.subscribed.indexOf(message.oldOriginGroupId) > -1) {
                     socket.emit('user.settings.devices.' + message.action, message)
                 }
-            })
-            .on(UserChangeMessage, (channel: string, message: any) => {
+            },
+            UserChangeMessage: (_ch: string, message: any) => {
                 message.targets.forEach((target: any) => {
                     socket.emit('user.' + target + '.users.' + message.action, message)
                 })
-            })
-            .on(GroupChangeMessage, (channel: string, message: any) => {
+            },
+            GroupChangeMessage: (_ch: string, message: any) => {
                 if (user.privilege === 'admin' ||
                     user.email === message.group.owner.email ||
                     !apiutil.isOriginGroup(message.group.class) &&
@@ -257,8 +370,8 @@ export default (async (options: Options) => {
                 if (message.subscribers.indexOf(user.email) > -1) {
                     socket.emit('user.view.groups.' + message.action, message)
                 }
-            })
-            .on(DeviceGroupChangeMessage, (channel: string, message: any) => {
+            },
+            DeviceGroupChangeMessage: (_ch: string, message: any) => {
                 if (user.groups.subscribed.indexOf(message.id) > -1) {
                     if (user.groups.subscribed.indexOf(message.group.id) > -1) {
                         socket.emit('device.updateGroupDevice', {
@@ -276,8 +389,8 @@ export default (async (options: Options) => {
                 else if (user.groups.subscribed.indexOf(message.group.id) > -1) {
                     socket.emit('device.addGroupDevices', {important: true, devices: [message.serial]})
                 }
-            })
-            .on(GroupUserChangeMessage, (channel: string, message: any) => {
+            },
+            GroupUserChangeMessage: (_ch: string, message: any) => {
                 if (message.users.indexOf(user.email) > -1) {
                     if (message.isAdded) {
                         user.groups.subscribed = [...new Set([...user.groups.subscribed, message.id])]
@@ -299,11 +412,11 @@ export default (async (options: Options) => {
                         }
                     }
                 }
-            })
-            .on(DeviceLogMessage, (channel: string, message: any) => {
+            },
+            DeviceLogMessage: (_ch: string, message: any) => {
                 io.emit('logcat.log', message)
-            })
-            .on(DeviceIntroductionMessage, (channel: string, message: any) => {
+            },
+            DeviceIntroductionMessage: (_ch: string, message: any) => {
                 if (message && message.group && user.groups.subscribed.indexOf(message.group.id) > -1) {
                     io.emit('device.add', {
                         important: true,
@@ -319,20 +432,20 @@ export default (async (options: Options) => {
                         }
                     })
                 }
-            })
-            .on(DeviceReadyMessage, (channel: string, message: any) => {
+            },
+            DeviceReadyMessage: (_ch: string, message: any) => {
                 io.emit('device.change', {
                     important: true,
                     data: {
                         serial: message.serial,
                         channel: message.channel,
-                        owner: null, // @todo Get rid of need to reset this here.
+                        owner: null,
                         ready: true,
-                        reverseForwards: [], // @todo Get rid of need to reset this here.
+                        reverseForwards: [],
                     }
                 })
-            })
-            .on(DevicePresentMessage, (channel: string, message: any) => {
+            },
+            DevicePresentMessage: (_ch: string, message: any) => {
                 io.emit('device.change', {
                     important: true,
                     data: {
@@ -340,10 +453,9 @@ export default (async (options: Options) => {
                         present: true
                     }
                 })
-            })
-            .on(DeviceAbsentMessage, (channel: string, message: any) => {
-                user?.ownedChannels?.delete(serialToChannel(message.serial))
-
+            },
+            DeviceAbsentMessage: (_ch: string, message: any) => {
+                ownership.release(message.serial)
                 io.emit('device.remove', {
                     important: true,
                     data: {
@@ -352,8 +464,8 @@ export default (async (options: Options) => {
                         likelyLeaveReason: 'device_absent'
                     }
                 })
-            })
-            .on(InstalledApplications, (channel: string, message: any) => {
+            },
+            InstalledApplications: (_ch: string, message: any) => {
                 socket.emit('device.applications', {
                     important: true,
                     data: {
@@ -361,20 +473,20 @@ export default (async (options: Options) => {
                         applications: message.applications
                     }
                 })
-            })
-            // @TODO refactor JoinGroupMessage route
-            .on(JoinGroupMessage, (channel: string, message: any) => {
-                if (!user?.ownedChannels) {
-                    user.ownedChannels = new Set()
+            },
+            DeviceLogcatEntryMessage: (_ch: string, message: any) => {
+                socket.emit('logcat.entry', message)
+            },
+            JoinGroupMessage: (_ch: string, message: any) => {
+                // Track ownership by serial (provider resolved lazily on first command).
+                if (message.owner && message.owner.email === user.email) {
+                    ownership.claim(message.serial, ownership.providerOf(message.serial) ?? '')
+                    providerFor(message.serial).catch(() => {})
                 }
-
-                user.ownedChannels.add(serialToChannel(message.serial))
 
                 AllModel.getInstalledApplications({serial: message.serial})
                     .then((applications: any) => {
-                        socket.emit(`device.application-${message.serial}`, {
-                            applications
-                        })
+                        socket.emit(`device.application-${message.serial}`, {applications})
                         socket.emit('device.change', {
                             important: true,
                             data: datautil.applyOwner({
@@ -397,16 +509,16 @@ export default (async (options: Options) => {
                             }, user)
                         })
                     })
-            })
-            .on(JoinGroupByAdbFingerprintMessage, (channel: string, message: any) => {
+            },
+            JoinGroupByAdbFingerprintMessage: (_ch: string, message: any) => {
                 socket.emit('user.keys.adb.confirm', {
                     title: message.comment,
                     fingerprint: message.fingerprint
                 })
-            })
-            .on(LeaveGroupMessage, (channel: string, message: any) => {
-                user?.ownedChannels?.delete(serialToChannel(message.serial))
-
+            },
+            LeaveGroupMessage: (_ch: string, message: any) => {
+                ownership.release(message.serial)
+                ownedCache.invalidate(user.email)
                 io.emit('device.change', {
                     important: true,
                     data: datautil.applyOwner({
@@ -415,28 +527,16 @@ export default (async (options: Options) => {
                         likelyLeaveReason: message.reason
                     }, user)
                 })
-            })
-            .on(DeviceStatusMessage, (channel: string, message: any) => {
+            },
+            DeviceStatusMessage: (_ch: string, message: any) => {
                 message.likelyLeaveReason = 'status_change'
-                io.emit('device.change', {
-                    important: true,
-                    data: message
-                })
-            })
-            .on(DeviceIdentityMessage, (channel: string, message: any) => {
+                io.emit('device.change', {important: true, data: message})
+            },
+            DeviceIdentityMessage: (_ch: string, message: any) => {
                 datautil.applyData(message)
-                io.emit('device.change', {
-                    important: true,
-                    data: message
-                })
-            })
-            .on(SizeIosDevice, (_channel: string, message: {
-                id: string
-                width: number
-                height: number
-                scale: number
-                url: string
-            }) => {
+                io.emit('device.change', {important: true, data: message})
+            },
+            SizeIosDevice: (_ch: string, message: any) => {
                 io.emit('device.change', {
                     important: true,
                     data: {
@@ -449,134 +549,67 @@ export default (async (options: Options) => {
                         }
                     }
                 })
-            })
-            .on(TransactionProgressMessage, (channel: string, message: any) => {
-                socket.emit('tx.progress', channel.toString(), message)
-            })
-            .on(TransactionDoneMessage, (channel: string, message: any) => {
-                socket.emit('tx.done', channel.toString(), message)
-            })
-            .on(TransactionTreeMessage, (channel: string, message: any) => {
-                socket.emit('tx.tree', channel.toString(), message)
-            })
-            .on(DeviceLogcatEntryMessage, (channel: string, message: any) => {
-                socket.emit('logcat.entry', message)
-            })
-            .on(AirplaneModeEvent, (channel: string, message: any) => {
+            },
+            AirplaneModeEvent: (_ch: string, message: any) => {
                 io.emit('device.change', {
                     important: true,
-                    data: {
-                        serial: message.serial,
-                        airplaneMode: message.enabled
-                    }
+                    data: {serial: message.serial, airplaneMode: message.enabled}
                 })
-            })
-            .on(BatteryEvent, (channel: string, message: any) => {
+            },
+            BatteryEvent: (_ch: string, message: any) => {
                 const {serial} = message
                 delete message.serial
-                io.emit('device.change', {
-                    important: false,
-                    data: {
-                        serial,
-                        battery: message
-                    }
-                })
-            })
-            .on(GetServicesAvailabilityMessage, (channel: string, message: any) => {
+                io.emit('device.change', {important: false, data: {serial, battery: message}})
+            },
+            GetServicesAvailabilityMessage: (_ch: string, message: any) => {
                 const serial = message.serial
                 delete message.serial
-                io.emit('device.change', {
-                    important: true,
-                    data: {
-                        serial,
-                        service: message
-                    }
-                })
-            })
-            .on(DeviceBrowserMessage, (channel: string, message: any) => {
+                io.emit('device.change', {important: true, data: {serial, service: message}})
+            },
+            DeviceBrowserMessage: (_ch: string, message: any) => {
                 const {serial} = message
                 delete message.serial
                 io.emit('device.change', {
                     important: true,
-                    data: datautil.applyBrowsers({
-                        serial,
-                        browser: message
-                    })
+                    data: datautil.applyBrowsers({serial, browser: message})
                 })
-            })
-            .on(ConnectivityEvent, (channel: string, message: any) => {
+            },
+            ConnectivityEvent: (_ch: string, message: any) => {
                 const {serial} = message
                 delete message.serial
-                io.emit('device.change', {
-                    important: false,
-                    data: {
-                        serial,
-                        network: message
-                    }
-                })
-            })
-            .on(PhoneStateEvent, (channel: string, message: any) => {
+                io.emit('device.change', {important: false, data: {serial, network: message}})
+            },
+            PhoneStateEvent: (_ch: string, message: any) => {
                 const {serial} = message
                 delete message.serial
-                io.emit('device.change', {
+                io.emit('device.change', {important: false, data: {serial, network: message}})
+            },
+            RotationEvent: (_ch: string, message: any) => {
+                socket.emit('device.change', {
                     important: false,
-                    data: {
-                        serial,
-                        network: message
-                    }
+                    data: {serial: message.serial, display: {rotation: message.rotation}}
                 })
-            })
-            .on(RotationEvent, (channel: string, message: any) => {
+            },
+            CapabilitiesMessage: (_ch: string, message: any) => {
                 socket.emit('device.change', {
                     important: false,
                     data: {
                         serial: message.serial,
-                        display: {
-                            rotation: message.rotation
-                        }
+                        capabilities: {hasTouch: message.hasTouch, hasCursor: message.hasCursor}
                     }
                 })
-            })
-            .on(CapabilitiesMessage, (channel: string, message: any) => {
-                socket.emit('device.change', {
-                    important: false,
-                    data: {
-                        serial: message.serial,
-                        capabilities: {
-                            hasTouch: message.hasTouch,
-                            hasCursor: message.hasCursor
-                        }
-                    }
-                })
-            })
-            .on(ReverseForwardsEvent, (channel: string, message: any) => {
-                socket.emit('device.change', {
-                    important: false,
-                    data: {
-                        serial: message.serial,
-                        reverseForwards: message.forwards
-                    }
-                })
-            })
-            .on(TemporarilyUnavailableMessage, (channel: string, message: any) => {
+            },
+            TemporarilyUnavailableMessage: (_ch: string, message: any) => {
                 socket.emit('temporarily-unavailable', {
-                    data: {
-                        removeConnectUrl: message.removeConnectUrl
-                    }
+                    data: {removeConnectUrl: message.removeConnectUrl}
                 })
-            })
-            .on(UpdateRemoteConnectUrl, (channel: string, message: any) => {
-                socket.emit('device.change', {
-                    important: true,
-                    data: {
-                        serial: message.serial
-                    }
-                })
-            })
-            .handler()
+            },
+            UpdateRemoteConnectUrl: (_ch: string, message: any) => {
+                socket.emit('device.change', {important: true, data: {serial: message.serial}})
+            }
+        }
 
-        channelRouter.on(wireutil.global, messageListener)
-        joinChannel(user.group)
+        hub.add(socket.id, handlers)
 
         new Promise<void>((resolve) => {
             disconnectSocket = resolve
@@ -588,10 +621,7 @@ export default (async (options: Options) => {
                 if (device) {
                     io.emit('device.change', {
                         important: true,
-                        data: {
-                            serial: device.serial,
-                            notes: device.notes
-                        }
+                        data: {serial: device.serial, notes: device.notes}
                     })
                 }
             })
@@ -617,10 +647,7 @@ export default (async (options: Options) => {
                     id: token.id,
                     jwt: token.jwt
                 })
-                socket.emit('user.keys.accessToken.generated', {
-                    title,
-                    token: token.jwt
-                })
+                socket.emit('user.keys.accessToken.generated', {title, token: token.jwt})
             })
 
             socket.on('user.keys.accessToken.remove', async (data: any) => {
@@ -641,19 +668,11 @@ export default (async (options: Options) => {
                         title: data.title,
                         fingerprint: key.fingerprint
                     })
-                    socket.emit('user.keys.adb.added', {
-                        title: data.title,
-                        fingerprint: key.fingerprint
-                    })
-                    push.send([
-                        wireutil.global,
-                        wireutil.pack(AdbKeysUpdatedMessage, {})
-                    ])
+                    socket.emit('user.keys.adb.added', {title: data.title, fingerprint: key.fingerprint})
+                    transport.sendBroadcast(wireutil.pack(AdbKeysUpdatedMessage, {}))
                 }
                 catch (err: any) {
-                    socket.emit('user.keys.adb.error', {
-                        message: err.message
-                    })
+                    socket.emit('user.keys.adb.error', {message: err.message})
                 }
             })
 
@@ -667,14 +686,8 @@ export default (async (options: Options) => {
                         title: data.title,
                         fingerprint: data.fingerprint
                     })
-                    socket.emit('user.keys.adb.added', {
-                        title: data.title,
-                        fingerprint: data.fingerprint
-                    })
-                    push.send([
-                        user.group,
-                        wireutil.pack(AdbKeysUpdatedMessage, {})
-                    ])
+                    socket.emit('user.keys.adb.added', {title: data.title, fingerprint: data.fingerprint})
+                    transport.sendBroadcast(wireutil.pack(AdbKeysUpdatedMessage, {}))
                 }
                 catch (err: any) {
                     if (!(err instanceof AllModel.DuplicateSecondaryIndexError)) throw err
@@ -690,918 +703,246 @@ export default (async (options: Options) => {
                 if (user.privilege !== apiutil.ADMIN) {
                     return
                 }
-
                 const {command} = data
                 const devices = await AllModel.loadDevices()
                 devices.forEach((device: any) => {
-                    push.send([
-                        device.channel,
-                        wireutil.pack(ShellCommandMessage, {command, timeout: 10000})
-                    ])
+                    if (device.provider?.name) {
+                        transport.sendCommand(device.provider.name, device.serial,
+                            wireutil.pack(ShellCommandMessage, {command, timeout: 10000}))
+                    }
                 })
             })
 
-            // Touch events
-            socket.on('input.touchDown', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchDownMessage, {
-                            seq: data.seq,
-                            contact: data.contact,
-                            x: data.x,
-                            y: data.y,
-                            pressure: data.pressure
-                        })
-                    ])
-                }
-                catch {}
+            // Touch / input events (fire-and-forget to the owned device).
+            socket.on('input.touchDown', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchDownMessage, {
+                    seq: data.seq, contact: data.contact, x: data.x, y: data.y, pressure: data.pressure
+                })).catch(() => {})
+            })
+            socket.on('input.touchMove', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchMoveMessage, {
+                    seq: data.seq, contact: data.contact, x: data.x, y: data.y, pressure: data.pressure
+                })).catch(() => {})
+            })
+            socket.on('input.touchMoveIos', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchMoveIosMessage, {
+                    toX: data.toX, toY: data.toY, fromX: data.fromX, fromY: data.fromY, duration: data.duration || 0
+                })).catch(() => {})
+            })
+            socket.on('tapDeviceTreeElement', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TapDeviceTreeElement, {label: data.label})).catch(() => {})
+            })
+            socket.on('input.touchUp', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchUpMessage, {seq: data.seq, contact: data.contact})).catch(() => {})
+            })
+            socket.on('input.touchCommit', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchCommitMessage, {seq: data.seq})).catch(() => {})
+            })
+            socket.on('input.touchReset', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TouchResetMessage, {seq: data.seq})).catch(() => {})
+            })
+            socket.on('input.gestureStart', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(GestureStartMessage, {seq: data.seq})).catch(() => {})
+            })
+            socket.on('input.gestureStop', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(GestureStopMessage, {seq: data.seq})).catch(() => {})
             })
 
-            socket.on('input.touchMove', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchMoveMessage, {
-                            seq: data.seq,
-                            contact: data.contact,
-                            x: data.x,
-                            y: data.y,
-                            pressure: data.pressure
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.touchMoveIos', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchMoveIosMessage, {
-                            toX: data.toX,
-                            toY: data.toY,
-                            fromX: data.fromX,
-                            fromY: data.fromY,
-                            duration: data.duration || 0
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('tapDeviceTreeElement', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TapDeviceTreeElement, {
-                            label: data.label
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.touchUp', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchUpMessage, {
-                            seq: data.seq,
-                            contact: data.contact
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.touchCommit', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchCommitMessage, {
-                            seq: data.seq
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.touchReset', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TouchResetMessage, {
-                            seq: data.seq
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.gestureStart', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(GestureStartMessage, {
-                            seq: data.seq
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            socket.on('input.gestureStop', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(GestureStopMessage, {
-                            seq: data.seq
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            // Key events
             socket.on('input.keyDown', createKeyHandler(KeyDownMessage))
             socket.on('input.keyUp', createKeyHandler(KeyUpMessage))
             socket.on('input.keyPress', createKeyHandler(KeyPressMessage))
 
-            socket.on('input.type', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(TypeMessage, {
-                            text: data.text
-                        })
-                    ])
-                }
-                catch {}
+            socket.on('input.type', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(TypeMessage, {text: data.text})).catch(() => {})
+            })
+            socket.on('display.rotate', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(RotateMessage, {rotation: data.rotation})).catch(() => {})
+            })
+            socket.on('quality.change', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(ChangeQualityMessage, {quality: data.quality})).catch(() => {})
             })
 
-            socket.on('display.rotate', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(RotateMessage, {
-                            rotation: data.rotation
-                        })
-                    ])
-                }
-                catch {}
-            })
+            // Transactions. Each takes (serial, responseChannel, [data]).
+            socket.on('airplane.set', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, AirplaneSetMessage, {enabled: data.enabled}))
+            socket.on('clipboard.paste', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, PasteMessage, {text: data.text}))
+            socket.on('clipboard.copy', (serial: string, rc: string) =>
+                runTx(serial, rc, CopyMessage, {}))
+            socket.on('clipboard.copyIos', (serial: string, rc: string) =>
+                runTx(serial, rc, CopyMessage, {}))
+            socket.on('device.identify', (serial: string, rc: string) =>
+                runTx(serial, rc, PhysicalIdentifyMessage, {}, {requireOwned: false}))
+            socket.on('device.reboot', (serial: string, rc: string) =>
+                runTx(serial, rc, RebootMessage, {}))
+            socket.on('device.rebootIos', (serial: string, rc: string) =>
+                runTx(serial, rc, RebootMessage, {}))
+            socket.on('account.check', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, AccountCheckMessage, {type: data.type, account: data.account}))
+            socket.on('account.remove', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, AccountRemoveMessage, {type: data.type, account: data.account}))
+            socket.on('account.addmenu', (serial: string, rc: string) =>
+                runTx(serial, rc, AccountAddMenuMessage, {}))
+            socket.on('account.add', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, AccountAddMessage, {user: data.user, password: data.password}))
+            socket.on('account.get', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, AccountGetMessage, {type: data.type}, {requireOwned: false}))
+            socket.on('sd.status', (serial: string, rc: string) =>
+                runTx(serial, rc, SdStatusMessage, {}))
+            socket.on('ringer.set', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, RingerSetMessage, {mode: data.mode}))
+            socket.on('ringer.get', (serial: string, rc: string) =>
+                runTx(serial, rc, RingerGetMessage, {}))
+            socket.on('wifi.set', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, WifiSetEnabledMessage, {enabled: data.enabled}))
+            socket.on('wifi.get', (serial: string, rc: string) =>
+                runTx(serial, rc, WifiGetStatusMessage, {}))
+            socket.on('bluetooth.set', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, BluetoothSetEnabledMessage, {enabled: data.enabled}))
+            socket.on('bluetooth.get', (serial: string, rc: string) =>
+                runTx(serial, rc, BluetoothGetStatusMessage, {}))
+            socket.on('bluetooth.cleanBonds', (serial: string, rc: string) =>
+                runTx(serial, rc, BluetoothCleanBondedMessage, {}))
 
-            socket.on('quality.change', (channel: string, data: any) => {
-                try {
-                    trySendPush([
-                        channel,
-                        wireutil.pack(ChangeQualityMessage, {
-                            quality: data.quality
-                        })
-                    ])
-                }
-                catch {}
-            })
-
-            // Transactions
-            socket.on('airplane.set', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AirplaneSetMessage, {enabled: data.enabled})
-                ])
-            })
-
-            socket.on('clipboard.paste', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, PasteMessage, {text: data.text})
-                ])
-            })
-
-            socket.on('clipboard.copy', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, CopyMessage, {})
-                ])
-            })
-
-            socket.on('clipboard.copyIos', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, CopyMessage, {})
-                ])
-            })
-
-            socket.on('device.identify', (channel: string, responseChannel: string) => {
-                trySendPush([
-                    channel,
-                    wireutil.tr(responseChannel, PhysicalIdentifyMessage, {})
-                ])
-            })
-
-            socket.on('device.reboot', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, RebootMessage, {})
-                ])
-            })
-
-            socket.on('device.rebootIos', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, RebootMessage, {})
-                ])
-            })
-
-            socket.on('account.check', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AccountCheckMessage, {type: data.type, account: data.account})
-                ])
-            })
-
-            socket.on('account.remove', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AccountRemoveMessage, {type: data.type, account: data.account})
-                ])
-            })
-
-            socket.on('account.addmenu', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AccountAddMenuMessage, {})
-                ])
-            })
-
-            socket.on('account.add', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AccountAddMessage, {user: data.user, password: data.password})
-                ])
-            })
-
-            socket.on('account.get', (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, AccountGetMessage, {type: data.type})
-                ])
-            })
-
-            socket.on('sd.status', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, SdStatusMessage, {})
-                ])
-            })
-
-            socket.on('ringer.set', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, RingerSetMessage, {mode: data.mode})
-                ])
-            })
-
-            socket.on('ringer.get', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, RingerGetMessage, {})
-                ])
-            })
-
-            socket.on('wifi.set', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, WifiSetEnabledMessage, {enabled: data.enabled})
-                ])
-            })
-
-            socket.on('wifi.get', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, WifiGetStatusMessage, {})
-                ])
-            })
-
-            socket.on('bluetooth.set', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BluetoothSetEnabledMessage, {enabled: data.enabled})
-                ])
-            })
-
-            socket.on('bluetooth.get', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BluetoothGetStatusMessage, {})
-                ])
-            })
-
-            socket.on('bluetooth.cleanBonds', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BluetoothCleanBondedMessage, {})
-                ])
-            })
-
-            socket.on('group.invite', async (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
+            socket.on('group.invite', async (serial: string, rc: string, data: any) => {
                 const keys = await UserModel.getUserAdbKeys(user.email)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GroupMessage, {
-                        owner: {email: user.email, name: user.name, group: user.group},
-                        timeout: data.timeout || undefined,
-                        requirements: wireutil.toDeviceRequirements(data.requirements),
-                        keys: keys.map((key: any) => key.fingerprint)
+                runTx(serial, rc, GroupMessage, {
+                    owner: {email: user.email, name: user.name, group: user.group},
+                    timeout: data.timeout || undefined,
+                    requirements: wireutil.toDeviceRequirements(data.requirements),
+                    keys: keys.map((key: any) => key.fingerprint)
+                }, {requireOwned: false})
+            })
+            socket.on('group.kick', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, UngroupMessage, {
+                    requirements: wireutil.toDeviceRequirements(data.requirements)
+                }, {requireOwned: false}))
+
+            socket.on('getTreeElementsIos', (serial: string, rc: string) =>
+                runTx(serial, rc, GetIosTreeElements, {}, {requireOwned: false}))
+
+            socket.on('shell.command', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, ShellCommandMessage, {command: data.command, timeout: data.timeout}))
+
+            socket.on('shell.keepalive', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(ShellKeepAliveMessage, {timeout: data.timeout})).catch(() => {})
+            })
+
+            socket.on('device.install', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, InstallMessage, {
+                    href: data.href,
+                    launch: data.launch === true,
+                    isApi: false,
+                    manifest: JSON.stringify(data.manifest),
+                    installFlags: ['-r'],
+                    jwt: req.internalJwt
+                }))
+            socket.on('device.installIos', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, InstallMessage, {
+                    href: data.href,
+                    launch: data.launch === true,
+                    isApi: false,
+                    manifest: JSON.stringify(data.manifest),
+                    installFlags: [],
+                    jwt: req.internalJwt
+                }))
+            socket.on('device.uninstall', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, UninstallMessage, {packageName: data.packageName}))
+            socket.on('device.uninstallIos', (serial: string, data: any) => {
+                sendOwned(serial, wireutil.pack(UninstallIosMessage, {packageName: data.packageName})).catch(() => {})
+            })
+            socket.on('device.launchApp', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, LaunchDeviceApp, {pkg: data.pkg}))
+
+            socket.on('device.unlockDevice', (serial: string) => {
+                sendOwned(serial, wireutil.pack(UnlockDeviceMessage, {})).catch(() => {})
+            })
+
+            const getApps = (serial: string, rc: string) =>
+                runTx(serial, rc, GetInstalledApplications, {})
+            // Preserve the original debounce on the app list fetch.
+            socket.on('device.getApps', _.debounce(getApps, 500))
+
+            socket.on('app.kill', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, data?.force ? KillDeviceApp : TerminateDeviceApp, {}))
+            socket.on('app.getAssetList', (serial: string, rc: string) =>
+                runTx(serial, rc, GetAppAssetsList, {}))
+            socket.on('app.getAsset', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, GetAppAsset, {url: data.url}))
+            socket.on('app.getAppHTML', (serial: string, rc: string) =>
+                runTx(serial, rc, GetAppHTML, {}))
+            socket.on('app.getInspectServerUrl', (serial: string, rc: string) =>
+                runTx(serial, rc, GetAppInspectServerUrl, {}))
+
+            socket.on('storage.upload', async (serial: string, rc: string, data: any) => {
+                if (!ownership.isOwned(serial)) {
+                    return
+                }
+                try {
+                    await fetch(`${options.storageUrl}api/v1/resources?channel=${rc}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({url: data.url})
                     })
-                ])
-            })
-
-            socket.on('group.kick', (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, UngroupMessage, {
-                        requirements: wireutil.toDeviceRequirements(data.requirements)
-                    })
-                ])
-            })
-
-            socket.on('getTreeElementsIos', (channel: string, responseChannel: string) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetIosTreeElements, {})
-                ])
-            })
-
-            socket.on('tx.cleanup', (channel: string) => {
-                leaveChannel(channel)
-            })
-
-            socket.on('tx.punch', (channel: string) => {
-                joinChannel(channel)
-                socket.emit('tx.punch', channel)
-            })
-
-            socket.on('shell.command', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
                 }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ShellCommandMessage, {command: data.command, timeout: data.timeout})
-                ])
-            })
-
-            socket.on('shell.keepalive', (channel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
+                catch (err: any) {
+                    log.error('Storage upload had an error: %s', err.stack)
+                    socket.emit('tx.cancel', rc, {success: false, data: 'fail_upload'})
                 }
-
-                push.send([
-                    channel,
-                    wireutil.pack(ShellKeepAliveMessage, {timeout: data.timeout})
-                ])
             })
 
-            socket.on('device.install', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
+            socket.on('logcat.start', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
+            socket.on('logcat.startIos', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
+            socket.on('logcat.stop', (serial: string, rc: string) =>
+                runTx(serial, rc, LogcatStopMessage, {}))
+            socket.on('logcat.stopIos', (serial: string, rc: string) =>
+                runTx(serial, rc, LogcatStopMessage, {}))
 
-                const installFlags = ['-r']
-                const isApi = false
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, InstallMessage, {
-                        href: data.href,
-                        launch: data.launch === true,
-                        isApi,
-                        manifest: JSON.stringify(data.manifest),
-                        installFlags,
-                        jwt: req.internalJwt
-                    })
-                ])
+            socket.on('connect.start', (serial: string, rc: string) =>
+                runTx(serial, rc, ConnectStartMessage, {}, {requireOwned: false}))
+            socket.on('connect.startIos', (serial: string, rc: string) =>
+                runTx(serial, rc, ConnectStartMessage, {}, {requireOwned: false}))
+            socket.on('connect.stop', (serial: string, rc: string) =>
+                runTx(serial, rc, ConnectStopMessage, {}, {requireOwned: false}))
+
+            socket.on('browser.open', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, BrowserOpenMessage, {url: data.url, browser: data.browser}))
+            socket.on('browser.openIos', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, BrowserOpenMessage, {url: data.url, browser: data.browser}))
+            socket.on('browser.clear', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, BrowserClearMessage, {browser: data.browser}))
+
+            socket.on('store.open', (serial: string, rc: string) =>
+                runTx(serial, rc, StoreOpenMessage, {}))
+            socket.on('store.openIos', (serial: string, rc: string) =>
+                runTx(serial, rc, StoreOpenMessage, {}))
+
+            socket.on('settings.open', (serial: string) => {
+                sendOwned(serial, wireutil.pack(DashboardOpenMessage, {})).catch(() => {})
             })
 
-            socket.on('device.installIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
+            socket.on('screen.capture', (serial: string, rc: string) =>
+                runTx(serial, rc, ScreenCaptureMessage, {} as any))
+            socket.on('screen.captureIos', (serial: string, rc: string) =>
+                runTx(serial, rc, ScreenCaptureMessage, {} as any))
 
-                const isApi = false
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, InstallMessage, {
-                        href: data.href,
-                        launch: data.launch === true,
-                        isApi,
-                        manifest: JSON.stringify(data.manifest),
-                        installFlags: [],
-                        jwt: req.internalJwt
-                    })
-                ])
-            })
-
-            socket.on('device.uninstall', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, UninstallMessage, {packageName: data.packageName})
-                ])
-            })
-
-            socket.on('device.uninstallIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.pack(UninstallIosMessage, {packageName: data.packageName})
-                ])
-            })
-
-            socket.on('device.launchApp', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, LaunchDeviceApp, {pkg: data.pkg})
-                ])
-            })
-
-            socket.on('device.getApps', _.debounce(async (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetInstalledApplications, {})
-                ])
-            }, 500))
-
-            socket.on('app.kill', async (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    data?.force
-                        ? wireutil.tr(responseChannel, KillDeviceApp, {})
-                        : wireutil.tr(responseChannel, TerminateDeviceApp, {})
-                ])
-            })
-
-            socket.on('app.getAssetList', async (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetAppAssetsList, {})
-                ])
-            })
-
-            socket.on('app.getAsset', async (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetAppAsset, {url: data.url})
-                ])
-            })
-
-            socket.on('app.getAppHTML', async (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetAppHTML, {})
-                ])
-            })
-
-            socket.on('app.getInspectServerUrl', async (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, GetAppInspectServerUrl, {})
-                ])
-            })
-
-            socket.on('device.unlockDevice', (channel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                push.send([
-                    channel,
-                    wireutil.pack(UnlockDeviceMessage, {})
-                ])
-            })
-
-            socket.on('storage.upload', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                fetch(`${options.storageUrl}api/v1/resources?channel=${responseChannel}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({url: data.url})
-                })
-                    .catch((err: any) => {
-                        log.error('Storage upload had an error: %s', err.stack)
-                        leaveChannel(responseChannel)
-                        socket.emit('tx.cancel', responseChannel, {
-                            success: false,
-                            data: 'fail_upload'
-                        })
-                    })
-            })
-
-            socket.on('forward.test', (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
-                if (!data.targetHost || data.targetHost === 'localhost') {
-                    data.targetHost = user.ip
-                }
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ForwardTestMessage, {
-                        targetHost: data.targetHost,
-                        targetPort: data.targetPort
-                    })
-                ])
-            })
-
-            socket.on('forward.create', (channel: string, responseChannel: string, data: any) => {
-                if (!data.targetHost || data.targetHost === 'localhost') {
-                    data.targetHost = user.ip
-                }
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ForwardCreateMessage, {
-                        id: data.id,
-                        devicePort: data.devicePort,
-                        targetHost: data.targetHost,
-                        targetPort: data.targetPort
-                    })
-                ])
-            })
-
-            socket.on('forward.remove', (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ForwardRemoveMessage, {id: data.id})
-                ])
-            })
-
-            socket.on('logcat.start', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, LogcatStartMessage, {filters: data.filters})
-                ])
-            })
-
-            socket.on('logcat.startIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, LogcatStartMessage, {filters: data.filters})
-                ])
-            })
-
-            socket.on('logcat.stop', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, LogcatStopMessage, {})
-                ])
-            })
-
-            socket.on('logcat.stopIos', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, LogcatStopMessage, {})
-                ])
-            })
-
-            socket.on('connect.start', (channel: string, responseChannel: string) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ConnectStartMessage, {})
-                ])
-            })
-
-            socket.on('connect.startIos', (channel: string, responseChannel: string) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ConnectStartMessage, {})
-                ])
-            })
-
-            socket.on('connect.stop', (channel: string, responseChannel: string) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ConnectStopMessage, {})
-                ])
-            })
-
-            socket.on('browser.open', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BrowserOpenMessage, {url: data.url, browser: data.browser})
-                ])
-            })
-
-            socket.on('browser.openIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BrowserOpenMessage, {url: data.url, browser: data.browser})
-                ])
-            })
-
-            socket.on('browser.clear', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, BrowserClearMessage, {browser: data.browser})
-                ])
-            })
-
-            socket.on('store.open', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, StoreOpenMessage, {})
-                ])
-            })
-
-            socket.on('store.openIos', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, StoreOpenMessage, {})
-                ])
-            })
-
-            socket.on('settings.open', (channel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                push.send([
-                    channel,
-                    wireutil.pack(DashboardOpenMessage, {})
-                ])
-            })
-
-            socket.on('screen.capture', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ScreenCaptureMessage, {} as any)
-                ])
-            })
-
-            socket.on('screen.captureIos', (channel: string, responseChannel: string) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, ScreenCaptureMessage, {} as any)
-                ])
-            })
-
-            socket.on('fs.retrieve', (channel: string, responseChannel: string, data: any) => {
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt})
-                ])
-            })
-
-            socket.on('fs.list', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, FileSystemListMessage, {dir: data.dir})
-                ])
-            })
-
-            socket.on('fs.listIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, FileSystemListMessage, {dir: data.dir})
-                ])
-            })
-
-            socket.on('fs.retrieveIos', (channel: string, responseChannel: string, data: any) => {
-                if (!deviceIsOwned(channel)) {
-                    return
-                }
-
-                joinChannel(responseChannel)
-                push.send([
-                    channel,
-                    wireutil.tr(responseChannel, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt})
-                ])
-            })
+            socket.on('fs.retrieve', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt}, {requireOwned: false}))
+            socket.on('fs.list', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, FileSystemListMessage, {dir: data.dir}))
+            socket.on('fs.listIos', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, FileSystemListMessage, {dir: data.dir}))
+            socket.on('fs.retrieveIos', (serial: string, rc: string, data: any) =>
+                runTx(serial, rc, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt}))
 
             socket.on('policy.accept', () => {
                 UserModel.acceptPolicy(user.email)
             })
         })
             .finally(() => {
-                channelRouter.removeListener(wireutil.global, messageListener)
-                channels.forEach((channel) => {
-                    channelRouter.removeListener(channel, messageListener)
-                    sub.unsubscribe(channel)
-                })
+                hub.remove(socket.id)
                 socket.disconnect(true)
             })
             .catch((err: any) => {
@@ -1610,14 +951,12 @@ export default (async (options: Options) => {
     })
 
     lifecycle.observe(() => {
-        [push, pushdev, sub, subdev].forEach((sock) => {
-            try {
-                sock.close()
-            }
-            catch (err) {
-                // No-op
-            }
-        })
+        try {
+            transport.close()
+        }
+        catch {
+            // No-op
+        }
     })
 
     server.listen(options.port)

@@ -13,7 +13,7 @@ const MILLISECONDS_IN_MINUTE = 1000 * 60
 export class GroupService {
   constructor(@inject(CONTAINER_IDS.factoryTransactionService) private transactionServiceFactory: TransactionFactory) {}
 
-  invite(serial: string, channel: string, deviceGroup?: DeviceGroup): Promise<unknown> {
+  invite(serial: string, deviceGroup?: DeviceGroup): Promise<unknown> {
     /* NOTE: 1 for Infinity */
     let timeout = 1
 
@@ -28,7 +28,7 @@ export class GroupService {
     const transaction = this.transactionServiceFactory()
     const { channel: transactionChannel, donePromise: transactionEndPromise } = transaction.initializeTransaction()
     const invite = (): void =>
-      socket.emit('group.invite', channel, transactionChannel, {
+      socket.emit('group.invite', serial, transactionChannel, {
         requirements: {
           serial: {
             value: serial,
@@ -47,11 +47,11 @@ export class GroupService {
     return transactionEndPromise
   }
 
-  kick(serial: string, channel: string): Promise<unknown> {
+  kick(serial: string): Promise<unknown> {
     const transaction = this.transactionServiceFactory()
     const { channel: transactionChannel, donePromise: transactionEndPromise } = transaction.initializeTransaction()
 
-    socket.emit('group.kick', channel, transactionChannel, {
+    socket.emit('group.kick', serial, transactionChannel, {
       requirements: {
         serial: {
           value: serial,

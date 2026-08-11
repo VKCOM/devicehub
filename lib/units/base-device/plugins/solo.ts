@@ -1,17 +1,12 @@
 import crypto from 'crypto'
 import syrup from '@devicefarmer/stf-syrup'
-import logger from '../../../util/logger.js'
 import wireutil from '../../../wire/util.js'
-import sub from '../support/sub.js'
-import push from '../support/push.js'
+import transport from '../support/transport.js'
 import {DeviceReadyMessage} from "../../../wire/wire.js"
 
 export default syrup.serial()
-    .dependency(sub)
-    .dependency(push)
-    .define((options, sub, push) => {
-        const log = logger.createLogger('base-device:plugins:solo')
-
+    .dependency(transport)
+    .define((options, transport) => {
         // The channel should keep the same value between restarts, so that
         // having the client side up to date all the time is not horribly painful.
         const makeChannelId = () => {
@@ -20,15 +15,15 @@ export default syrup.serial()
             return hash.digest('base64')
         }
 
+        // The channel identifies this device to the client side. Routing is by
+        // deviceKey now, so there is no channel subscription — the id is still
+        // published in DeviceReadyMessage for the client to address replies.
         const channel = makeChannelId()
-
-        log.info('Subscribing to permanent channel "%s"', channel)
-        sub.subscribe(channel)
 
         return {
             channel: channel,
             poke: () => {
-                push.send([
+                transport.send([
                     wireutil.global,
                     wireutil.pack(DeviceReadyMessage, {
                         serial: options.serial,

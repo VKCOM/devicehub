@@ -29,10 +29,8 @@ spec:
             - --adb-host
             - adbd
             - --no-cleanup
-            - --connect-sub
-            - tcp://devicehub-triproxy-dev:7250
-            - --connect-push
-            - tcp://devicehub-triproxy-dev:7270
+            - --connect-processor
+            - tcp://devicehub-processor:7160
             - --storage-url
             - https://:/
             - --public-ip

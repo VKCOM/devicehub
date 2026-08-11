@@ -1,25 +1,13 @@
 import logger from '../../util/logger.js'
-import wireutil from '../../wire/util.js'
-import {WireRouter} from '../../wire/router.js'
 import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
-import * as zmqutil from '../../util/zmqutil.js'
 import {ChildProcess} from 'node:child_process'
 import ADBObserver, {ADBDevice} from './ADBObserver.js'
-import {
-    DeviceRegisteredMessage,
-    DeviceAbsentMessage,
-    DeviceIntroductionMessage,
-    ProviderMessage,
-    DeviceStatusMessage
-} from '../../wire/wire.js'
 import {ProcessManager, ResourcePool} from '../../util/ProcessManager.js'
 
 // Device-specific context for process management
 interface DeviceContext {
     device: ADBDevice
-    resolveRegister?: () => void
-    register: Promise<void>
 }
 
 type DeviceHandler = (device: ADBDevice, oldType?: ADBDevice['type']) => any | Promise<any>
@@ -33,11 +21,13 @@ export interface Options {
     killTimeout: number
     deviceType: string
     endpoints: {
-        push: string[]
-        sub: string[]
+        // processor ROUTER endpoint(s) — resolved once at startup via SRV
+        // weighted selection. The winning URL is passed to every forked device
+        // so all devices under this provider share one processor.
+        processor: string[]
     }
     filter: (serial: string) => boolean
-    fork: (serial: string, ports: number[]) => ChildProcess
+    fork: (serial: string, ports: number[], processorEndpoint: string) => ChildProcess
 }
 
 export default async (options: Options): Promise<void> => {
@@ -54,46 +44,29 @@ export default async (options: Options): Promise<void> => {
         lifecycle.fatal()
     }
 
-    const solo = wireutil.makePrivateChannel()
+    // Resolve all endpoints, flatten records, pick first via srv.attempt.
+    // Failover between records works only with srv+tcp:// (DNS-level selection).
+    // Plain tcp:// always resolves to one record — ZMQ handles reconnects itself.
+    // All forked devices get the same URL — one processor per provider.
+    let selectedProcessorEndpoint: string
+    try {
+        const allRecords = (
+            await Promise.all(options.endpoints.processor.map(e => srv.resolve(e)))
+        ).flat()
+        selectedProcessorEndpoint = await srv.attempt(allRecords, (record) => {
+            log.info('Provider "%s": devices will connect to processor "%s"', options.name, record.url)
+            return record.url
+        })
+    }
+    catch (err: any) {
+        log.fatal('Unable to resolve processor endpoint: %s', err?.message || err)
+        lifecycle.fatal()
+        return
+    }
 
     // To make sure that we always bind the same type of service to the same
     // port, we must ensure that we allocate ports in fixed groups.
     options.ports = options.ports.slice(0, options.ports.length - options.ports.length % RESOURCE_ALLOCATION_COUNT)
-
-    // Output
-    const push = zmqutil.socket('push')
-    try {
-        await Promise.all(options.endpoints.push.map(async(endpoint) => {
-            const records = await srv.resolve(endpoint)
-            return srv.attempt(records, (record) => {
-                log.info('Sending output to "%s"', record.url)
-                push.connect(record.url)
-            })
-        }))
-    }
-    catch (err) {
-        log.fatal('Unable to connect to push endpoint: %s', err)
-        lifecycle.fatal()
-    }
-
-    // Input
-    const sub = zmqutil.socket('sub')
-    try {
-        await Promise.all(options.endpoints.sub.map(async(endpoint) => {
-            const records = await srv.resolve(endpoint)
-            return srv.attempt(records, (record) => {
-                log.info('Receiving input to "%s"', record.url)
-                sub.connect(record.url)
-            })
-        }))
-
-        log.info('Subscribing to permanent channel "%s"', solo)
-        sub.subscribe(solo)
-    }
-    catch (err) {
-        log.fatal('Unable to connect to sub endpoint: %s', err)
-        lifecycle.fatal()
-    }
 
     // Resource pool for port allocation
     const portPool = new ResourcePool<number>(options.ports)
@@ -101,7 +74,7 @@ export default async (options: Options): Promise<void> => {
     const processManager = new ProcessManager<DeviceContext, number>({
         spawn: (id, context, resources) => {
             log.info('Spawning device process "%s" with ports [%s]', id, resources.join(', '))
-            return options.fork(id, resources)
+            return options.fork(id, resources, selectedProcessorEndpoint)
         },
         onReady: (id) => {
             log.info('Device process "%s" is ready', id)
@@ -109,15 +82,8 @@ export default async (options: Options): Promise<void> => {
         onError: (id, context, error) => {
             log.error('Device process "%s" error: %s', id, error.message)
         },
-        onCleanup: (id, context) => {
-            // Resolve register if pending
-            context.resolveRegister?.()
-
-            // Tell others the device is gone
-            push.send([
-                wireutil.global,
-                wireutil.pack(DeviceAbsentMessage, { serial: id })
-            ])
+        onCleanup: (id) => {
+            log.info('Device process "%s" cleaned up', id)
         }
     }, {
         killTimeout: options.killTimeout,
@@ -126,15 +92,6 @@ export default async (options: Options): Promise<void> => {
         },
         resourcePool: portPool
     })
-
-    // Handle device registration messages
-    sub.on('message', new WireRouter()
-        .on(DeviceRegisteredMessage, (channel, message: {serial: string}) => {
-            const process = processManager.get(message.serial)
-            process?.context?.resolveRegister?.()
-        })
-        .handler()
-    )
 
     let statsTimer: NodeJS.Timeout
     const stats = (twice = true) => {
@@ -182,85 +139,27 @@ export default async (options: Options): Promise<void> => {
         }
     }
 
-    // Tell others we found a device
-    const register = (device: ADBDevice) => new Promise<void>(
-        async(resolve, reject) => {
-            push.send([
-                wireutil.global,
-                wireutil.pack(DeviceIntroductionMessage, {
-                    serial: device.serial,
-                    status: wireutil.toDeviceStatus(device.type) || 1,
-                    provider: ProviderMessage.create({
-                        channel: solo,
-                        name: options.name
-                    }),
-                    deviceType: options.deviceType
-                })
-            ])
-
-            log.info('Registering device "%s"', device.serial)
-
-            process.nextTick(() => { // after creating process context
-                const managedProcess = processManager.get(device.serial)
-                if (!managedProcess) return
-
-                const timeout = setTimeout(() => reject('Register timeout'), BASE_DELAY)
-                managedProcess.context.resolveRegister = () => {
-                    clearTimeout(timeout)
-                    delete managedProcess?.context?.resolveRegister
-                    resolve()
-                }
-            })
-        }
-    )
-
-    const startDeviceWork = async(device: ADBDevice, restart = false, reregister = false) => {
+    const startDeviceWork = async(device: ADBDevice, restart = false) => {
         if (!processManager.has(device.serial)) return stats(false)
 
         const managedProcess = processManager.get(device.serial)
         if (!managedProcess) return
 
-        if (restart || reregister) {
-            log.warn('Trying to %s device again, delay 10 sec [%s]', restart ? 'start' : 'register', device.serial)
+        if (restart) {
+            log.warn('Trying to start device again, delay 10 sec [%s]', device.serial)
             await new Promise(r => setTimeout(r, BASE_DELAY))
         }
 
         log.info('Starting work for device "%s"', device.serial)
 
-        if (reregister) {
-            managedProcess.context.register = register(device)
-        }
-
-        if (!restart) {
-            try {
-                // Wait for registration
-                await managedProcess.context.register
-                log.info('Device "%s" registered successfully', device.serial)
-            }
-            catch (err: any) {
-                log.error('Device "%s" registration failed: %s', device.serial, err?.message || err)
-                return startDeviceWork(device, false, true)
-            }
-        }
-
-        // Start the process (this will spawn and wait for ready)
         const started = await processManager.start(device.serial)
 
         if (!started) {
             log.error('Failed to start device process [%s]', device.serial)
-            return startDeviceWork(device, true, false)
+            return startDeviceWork(device, true)
         }
 
         stats()
-
-        // Tell others the device state changed
-        push.send([
-            wireutil.global,
-            wireutil.pack(DeviceStatusMessage, {
-                serial: device.serial,
-                status: wireutil.toDeviceStatus(device.type)
-            })
-        ])
     }
 
     // Track and manage devices
@@ -303,14 +202,8 @@ export default async (options: Options): Promise<void> => {
 
         log.info('Connected device "%s" [%s]', device.serial, device.type)
 
-        // Create device context with registration promise
-        const deviceContext: DeviceContext = {
-            device,
-            register: register(device) // Register device immediately, before 'running' state
-        }
-
         // Create managed process
-        const created = await processManager.create(device.serial, deviceContext, {
+        const created = await processManager.create(device.serial, {device}, {
             initialState: 'waiting',
             resourceCount: RESOURCE_ALLOCATION_COUNT // Allocate 2 ports per device
         })
@@ -416,10 +309,6 @@ export default async (options: Options): Promise<void> => {
 
         stats(false)
         tracker.destroy()
-
-        ;[push, sub].forEach((sock) =>
-            sock.close()
-        )
 
         // Clean up all processes
         return processManager.cleanup()

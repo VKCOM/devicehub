@@ -63,7 +63,7 @@ export class ShellSettingsService extends ListManagementService<'serial', ShellD
         const transaction = new TransactionService()
         const initializeTransaction = transaction.initializeTransaction()
 
-        socket.emit('shell.command', device.channel, initializeTransaction.channel, {
+        socket.emit('shell.command', device.serial, initializeTransaction.channel, {
           command: this.command,
           timeout: 60000,
         })

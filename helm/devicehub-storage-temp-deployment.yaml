@@ -28,10 +28,6 @@ spec:
             - "3000"
             - --save-dir
             - /tmp
-            - --connect-sub
-            - tcp://devicehub-triproxy-app:7150
-            - --connect-push
-            - tcp://devicehub-triproxy-app:7170
             - --secret=
           envFrom:
             - configMapRef:
