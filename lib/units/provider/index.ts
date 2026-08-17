@@ -2,13 +2,8 @@ import logger from '../../util/logger.js'
 import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import {ChildProcess} from 'node:child_process'
-import ADBObserver, {ADBDevice} from './ADBObserver.js'
+import ADBObserver, {ADBDevice, isOnline} from './ADBObserver.js'
 import {ProcessManager, ResourcePool} from '../../util/ProcessManager.js'
-
-// Device-specific context for process management
-interface DeviceContext {
-    device: ADBDevice
-}
 
 type DeviceHandler = (device: ADBDevice, oldType?: ADBDevice['type']) => any | Promise<any>
 
@@ -16,6 +11,11 @@ export interface Options {
     name: string
     adbHost: string
     adbPort: number
+    /* Restart the local ADB server via `adbPath` when it goes down */
+    adbAutostart: boolean
+    adbPath: string
+    /* Minutes of idle time after which a device is force-reconnected. 0 = off */
+    idleDeviceReconnect: number
     ports: number[]
     allowRemote: boolean
     killTimeout: number
@@ -71,7 +71,7 @@ export default async (options: Options): Promise<void> => {
     // Resource pool for port allocation
     const portPool = new ResourcePool<number>(options.ports)
 
-    const processManager = new ProcessManager<DeviceContext, number>({
+    const processManager = new ProcessManager<ADBDevice, number>({
         spawn: (id, context, resources) => {
             log.info('Spawning device process "%s" with ports [%s]', id, resources.join(', '))
             return options.fork(id, resources, selectedProcessorEndpoint)
@@ -84,6 +84,17 @@ export default async (options: Options): Promise<void> => {
         },
         onCleanup: (id) => {
             log.info('Device process "%s" cleaned up', id)
+        },
+        onMessage: (id, context, message: any) => {
+            if (message?.type !== 'device-state') {
+                log.warn(`Unknown message from device "${id}": ${JSON.stringify(message)}`)
+                return
+            }
+
+            // Pause/resume ADB health checks and idle reconnects for this
+            // device so we never interfere with an active session.
+            tracker.setBusy(id, message.state === 'busy')
+            log.info('Device "%s" is now %s', id, message.state)
         }
     }, {
         killTimeout: options.killTimeout,
@@ -166,17 +177,32 @@ export default async (options: Options): Promise<void> => {
     const tracker = new ADBObserver({
         intervalMs: 3000,
         port: options.adbPort,
-        host: options.adbHost
+        host: options.adbHost,
+        adbAutostart: options.adbAutostart,
+        adbPath: options.adbPath,
+        idleReconnectMinutes: options.idleDeviceReconnect
     })
 
-    // TODO: add ADBObserver.enableHealthCheck(serial) to check only filtered devices
+    if (options.adbAutostart) {
+        log.info('ADB server autostart is enabled (adb path: "%s")', options.adbPath)
+    }
+
+    if (options.idleDeviceReconnect > 0) {
+        log.info('Idle devices will be reconnected every %s minute(s)', options.idleDeviceReconnect)
+    }
+
+    tracker.on('idle-reconnect', (device, info) => {
+        log.info(
+            `Reconnected idle device "${device.serial}" after ${
+                Math.floor(info.idleMs / 60_000)
+            } minute(s) [ok: ${info.ok}]`
+        )
+    })
+
     tracker.on('healthcheck', async(stats) => {
         log.info('Healthcheck [OK: %s, BAD: %s]', stats.ok, stats.bad)
 
-        // Check for stuck workers
         const stuckProcesses = processManager.checkHealth()
-
-        // Stop and restart stuck workers
         for (const serial of stuckProcesses) {
             log.error('Restarting stuck worker "%s"', serial)
 
@@ -201,9 +227,7 @@ export default async (options: Options): Promise<void> => {
         }
 
         log.info('Connected device "%s" [%s]', device.serial, device.type)
-
-        // Create managed process
-        const created = await processManager.create(device.serial, {device}, {
+        const created = await processManager.create(device.serial, device, {
             initialState: 'waiting',
             resourceCount: RESOURCE_ALLOCATION_COUNT // Allocate 2 ports per device
         })
@@ -220,24 +244,23 @@ export default async (options: Options): Promise<void> => {
             return
         }
 
-        // TODO: add options.unavailableTimeToReconnect (default: 30sec)
-        // Try to reconnect device if it is not available for more than 30 seconds
-        if (device.serial.includes(':')) {
-            const timer = setTimeout(serial => {
-                const device = tracker.getDevice(serial)
-                if (device && !['device', 'emulator'].includes(device?.type)) {
-                    device.reconnect()
-                }
-            }, 30_000, device.serial)
+        // Try to reconnect device if it is not available for more than 30
+        // seconds. Applies to USB devices too: ADBObserver reconnects those
+        // with `reconnect` instead of disconnect/connect.
+        const timer = setTimeout(serial => {
+            const device = tracker.getDevice(serial)
+            if (device && !isOnline(device?.type)) {
+                device.reconnect()
+            }
+        }, 30_000, device.serial)
 
-            processManager.setTimer(device.serial, timer)
-        }
+        processManager.setTimer(device.serial, timer)
     }))
 
     tracker.on('update', filterDevice(async(device, oldType) => {
         log.info('Device "%s" is now "%s" (was "%s")', device.serial, device.type, oldType)
 
-        if (!['device', 'emulator'].includes(device.type)) {
+        if (device.type !== 'device') {
             // Device went offline - stop worker but keep it in waiting state
             log.info('Device "%s" went offline [%s]', device.serial, device.type)
 
@@ -266,17 +289,17 @@ export default async (options: Options): Promise<void> => {
     }))
 
     tracker.on('stuck', async(device, health) => {
+        if (!processManager.has(device.serial)) {
+            log.warn('Device %s is stuck, but process is not running', device.serial)
+            return
+        }
+
         log.warn(
             'Device %s is stuck [attempts: %s, first_healthcheck: %s, last_healthcheck: %s]',
             device.serial,
             new Date(health.firstFailureTime).toISOString(),
             new Date(health.lastAttemptTime).toISOString()
         )
-
-        if (!processManager.has(device.serial)) {
-            log.warn('Device is stuck, but process is not running')
-            return
-        }
 
         removeDevice(device)
     })

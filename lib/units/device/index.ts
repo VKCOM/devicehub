@@ -93,6 +93,7 @@ export default (function(options: any) {
             })
 
             return syrup.serial()
+                .dependency(trackModuleReadyness('group', group))
                 .dependency(trackModuleReadyness('heartbeat', heartbeat))
                 .dependency(trackModuleReadyness('stream', stream))
                 .dependency(trackModuleReadyness('capture', capture))
@@ -106,8 +107,6 @@ export default (function(options: any) {
                 .dependency(trackModuleReadyness('shell', shell))
                 .dependency(trackModuleReadyness('touch', touch))
                 .dependency(trackModuleReadyness('install', install))
-
-                .dependency(trackModuleReadyness('group', group))
                 .dependency(trackModuleReadyness('cleanup', cleanup))
                 .dependency(trackModuleReadyness('reboot', reboot))
                 .dependency(trackModuleReadyness('connect', connect))
@@ -119,10 +118,32 @@ export default (function(options: any) {
                 .dependency(trackModuleReadyness('filesystem', filesystem))
                 .dependency(trackModuleReadyness('mobileService', mobileService))
                 .dependency(trackModuleReadyness('remotedebug', remotedebug))
-                .define((options, heartbeat) => {
+                .define((options, group) => {
                     if (process.send) {
                         // Only if we have a parent process
                         process.send('ready')
+
+                        /*
+                         * Tell the provider whether the device is rented out.
+                         * The provider pauses ADB health checks and idle
+                         * reconnects while a device is busy, so it never
+                         * interferes with an active session.
+                         */
+                        const reportState = (state: 'busy' | 'idle') => {
+                            try {
+                                process.send?.({
+                                    type: 'device-state',
+                                    serial: options.serial,
+                                    state
+                                })
+                            }
+                            catch (err: any) {
+                                log.warn('Failed to report "%s" state: %s', state, err?.message)
+                            }
+                        }
+
+                        group.on('join', () => reportState('busy'))
+                        group.on('leave', () => reportState('idle'))
                     }
                     log.info('Fully operational')
                     return solo.poke()
