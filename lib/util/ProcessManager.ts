@@ -48,6 +48,12 @@ export interface ProcessCallbacks<TContext = {}, TResources = any> {
     // Called before process cleanup
     onCleanup?: (id: string, context: TContext) => void | Promise<void>
 
+    /*
+     * Called for every IPC message from the child except the 'ready' handshake,
+     * for the whole lifetime of the process (not just during startup).
+     */
+    onMessage?: (id: string, context: TContext, message: unknown) => void | Promise<void>
+
     // Factory function to spawn the actual child process
     spawn: (id: string, context: TContext, resources: TResources[]) => ChildProcess | Promise<ChildProcess>
 }
@@ -61,6 +67,10 @@ export interface ManagedProcess<TContext, TResources> {
 
     // Safe timer - self-clear on process remove or state changes
     timer?: NodeJS.Timeout
+
+    // Currently spawned child, if any. Used to make sure a respawn can never
+    // leave the previous child running.
+    childProcess?: ChildProcess
 }
 
 export interface ProcessStats {
@@ -145,6 +155,14 @@ export class ProcessManager<TContext = any, TResources = any> {
 
         if (!force && process.state === 'running') {
             this.log.warn('Process "%s" is already running', id)
+            return true
+        }
+
+        // A spawn is already under way. Without this guard two overlapping
+        // start() calls each spawn a child, and the first one is leaked: only
+        // the last terminate handler is kept, so nothing can ever kill it.
+        if (!force && process.state === 'starting') {
+            this.log.warn('Process "%s" is already starting', id)
             return true
         }
 
@@ -234,13 +252,32 @@ export class ProcessManager<TContext = any, TResources = any> {
             }
 
             try {
+                // Never leave a previous child running: whoever spawns last owns
+                // the terminate handler, so an unkilled predecessor would keep
+                // serving the same device forever.
+                const previousChild = process.childProcess
+                if (previousChild && previousChild.exitCode === null && !previousChild.killed) {
+                    this.log.warn('Process "%s" still has a live child, killing it first', id)
+                    previousChild.removeAllListeners('message')
+                    await procutil.gracefullyKill(previousChild, this.killTimeout)
+                }
+
                 // Spawn the child process
                 childProcess = await this.callbacks.spawn(id, process.context, [...process.resources])
+                process.childProcess = childProcess
                 this.log.info('Spawned process "%s"', id)
 
                 // Set up event listeners
+                const exitedChild = childProcess
                 childProcess.on('exit', (code?: number, signal?: string) => {
                     cleanup()
+
+                    // Forget the child once it is gone, so a later respawn does
+                    // not try to kill an already dead process.
+                    const current = this.processes.get(id)
+                    if (current && current.childProcess === exitedChild) {
+                        current.childProcess = undefined
+                    }
 
                     // TODO: if (isResolved) then emit error
                     if (signal) {
@@ -261,15 +298,39 @@ export class ProcessManager<TContext = any, TResources = any> {
                     handleError(err)
                 })
 
-                const messageHandler = (message: string) => {
+                const readyHandler = (message: unknown) => {
                     if (message === 'ready') {
                         handleReady()
-                        childProcess?.removeListener('message', messageHandler)
-                    } else {
-                        this.log.warn('Unknown message from process "%s": "%s"', id, message)
+                        childProcess?.removeListener('message', readyHandler)
                     }
                 }
 
+                const messageHandler = async(message: unknown) => {
+                    if (message === 'ready') {
+                        return
+                    }
+
+                    const currentProcess = this.processes.get(id)
+                    if (!currentProcess) {
+                        return
+                    }
+
+                    if (!this.callbacks.onMessage) {
+                        this.log.warn('Unknown message from process "%s": "%s"', id, message)
+                        return
+                    }
+
+                    try {
+                        await this.callbacks.onMessage(id, currentProcess.context, message)
+                    }
+                    catch (err: any) {
+                        this.log.error(
+                            'Error handling message from process "%s": %s', id, err?.message || err
+                        )
+                    }
+                }
+
+                childProcess.on('message', readyHandler)
                 childProcess.on('message', messageHandler)
 
                 // Store kill function for later
@@ -278,6 +339,11 @@ export class ProcessManager<TContext = any, TResources = any> {
                     cleanup()
                     this.log.info('Gracefully killing process "%s"', id)
                     await procutil.gracefullyKill(originalChildProcess, this.killTimeout)
+
+                    const current = this.processes.get(id)
+                    if (current && current.childProcess === originalChildProcess) {
+                        current.childProcess = undefined
+                    }
                 })
             } catch (err: any) {
                 this.log.error('Failed to spawn process "%s": %s', id, err.message)
