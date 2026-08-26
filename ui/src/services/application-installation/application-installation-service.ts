@@ -44,7 +44,7 @@ export class ApplicationInstallationService {
   ) {
     makeAutoObservable(this)
 
-    this.manifestQuery = mobxQueryFactory(() => ({ ...queries.s.apk(this.href), enabled: !!this.href }))
+    this.manifestQuery = mobxQueryFactory(() => ({ ...queries.s.apk(this.href), enabled: !!this.href && this.isAndroid }))
     this.uploadFileMutate = mobxMutationFactory<UploadFileResponse, ErrorResponse, UploadFileArgs>({
       mutationFn: (data): Promise<UploadFileResponse> => uploadFile(data),
     })
