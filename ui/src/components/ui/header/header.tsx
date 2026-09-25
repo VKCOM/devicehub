@@ -36,6 +36,7 @@ export const Header = () => {
   const onLogout = () => {
     if (authUrl?.includes('openid')) {
       setIsConfirmationOpen(true)
+      return
     }
 
     authStore.logout()
