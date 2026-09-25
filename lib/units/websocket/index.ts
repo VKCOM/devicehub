@@ -25,6 +25,7 @@ import {TransactionManager} from '../../wire/transmanager.js'
 import {ClientDispatcher} from './support/clientDispatcher.js'
 import {DeviceOwnership} from './support/deviceOwnership.js'
 import {OwnershipCache} from './support/ownershipCache.js'
+import {parseLogcatFilters} from './support/logcatFilters.js'
 import {
     UpdateAccessTokenMessage,
     DeleteUserMessage,
@@ -891,10 +892,20 @@ export default (async (options: Options) => {
                 }
             })
 
-            socket.on('logcat.start', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
-            socket.on('logcat.startIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
+            const startLogcat = (serial: string, rc: string, data: unknown) => {
+                const filters = parseLogcatFilters((data as {filters?: unknown} | null)?.filters)
+                if (!filters) {
+                    socket.emit('tx.done', rc, {
+                        source: serial,
+                        success: false,
+                        data: 'invalid_logcat_filters'
+                    })
+                    return
+                }
+                return runTx(serial, rc, LogcatStartMessage, {filters})
+            }
+            socket.on('logcat.start', startLogcat)
+            socket.on('logcat.startIos', startLogcat)
             socket.on('logcat.stop', (serial: string, rc: string) =>
                 runTx(serial, rc, LogcatStopMessage, {}))
             socket.on('logcat.stopIos', (serial: string, rc: string) =>
