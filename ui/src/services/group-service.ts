@@ -1,4 +1,5 @@
-import { inject, injectable } from 'inversify'
+import { DeviceSession } from './device-session'
+import { inject, injectable, optional } from 'inversify'
 
 import { socket } from '@/api/socket'
 
@@ -11,9 +12,13 @@ const MILLISECONDS_IN_MINUTE = 1000 * 60
 
 @injectable()
 export class GroupService {
-  constructor(@inject(CONTAINER_IDS.factoryTransactionService) private transactionServiceFactory: TransactionFactory) {}
+  constructor(
+    @inject(CONTAINER_IDS.factoryTransactionService) private transactionServiceFactory: TransactionFactory,
+    @inject(CONTAINER_IDS.deviceSession) @optional() private session?: DeviceSession
+  ) {}
 
   invite(serial: string, deviceGroup?: DeviceGroup): Promise<unknown> {
+    if (this.session?.silent) return this.session.start()
     /* NOTE: 1 for Infinity */
     let timeout = 1
 
@@ -48,6 +53,7 @@ export class GroupService {
   }
 
   kick(serial: string): Promise<unknown> {
+    if (this.session?.silent) return this.session.release()
     const transaction = this.transactionServiceFactory()
     const { channel: transactionChannel, donePromise: transactionEndPromise } = transaction.initializeTransaction()
 

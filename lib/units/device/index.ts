@@ -56,15 +56,17 @@ export default (function(options: any) {
             // The DEALER's routing identity is deviceKey(providerName, serial),
             // which is what the processor uses to derive presence.
             const providerName = options.provider ?? os.hostname()
+            const type = await adb.getDevice(options.serial).getState()
+
             let registerListener: ((...args: any[]) => void) | null = null
             const waitRegister = Promise.race([
                 new Promise(resolve =>
                     router.on(DeviceRegisteredMessage, registerListener = (...args: any[]) => resolve(args))
                 ),
-                new Promise(r => setTimeout(r, 15000))
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(`Registration for device ${options.serial} failed`), 15000))
             ])
 
-            const type = await adb.getDevice(options.serial).getState()
             transport?.send([
                 wireutil.global,
                 wireutil.pack(DeviceIntroductionMessage, {
@@ -74,7 +76,9 @@ export default (function(options: any) {
                     provider: ProviderMessage.create({
                         channel: solo.channel,
                         name: providerName
-                    })
+                    }),
+                    silent: options.silent,
+                    groupId: options.groupId
                 })
             ])
 
@@ -129,12 +133,14 @@ export default (function(options: any) {
                          * reconnects while a device is busy, so it never
                          * interferes with an active session.
                          */
-                        const reportState = (state: 'busy' | 'idle') => {
+                        const reportState = (state: 'busy' | 'idle', email?: string, reason?: string) => {
                             try {
                                 process.send?.({
                                     type: 'device-state',
                                     serial: options.serial,
-                                    state
+                                    state,
+                                    email,
+                                    reason
                                 })
                             }
                             catch (err: any) {
@@ -142,8 +148,8 @@ export default (function(options: any) {
                             }
                         }
 
-                        group.on('join', () => reportState('busy'))
-                        group.on('leave', () => reportState('idle'))
+                        group.on('join', e => reportState('busy', e.owner.email))
+                        group.on('leave', (owner, reason) => reportState('idle', owner.email, reason))
                     }
                     log.info('Fully operational')
                     return solo.poke()
@@ -152,9 +158,9 @@ export default (function(options: any) {
         })
         .consume(options)
         .catch((err) => {
-            if (err.stack.includes('no service started')) {
+            if (err.stack?.includes('no service started')) {
                 return lifecycle.graceful(err.stack)
             }
-            lifecycle.fatal(`Setup had an error ${err.stack}`)
+            lifecycle.fatal(`Setup had an error ${err.stack || err.message}`)
         })
 })

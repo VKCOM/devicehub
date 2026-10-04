@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useInjection } from 'inversify-react'
+import cn from 'classnames'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
@@ -22,7 +23,7 @@ export const DashboardTab = observer(() => {
 
   return (
     <div className={styles.dashboardTabContainer}>
-      <div className={styles.dashboardTab}>
+      <div className={cn(styles.dashboardTab, { [styles.silent]: deviceBySerialStore.session.silent })}>
         <DeviceButtonsControl className={styles.deviceButtons} />
         <RemoteDebugControl className={styles.remoteDebug} />
         <AppUploadControl className={styles.appUpload} />
@@ -32,7 +33,7 @@ export const DashboardTab = observer(() => {
         </ConditionalRender>
         <ClipboardControl className={styles.clipboard} />
         {/* https://developer.apple.com/forums/thread/706761?answerId=714896022#714896022 */}
-        <DeviceBookingControl className={styles.deviceBooking} />
+        {!deviceBySerialStore.session.silent && <DeviceBookingControl className={styles.deviceBooking} />}
       </div>
     </div>
   )

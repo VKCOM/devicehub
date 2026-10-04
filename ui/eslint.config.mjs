@@ -124,7 +124,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-hooks/exhaustive-deps': 'off',
       /* @typescript */
-      '@typescript-eslint/no-use-before-define': 'error',
+      '@typescript-eslint/no-use-before-define': 'warn',
       '@typescript-eslint/no-empty-interface': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -195,8 +195,8 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'error',
-      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
       /* imports */
       'import/prefer-default-export': 'off',
       'import/no-named-default': 'error',

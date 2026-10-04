@@ -135,8 +135,13 @@ export default syrup.serial()
                     wdaClient.typeKey(key)
                 }
             })
-            .on(BrowserOpenMessage, (channel, message) => {
-                wdaClient.openUrl(message.url)
+            .on(BrowserOpenMessage, async(channel, message) => {
+                const reply = wireutil.reply(options.serial)
+                try {
+                    await wdaClient.openUrl(message.url)
+                    transport.send([channel, reply.okay()])
+                }
+                catch (err: any) { transport.send([channel, reply.fail(err?.message || 'fail')]) }
             })
             .on(RotateMessage, async(channel, message) => {
                 const orientation = iosutil.degreesToOrientation(message.rotation)

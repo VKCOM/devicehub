@@ -30,16 +30,19 @@ export default syrup.serial()
 
         group.on('leave', async() => {
             try {
+                Promise.all([
+                    service.sendCommand('settings put system screen_brightness_mode 0'),
+                    service.sendCommand('settings put system screen_brightness 0'),
+                    service.sendCommand('input keyevent 223'), // KEYCODE_SLEEP
+                ])
+
                 if (options.screenReset) {
                     service.pressKey('home')
                     service.thawRotation()
 
                     log.warn('Cleaning device')
                     await Promise.all([
-                        service.sendCommand('settings put system screen_brightness_mode 0'),
-                        service.sendCommand('settings put system screen_brightness 0'),
                         service.setMasterMute(true),
-                        service.sendCommand('input keyevent 223'), // KEYCODE_SLEEP
                         service.sendCommand('settings put global http_proxy :0'),
                         service.sendCommand('pm clear com.android.chrome'),
                         service.sendCommand('pm clear com.chrome.beta'),

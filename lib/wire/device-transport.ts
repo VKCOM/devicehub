@@ -26,10 +26,24 @@
 // is dropped.
 //
 import {EventEmitter} from 'events'
+import {InactivityMonitor} from '../util/inactivity-monitor.js'
 import logger from '../util/logger.js'
 import type {DealerSocket} from '../util/zmqsocket.js'
 import {KIND, CORRELATION_PREFIX, encodeEvent, encodeReply, classifyFrames} from './frame.js'
-import {Envelope} from './wire.js'
+import {
+    Envelope,
+    DescribeSilentDevice,
+    AcquireSilentDevice,
+    ReleaseSilentDevice,
+    SilentDeviceSnapshot,
+    DeviceRegisteredMessage,
+    ProbeMessage,
+    GroupMessage,
+    UngroupMessage
+} from './wire.js'
+import {Any} from './google/protobuf/any.js'
+import wireutil from './util.js'
+import {SilentDeviceRuntime} from '../units/base-device/support/silent-runtime.js'
 
 // Envelope.channel is proto field 3, wire type 2 (LEN): tag = (3 << 3) | 2 = 0x1a.
 // Appending this field to an existing Envelope binary injects the channel without a
@@ -147,13 +161,28 @@ export class DeviceWire {
 // The plugin-facing device transport over a DEALER. Mirrors the shape plugins
 // already use (`send`, `on('message')`) so no plugin needs to change.
 export class DeviceTransport extends EventEmitter {
+    readonly silent?: SilentDeviceRuntime
     private wire: DeviceWire
     private sweepTimer?: NodeJS.Timeout
     private closed = false
 
-    constructor(private dealer: DealerSocket) {
+    constructor(
+        private dealer: DealerSocket,
+        silentOptions?: {
+            providerName: string
+            serial: string
+            allowedEmails?: string[]
+            inactivityTimeout?: number
+        },
+        readonly inactivity = new InactivityMonitor()
+    ) {
         super()
         this.wire = new DeviceWire()
+        if (silentOptions) {
+            this.silent = new SilentDeviceRuntime(silentOptions.providerName, silentOptions.serial,
+                silentOptions.allowedEmails ?? [], json => this.send([wireutil.global, wireutil.pack(SilentDeviceSnapshot, {json})]),
+                inactivity, silentOptions.inactivityTimeout ?? 0)
+        }
 
         this.dealer.on('frames', (frames: Buffer[]) => {
             try {
@@ -177,36 +206,126 @@ export class DeviceTransport extends EventEmitter {
         const {kind} = classifyFrames(frames, {routerPrepended: false})
         if (kind === KIND.DEVICE) {
             const {channel, envelope} = this.wire.receiveCommand(frames)
+            const decoded = Envelope.fromBinary(envelope)
+            if (decoded.message && Any.contains(decoded.message, DescribeSilentDevice)) {
+                void this.handleSilent(channel, decoded)
+                return
+            }
+
+            if (this.silent) {
+                const message = decoded.message
+                if (!message) {
+                    return
+                }
+
+                if (Any.contains(message, AcquireSilentDevice) || Any.contains(message, ReleaseSilentDevice)) {
+                    void this.handleSilent(channel, decoded)
+                    return
+                }
+
+                // Only the processor's direct registration/probe (empty reply path) bypasses ownership.
+                if (!(frames.length === 4 && (Any.contains(message, DeviceRegisteredMessage) || Any.contains(message, ProbeMessage)))) {
+                    try {
+                        if (Any.contains(message, GroupMessage) || Any.contains(message, UngroupMessage)) {
+                            throw new Error('not_owner')
+                        }
+
+                        this.silent.authorize(decoded.silentCommand)
+                    }
+                    catch {
+                        if (channel) this.send([channel, wireutil.reply(this.silent.serial).fail('not_owner')])
+                        return
+                    }
+                }
+            }
+
             // Re-emit in the shape the WireRouter consumes.
             this.emit('message', channel, envelope)
         }
+
         // Any other kind targeted at a device is unexpected; drop silently.
+    }
+
+    private async handleSilent(channel: string, envelope: Envelope) {
+        const reply = wireutil.reply(this.silent?.serial || '')
+        try {
+            if (!this.silent) {
+                throw new Error('not_silent')
+            }
+
+            let result: any
+            if (Any.contains(envelope.message!, DescribeSilentDevice)) {
+                result = {device: this.silent.describe(Any.unpack(envelope.message!, DescribeSilentDevice).actor!)}
+            }
+            else if (Any.contains(envelope.message!, AcquireSilentDevice)) {
+                const request = Any.unpack(envelope.message!, AcquireSilentDevice)
+                result = await this.silent.acquire(request.actor!, request.instanceId)
+            }
+            else {
+                this.silent.authorize(envelope.silentCommand)
+                await this.silent.release()
+            }
+
+            this.send([channel, reply.okay('success', result)])
+        }
+        catch (err: any) {
+            this.send([channel, reply.fail(err?.message || 'fail')])
+        }
     }
 
     // Plugins call send([channel, envelope]); accept that array shape loosely
     // (callsites are untyped legacy JS).
     send(args: [string, Uint8Array] | any[]) {
-        if (this.closed) return
+        if (this.closed) {
+            return
+        }
+
         const channel = String(args[0])
         const payload = args[1] as Uint8Array
         const envelope = Buffer.isBuffer(payload) ? payload : Buffer.from(payload)
         const out = this.wire.send(channel, envelope)
         if (!out) {
-            return // dropped: unknown/stale correlationId
+            return // Unknown/stale correlationId: do not update live state from a stale reply.
         }
+
+        if (this.silent) {
+            const decoded = Envelope.fromBinary(out[out.length - 1])
+            const forward = !decoded.message || this.silent.observe(decoded.message)
+
+            // State is already published as a snapshot. Keep intros, ready/absent, heartbeats and replies.
+            if (!forward && out[0].toString() === KIND.EVENT) return
+            decoded.silentEvent = this.silent.context()
+            out[out.length - 1] = Buffer.from(Envelope.toBinary(decoded))
+        }
+
         this.dealer.send(out).catch((err: any) =>
             log.warn('Undeliverable to processor: %s', err?.message))
     }
 
     async close() {
-        if (this.closed) return
-        if (this.sweepTimer) {
-            clearInterval(this.sweepTimer)
+        if (this.closed) {
+            return
         }
 
-        this.closed = true
-        this.removeAllListeners()
-        await this.dealer.flush()
-        return this.dealer.close()
+        try {
+            await this.silent?.close()
+        }
+        finally {
+            this.inactivity.stop()
+            if (this.sweepTimer) {
+                clearInterval(this.sweepTimer)
+            }
+
+            this.closed = true
+            this.emit('close')
+            this.removeAllListeners()
+
+            try {
+                await this.dealer.flush()
+            }
+            finally {
+                await this.dealer.close()
+            }
+        }
     }
 }

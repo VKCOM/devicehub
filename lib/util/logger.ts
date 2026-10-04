@@ -87,7 +87,9 @@ export class Log extends EventEmitter {
     }
 
     debug(...args: LogArguments): void {
-        this._write(this._entry(LogLevel.DEBUG, args))
+        if (process.env.LOG_LEVEL === 'debug') {
+            this._write(this._entry(LogLevel.DEBUG, args))
+        }
     }
 
     verbose(...args: LogArguments): void {

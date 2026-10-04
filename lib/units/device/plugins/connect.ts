@@ -91,19 +91,16 @@ export default syrup.serial()
                 await awaitMinirev()
 
                 return new Promise((resolve, reject) => {
-                    // If Auth failed - the entire unit device will fall
-                    // TODO: fix
-                    const auth = (key: Key) => new Promise<void>(async(resolve, reject) => {
-                        if (plugin.auth(key)) {
-                            resolve()
-                            return
-                        }
-                        reject('Auth failed')
-                    })
+                    const auth = async(key: Key) => {
+                        if (!plugin.auth(key)) throw new Error('ADB key is not allowed for the current owner')
+                    }
 
                     activeServer = adb.createTcpUsbBridge(plugin.serial, {auth})
                         .on('listening', () => resolve(plugin.url))
-                        .on('error', reject)
+                        .on('error', err => {
+                            log.warn('Remote ADB bridge error: %s', err.message)
+                            reject(err)
+                        })
                         .on('connection', conn => {
                             // @ts-ignore
                             log.info('New remote ADB connection from %s', conn.remoteAddress)
@@ -118,7 +115,9 @@ export default syrup.serial()
                                 return conn as unknown as import('./adb-reverse/session.ts').MinirevStream
                             }
 
-                            const session: ReverseSession = attachReverse(conn as never, openMinirev)
+                            const session: ReverseSession = attachReverse(conn as never, openMinirev, err => {
+                                log.warn('Closing remote ADB connection: %s', err instanceof Error ? err.message : String(err))
+                            })
                             activeSessions.add(session)
 
                             conn.on('end', () => {
@@ -167,15 +166,17 @@ export default syrup.serial()
             }
         }
 
-        group.on('join', (group, keys) =>
+        const setAllowedKeys = (keys: string[] = []) => {
             plugin.auth = key => {
-                if (keys?.length && !keys.includes(key.fingerprint)) {
-                    log.error('Invalid RSA key. Somebody else took the device')
+                if (keys.length && !keys.includes(key.fingerprint)) {
+                    log.warn('Remote ADB key is not allowed for the current owner')
                     return false
                 }
                 return true
             }
-        )
+        }
+        group.on('join', e => setAllowedKeys(e.adbKeys))
+        if (options.silent) group.on('keys', setAllowedKeys)
 
         group.on('leave', () => {
             for (const session of activeSessions) {
@@ -194,7 +195,7 @@ export default syrup.serial()
 
         lifecycle.observe(() => connector.stop())
         group.on('leave', () => {
-            connector.stop()
             plugin.auth = (key) => false
+            return connector.stop()
         })
     })

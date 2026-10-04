@@ -56,6 +56,15 @@ const isWireless = (serial: string) => serial.includes(':')
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '0.0.0.0'])
 
+/*
+ * Serial ADB assigns to a device connected over TCP, also the `adb connect`
+ * target. IPv6 hosts must be bracketed, `::1:5555` is not understood by adb.
+ */
+export const deviceSerial = (host: string, port: number) => {
+    const bare = host.replace(/^\[(.*)\]$/, '$1')
+    return bare.includes(':') ? `[${bare}]:${port}` : `${bare}:${port}`
+}
+
 class ADBObserver extends EventEmitter<ADBEvents> {
     static instance: ADBObserver | null = null
 
@@ -83,12 +92,16 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     /* Serials with a reconnect currently in flight, to avoid overlapping ones */
     private reconnecting: Set<string> = new Set()
 
+    /* Serials whose connection is owned by someone else (the provider API): never reconnected here */
+    private noReconnect: Set<string> = new Set()
+
     private pollTimeout: NodeJS.Timeout | null = null
     private healthCheckTimeout: NodeJS.Timeout | null = null
 
     private connection: Socket | null = null
     private requestQueue: Array<{
         command: string
+        timeoutMs?: number // Overrides requestTimeoutMs for slow commands (e.g. host:connect)
         resolve: (value: string) => void
         reject: (error: Error) => void
         needData: boolean
@@ -100,10 +113,10 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }> = []
 
     /*
-     * True while we are tearing down a transport socket on purpose.
+     * True while we close a connection on purpose after a reply.
      * Such a close is expected and must not be mistaken for the ADB server going away.
      */
-    private isTransportTeardown: boolean = false
+    private isClosingAfterReply: boolean = false
     private shouldContinuePolling: boolean = false
 
     /* Completed poll iterations, useful to confirm the poll chain is alive */
@@ -196,6 +209,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
         this.busyDevices.clear()
         this.idleSince.clear()
         this.reconnecting.clear()
+        this.noReconnect.clear()
         this.removeAllListeners()
     }
 
@@ -237,6 +251,52 @@ class ADBObserver extends EventEmitter<ADBEvents> {
 
     isBusy(serial: string): boolean {
         return this.busyDevices.has(serial)
+    }
+
+    /**
+     * Enable or disable automatic reconnects (health check and idle) for a device.
+     * Disabled devices still emit `stuck`, the caller decides what to do.
+     */
+    setAutoReconnect(serial: string, enabled: boolean): void {
+        if (enabled) {
+            this.noReconnect.delete(serial)
+        }
+        else {
+            this.noReconnect.add(serial)
+        }
+    }
+
+    /**
+     * `adb connect host:port`. Resolves with the resulting serial.
+     * The ADB server replies OKAY with a human readable message even on failure,
+     * so success is decided by the message text.
+     */
+    async connect(host: string, port: number, timeoutMs = 15_000): Promise<string> {
+        const serial = deviceSerial(host, port)
+        const response = await this.sendADBCommand(`host:connect:${serial}`, undefined, {timeoutMs})
+
+        if (!/^(already )?connected to /i.test(response.trim())) {
+            throw new Error(response.trim() || `Unable to connect to ${serial}`)
+        }
+
+        // Pick the device up right away instead of waiting for the next poll
+        this.pollDevices()
+
+        return serial
+    }
+
+    /**
+     * `adb disconnect host:port`. An unknown device is not an error.
+     */
+    async disconnect(host: string, port: number): Promise<void> {
+        try {
+            await this.sendADBCommand(`host:disconnect:${deviceSerial(host, port)}`)
+        }
+        catch (err: any) {
+            if (!/no such device|not found/i.test(err?.message || '')) {
+                throw err
+            }
+        }
     }
 
     /**
@@ -303,7 +363,10 @@ class ADBObserver extends EventEmitter<ADBEvents> {
             }
         }
         catch (error: any) {
-            this.emit('error', error)
+            // destroy() rejects in-flight requests after removing the listeners
+            if (!this.isDestroyed) {
+                this.emit('error', error)
+            }
         }
         finally {
             this.isPolling = false
@@ -512,22 +575,26 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
-     * Establish or reuse persistent connection to ADB server
+     * Establish or reuse the connection to the ADB server.
+     *
+     * Resolves with null when a connection we waited for was already closed
+     * again: that is routine (one host request per connection), the request
+     * queue reconnects on its own. Rejects only on a network error.
      */
-    private async ensureConnection(): Promise<Socket> {
+    private async ensureConnection(): Promise<Socket | null> {
         if (this.connection && !this.connection.destroyed) {
             return this.connection
         }
 
         if (this.isConnecting || this.isReconnecting) {
             // Wait for ongoing connection or reconnection attempt
-            return new Promise((resolve, reject) => {
+            return new Promise(resolve => {
                 const checkConnection = () => {
                     if (this.connection && !this.connection.destroyed) {
                         resolve(this.connection)
                     }
                     else if (!this.isConnecting && !this.isReconnecting) {
-                        reject(new Error('Connection failed'))
+                        resolve(null)
                     }
                     else {
                         setTimeout(checkConnection, 10)
@@ -579,7 +646,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
-     * Setup event handlers for persistent connection
+     * Setup event handlers for a connection
      */
     private setupConnectionHandlers(client: Socket): void {
         let responseBuffer = Buffer.alloc(0) as Buffer
@@ -627,11 +694,11 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 return
             }
 
-            // We closed this socket ourselves after a transport session; that is
-            // routine, so just continue with a fresh connection instead of
-            // treating it as an ADB server outage.
-            if (this.isTransportTeardown) {
-                this.isTransportTeardown = false
+            // We closed this socket ourselves after a reply; that is routine,
+            // so just continue with a fresh connection instead of treating it
+            // as an ADB server outage.
+            if (this.isClosingAfterReply) {
+                this.isClosingAfterReply = false
                 this.processNextRequest()
                 return
             }
@@ -676,7 +743,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                         request.resolve(responseData)
 
                         // After transport session, close connection for next device/command
-                        this.closeConnectionAfterTransport()
+                        this.closeConnectionAfterReply()
 
                         // Process next request in queue (will reconnect)
                         this.processNextRequest()
@@ -716,6 +783,8 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 }
 
                 request.reject(new Error(errorMessage || 'ADB command failed'))
+                this.closeConnectionAfterReply()
+
                 this.processNextRequest()
             }
 
@@ -752,7 +821,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                         request.resolve(responseData)
 
                         // After transport session, close connection for next device/command
-                        this.closeConnectionAfterTransport()
+                        this.closeConnectionAfterReply()
 
                         // Process next request in queue (will reconnect if needed)
                         this.processNextRequest()
@@ -784,6 +853,8 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                     }
 
                     request.resolve(responseData)
+                    this.closeConnectionAfterReply()
+
                     this.processNextRequest()
                 }
 
@@ -810,10 +881,14 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
-     * Send command to ADB server using persistent connection
-     * Requests are queued and processed sequentially
+     * Send command to ADB server.
+     * Requests are queued and processed sequentially, one connection per request.
      */
-    private async sendADBCommand(command: string, host?: string): Promise<string> {
+    private async sendADBCommand(
+        command: string,
+        host?: string,
+        {timeoutMs}: {timeoutMs?: number} = {}
+    ): Promise<string> {
         await this.ensureConnection()
 
         return new Promise((resolve, reject) => {
@@ -838,7 +913,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 })
             } else {
                 // Host commands have length-prefixed responses
-                this.requestQueue.push({command, resolve, reject, needData: true})
+                this.requestQueue.push({command, timeoutMs, resolve, reject, needData: true})
             }
 
             // Try to process the queue if no request is currently in-flight
@@ -858,6 +933,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
         // Get the first request in queue (don't shift yet - only shift on response)
         const request = this.requestQueue[0]
         const {command, reject} = request
+        const timeoutMs = request.timeoutMs ?? this.requestTimeoutMs
 
         // Arm the deadline as soon as the request is queued, not only once it is
         // written. Otherwise a request queued while the socket is down has
@@ -867,11 +943,11 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 const index = this.requestQueue.indexOf(request)
                 if (index !== -1) {
                     this.requestQueue.splice(index, 1)
-                    reject(new Error(`Request timeout after ${this.requestTimeoutMs}ms: ${command}`))
+                    reject(new Error(`Request timeout after ${timeoutMs}ms: ${command}`))
                     // Process next request in queue
                     this.processNextRequest()
                 }
-            }, this.requestTimeoutMs)
+            }, timeoutMs)
         }
 
         // No usable socket yet - reconnect and let that resume the queue. The
@@ -1011,14 +1087,16 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
-     * Close connection after transport session (device-specific command)
-     * This is necessary because after host:transport:<serial>, the socket becomes
-     * a dedicated tunnel to that device and cannot be reused for other commands
+     * Close the connection once a request got its reply. The ADB server closes
+     * it anyway after every host request, and after host:transport:<serial> the
+     * socket is a tunnel to that device that cannot be reused. Closing it here
+     * means the next request never gets written to a socket the server is
+     * already closing ("This socket has been ended by the other party").
      */
-    private closeConnectionAfterTransport(): void {
+    private closeConnectionAfterReply(): void {
         if (this.connection && !this.connection.destroyed) {
             // Tell the 'close' handler this teardown is intentional
-            this.isTransportTeardown = true
+            this.isClosingAfterReply = true
             this.connection.destroy()
             this.connection = null
         }
@@ -1028,7 +1106,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
-     * Close the persistent connection
+     * Close the current connection and reject every queued request
      */
     private closeConnection(): void {
         if (this.connection && !this.connection.destroyed) {
@@ -1082,7 +1160,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
             type: deviceEntry.state,
             isStuck: false,
             reconnect: async(): Promise<boolean> => {
-                if (this.isDestroyed) {
+                if (this.isDestroyed || this.noReconnect.has(device.serial)) {
                     return false
                 }
 

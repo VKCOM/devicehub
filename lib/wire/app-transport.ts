@@ -91,6 +91,12 @@ export class AppTransport extends EventEmitter {
 
     constructor(private dealer: DealerSocket) {
         super()
+        this.dealer.on('reconnect', () => {
+            if (this.subscribed) this.sendSubscribe()
+        })
+        // The dealer may already be connected. Replaying [S] is idempotent, so
+        // include the first observed connect rather than risk missing a restart.
+        this.dealer.watchReconnect?.({includeInitial: true})
         this.dealer.on('frames', (frames: Buffer[]) => {
             try {
                 this.onFrames(frames)
@@ -120,6 +126,10 @@ export class AppTransport extends EventEmitter {
             return
         }
         this.subscribed = true
+        this.sendSubscribe()
+    }
+
+    private sendSubscribe() {
         this.dealer.send(this.wire.encodeSubscribe()).catch((err: any) =>
             log.warn('Broadcast registration failed: %s', err?.message))
     }

@@ -225,23 +225,38 @@ export class ReverseSession {
  * constructor, while PacketReader defers its first read to setImmediate
  * (packetreader.js:38), so no packet can arrive before we are in place.
  */
-export function attachReverse(socket: ReverseHostSocketWithReader, openMinirev: OpenMinirev): ReverseSession {
+export function attachReverse(socket: ReverseHostSocketWithReader, openMinirev: OpenMinirev,
+    onError: (error: unknown) => void = () => {}): ReverseSession {
     const session = new ReverseSession(socket, openMinirev)
     const reader = socket.reader
     // Every listener is captured, not just the first: a real Socket has only its
     // own bound _handle there, but dropping a listener somebody else installed
     // would be a regression we could not see.
-    const original = reader.listeners('packet') as ((packet: ReversePacket) => void)[]
+    const original = reader.listeners('packet') as ((packet: ReversePacket) => void | Promise<unknown>)[]
+    const fail = (error: unknown) => {
+        if (socket.ended) return
+        try { onError(error) }
+        finally { socket.end() }
+    }
 
     reader.removeAllListeners('packet')
     reader.on('packet', (packet: ReversePacket) => {
-        if (isReverseOpen(packet)) {
-            session.serve(packet)
-            return
+        if (socket.ended) return
+        try {
+            // Unauthenticated OPENs must reach adbkit's authorization gate.
+            if (socket.authorized && isReverseOpen(packet)) {
+                void session.serve(packet).catch(fail)
+                return
+            }
+            for (const listener of original) {
+                // adbkit returns its async AUTH handler without awaiting it in
+                // try/catch. EventEmitter ignores the returned promise, so catch
+                // rejections here and terminate only this client's connection.
+                const pending = listener(packet)
+                if (pending && typeof pending.then === 'function') void pending.catch(fail)
+            }
         }
-        for (const listener of original) {
-            listener(packet)
-        }
+        catch (error) { fail(error) }
     })
 
     return session
@@ -261,6 +276,9 @@ export type ReverseSessionSocket = ReverseHostSocket
  * only and every one of those fields is there at runtime.
  */
 export interface ReverseHostSocketWithReader extends ReverseSessionSocket {
+    readonly authorized: boolean
+    readonly ended: boolean
+    end(): unknown
     reader: {
         listeners(event: string): unknown[]
         removeAllListeners(event: string): unknown

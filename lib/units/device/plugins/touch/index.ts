@@ -582,7 +582,6 @@ export default syrup.serial()
                 origin: touchOrigins[origin]
             }, options, adb, minitouch)
 
-            // Use Promise.race with once() for cleaner event handling
             touchConsumer.start()
 
             return Promise.race([

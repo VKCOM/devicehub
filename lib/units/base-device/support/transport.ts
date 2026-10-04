@@ -14,6 +14,9 @@ export {DeviceTransport} from '../../../wire/device-transport.js'
 export interface DeviceTransportOptions {
     serial: string
     provider?: string
+    silent?: boolean
+    silentAllowedEmail?: string[]
+    groupTimeout: number
     endpoints: {
         // processor ROUTER endpoint(s) to connect to (SRV-resolvable).
         processor: string[]
@@ -42,7 +45,11 @@ export default syrup.serial().define(
             return lifecycle.fatal()
         }
 
-        const transport = new DeviceTransport(dealer)
+        const transport = new DeviceTransport(dealer, options.silent ? {
+            providerName, serial: options.serial, allowedEmails: options.silentAllowedEmail,
+            inactivityTimeout: options.groupTimeout
+        } : undefined)
+
         lifecycle.observe(() => transport.close())
         return transport
     }

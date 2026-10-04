@@ -10,7 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Any } from "./google/protobuf/any.js"; // NOTE: KEEP THIS. ADD .js MANUALLY.
+import { Any } from "./google/protobuf/any.js";
 /**
  * @generated from protobuf message Envelope
  */
@@ -25,6 +25,155 @@ export interface Envelope {
      * @generated from protobuf field: optional string channel = 3
      */
     channel?: string;
+    /**
+     * @generated from protobuf field: optional SilentEventContext silentEvent = 4
+     */
+    silentEvent?: SilentEventContext;
+    /**
+     * @generated from protobuf field: optional SilentCommandContext silentCommand = 5
+     */
+    silentCommand?: SilentCommandContext;
+}
+/**
+ * @generated from protobuf message SilentEventContext
+ */
+export interface SilentEventContext {
+    /**
+     * @generated from protobuf field: required string instanceId = 1
+     */
+    instanceId: string;
+    /**
+     * @generated from protobuf field: required uint32 sequence = 2
+     */
+    sequence: number;
+    /**
+     * @generated from protobuf field: optional string leaseId = 3
+     */
+    leaseId?: string;
+}
+/**
+ * @generated from protobuf message SilentCommandContext
+ */
+export interface SilentCommandContext {
+    /**
+     * @generated from protobuf field: required string instanceId = 1
+     */
+    instanceId: string;
+    /**
+     * @generated from protobuf field: required string leaseId = 2
+     */
+    leaseId: string;
+}
+/**
+ * @generated from protobuf message SilentActor
+ */
+export interface SilentActor {
+    /**
+     * @generated from protobuf field: required string email = 1
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: required string name = 2
+     */
+    name: string;
+    /**
+     * @generated from protobuf field: required string group = 3
+     */
+    group: string;
+    /**
+     * @generated from protobuf field: repeated string adbKeys = 4
+     */
+    adbKeys: string[];
+}
+/**
+ * @generated from protobuf message DescribeSilentDevice
+ */
+export interface DescribeSilentDevice {
+    /**
+     * @generated from protobuf field: required SilentActor actor = 1
+     */
+    actor?: SilentActor;
+}
+/**
+ * @generated from protobuf message AcquireSilentDevice
+ */
+export interface AcquireSilentDevice {
+    /**
+     * @generated from protobuf field: required SilentActor actor = 1
+     */
+    actor?: SilentActor;
+    /**
+     * @generated from protobuf field: required string instanceId = 2
+     */
+    instanceId: string;
+}
+/**
+ * @generated from protobuf message ReleaseSilentDevice
+ */
+export interface ReleaseSilentDevice {
+}
+/**
+ * Snapshot contains only UI fields, never ACL, keys or lease credentials.
+ *
+ * @generated from protobuf message SilentDeviceSnapshot
+ */
+export interface SilentDeviceSnapshot {
+    /**
+     * @generated from protobuf field: required string json = 1
+     */
+    json: string;
+}
+/**
+ * Source is filled by processor from the ROUTER identity, not worker payload.
+ *
+ * @generated from protobuf message SilentDeviceEvent
+ */
+export interface SilentDeviceEvent {
+    /**
+     * @generated from protobuf field: required string providerName = 1
+     */
+    providerName: string;
+    /**
+     * @generated from protobuf field: required string serial = 2
+     */
+    serial: string;
+    /**
+     * @generated from protobuf field: required SilentEventContext context = 3
+     */
+    context?: SilentEventContext;
+    /**
+     * @generated from protobuf field: required google.protobuf.Any event = 4
+     */
+    event?: Any;
+}
+/**
+ * A worker asks its processor for persisted remote-connect configuration.
+ * Correlation is independent of app-side transaction reply paths.
+ *
+ * @generated from protobuf message ResolveAdbPortRequest
+ */
+export interface ResolveAdbPortRequest {
+    /**
+     * @generated from protobuf field: required string requestId = 1
+     */
+    requestId: string;
+}
+/**
+ * @generated from protobuf message ResolveAdbPortResponse
+ */
+export interface ResolveAdbPortResponse {
+    /**
+     * @generated from protobuf field: required string requestId = 1
+     */
+    requestId: string;
+    /**
+     * @generated from protobuf field: optional uint32 adbPort = 2
+     */
+    adbPort?: number;
+    /**
+     * @generated from protobuf field: optional string error = 3
+     */
+    error?: string;
 }
 /**
  * @generated from protobuf message UpdateAccessTokenMessage
@@ -797,6 +946,14 @@ export interface DeviceIntroductionMessage {
      * @generated from protobuf field: optional string deviceType = 4
      */
     deviceType?: string;
+    /**
+     * @generated from protobuf field: optional bool silent = 5
+     */
+    silent?: boolean;
+    /**
+     * @generated from protobuf field: optional string groupId = 6
+     */
+    groupId?: string;
 }
 /**
  * @generated from protobuf message DeviceIosIntroductionMessage
@@ -2504,7 +2661,9 @@ class Envelope$Type extends MessageType<Envelope> {
     constructor() {
         super("Envelope", [
             { no: 2, name: "message", kind: "message", T: () => Any },
-            { no: 3, name: "channel", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "channel", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "silentEvent", kind: "message", T: () => SilentEventContext },
+            { no: 5, name: "silentCommand", kind: "message", T: () => SilentCommandContext }
         ]);
     }
     create(value?: PartialMessage<Envelope>): Envelope {
@@ -2524,6 +2683,12 @@ class Envelope$Type extends MessageType<Envelope> {
                 case /* optional string channel */ 3:
                     message.channel = reader.string();
                     break;
+                case /* optional SilentEventContext silentEvent */ 4:
+                    message.silentEvent = SilentEventContext.internalBinaryRead(reader, reader.uint32(), options, message.silentEvent);
+                    break;
+                case /* optional SilentCommandContext silentCommand */ 5:
+                    message.silentCommand = SilentCommandContext.internalBinaryRead(reader, reader.uint32(), options, message.silentCommand);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -2542,6 +2707,12 @@ class Envelope$Type extends MessageType<Envelope> {
         /* optional string channel = 3; */
         if (message.channel !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.channel);
+        /* optional SilentEventContext silentEvent = 4; */
+        if (message.silentEvent)
+            SilentEventContext.internalBinaryWrite(message.silentEvent, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* optional SilentCommandContext silentCommand = 5; */
+        if (message.silentCommand)
+            SilentCommandContext.internalBinaryWrite(message.silentCommand, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2552,6 +2723,556 @@ class Envelope$Type extends MessageType<Envelope> {
  * @generated MessageType for protobuf message Envelope
  */
 export const Envelope = new Envelope$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SilentEventContext$Type extends MessageType<SilentEventContext> {
+    constructor() {
+        super("SilentEventContext", [
+            { no: 1, name: "instanceId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "sequence", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 3, name: "leaseId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SilentEventContext>): SilentEventContext {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.instanceId = "";
+        message.sequence = 0;
+        if (value !== undefined)
+            reflectionMergePartial<SilentEventContext>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SilentEventContext): SilentEventContext {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string instanceId */ 1:
+                    message.instanceId = reader.string();
+                    break;
+                case /* required uint32 sequence */ 2:
+                    message.sequence = reader.uint32();
+                    break;
+                case /* optional string leaseId */ 3:
+                    message.leaseId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SilentEventContext, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string instanceId = 1; */
+        if (message.instanceId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.instanceId);
+        /* required uint32 sequence = 2; */
+        if (message.sequence !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.sequence);
+        /* optional string leaseId = 3; */
+        if (message.leaseId !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.leaseId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message SilentEventContext
+ */
+export const SilentEventContext = new SilentEventContext$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SilentCommandContext$Type extends MessageType<SilentCommandContext> {
+    constructor() {
+        super("SilentCommandContext", [
+            { no: 1, name: "instanceId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "leaseId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SilentCommandContext>): SilentCommandContext {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.instanceId = "";
+        message.leaseId = "";
+        if (value !== undefined)
+            reflectionMergePartial<SilentCommandContext>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SilentCommandContext): SilentCommandContext {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string instanceId */ 1:
+                    message.instanceId = reader.string();
+                    break;
+                case /* required string leaseId */ 2:
+                    message.leaseId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SilentCommandContext, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string instanceId = 1; */
+        if (message.instanceId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.instanceId);
+        /* required string leaseId = 2; */
+        if (message.leaseId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.leaseId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message SilentCommandContext
+ */
+export const SilentCommandContext = new SilentCommandContext$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SilentActor$Type extends MessageType<SilentActor> {
+    constructor() {
+        super("SilentActor", [
+            { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "group", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "adbKeys", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SilentActor>): SilentActor {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.email = "";
+        message.name = "";
+        message.group = "";
+        message.adbKeys = [];
+        if (value !== undefined)
+            reflectionMergePartial<SilentActor>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SilentActor): SilentActor {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string email */ 1:
+                    message.email = reader.string();
+                    break;
+                case /* required string name */ 2:
+                    message.name = reader.string();
+                    break;
+                case /* required string group */ 3:
+                    message.group = reader.string();
+                    break;
+                case /* repeated string adbKeys */ 4:
+                    message.adbKeys.push(reader.string());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SilentActor, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string email = 1; */
+        if (message.email !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.email);
+        /* required string name = 2; */
+        if (message.name !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* required string group = 3; */
+        if (message.group !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.group);
+        /* repeated string adbKeys = 4; */
+        for (let i = 0; i < message.adbKeys.length; i++)
+            writer.tag(4, WireType.LengthDelimited).string(message.adbKeys[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message SilentActor
+ */
+export const SilentActor = new SilentActor$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DescribeSilentDevice$Type extends MessageType<DescribeSilentDevice> {
+    constructor() {
+        super("DescribeSilentDevice", [
+            { no: 1, name: "actor", kind: "message", T: () => SilentActor }
+        ]);
+    }
+    create(value?: PartialMessage<DescribeSilentDevice>): DescribeSilentDevice {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<DescribeSilentDevice>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DescribeSilentDevice): DescribeSilentDevice {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required SilentActor actor */ 1:
+                    message.actor = SilentActor.internalBinaryRead(reader, reader.uint32(), options, message.actor);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DescribeSilentDevice, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required SilentActor actor = 1; */
+        if (message.actor)
+            SilentActor.internalBinaryWrite(message.actor, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message DescribeSilentDevice
+ */
+export const DescribeSilentDevice = new DescribeSilentDevice$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AcquireSilentDevice$Type extends MessageType<AcquireSilentDevice> {
+    constructor() {
+        super("AcquireSilentDevice", [
+            { no: 1, name: "actor", kind: "message", T: () => SilentActor },
+            { no: 2, name: "instanceId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<AcquireSilentDevice>): AcquireSilentDevice {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.instanceId = "";
+        if (value !== undefined)
+            reflectionMergePartial<AcquireSilentDevice>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AcquireSilentDevice): AcquireSilentDevice {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required SilentActor actor */ 1:
+                    message.actor = SilentActor.internalBinaryRead(reader, reader.uint32(), options, message.actor);
+                    break;
+                case /* required string instanceId */ 2:
+                    message.instanceId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AcquireSilentDevice, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required SilentActor actor = 1; */
+        if (message.actor)
+            SilentActor.internalBinaryWrite(message.actor, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* required string instanceId = 2; */
+        if (message.instanceId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.instanceId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message AcquireSilentDevice
+ */
+export const AcquireSilentDevice = new AcquireSilentDevice$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ReleaseSilentDevice$Type extends MessageType<ReleaseSilentDevice> {
+    constructor() {
+        super("ReleaseSilentDevice", []);
+    }
+    create(value?: PartialMessage<ReleaseSilentDevice>): ReleaseSilentDevice {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<ReleaseSilentDevice>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ReleaseSilentDevice): ReleaseSilentDevice {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ReleaseSilentDevice, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ReleaseSilentDevice
+ */
+export const ReleaseSilentDevice = new ReleaseSilentDevice$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SilentDeviceSnapshot$Type extends MessageType<SilentDeviceSnapshot> {
+    constructor() {
+        super("SilentDeviceSnapshot", [
+            { no: 1, name: "json", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SilentDeviceSnapshot>): SilentDeviceSnapshot {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.json = "";
+        if (value !== undefined)
+            reflectionMergePartial<SilentDeviceSnapshot>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SilentDeviceSnapshot): SilentDeviceSnapshot {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string json */ 1:
+                    message.json = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SilentDeviceSnapshot, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string json = 1; */
+        if (message.json !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.json);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message SilentDeviceSnapshot
+ */
+export const SilentDeviceSnapshot = new SilentDeviceSnapshot$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SilentDeviceEvent$Type extends MessageType<SilentDeviceEvent> {
+    constructor() {
+        super("SilentDeviceEvent", [
+            { no: 1, name: "providerName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "context", kind: "message", T: () => SilentEventContext },
+            { no: 4, name: "event", kind: "message", T: () => Any }
+        ]);
+    }
+    create(value?: PartialMessage<SilentDeviceEvent>): SilentDeviceEvent {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.providerName = "";
+        message.serial = "";
+        if (value !== undefined)
+            reflectionMergePartial<SilentDeviceEvent>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SilentDeviceEvent): SilentDeviceEvent {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string providerName */ 1:
+                    message.providerName = reader.string();
+                    break;
+                case /* required string serial */ 2:
+                    message.serial = reader.string();
+                    break;
+                case /* required SilentEventContext context */ 3:
+                    message.context = SilentEventContext.internalBinaryRead(reader, reader.uint32(), options, message.context);
+                    break;
+                case /* required google.protobuf.Any event */ 4:
+                    message.event = Any.internalBinaryRead(reader, reader.uint32(), options, message.event);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SilentDeviceEvent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string providerName = 1; */
+        if (message.providerName !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.providerName);
+        /* required string serial = 2; */
+        if (message.serial !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.serial);
+        /* required SilentEventContext context = 3; */
+        if (message.context)
+            SilentEventContext.internalBinaryWrite(message.context, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* required google.protobuf.Any event = 4; */
+        if (message.event)
+            Any.internalBinaryWrite(message.event, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message SilentDeviceEvent
+ */
+export const SilentDeviceEvent = new SilentDeviceEvent$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ResolveAdbPortRequest$Type extends MessageType<ResolveAdbPortRequest> {
+    constructor() {
+        super("ResolveAdbPortRequest", [
+            { no: 1, name: "requestId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ResolveAdbPortRequest>): ResolveAdbPortRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.requestId = "";
+        if (value !== undefined)
+            reflectionMergePartial<ResolveAdbPortRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResolveAdbPortRequest): ResolveAdbPortRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string requestId */ 1:
+                    message.requestId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ResolveAdbPortRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string requestId = 1; */
+        if (message.requestId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.requestId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ResolveAdbPortRequest
+ */
+export const ResolveAdbPortRequest = new ResolveAdbPortRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ResolveAdbPortResponse$Type extends MessageType<ResolveAdbPortResponse> {
+    constructor() {
+        super("ResolveAdbPortResponse", [
+            { no: 1, name: "requestId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "adbPort", kind: "scalar", opt: true, T: 13 /*ScalarType.UINT32*/ },
+            { no: 3, name: "error", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ResolveAdbPortResponse>): ResolveAdbPortResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.requestId = "";
+        if (value !== undefined)
+            reflectionMergePartial<ResolveAdbPortResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResolveAdbPortResponse): ResolveAdbPortResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* required string requestId */ 1:
+                    message.requestId = reader.string();
+                    break;
+                case /* optional uint32 adbPort */ 2:
+                    message.adbPort = reader.uint32();
+                    break;
+                case /* optional string error */ 3:
+                    message.error = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ResolveAdbPortResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* required string requestId = 1; */
+        if (message.requestId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.requestId);
+        /* optional uint32 adbPort = 2; */
+        if (message.adbPort !== undefined)
+            writer.tag(2, WireType.Varint).uint32(message.adbPort);
+        /* optional string error = 3; */
+        if (message.error !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.error);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ResolveAdbPortResponse
+ */
+export const ResolveAdbPortResponse = new ResolveAdbPortResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class UpdateAccessTokenMessage$Type extends MessageType<UpdateAccessTokenMessage> {
     constructor() {
@@ -5138,7 +5859,9 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
             { no: 1, name: "serial", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "status", kind: "enum", T: () => ["DeviceStatus", DeviceStatus] },
             { no: 3, name: "provider", kind: "message", T: () => ProviderMessage },
-            { no: 4, name: "deviceType", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "deviceType", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "silent", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "groupId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<DeviceIntroductionMessage>): DeviceIntroductionMessage {
@@ -5166,6 +5889,12 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
                 case /* optional string deviceType */ 4:
                     message.deviceType = reader.string();
                     break;
+                case /* optional bool silent */ 5:
+                    message.silent = reader.bool();
+                    break;
+                case /* optional string groupId */ 6:
+                    message.groupId = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -5190,6 +5919,12 @@ class DeviceIntroductionMessage$Type extends MessageType<DeviceIntroductionMessa
         /* optional string deviceType = 4; */
         if (message.deviceType !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.deviceType);
+        /* optional bool silent = 5; */
+        if (message.silent !== undefined)
+            writer.tag(5, WireType.Varint).bool(message.silent);
+        /* optional string groupId = 6; */
+        if (message.groupId !== undefined)
+            writer.tag(6, WireType.LengthDelimited).string(message.groupId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

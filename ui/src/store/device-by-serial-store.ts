@@ -1,8 +1,10 @@
+import { DeviceSession } from '@/services/device-session'
 import { makeAutoObservable } from 'mobx'
 import { inject, injectable } from 'inversify'
 import { merge } from 'lodash'
 
 import { socket } from '@/api/socket'
+import { getDeviceBySerial } from '@/api/openstf-api'
 
 import { queries } from '@/config/queries/query-key-store'
 import { queryClient } from '@/config/queries/query-client'
@@ -26,14 +28,23 @@ export class DeviceBySerialStore {
   private deviceQuery
 
   constructor(
+    @inject(CONTAINER_IDS.deviceSession) readonly session: DeviceSession,
     @inject(CONTAINER_IDS.deviceSerial) private serial: string,
     @inject(CONTAINER_IDS.factoryMobxQuery) mobxQueryFactory: MobxQueryFactory
   ) {
     makeAutoObservable(this)
 
-    this.deviceQuery = mobxQueryFactory(() => ({
-      ...queries.devices.bySerial(serial),
-      staleTime: 3 * (60 * 1000),
+    this.deviceQuery = mobxQueryFactory<Device>(() => ({
+      ...(session.silent
+        ? {
+            queryKey: session.queryKey,
+            queryFn: () => session.describe(),
+            retry: false,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+          }
+        : { queryKey: queries.devices.bySerial(serial).queryKey, queryFn: () => getDeviceBySerial(serial) }),
+      staleTime: session.silent ? Infinity : 3 * (60 * 1000),
       enabled: !!serial,
     }))
 
@@ -41,11 +52,11 @@ export class DeviceBySerialStore {
   }
 
   addDeviceChangeListener(): void {
-    socket.on('device.change', this.onDeviceChange)
+    if (!this.session.silent) socket.on('device.change', this.onDeviceChange)
   }
 
   removeDeviceChangeListener(): void {
-    socket.off('device.change', this.onDeviceChange)
+    if (!this.session.silent) socket.off('device.change', this.onDeviceChange)
   }
 
   private async onDeviceChange({ data: changedData }: DeviceChangeMessage<Partial<Device>>): Promise<void> {
@@ -54,7 +65,7 @@ export class DeviceBySerialStore {
     queryClient.setQueryData<Device>(queries.devices.bySerial(this.serial).queryKey, (oldData) => {
       if (!oldData) return undefined
 
-      const newData = merge(oldData, changedData)
+      const newData = merge({}, oldData, changedData)
 
       const prevDeviceState = getDeviceState(oldData)
       const nextDeviceState = getDeviceState(newData)

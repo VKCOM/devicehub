@@ -95,6 +95,11 @@ export class DeviceScreenStore {
     // from a possibly-stale initial fetch.
     this.urlReactionDisposer?.()
     this.urlReactionDisposer = autorun(() => {
+      const session = this.deviceBySerialStore.session
+      if (session.silent && !session.ready) {
+        this.websocket?.close()
+        return
+      }
       const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
 
       if (!url) return
@@ -289,6 +294,10 @@ export class DeviceScreenStore {
 
   private connectWebsocket(): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (this.disposed || !this.deviceBySerialStore.session.ready) {
+        reject(new Error('Device session ended'))
+        return
+      }
       const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
 
       if (!url) {
@@ -308,6 +317,11 @@ export class DeviceScreenStore {
       ws.binaryType = 'blob'
 
       ws.onopen = (): void => {
+        if (this.disposed || !this.deviceBySerialStore.session.ready) {
+          ws.close()
+          reject(new Error('Device session ended'))
+          return
+        }
         this.websocket = ws
         ws.onmessage = this.messageListener.bind(this)
         ws.onerror = (): void => {}
@@ -341,7 +355,7 @@ export class DeviceScreenStore {
       maxDelay: 16000,
       jitter: 'full',
       retry: (err) => {
-        if (this.disposed) return false
+        if (this.disposed || !this.deviceBySerialStore.session.ready) return false
 
         if (err instanceof AuthError) return false
 
@@ -349,7 +363,7 @@ export class DeviceScreenStore {
       },
     })
       .catch((err) => {
-        if (this.disposed) return
+        if (this.disposed || !this.deviceBySerialStore.session.ready) return
 
         runInAction(() => {
           if (err instanceof AuthError) {
@@ -379,7 +393,7 @@ export class DeviceScreenStore {
       return
     }
 
-    if (!event.wasClean && !this.disposed) {
+    if (!event.wasClean && !this.disposed && this.deviceBySerialStore.session.ready) {
       this.connectWithBackoff()
     }
   }

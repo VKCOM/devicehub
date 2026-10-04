@@ -17,7 +17,9 @@ export class InfoService {
   ) {
     makeAutoObservable(this)
 
-    this.getSdStatus()
+    void this.getSdStatus().catch(() => {
+      this.sdCardMounted = undefined
+    })
   }
 
   findDevice(): void {
@@ -33,6 +35,8 @@ export class InfoService {
   }
 
   async getSdStatus(): Promise<void> {
+    const device = await this.deviceBySerialStore.fetch()
+    if (device.manufacturer === 'Apple') return
     const sdStatusResult = await this.deviceControlStore.getSdStatus()
     const { data } = await sdStatusResult.donePromise
 

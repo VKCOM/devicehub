@@ -16,6 +16,7 @@ export class DeviceLifecycleService {
   ) {}
 
   prepareDevice(): void {
+    this.deviceBySerialStore.session.activate()
     this.deviceConnection.useDevice()
     this.deviceBySerialStore.addDeviceChangeListener()
   }
@@ -23,6 +24,7 @@ export class DeviceLifecycleService {
   cleanupDevice(): void {
     this.deviceBySerialStore.removeDeviceChangeListener()
     this.logcatService.terminateLogcat()
+    this.deviceBySerialStore.session.scheduleDispose()
 
     deviceErrorModalStore.clearError()
   }

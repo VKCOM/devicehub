@@ -2,6 +2,9 @@
 * Copyright 2019 contains code contributed by Orange SA, authors: Denis Barbaron - Licensed under the Apache license 2.0
 **/
 
+import {registerDeviceCommands, type DeviceCommands} from './support/device-command-handlers.js'
+import {SilentDeviceDispatcher} from './support/silent-device-dispatcher.js'
+import {registerSilentNamespace} from './support/silent-session.js'
 import http from 'http'
 import _ from 'lodash'
 import {Adb} from '@u4/adbkit'
@@ -54,72 +57,14 @@ import {
     PhoneStateEvent,
     RotationEvent,
     CapabilitiesMessage,
-
     TemporarilyUnavailableMessage,
     UpdateRemoteConnectUrl,
-    KeyDownMessage,
-    KeyUpMessage,
-    KeyPressMessage,
-    TouchDownMessage,
-    TouchMoveMessage,
-    TouchMoveIosMessage,
-    TouchUpMessage,
-    TouchCommitMessage,
-    TouchResetMessage,
-    GestureStartMessage,
-    GestureStopMessage,
-    TypeMessage,
-    TapDeviceTreeElement,
-    RotateMessage,
-    ChangeQualityMessage,
     AdbKeysUpdatedMessage,
-    ShellKeepAliveMessage,
-    UninstallIosMessage,
-    UnlockDeviceMessage,
-    DashboardOpenMessage,
-    AirplaneSetMessage,
-    PasteMessage,
-    CopyMessage,
-    PhysicalIdentifyMessage,
-    RebootMessage,
-    AccountCheckMessage,
-    AccountRemoveMessage,
-    AccountAddMenuMessage,
-    AccountAddMessage,
-    AccountGetMessage,
-    SdStatusMessage,
-    RingerSetMessage,
-    RingerGetMessage,
-    WifiSetEnabledMessage,
-    WifiGetStatusMessage,
-    BluetoothSetEnabledMessage,
-    BluetoothGetStatusMessage,
-    BluetoothCleanBondedMessage,
+    SizeIosDevice,
     GroupMessage,
     UngroupMessage,
-    GetIosTreeElements,
-    InstallMessage,
-    UninstallMessage,
-    LaunchDeviceApp,
-    GetInstalledApplications,
-    KillDeviceApp,
-    TerminateDeviceApp,
-    GetAppAssetsList,
-    GetAppAsset,
-    GetAppHTML,
-    GetAppInspectServerUrl,
-
-    LogcatStartMessage,
-    LogcatStopMessage,
-    ConnectStartMessage,
-    ConnectStopMessage,
-    BrowserOpenMessage,
-    BrowserClearMessage,
-    StoreOpenMessage,
     ScreenCaptureMessage,
-    FileSystemGetMessage,
-    FileSystemListMessage,
-    SizeIosDevice
+    SilentDeviceEvent
 } from '../../wire/wire.js'
 import AllModel from '../../db/models/all/index.js'
 import UserModel from '../../db/models/user/index.js'
@@ -186,11 +131,11 @@ export default (async (options: Options) => {
         }
     }
 
-    // One WireRouter decodes each inbound broadcast once and dispatches the
-    // One ClientDispatcher decodes each inbound broadcast once and dispatches the
-    // decoded message to every connection's per-type handler.
+    // One router decodes broadcasts; dispatchers select the relevant client handlers.
     const hub = new ClientDispatcher()
+    const silentEvents = new SilentDeviceDispatcher(error => log.warn('Silent event handler failed: %s', error))
     const route = new WireRouter()
+        .on(SilentDeviceEvent, (_ch, message) => silentEvents.dispatch(message))
         .on(UpdateAccessTokenMessage, (ch, m) => hub.dispatch('UpdateAccessTokenMessage', ch, m))
         .on(DeleteUserMessage, (ch, m) => hub.dispatch('DeleteUserMessage', ch, m))
         .on(DeviceChangeMessage, (ch, m) => hub.dispatch('DeviceChangeMessage', ch, m))
@@ -234,6 +179,7 @@ export default (async (options: Options) => {
         trust: () => true
     }))
     io.use(auth({secret: options.secret}))
+    registerSilentNamespace(io, transport, txmanager, silentEvents, options)
 
     io.on('connection', (socket) => {
         const req = socket.request as any
@@ -272,7 +218,7 @@ export default (async (options: Options) => {
         }
 
         // Fire-and-forget command to the owned device.
-        const sendOwned = async (serial: string, envelope: Uint8Array) => {
+        const sendOwned: DeviceCommands['send'] = async (serial, type, message) => {
             if (!ownership.isOwned(serial)) {
                 return
             }
@@ -280,7 +226,7 @@ export default (async (options: Options) => {
             if (!providerName) {
                 return
             }
-            transport.sendCommand(providerName, serial, envelope)
+            transport.sendCommand(providerName, serial, wireutil.pack(type, message))
         }
 
         // Runs a device transaction and relays progress/result to the client's
@@ -321,11 +267,6 @@ export default (async (options: Options) => {
                 })
             }
         }
-
-        const createKeyHandler = (Klass: MessageType<any>) =>
-            (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(Klass, {key: data.key})).catch(() => {})
-            }
 
         let disconnectSocket!: (value?: any) => void
 
@@ -713,167 +654,31 @@ export default (async (options: Options) => {
                 })
             })
 
-            // Touch / input events (fire-and-forget to the owned device).
-            socket.on('input.touchDown', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchDownMessage, {
-                    seq: data.seq, contact: data.contact, x: data.x, y: data.y, pressure: data.pressure
-                })).catch(() => {})
-            })
-            socket.on('input.touchMove', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchMoveMessage, {
-                    seq: data.seq, contact: data.contact, x: data.x, y: data.y, pressure: data.pressure
-                })).catch(() => {})
-            })
-            socket.on('input.touchMoveIos', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchMoveIosMessage, {
-                    toX: data.toX, toY: data.toY, fromX: data.fromX, fromY: data.fromY, duration: data.duration || 0
-                })).catch(() => {})
-            })
-            socket.on('tapDeviceTreeElement', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TapDeviceTreeElement, {label: data.label})).catch(() => {})
-            })
-            socket.on('input.touchUp', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchUpMessage, {seq: data.seq, contact: data.contact})).catch(() => {})
-            })
-            socket.on('input.touchCommit', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchCommitMessage, {seq: data.seq})).catch(() => {})
-            })
-            socket.on('input.touchReset', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TouchResetMessage, {seq: data.seq})).catch(() => {})
-            })
-            socket.on('input.gestureStart', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(GestureStartMessage, {seq: data.seq})).catch(() => {})
-            })
-            socket.on('input.gestureStop', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(GestureStopMessage, {seq: data.seq})).catch(() => {})
-            })
+            registerDeviceCommands(socket, {
+                send: sendOwned,
+                run: runTx,
+                acquire: async (serial, rc, data) => {
+                    try {
+                        const keys = await UserModel.getUserAdbKeys(user.email)
+                        await runTx(serial, rc, GroupMessage, {
+                            owner: {email: user.email, name: user.name, group: user.group},
+                            timeout: data.timeout || undefined,
+                            requirements: wireutil.toDeviceRequirements(data.requirements),
+                            keys: keys.map((key: {fingerprint: string}) => key.fingerprint)
+                        }, {requireOwned: false})
+                    }
+                    catch (err: any) {
+                        socket.emit('tx.done', rc, {source: serial, success: false, data: err?.message || 'fail'})
+                    }
+                },
+                release: async (serial, rc, data) => {
+                    await runTx(serial, rc, UngroupMessage, {
+                        requirements: wireutil.toDeviceRequirements(data.requirements)
+                    }, {requireOwned: false})
+                }
+            }, req.internalJwt)
 
-            socket.on('input.keyDown', createKeyHandler(KeyDownMessage))
-            socket.on('input.keyUp', createKeyHandler(KeyUpMessage))
-            socket.on('input.keyPress', createKeyHandler(KeyPressMessage))
-
-            socket.on('input.type', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(TypeMessage, {text: data.text})).catch(() => {})
-            })
-            socket.on('display.rotate', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(RotateMessage, {rotation: data.rotation})).catch(() => {})
-            })
-            socket.on('quality.change', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(ChangeQualityMessage, {quality: data.quality})).catch(() => {})
-            })
-
-            // Transactions. Each takes (serial, responseChannel, [data]).
-            socket.on('airplane.set', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, AirplaneSetMessage, {enabled: data.enabled}))
-            socket.on('clipboard.paste', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, PasteMessage, {text: data.text}))
-            socket.on('clipboard.copy', (serial: string, rc: string) =>
-                runTx(serial, rc, CopyMessage, {}))
-            socket.on('clipboard.copyIos', (serial: string, rc: string) =>
-                runTx(serial, rc, CopyMessage, {}))
-            socket.on('device.identify', (serial: string, rc: string) =>
-                runTx(serial, rc, PhysicalIdentifyMessage, {}, {requireOwned: false}))
-            socket.on('device.reboot', (serial: string, rc: string) =>
-                runTx(serial, rc, RebootMessage, {}))
-            socket.on('device.rebootIos', (serial: string, rc: string) =>
-                runTx(serial, rc, RebootMessage, {}))
-            socket.on('account.check', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, AccountCheckMessage, {type: data.type, account: data.account}))
-            socket.on('account.remove', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, AccountRemoveMessage, {type: data.type, account: data.account}))
-            socket.on('account.addmenu', (serial: string, rc: string) =>
-                runTx(serial, rc, AccountAddMenuMessage, {}))
-            socket.on('account.add', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, AccountAddMessage, {user: data.user, password: data.password}))
-            socket.on('account.get', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, AccountGetMessage, {type: data.type}, {requireOwned: false}))
-            socket.on('sd.status', (serial: string, rc: string) =>
-                runTx(serial, rc, SdStatusMessage, {}))
-            socket.on('ringer.set', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, RingerSetMessage, {mode: data.mode}))
-            socket.on('ringer.get', (serial: string, rc: string) =>
-                runTx(serial, rc, RingerGetMessage, {}))
-            socket.on('wifi.set', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, WifiSetEnabledMessage, {enabled: data.enabled}))
-            socket.on('wifi.get', (serial: string, rc: string) =>
-                runTx(serial, rc, WifiGetStatusMessage, {}))
-            socket.on('bluetooth.set', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, BluetoothSetEnabledMessage, {enabled: data.enabled}))
-            socket.on('bluetooth.get', (serial: string, rc: string) =>
-                runTx(serial, rc, BluetoothGetStatusMessage, {}))
-            socket.on('bluetooth.cleanBonds', (serial: string, rc: string) =>
-                runTx(serial, rc, BluetoothCleanBondedMessage, {}))
-
-            socket.on('group.invite', async (serial: string, rc: string, data: any) => {
-                const keys = await UserModel.getUserAdbKeys(user.email)
-                runTx(serial, rc, GroupMessage, {
-                    owner: {email: user.email, name: user.name, group: user.group},
-                    timeout: data.timeout || undefined,
-                    requirements: wireutil.toDeviceRequirements(data.requirements),
-                    keys: keys.map((key: any) => key.fingerprint)
-                }, {requireOwned: false})
-            })
-            socket.on('group.kick', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, UngroupMessage, {
-                    requirements: wireutil.toDeviceRequirements(data.requirements)
-                }, {requireOwned: false}))
-
-            socket.on('getTreeElementsIos', (serial: string, rc: string) =>
-                runTx(serial, rc, GetIosTreeElements, {}, {requireOwned: false}))
-
-            socket.on('shell.command', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, ShellCommandMessage, {command: data.command, timeout: data.timeout}))
-
-            socket.on('shell.keepalive', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(ShellKeepAliveMessage, {timeout: data.timeout})).catch(() => {})
-            })
-
-            socket.on('device.install', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, InstallMessage, {
-                    href: data.href,
-                    launch: data.launch === true,
-                    isApi: false,
-                    manifest: JSON.stringify(data.manifest),
-                    installFlags: ['-r'],
-                    jwt: req.internalJwt
-                }))
-            socket.on('device.installIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, InstallMessage, {
-                    href: data.href,
-                    launch: data.launch === true,
-                    isApi: false,
-                    manifest: JSON.stringify(data.manifest),
-                    installFlags: [],
-                    jwt: req.internalJwt
-                }))
-            socket.on('device.uninstall', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, UninstallMessage, {packageName: data.packageName}))
-            socket.on('device.uninstallIos', (serial: string, data: any) => {
-                sendOwned(serial, wireutil.pack(UninstallIosMessage, {packageName: data.packageName})).catch(() => {})
-            })
-            socket.on('device.launchApp', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, LaunchDeviceApp, {pkg: data.pkg}))
-
-            socket.on('device.unlockDevice', (serial: string) => {
-                sendOwned(serial, wireutil.pack(UnlockDeviceMessage, {})).catch(() => {})
-            })
-
-            const getApps = (serial: string, rc: string) =>
-                runTx(serial, rc, GetInstalledApplications, {})
-            // Preserve the original debounce on the app list fetch.
-            socket.on('device.getApps', _.debounce(getApps, 500))
-
-            socket.on('app.kill', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, data?.force ? KillDeviceApp : TerminateDeviceApp, {}))
-            socket.on('app.getAssetList', (serial: string, rc: string) =>
-                runTx(serial, rc, GetAppAssetsList, {}))
-            socket.on('app.getAsset', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, GetAppAsset, {url: data.url}))
-            socket.on('app.getAppHTML', (serial: string, rc: string) =>
-                runTx(serial, rc, GetAppHTML, {}))
-            socket.on('app.getInspectServerUrl', (serial: string, rc: string) =>
-                runTx(serial, rc, GetAppInspectServerUrl, {}))
-
+            // Legacy operations that are not part of the shared device controls.
             socket.on('storage.upload', async (serial: string, rc: string, data: any) => {
                 if (!ownership.isOwned(serial)) {
                     return
@@ -890,52 +695,11 @@ export default (async (options: Options) => {
                     socket.emit('tx.cancel', rc, {success: false, data: 'fail_upload'})
                 }
             })
-
-            socket.on('logcat.start', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
-            socket.on('logcat.startIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
-            socket.on('logcat.stop', (serial: string, rc: string) =>
-                runTx(serial, rc, LogcatStopMessage, {}))
-            socket.on('logcat.stopIos', (serial: string, rc: string) =>
-                runTx(serial, rc, LogcatStopMessage, {}))
-
-            socket.on('connect.start', (serial: string, rc: string) =>
-                runTx(serial, rc, ConnectStartMessage, {}, {requireOwned: false}))
-            socket.on('connect.startIos', (serial: string, rc: string) =>
-                runTx(serial, rc, ConnectStartMessage, {}, {requireOwned: false}))
-            socket.on('connect.stop', (serial: string, rc: string) =>
-                runTx(serial, rc, ConnectStopMessage, {}, {requireOwned: false}))
-
-            socket.on('browser.open', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, BrowserOpenMessage, {url: data.url, browser: data.browser}))
-            socket.on('browser.openIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, BrowserOpenMessage, {url: data.url, browser: data.browser}))
-            socket.on('browser.clear', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, BrowserClearMessage, {browser: data.browser}))
-
-            socket.on('store.open', (serial: string, rc: string) =>
-                runTx(serial, rc, StoreOpenMessage, {}))
-            socket.on('store.openIos', (serial: string, rc: string) =>
-                runTx(serial, rc, StoreOpenMessage, {}))
-
-            socket.on('settings.open', (serial: string) => {
-                sendOwned(serial, wireutil.pack(DashboardOpenMessage, {})).catch(() => {})
-            })
-
             socket.on('screen.capture', (serial: string, rc: string) =>
                 runTx(serial, rc, ScreenCaptureMessage, {} as any))
             socket.on('screen.captureIos', (serial: string, rc: string) =>
                 runTx(serial, rc, ScreenCaptureMessage, {} as any))
 
-            socket.on('fs.retrieve', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt}, {requireOwned: false}))
-            socket.on('fs.list', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, FileSystemListMessage, {dir: data.dir}))
-            socket.on('fs.listIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, FileSystemListMessage, {dir: data.dir}))
-            socket.on('fs.retrieveIos', (serial: string, rc: string, data: any) =>
-                runTx(serial, rc, FileSystemGetMessage, {file: data.file, jwt: req.internalJwt}))
 
             socket.on('policy.accept', () => {
                 UserModel.acceptPolicy(user.email)
@@ -951,6 +715,7 @@ export default (async (options: Options) => {
     })
 
     lifecycle.observe(() => {
+        silentEvents.close()
         try {
             transport.close()
         }

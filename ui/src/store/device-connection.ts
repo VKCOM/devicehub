@@ -1,3 +1,4 @@
+import { authStore } from '@/store/auth-store'
 import { t } from 'i18next'
 import { makeAutoObservable } from 'mobx'
 import { inject, injectable } from 'inversify'
@@ -28,24 +29,32 @@ export class DeviceConnection {
   }
 
   async useDevice(): Promise<void> {
-    const device = await this.deviceBySerialStore.fetch()
-
     try {
+      const device = await this.deviceBySerialStore.fetch()
+      const session = this.deviceBySerialStore.session
+      if (session.silent) await session.start()
       if (!device?.channel) throw new Error('Device is not cooperating.')
 
       const startRemoteConnectResult = await this.deviceControlStore.startRemoteConnect()
 
-      startRemoteConnectResult.donePromise.then(({ data }) => {
-        this.debugCommand =
-          device.manufacturer === 'Apple'
-            ? `curl http://${data}/status`
-            : device.platform === 'Tizen'
-              ? `sdb connect ${data}`
-              : device.ready
-                ? `adb connect ${data}`
-                : 'Error'
-      })
+      startRemoteConnectResult.donePromise
+        .then(({ data }) => {
+          this.debugCommand =
+            device.manufacturer === 'Apple'
+              ? session.silent
+                ? `curl -H 'Authorization: Bearer ${authStore.jwt}' 'http://${data}/status'`
+                : `curl http://${data}/status`
+              : device.platform === 'Tizen'
+                ? `sdb connect ${data}`
+                : device.ready
+                  ? `adb connect ${data}`
+                  : 'Error'
+        })
+        .catch((error) => {
+          this.debugCommand = error.message
+        })
 
+      if (session.silent) return
       await this.groupService.invite(this.serial, device.group)
 
       this.settingsService.updateLastUsedDevice(this.serial)

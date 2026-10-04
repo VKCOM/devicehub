@@ -26,6 +26,38 @@ tags:
 - name: autotests
   description: Autotests Operations
 paths:
+  /silent-devices/{provider}/{serial}:
+    x-swagger-router-controller: silent-devices
+    get:
+      tags: [devices]
+      summary: Describe a live silent device without acquiring it
+      operationId: getSilentDevice
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: {type: string, minLength: 1}
+        - name: serial
+          in: path
+          required: true
+          schema: {type: string, minLength: 1}
+      responses:
+        '200':
+          description: Live device snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: {type: boolean}
+                  device:
+                    $ref: '#/components/schemas/SilentDevice'
+        default:
+          description: '400 invalid address, 401 unauthorized, 403 forbidden, 404 not silent, 504 device unavailable'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedErrorResponse'
   /groups:
     get:
       tags:
@@ -3773,6 +3805,13 @@ paths:
     x-swagger-router-controller: teams
 components:
   schemas:
+    SilentDevice:
+      allOf:
+        - $ref: '#/components/schemas/Device'
+        - type: object
+          properties:
+            silent: {type: boolean}
+            instanceId: {type: string}
     UnexpectedErrorResponse:
       required:
       - description

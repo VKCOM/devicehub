@@ -16,10 +16,13 @@ import styles from './control-page.module.css'
 
 export const ControlPage = observer(() => {
   const { t } = useTranslation()
-  const { serial = '' } = useParams()
+  const { serial = '', provider } = useParams()
 
   return (
-    <DIContainerProvider container={() => createDeviceContainer(serial)}>
+    <DIContainerProvider
+      key={JSON.stringify([provider, serial])}
+      container={() => createDeviceContainer(serial, provider)}
+    >
       <Split
         className={styles.split}
         direction='horizontal'
