@@ -3811,6 +3811,7 @@ components:
         - type: object
           properties:
             silent: {type: boolean}
+            hideHeader: {type: boolean}
             instanceId: {type: string}
     UnexpectedErrorResponse:
       required:

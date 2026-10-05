@@ -16,6 +16,7 @@ export interface DeviceTransportOptions {
     provider?: string
     silent?: boolean
     silentAllowedEmail?: string[]
+    hideHeader?: boolean
     groupTimeout: number
     endpoints: {
         // processor ROUTER endpoint(s) to connect to (SRV-resolvable).
@@ -47,7 +48,7 @@ export default syrup.serial().define(
 
         const transport = new DeviceTransport(dealer, options.silent ? {
             providerName, serial: options.serial, allowedEmails: options.silentAllowedEmail,
-            inactivityTimeout: options.groupTimeout
+            inactivityTimeout: options.groupTimeout, hideHeader: options.hideHeader
         } : undefined)
 
         lifecycle.observe(() => transport.close())

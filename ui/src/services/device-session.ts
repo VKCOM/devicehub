@@ -12,6 +12,8 @@ import { deviceErrorModalStore } from '@/store/device-error-modal-store'
 
 import type { Device, SilentDevice } from '@/generated/types'
 
+export const silentDeviceQueryKey = (provider: string, serial: string) => ['silentDevice', provider, serial] as const
+
 /** One control page, one target, one connection and one acquisition barrier. */
 export class DeviceSession {
   readonly socket: Socket
@@ -31,7 +33,7 @@ export class DeviceSession {
     readonly serial: string,
     readonly provider?: string
   ) {
-    this.queryKey = ['silentDevice', provider || '', serial]
+    this.queryKey = silentDeviceQueryKey(provider || '', serial)
     this.socket =
       provider === undefined
         ? globalSocket

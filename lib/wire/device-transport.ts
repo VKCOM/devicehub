@@ -173,6 +173,7 @@ export class DeviceTransport extends EventEmitter {
             serial: string
             allowedEmails?: string[]
             inactivityTimeout?: number
+            hideHeader?: boolean
         },
         readonly inactivity = new InactivityMonitor()
     ) {
@@ -181,7 +182,7 @@ export class DeviceTransport extends EventEmitter {
         if (silentOptions) {
             this.silent = new SilentDeviceRuntime(silentOptions.providerName, silentOptions.serial,
                 silentOptions.allowedEmails ?? [], json => this.send([wireutil.global, wireutil.pack(SilentDeviceSnapshot, {json})]),
-                inactivity, silentOptions.inactivityTimeout ?? 0)
+                inactivity, silentOptions.inactivityTimeout ?? 0, silentOptions.hideHeader ?? false)
         }
 
         this.dealer.on('frames', (frames: Buffer[]) => {

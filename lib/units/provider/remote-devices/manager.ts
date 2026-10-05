@@ -10,8 +10,10 @@ export interface DeviceForkOverrides {
     silent: boolean
     silentAllowedEmail: string[]
     groupTimeout?: number
-    connectUrlPattern?: string
+    /* Literal, never a template: it comes from an unauthenticated request */
+    connectUrl?: string
     groupId?: string
+    hideHeader: boolean
 }
 
 export interface RemoteDevice extends ConnectRequest {
@@ -88,8 +90,9 @@ export class RemoteDeviceManager {
             silent: device.silent,
             silentAllowedEmail: device.emails,
             groupTimeout: device.idleTtl,
-            connectUrlPattern: device.connectUrl,
-            groupId: device.groupId
+            connectUrl: device.connectCommand ?? device.connectUrl,
+            groupId: device.groupId,
+            hideHeader: device.hideHeader
         }
     }
 

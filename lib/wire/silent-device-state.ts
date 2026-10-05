@@ -16,6 +16,8 @@ export interface SilentDeviceState extends Partial<Omit<DeviceIdentityMessage, '
     serial: string
     provider: {name: string; channel?: string}
     silent: true
+    /* The UI hides its site header on the control page, e.g. to be embedded in an iframe */
+    hideHeader: boolean
     instanceId: string
     present: boolean
     ready: boolean

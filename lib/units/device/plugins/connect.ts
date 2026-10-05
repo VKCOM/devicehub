@@ -82,7 +82,8 @@ export default syrup.serial()
         const plugin = {
             serial: options.serial,
             port: options.connectPort,
-            url: urlformat(options.connectUrlPattern, options.connectPort, identity.model, data ? data.name.id : ''),
+            url: options.connectUrl ||
+                urlformat(options.connectUrlPattern, options.connectPort, identity.model, data ? data.name.id : ''),
             auth: (key: Key): boolean => false,
             start: async() => {
                 log.info('Starting connect plugin')

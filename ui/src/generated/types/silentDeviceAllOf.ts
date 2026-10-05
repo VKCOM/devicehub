@@ -7,6 +7,7 @@
  */
 
 export type SilentDeviceAllOf = {
+  hideHeader?: boolean
   instanceId?: string
   silent?: boolean
 }

@@ -38,11 +38,13 @@ export class SilentDeviceRuntime {
         private publish: (snapshot: string) => void,
         private inactivity: InactivityMonitor,
         private timeout: number,
+        hideHeader = false,
     ) {
         this.state = {
             serial,
             provider: {name: providerName},
             silent: true,
+            hideHeader,
             instanceId: this.instanceId,
             present: true,
             ready: false,

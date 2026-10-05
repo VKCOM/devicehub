@@ -42,6 +42,13 @@ describe('silent runtime', () => {
         }
     })
 
+    it('tells the UI whether to hide the site header', () => {
+        const runtime = new SilentDeviceRuntime('provider', 'serial', [], vi.fn(), new InactivityMonitor(), 1000, true)
+        closing.push(runtime)
+        expect(runtime.describe(actor()).hideHeader).toBe(true)
+        expect(device().runtime.describe(actor()).hideHeader).toBe(false)
+    })
+
     it('checks ACL for both description and acquisition, including admins supplied as ordinary actors', async () => {
         const {runtime} = device(['owner@example.com'])
         expect(() => runtime.describe(actor('other@example.com'))).toThrow('forbidden')

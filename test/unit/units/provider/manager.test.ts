@@ -51,8 +51,18 @@ describe('RemoteDeviceManager', () => {
         await vi.waitFor(() => expect(device.state).toBe('active'))
         expect(events()).toEqual([{serial: '10.0.0.5:5555', event: 'device.connected', data: undefined}])
         expect(manager.forkOverrides('10.0.0.5:5555')).toEqual({
-            silent: true, silentAllowedEmail: ['a@x'], groupTimeout: 60, connectUrlPattern: undefined, groupId: undefined
+            silent: true, silentAllowedEmail: ['a@x'], groupTimeout: 60, connectUrl: undefined, groupId: undefined,
+            hideHeader: false
         })
+    })
+
+    it('passes the connect URL or command and hideHeader to the worker', () => {
+        manager.connect(request({connectUrl: 'proxy:1234'}))
+        manager.connect(request({host: '10.0.0.6', silent: true, hideHeader: true, connectCommand: 'custom-adb connect proxy:1'}))
+
+        expect(manager.forkOverrides('10.0.0.5:5555')).toMatchObject({connectUrl: 'proxy:1234', hideHeader: false})
+        expect(manager.forkOverrides('10.0.0.6:5555'))
+            .toMatchObject({connectUrl: 'custom-adb connect proxy:1', hideHeader: true})
     })
 
     it('uses the adb serial of IPv6 hosts', async() => {

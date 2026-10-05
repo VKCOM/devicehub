@@ -57,6 +57,8 @@ describe('provider CLI: remote device API', () => {
             connectUrlPattern: '${publicIp}:${publicPort}'
         })
         expect(worker.groupId).toBeUndefined()
+        expect(worker.connectUrl).toBeUndefined()
+        expect(worker.hideHeader).toBe(false)
     })
 
     it('applies the per-device settings of a silent API device', async() => {
@@ -64,16 +66,25 @@ describe('provider CLI: remote device API', () => {
             silent: true,
             silentAllowedEmail: ['a@example.test', 'b@example.test'],
             groupTimeout: 60,
-            connectUrlPattern: 'adb.example.test:15555'
+            connectUrl: 'adb.example.test:15555',
+            hideHeader: true
         })
         expect(worker).toMatchObject({
             silent: true,
             silentAllowedEmail: ['a@example.test', 'b@example.test'],
             groupTimeout: 60_000,
-            connectUrlPattern: 'adb.example.test:15555',
+            connectUrl: 'adb.example.test:15555',
+            connectUrlPattern: '${publicIp}:${publicPort}',
+            hideHeader: true,
             serial: '10.0.0.5:5555',
             provider: 'test-provider'
         })
+    })
+
+    it('passes a full connect command verbatim, never as a template', async() => {
+        const command = 'custom-adb connect <%= publicPort %> ${publicIp}'
+        const worker = await workerOptions(await startProvider(), {silent: true, silentAllowedEmail: [], connectUrl: command})
+        expect(worker.connectUrl).toBe(command)
     })
 
     it('places a grouped API device into its group, never silent', async() => {
