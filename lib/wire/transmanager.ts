@@ -114,7 +114,7 @@ export class TransactionManager {
         serial: string,
         messageType: MessageType<T>,
         message: T,
-        {timeout = apiutil.GRPC_WAIT_TIMEOUT, onProgress}: {timeout?: number; onProgress?: ProgressCallback} = {}
+        {timeout = apiutil.GRPC_WAIT_TIMEOUT, onProgress, silentCommand}: {timeout?: number; onProgress?: ProgressCallback; silentCommand?: import('./wire.js').SilentCommandContext} = {}
     ): Promise<TransactionResult> {
         const target = providerName + '/' + serial
         return sentryTransactionSpan(target, message, timeout, () => {
@@ -134,10 +134,11 @@ export class TransactionManager {
                 this.transport.sendCommand(
                     providerName,
                     serial,
-                    tr(correlationId, messageType, message)
+                    silentCommand
+                        ? Envelope.toBinary({message: Any.pack(message, messageType), channel: correlationId, silentCommand})
+                        : tr(correlationId, messageType, message)
                 )
             })
         })
     }
 }
-

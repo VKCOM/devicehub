@@ -1,3 +1,4 @@
+import type { DeviceSession } from '@/services/device-session'
 import type { interfaces } from 'inversify'
 import type { InfoService } from '@/services/info-service'
 import type { GroupService } from '@/services/group-service'
@@ -35,6 +36,7 @@ import type { TeamSettingsService } from '@/services/team-settings-service'
 import type { TeamItemService } from '@/services/team-item-service'
 
 export const CONTAINER_IDS = {
+  deviceSession: Symbol.for('DeviceSession') as interfaces.ServiceIdentifier<DeviceSession>,
   groupId: Symbol.for('groupId') as interfaces.ServiceIdentifier<string>,
   teamId: Symbol.for('teamId') as interfaces.ServiceIdentifier<string>,
   deviceSerial: Symbol.for('serial') as interfaces.ServiceIdentifier<string>,

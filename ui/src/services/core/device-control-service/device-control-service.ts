@@ -1,5 +1,3 @@
-import { socket } from '@/api/socket'
-
 import { KEYBOARD_KEYS_MAP } from '@/constants/keyboard-keys-map'
 
 import type {
@@ -293,10 +291,14 @@ export class DeviceControlService {
   private sendOneWay<T>(action: string, data?: T): void {
     const { data: device } = this.deviceBySerialStore.deviceQueryResult()
 
-    socket.emit(action, device?.serial, data)
+    const session = this.deviceBySerialStore.session
+
+    if (session.silent && !session.ready) return
+    session.socket.emit(action, device?.serial, data)
   }
 
   private async sendTwoWay<T, R>(action: string, data?: T): Promise<InitializeTransactionReturn<R>> {
+    await this.deviceBySerialStore.session.waitUntilReady()
     const transaction = this.transactionServiceFactory<R>()
     const initializeTransaction = transaction.initializeTransaction()
 
@@ -304,7 +306,12 @@ export class DeviceControlService {
 
     const platformSpecificAction = device?.manufacturer === 'Apple' ? `${action}Ios` : action
 
-    socket.emit(platformSpecificAction, device?.serial, initializeTransaction.channel, data)
+    this.deviceBySerialStore.session.socket.emit(
+      platformSpecificAction,
+      device?.serial,
+      initializeTransaction.channel,
+      data
+    )
 
     return initializeTransaction
   }

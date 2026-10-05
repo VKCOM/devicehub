@@ -101,6 +101,23 @@ export default syrup.serial()
         const stopAgent = () =>
             devutil.killProcsByComm('stf.agent', 'stf.agent')
 
+        // Runs an `am` command and returns the error line it printed, if any
+        const runAm = async(command: string): Promise<string | null> => {
+            const out: Duplex = await adb.getDevice(options.serial).shell(command)
+            try {
+                return await streamutil.findLine(out, /^Error/)
+            }
+            catch (err: any) {
+                if (err instanceof streamutil.NoSuchLineError) { // success
+                    return null
+                }
+                throw err
+            }
+            finally {
+                out.end()
+            }
+        }
+
         const callService = async(intent: string) => {
             const startServiceCmd = sdk.level < 26 ?
                 'startservice' :
@@ -108,43 +125,32 @@ export default syrup.serial()
 
             log.info('using \'%s\' command for API %s', startServiceCmd, sdk.level)
 
-            let out: Duplex | null = null
-            try {
-                out = await adb.getDevice(options.serial).shell(util.format('am %s --user 0 %s', startServiceCmd, intent))
-                const line = await streamutil.findLine(out, /^Error/) // reject if no errors in stdout
-                if (!line?.includes('--user')) {
-                    throw new Error(util.format('[first attempt] Service had an error: "%s"', line))
-                }
-            }
-            catch (err: any) {
-                if (err instanceof streamutil.NoSuchLineError) { // success
-                    return true
-                }
-                throw err
-            }
-            finally {
-                out?.end()
+            const withUser = util.format('am %s --user 0 %s', startServiceCmd, intent)
+            let error = await runAm(withUser)
+
+            // The screen may take a moment to wake up (see openService): one more try
+            if (error?.includes('Not found')) {
+                log.warn('Service not started ("%s"), retrying', error)
+                await new Promise(r => setTimeout(r, 1000))
+                error = await runAm(withUser)
             }
 
+            if (!error) {
+                return true
+            }
 
-            let command = util.format('am %s %s', startServiceCmd, intent)
+            if (!error.includes('--user')) {
+                throw new Error(util.format('[first attempt] Service had an error: "%s"', error))
+            }
+
+            const command = util.format('am %s %s', startServiceCmd, intent)
             log.info('Stating service with command ' + command)
 
-            out = await adb.getDevice(options.serial).shell(command)
-            try {
-                const line = await streamutil.findLine(out, /^Error/) // reject if no errors in stdout
-                throw new Error(util.format('[second attempt] Service had an error: "%s"', line))
+            error = await runAm(command)
+            if (error) {
+                throw new Error(util.format('[second attempt] Service had an error: "%s"', error))
             }
-            catch (err: any) {
-                if (err instanceof streamutil.NoSuchLineError) { // success
-                    return true
-                }
-                throw err
-            }
-            finally {
-                out?.end()
-                out = null
-            }
+            return true
         }
 
         const handleEnvelope = (data: Buffer<ArrayBuffer>) => {
@@ -630,6 +636,9 @@ export default syrup.serial()
             log.info('Launching service')
 
             await openAgent()
+            // Some devices (e.g. Huawei) refuse to start the service while the screen
+            // is off. The device turns it off again once fully operational.
+            await devutil.executeShellCommand('input keyevent 224') // KEYCODE_WAKEUP
             await callService(util.format("-a '%s' -n '%s'", apk.startIntent.action, apk.startIntent.component))
 
             service.socket = await devutil.waitForLocalSocket(service.sock)
@@ -643,10 +652,6 @@ export default syrup.serial()
             service.socket!.once('end', () => onServiceDeath())
 
             service.socket!.on('error', () => onServiceDeath())
-
-            await devutil.executeShellCommand('settings put system screen_brightness 0')
-            await devutil.executeShellCommand('settings put system screen_brightness_mode 0')
-            await devutil.executeShellCommand('input keyevent 26')
         }
 
         await openService()

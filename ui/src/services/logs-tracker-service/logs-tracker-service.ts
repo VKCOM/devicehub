@@ -1,4 +1,4 @@
-import { injectable } from 'inversify'
+import { injectable, unmanaged } from 'inversify'
 import { makeAutoObservable, runInAction } from 'mobx'
 
 import { socket } from '@/api/socket'
@@ -24,8 +24,8 @@ export class LogsTrackerService {
 
   private throttledFlushLogs = throttle(this.flushLogs, this.throttleDelay)
 
-  constructor() {
-    makeAutoObservable(this)
+  constructor(@unmanaged() private connection = socket) {
+    makeAutoObservable<this, 'connection'>(this, { connection: false })
 
     this.flushLogs = this.flushLogs.bind(this)
     this.onLogcatEntry = this.onLogcatEntry.bind(this)
@@ -46,13 +46,13 @@ export class LogsTrackerService {
       }
     }
 
-    socket.on('logcat.entry', this.onLogcatEntry)
+    this.connection.on('logcat.entry', this.onLogcatEntry)
   }
 
   stopLogcatTracker(serial: string): void {
     this.setLogcatStarted(serial, false)
 
-    socket.off('logcat.entry', this.onLogcatEntry)
+    this.connection.off('logcat.entry', this.onLogcatEntry)
   }
 
   clearDeviceLogs(serial: string): void {

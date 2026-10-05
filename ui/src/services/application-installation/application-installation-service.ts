@@ -44,12 +44,18 @@ export class ApplicationInstallationService {
   ) {
     makeAutoObservable(this)
 
-    this.manifestQuery = mobxQueryFactory(() => ({ ...queries.s.apk(this.href), enabled: !!this.href && this.isAndroid }))
+    this.manifestQuery = mobxQueryFactory(() => ({
+      ...queries.s.apk(this.href),
+      enabled: !!this.href && this.isAndroid,
+    }))
     this.uploadFileMutate = mobxMutationFactory<UploadFileResponse, ErrorResponse, UploadFileArgs>({
       mutationFn: (data): Promise<UploadFileResponse> => uploadFile(data),
     })
 
-    this.init()
+    void this.init().catch(() => {
+      this.isError = true
+      this.status = 'Device unavailable'
+    })
   }
 
   async init(): Promise<void> {
@@ -201,7 +207,6 @@ export class ApplicationInstallationService {
 
     this.href = data.resources.file.href
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const install = await (async () => {
       if (!this.isAndroid) {
         return await this.deviceControlStore.install({

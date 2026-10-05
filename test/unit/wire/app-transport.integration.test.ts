@@ -39,7 +39,7 @@ describe('AppTransport <-> proxy ROUTER', () => {
 
     // A minimal real proxy: a RouterSocket wired to the pure ProxyRouting, the
     // same glue lib/units/proxy/index.ts uses (without the lifecycle globals).
-    const setup = async () => {
+    const setup = async (attachAfterConnect = false) => {
         const addr = `tcp://127.0.0.1:${nextPort()}`
         const routing = new ProxyRouting()
         const router = new RouterSocket()
@@ -53,6 +53,12 @@ describe('AppTransport <-> proxy ROUTER', () => {
 
         const dealer = new DealerSocket({routingId: 'app-1', probeRouter: true})
         dealer.connect(addr)
+        if (attachAfterConnect) {
+            // Establish the link before AppTransport starts observing ZMQ events.
+            const connected = nextRealFrames(router)
+            await dealer.send([Buffer.from(KIND.SUBSCRIBE_BROADCAST)])
+            await connected
+        }
         const transport = new AppTransport(dealer)
         open.push(transport)
         return {addr, router, routing, transport}
@@ -155,4 +161,23 @@ describe('AppTransport <-> proxy ROUTER', () => {
         const decoded = Envelope.fromBinary(reply.body)
         expect(decoded.message?.typeUrl).toContain('TransactionDoneMessage')
     })
+    it.each([false, true])('restores broadcasts after proxy restart (transport attached late: %s)', async (attachAfterConnect) => {
+        const {addr, router, transport} = await setup(attachAfterConnect)
+        const initialRegistration = nextRealFrames(router)
+        transport.registerBroadcast()
+        await initialRegistration
+        await router.close()
+
+        const replacement = new RouterSocket()
+        open.push(replacement)
+        const registered = nextRealFrames(replacement)
+        await replacement.bind(addr)
+        const frames = await registered
+        expect(frames[1].toString()).toBe(KIND.SUBSCRIBE_BROADCAST)
+        const received = new Promise<Buffer>(resolve => transport.once('broadcast', resolve))
+        const envelope = Buffer.from(wireutil.pack(DeviceHeartbeatMessage, {serial: 'after-restart'}))
+        await replacement.send([frames[0], ...encodeBroadcast(envelope)])
+        expect(Envelope.fromBinary(await received).message?.typeUrl).toContain('DeviceHeartbeatMessage')
+    })
+
 })

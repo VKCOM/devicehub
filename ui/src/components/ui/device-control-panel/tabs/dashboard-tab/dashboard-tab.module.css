@@ -27,6 +27,26 @@
   }
 }
 
+.silent {
+  grid-template:
+    'deviceButtons remoteDebug' min-content
+    'deviceButtons linkOpener' min-content
+    'deviceButtons shell' 1fr
+    'appUpload shell'
+    'clipboard shell' / minmax(400px, 1fr) 1fr;
+  align-items: start;
+
+  @container (max-width: 620px) {
+    grid-template:
+      'deviceButtons'
+      'shell'
+      'linkOpener'
+      'clipboard'
+      'appUpload'
+      'remoteDebug' / minmax(400px, auto);
+  }
+}
+
 .deviceButtons {
   grid-area: deviceButtons;
 }

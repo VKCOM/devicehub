@@ -20,6 +20,9 @@ export default syrup.serial()
     .define(function(options, solo, WdaClient, transport, group) {
         const log = logger.createLogger('device:plugins:screen:stream')
         const wss = new webSocketServer.Server({port: options.screenPort})
+        if (options.silent) group.on('leave', () => {
+            for (const client of wss.clients) client.close(1008, 'Device session ended')
+        })
         const url = iosutil.getUri(options.wdaHost, options.mjpegPort)
 
         wss.on('connection', async(ws, req) => {
@@ -79,6 +82,7 @@ export default syrup.serial()
             }
 
             await tryCheckDeviceGroup()
+            if (!authed || ws.readyState !== ws.OPEN) return
 
             const stream = new Writable({
                 write(chunk, encoding, callback) {
@@ -106,8 +110,9 @@ export default syrup.serial()
             const handleRequestStream = () => {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => {
+                        if (!isConnectionAlive) { reject(); return }
                         if (frameStream !== null) {
-                            frameStream.req.end()
+                            frameStream?.req?.end()
                         }
                         frameStream = request.get(url)
                         frameStream.on('response', response => {
@@ -135,7 +140,7 @@ export default syrup.serial()
                         if (result) {
                             result.response.pipe(consumer).pipe(stream)
                             // [VD] We can't launch homeBtn otherwise opening in STF corrupt test automation run. Also no sense to execute connect
-                            await WdaClient.startSession()
+                            if (!options.silent) await WdaClient.startSession()
                             // WdaClient.homeBtn() //no existing session detected so we can press home button to wake up device automatically
                             // override already existing error handler
                             result.frameStream.on('error', function(err) {
@@ -147,25 +152,31 @@ export default syrup.serial()
 
             consumer.on('error', (err) => {
                 handleSocketError(err, 'Consumer error')
-                frameStream.req.end()
+                frameStream?.req?.end()
                 // doConnectionToMJPEGStream(fn)
             })
             stream.on('error', () => {
                 // handleSocketError(err, 'Stream error ')
-                frameStream.req.end()
+                frameStream?.req?.end()
             })
             stream.socket.on('error', () => {
                 // handleSocketError(err, 'Websocket stream error ')
-                frameStream.req.end()
+                frameStream?.req?.end()
             })
             ws.on('close', async() => {
+                if (options.silent) {
+                    isConnectionAlive = false
+                    frameStream?.abort()
+                    stream.destroy()
+                    return
+                }
                 // @TODO handle close event
                 // stream.socket.onclose()
                 if (!authed) {
                     return
                 }
 
-                frameStream.req.end()
+                frameStream?.req?.end()
                 const orientation = WdaClient.orientation
 
                 const stoppingSession = async() => {
@@ -186,6 +197,12 @@ export default syrup.serial()
                 stoppingSession()
             })
             ws.on('error', async() => {
+                if (options.silent) {
+                    isConnectionAlive = false
+                    frameStream?.abort()
+                    stream.destroy()
+                    return
+                }
                 // @TODO handle error event
                 // stream.socket.onclose()
                 if (!authed) {

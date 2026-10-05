@@ -27,6 +27,9 @@ function fakeReader() {
 function fakeSocket(reader: unknown) {
     const writes: Buffer[] = []
     return {
+        authorized: true,
+        ended: false,
+        end() { this.ended = true },
         maxPayload: 4096,
         writes,
         reader,

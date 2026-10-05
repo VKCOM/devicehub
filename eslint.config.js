@@ -108,7 +108,7 @@ export default tseslint.config(
             'no-label-var': 2,
             'no-shadow-restricted-names': 2,
             'no-shadow': 0,
-            'no-undefined': 1,
+            'no-undefined': 0,
             'no-unused-vars': [1, {varsIgnorePattern: '^_'}],
             'no-use-before-define': 0,
 
@@ -170,7 +170,7 @@ export default tseslint.config(
             'wrap-regex': 0,
 
             // Node.js / Common.js
-            'callback-return': 1,
+            'callback-return': 0,
             'global-require': 0,
             'handle-callback-err': 1,
             'no-mixed-requires': [0, {grouping: true}],

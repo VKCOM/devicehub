@@ -1,5 +1,6 @@
 import * as usbmux from '@irdk/usbmux'
 import logger from '../../util/logger.js'
+import net from 'node:net'
 
 const log = logger.createLogger('ios:redirect-ports')
 
@@ -12,10 +13,54 @@ export async function openPort(
     devicePort: number,
     listenPort: number,
     udid: string,
-    usbmuxPath = '/var/run/usbmuxd'
+    usbmuxPath = '/var/run/usbmuxd',
+    loopbackOnly = false
 ): Promise<() => Promise<void>> {
     try {
         usbmux.address.path = usbmuxPath
+
+        // The library Relay binds all interfaces. Silent workers keep raw WDA/MJPEG private.
+        if (loopbackOnly) {
+            const deviceId = await usbmux.findDevice({udid})
+            const sockets = new Set<net.Socket>()
+            let closing = false
+            const server = net.createServer(async socket => {
+                sockets.add(socket)
+                socket.once('close', () => sockets.delete(socket))
+                socket.on('error', () => socket.destroy())
+
+                try {
+                    const tunnel = await usbmux.connect(deviceId, devicePort)
+                    if (closing || socket.destroyed) {
+                        tunnel.destroy()
+                        return
+                    }
+
+                    sockets.add(tunnel)
+                    tunnel.once('close', () => {
+                        sockets.delete(tunnel)
+                        socket.destroy()
+                    })
+                    tunnel.on('error', () => tunnel.destroy())
+                    socket.once('close', () => tunnel.destroy())
+                    socket.pipe(tunnel).pipe(socket)
+                }
+                catch {
+                    socket.destroy()
+                }
+            })
+
+            await new Promise<void>((resolve, reject) => {
+                server.once('error', reject)
+                server.listen(listenPort, '127.0.0.1', resolve)
+            })
+
+            return async () => {
+                closing = true
+                for (const socket of sockets) socket.destroy()
+                await new Promise<void>(resolve => server.close(() => resolve()))
+            }
+        }
 
         const relay = new usbmux.Relay(devicePort, listenPort, {
             udid: udid

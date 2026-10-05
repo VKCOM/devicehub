@@ -9,6 +9,7 @@ on:
       - '.github/workflows/unit_tests.yaml'
       - 'lib/**'
       - 'test/unit/**'
+      - 'test/support/**'
       - 'vitest.config.ts'
       - 'tsconfig*.json'
       - 'package.json'
@@ -31,5 +32,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Provider integration tests talk to a real ADB server; devices are faked,
+      # so no emulator is needed. The runner image ships the Android SDK.
+      - name: Provide adb
+        run: |
+          ADB="${ANDROID_HOME:-/usr/local/lib/android/sdk}/platform-tools/adb"
+          if [ ! -x "$ADB" ]; then
+            sudo apt-get update && sudo apt-get install -y adb
+            ADB="$(command -v adb)"
+          fi
+          "$ADB" version
+          echo "ADB_PATH=$ADB" >> "$GITHUB_ENV"
+
       - name: Run unit tests
         run: npm run test:unit
+        env:
+          ADB_INTEGRATION_TESTS: '1'

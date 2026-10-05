@@ -181,8 +181,10 @@ export class DealerSocket extends BaseSocket<Dealer> {
     // ROUTER is a fresh process with an empty routing table, so any state we
     // previously pushed to it (ANNOUNCE, HELLO) has to be pushed again. Opt-in,
     // because it starts a second async loop over the socket's event observer.
-    watchReconnect() {
-        let seenFirst = false
+    // Include the first observed connection when attaching after connect(): the
+    // real initial event may already be gone, making this first event a reconnect.
+    watchReconnect({includeInitial = false}: {includeInitial?: boolean} = {}) {
+        let seenFirst = includeInitial
         ;(async () => {
             try {
                 for await (const event of this.socket.events) {

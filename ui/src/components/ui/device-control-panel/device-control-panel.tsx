@@ -32,47 +32,47 @@ import type { TabsContent } from '@/components/lib/tabs-panel'
 
 export const DeviceControlPanel = () => {
   const { t } = useTranslation()
-  const { serial = '' } = useParams()
+  const { serial = '', provider } = useParams()
 
   const tabsContent = useMemo<TabsContent[]>(
     () => [
       {
-        id: getControlRoute(serial),
+        id: getControlRoute(serial, provider),
         title: t('Dashboard'),
         before: <Icon20HomeOutline height={17} width={17} />,
         ariaControls: 'tab-content-dashboard',
         content: <DashboardTab />,
       },
       {
-        id: getControlLogsRoute(serial),
+        id: getControlLogsRoute(serial, provider),
         title: t('Logs'),
         before: <Icon20ArticleBoxOutline height={17} width={17} />,
         ariaControls: 'tab-content-logs',
         content: <LogsTab />,
       },
       {
-        id: getControlAdvancedRoute(serial),
+        id: getControlAdvancedRoute(serial, provider),
         title: t('Advanced'),
         before: <Icon20FlashOutline height={17} width={17} />,
         ariaControls: 'tab-content-advanced',
         content: <AdvancedTab />,
       },
       {
-        id: getControlFileExplorerRoute(serial),
+        id: getControlFileExplorerRoute(serial, provider),
         title: t('File Explorer'),
         before: <Icon20FolderSimpleOutline height={17} width={17} />,
         ariaControls: 'tab-content-explorer',
         content: <FileExplorerTab />,
       },
       {
-        id: getControlInfoRoute(serial),
+        id: getControlInfoRoute(serial, provider),
         title: t('Info'),
         before: <Icon24InfoCircleOutline height={17} width={17} />,
         ariaControls: 'tab-content-info',
         content: <InfoTab />,
       },
     ],
-    [t, serial]
+    [t, serial, provider]
   )
 
   return (

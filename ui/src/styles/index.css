@@ -10,6 +10,10 @@
   padding-top: calc(var(--vkui_internal--panel_header_height) + var(--marquee-height));
 }
 
+.pageWrapper.headless {
+  padding-top: 0;
+}
+
 body {
   overflow-x: hidden;
 }

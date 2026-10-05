@@ -25,6 +25,8 @@ import {WebDriverAgent} from "appium-webdriveragent"
 import { openPort } from "./redirect-ports.js"
 
 interface Options {
+    silent?: boolean
+    silentAllowedEmail?: string[]
     serial: string
     provider: string
     isSimulator: boolean
@@ -32,7 +34,7 @@ interface Options {
     wdaHost: string
     wdaPort: number
     mjpegPort: number
-
+    wdaBundleId: string
     publicIp: string,
     endpoints: {
         processor: string[]
@@ -60,8 +62,8 @@ export default (async(options: Options) => {
     const [stopWDAPortForwarding, stopMJPEGPortForwarding] = options.isSimulator
         ? [async() => {}, async() => {}]
         : await Promise.all([
-            openPort(options.wdaPort, options.wdaPort, options.serial),
-            openPort(options.mjpegPort, options.mjpegPort, options.serial),
+            openPort(options.wdaPort, options.wdaPort, options.serial, undefined, options.silent),
+            openPort(options.mjpegPort, options.mjpegPort, options.serial, undefined, options.silent),
         ])
 
     const stopPortForwarding = async() => {
@@ -76,6 +78,7 @@ export default (async(options: Options) => {
         device: {udid: options.serial},
         realDevice: !options.isSimulator,
         wdaRemotePort: options.wdaPort,
+        wdaBindingIP: options.silent ? '127.0.0.1' : undefined,
         wdaConnectionTimeout: 60_000,
         wdaLaunchTimeout: 60_000,
         prebuildWDA: true,
@@ -84,7 +87,7 @@ export default (async(options: Options) => {
         usePreinstalledWDA: false,
         allowProvisioningDeviceRegistration: true,
         showXcodeLog: true,
-        updatedWDABundleId: 'com.dhub.WebDriverAgentRunner'
+        updatedWDABundleId: options.wdaBundleId
     })
 
     lifecycle.observe(async() => {
@@ -111,7 +114,8 @@ export default (async(options: Options) => {
     }
 
     try {
-        await WDA.setupCaching()
+        // A cached runner may still expose public HTTP/MJPEG listeners.
+        if (!options.silent) await WDA.setupCaching()
         await WDA.launch(options.provider)
         await new Promise(r => setTimeout(r, 5000))
         await waitWDA()
@@ -216,7 +220,8 @@ export default (async(options: Options) => {
                         })
 
                         group.on('join', async() => {
-                            await wdaClient.startSession()
+                            const started = await wdaClient.startSession()
+                            if (options.silent && !started) throw new Error('Unable to start WDA session')
                         })
 
                         group.on('leave', async() => {

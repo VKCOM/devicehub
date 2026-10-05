@@ -28,12 +28,14 @@ import lifecycle from '../../util/lifecycle.js'
 import srv from '../../util/srv.js'
 import UserModel from '../../db/models/user/index.js'
 import DeviceModel from '../../db/models/device/index.js'
+import {defaultStore as introductionStore, saveIntroducedDevice} from './device-introduction.js'
 import {RouterSocket, DealerSocket} from '../../util/zmqsocket.js'
 import {encodeDeviceFrame, encodeAnnounce, encodeBroadcast, encodeHello, deviceKey} from '../../wire/frame.js'
 import {Envelope} from '../../wire/wire.js'
 import {Any} from '../../wire/google/protobuf/any.js'
 import {ProcessorRouting} from './routing.js'
 import {PresenceTracker, type PresenceEvent} from './presence.js'
+import {SilentDevices} from './silent-devices.js'
 import {
     UserChangeMessage,
     GroupChangeMessage,
@@ -81,6 +83,8 @@ import {
     DeviceGetIsInOrigin,
     GetDeadDevices,
     DeviceIosIntroductionMessage,
+    ResolveAdbPortRequest,
+    ResolveAdbPortResponse,
 } from '../../wire/wire.js'
 
 interface Options {
@@ -100,7 +104,7 @@ const buf = (u: Uint8Array): Buffer => Buffer.from(u)
 
 const _deviceKeyCache = new Map<string, {providerName: string; serial: string}>()
 
-const parseDeviceKey = (identity: Buffer): {providerName: string; serial: string} => {
+const parseDeviceKey = (identity: Buffer, remember = true): {providerName: string; serial: string} => {
     const s = identity.toString()
     const cached = _deviceKeyCache.get(s)
     if (cached) {
@@ -110,7 +114,7 @@ const parseDeviceKey = (identity: Buffer): {providerName: string; serial: string
     const parsed = sep < 0
         ? {providerName: '', serial: s}
         : {providerName: s.slice(0, sep), serial: s.slice(sep + 1)}
-    _deviceKeyCache.set(s, parsed)
+    if (remember) _deviceKeyCache.set(s, parsed)
     return parsed
 }
 
@@ -190,7 +194,7 @@ export default db.ensureConnectivity(async(options: Options) => {
     // EMPTY reply-path (there is no app node waiting for a reply). The
     // (providerName, serial) are derived from the routing identity (deviceKey).
     const sendToDevice = (identity: Buffer, envelope: Uint8Array) => {
-        const {providerName, serial} = parseDeviceKey(identity)
+        const {providerName, serial} = parseDeviceKey(identity, false)
         const frames = encodeDeviceFrame(providerName, serial, buf(envelope))
         deviceRouter.send([identity, ...frames]).catch((err: any) =>
             log.warn('Undeliverable to device %s: %s', identity.toString(), err?.message))
@@ -202,6 +206,16 @@ export default db.ensureConnectivity(async(options: Options) => {
         proxyDealer.send(encodeBroadcast(buf(envelope)))
             .catch((err: any) => log.warn('Broadcast to app failed: %s', err?.message))
     }
+
+    const silentDevices = new SilentDevices(options.heartbeatTimeout, sendToApp, undefined, (providerName, serial) => {
+        presence.forget(providerName, serial)
+        const key = deviceKey(providerName, serial)
+        sweptKeys.delete(key)
+        _deviceKeyCache.delete(key)
+        if (routing.learnProvider(providerName)) announceProvider(providerName)
+    })
+
+    lifecycle.observe(() => silentDevices.close())
 
     // Per-request reply helper. wireutil.reply() packs a TransactionDoneMessage
     // without a channel; we re-inject the request's correlationId so the
@@ -278,6 +292,8 @@ export default db.ensureConnectivity(async(options: Options) => {
 
         for (const device of stale) {
             const providerName = device.provider?.name ?? ''
+            // The DB read may finish after this address has already introduced a silent worker.
+            if (silentDevices.has(providerName, device.serial)) continue
             sweptKeys.add(deviceKey(providerName, device.serial))
             // silent: we are NOT claiming these devices, so no 'present'
             // broadcast. time = startedAt so they all expire together exactly one
@@ -311,7 +327,8 @@ export default db.ensureConnectivity(async(options: Options) => {
         const stillStale = await DeviceModel.loadDevicesPresentBefore(new Date(startedAt))
         const stillStaleSerials = new Set(stillStale.map((d: any) => d.serial))
 
-        for (const {serial} of batch) {
+        for (const {serial, providerName} of batch) {
+            if (silentDevices.has(providerName, serial)) continue
             if (!stillStaleSerials.has(serial)) {
                 log.info('Device "%s" was adopted by another processor, leaving it present', serial)
                 continue
@@ -335,6 +352,8 @@ export default db.ensureConnectivity(async(options: Options) => {
     //                                forwarding to the app side.
     // The dispatch table is built once; ctx is the only per-message value.
     interface DeviceContext {
+        providerName: string
+        serial: string
         sendToDevice: (envelope: Uint8Array) => void
         data: Buffer
         // A reply sequencer scoped to THIS request, bound to the request's own
@@ -372,10 +391,27 @@ export default db.ensureConnectivity(async(options: Options) => {
     on(DeviceHeartbeatMessage, () => {
         // presence bump is handled up front from the routing identity.
     })
+    on(ResolveAdbPortRequest, async (ctx, message) => {
+        try {
+            const device = await DeviceModel.loadAdbPort(ctx.providerName, ctx.serial)
+            const port = Number(device?.adbPort)
+            ctx.sendToDevice(wireutil.pack(ResolveAdbPortResponse, {
+                requestId: message.requestId,
+                adbPort: Number.isInteger(port) && port > 0 && port <= 65535 ? port : undefined
+            }))
+        }
+        catch {
+            ctx.sendToDevice(wireutil.pack(ResolveAdbPortResponse, {
+                requestId: message.requestId, error: 'Unable to resolve remote ADB port'
+            }))
+        }
+    })
     on(DeviceIntroductionMessage, async (ctx, message) => {
-        await dbapi.saveDeviceInitialState(message.serial, message)
+        if (!message.silent) {
+            await saveIntroducedDevice(introductionStore, log, message)
+            sendToApp(ctx.data)
+        }
         ctx.sendToDevice(wireutil.pack(DeviceRegisteredMessage, {serial: message.serial}))
-        sendToApp(ctx.data)
     })
     on(DeviceIosIntroductionMessage, async (ctx, message) => {
         await dbapi.saveIosDeviceInitialState(options.publicIp, message)
@@ -539,6 +575,7 @@ export default db.ensureConnectivity(async(options: Options) => {
         // reply is a lazy getter: most handlers never call it, so allocation is
         // deferred to first access. defineProperty caches the result inline.
         const ctx: DeviceContext = {
+            ...parseDeviceKey(senderId),
             sendToDevice: (out) => sendToDevice(senderId, out),
             data: envelope,
             get reply() {
@@ -574,9 +611,9 @@ export default db.ensureConnectivity(async(options: Options) => {
         // TTL governs it and no Mongo re-check is needed on expiry.
         const wasSwept = sweptKeys.delete(deviceKey(providerName, serial))
 
-    // Announce ONLY when the provider is newly learned. learnProvider returns
-    // true exactly once per provider, so the proxy's provider->processor table
-    // is updated once and not on every heartbeat.
+        // Announce ONLY when the provider is newly learned. learnProvider returns
+        // true exactly once per provider, so the proxy's provider->processor table
+        // is updated once and not on every heartbeat.
         if (routing.learnProvider(providerName)) {
             announceProvider(providerName)
         }
@@ -628,6 +665,12 @@ export default db.ensureConnectivity(async(options: Options) => {
         // dispatch below.
         const decoded = Envelope.fromBinary(envelope)
         const typeUrl = decoded.message?.typeUrl
+
+        if (decoded.silentEvent) {
+            const {providerName, serial} = parseDeviceKey(senderId, false)
+            silentDevices.consume(providerName, serial, decoded, bytes => sendToDevice(senderId, bytes))
+            return
+        }
 
         // The (providerName, serial) for presence come from the routing
         // identity, not the message body (a heartbeat only carries serial).
@@ -687,6 +730,7 @@ export default db.ensureConnectivity(async(options: Options) => {
     })
 
     const shutdown = () => {
+        silentDevices.close()
         presence.stop()
         ;[deviceRouter, proxyDealer].forEach((sock) => {
             try {

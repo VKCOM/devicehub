@@ -31,6 +31,12 @@ export const appRouter = createHashRouter(
               <Route element={<ControlPage />} path='file-explorer' />
               <Route element={<ControlPage />} path='info' />
             </Route>
+            <Route element={<ControlPage />} path='/silent-control/:provider/:serial'>
+              <Route element={<ControlPage />} path='logs' />
+              <Route element={<ControlPage />} path='advanced' />
+              <Route element={<ControlPage />} path='file-explorer' />
+              <Route element={<ControlPage />} path='info' />
+            </Route>
             <Route element={<SettingsPage />} path={getSettingsRoute()}>
               <Route element={<SettingsPage />} path='keys' />
               <Route element={<SettingsPage />} path='groups' />

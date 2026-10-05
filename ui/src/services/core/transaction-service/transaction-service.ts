@@ -1,4 +1,4 @@
-import { injectable } from 'inversify'
+import { injectable, unmanaged } from 'inversify'
 import { makeAutoObservable } from 'mobx'
 
 import { socket } from '@/api/socket'
@@ -22,8 +22,11 @@ export class TransactionService<T = unknown> {
   private timeoutId: ReturnType<typeof setTimeout> | undefined = undefined
   private timeoutDelay = 60000
 
-  constructor() {
-    makeAutoObservable(this)
+  private onDisconnect = (): void => {
+    this.abortController.abort('Device connection closed')
+  }
+constructor(@unmanaged() private connection = socket) {
+    makeAutoObservable<this, 'connection'>(this, { connection: false })
 
     this.donePromise = Promise.withResolvers()
     this.abortController = new AbortController()
@@ -47,14 +50,15 @@ export class TransactionService<T = unknown> {
     this.addTransactionAbortListener()
     this.createChannel()
 
-    socket.on('tx.done', this.transactionDoneListener)
-    socket.on('tx.progress', this.transactionProgressListener)
+    this.connection.once('disconnect', this.onDisconnect)
+    this.connection.on('tx.done', this.transactionDoneListener)
+    this.connection.on('tx.progress', this.transactionProgressListener)
 
     /* NOTE: The transaction will be automatically cleaned up if the tx.done message
       is not received after a certain period of time
      */
     this.timeoutId = setTimeout(() => {
-      this.cleanUpTransaction()
+      this.abortController.abort('Transaction timed out')
     }, this.timeoutDelay)
 
     return {
@@ -65,14 +69,17 @@ export class TransactionService<T = unknown> {
     }
   }
 
+  
+
   cleanUpTransaction(): void {
     this.progressFn = null
 
     clearTimeout(this.timeoutId)
 
-    socket.off('tx.done', this.transactionDoneListener)
-    socket.off('tx.progress', this.transactionProgressListener)
-    socket.emit('tx.cleanup', this.channel)
+    this.connection.off('disconnect', this.onDisconnect)
+    this.connection.off('tx.done', this.transactionDoneListener)
+    this.connection.off('tx.progress', this.transactionProgressListener)
+    this.connection.emit('tx.cleanup', this.channel)
   }
 
   private addTransactionAbortListener(): void {
