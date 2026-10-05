@@ -45,7 +45,12 @@ describe('provider CLI: remote device API', () => {
 
     it('enables the API', async() => {
         const options = await startProvider(['--enable-api', '--api-host', '127.0.0.1', '--api-port', '7131'])
-        expect(options.api).toEqual({host: '127.0.0.1', port: 7131})
+        expect(options.api).toEqual({host: '127.0.0.1', port: 7131, recoveryTimeoutMs: 30_000})
+    })
+
+    it('sets how long an API device may take to recover', async() => {
+        const options = await startProvider(['--enable-api', '--api-recovery-timeout', '5'])
+        expect(options.api.recoveryTimeoutMs).toBe(5000)
     })
 
     it('uses the global settings for regular devices', async() => {

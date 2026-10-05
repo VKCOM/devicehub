@@ -122,7 +122,15 @@ export default (function(options: any) {
                 .dependency(trackModuleReadyness('filesystem', filesystem))
                 .dependency(trackModuleReadyness('mobileService', mobileService))
                 .dependency(trackModuleReadyness('remotedebug', remotedebug))
-                .define((options, group) => {
+                .define((options, group, _heartbeat, _stream, _capture, service) => {
+                    // The screen was woken up to start the service. An idle device keeps
+                    // it off, as after a release; joining wakes it up again
+                    group.get().catch(() => {
+                        service.sendCommand('settings put system screen_brightness_mode 0')
+                        service.sendCommand('settings put system screen_brightness 0')
+                        service.sendCommand('input keyevent 223') // KEYCODE_SLEEP
+                    })
+
                     if (process.send) {
                         // Only if we have a parent process
                         process.send('ready')

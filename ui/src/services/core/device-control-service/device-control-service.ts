@@ -292,6 +292,7 @@ export class DeviceControlService {
     const { data: device } = this.deviceBySerialStore.deviceQueryResult()
 
     const session = this.deviceBySerialStore.session
+
     if (session.silent && !session.ready) return
     session.socket.emit(action, device?.serial, data)
   }

@@ -1,8 +1,8 @@
-import { DeviceSession } from '@/services/device-session'
 import { makeAutoObservable } from 'mobx'
 import { inject, injectable } from 'inversify'
 import { merge } from 'lodash'
 
+import { DeviceSession } from '@/services/device-session'
 import { socket } from '@/api/socket'
 import { getDeviceBySerial } from '@/api/openstf-api'
 

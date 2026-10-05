@@ -1,9 +1,10 @@
-import { DeviceSession } from './device-session'
 import { inject, injectable, optional } from 'inversify'
 
 import { socket } from '@/api/socket'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+
+import { DeviceSession } from './device-session'
 
 import type { DeviceGroup } from '@/generated/types'
 import type { TransactionFactory } from '@/types/transaction-factory.type'

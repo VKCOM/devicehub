@@ -47,10 +47,11 @@ export class FakeAdbd {
         readonly host = '127.0.0.1'
     ) {}
 
-    async start(): Promise<number> {
+    /* Listens on `port`, or on the previous one: a stopped device comes back where it was */
+    async start(port = this.port): Promise<number> {
         await new Promise<void>((resolve, reject) => {
             this.server.once('error', reject)
-            this.server.listen(0, this.host, resolve)
+            this.server.listen(port, this.host, resolve)
         })
         this.port = (this.server.address() as net.AddressInfo).port
         return this.port

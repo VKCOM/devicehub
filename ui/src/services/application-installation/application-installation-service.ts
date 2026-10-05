@@ -207,7 +207,6 @@ export class ApplicationInstallationService {
 
     this.href = data.resources.file.href
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const install = await (async () => {
       if (!this.isAndroid) {
         return await this.deviceControlStore.install({

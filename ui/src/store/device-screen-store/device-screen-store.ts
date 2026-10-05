@@ -96,10 +96,13 @@ export class DeviceScreenStore {
     this.urlReactionDisposer?.()
     this.urlReactionDisposer = autorun(() => {
       const session = this.deviceBySerialStore.session
+
       if (session.silent && !session.ready) {
         this.websocket?.close()
+
         return
       }
+
       const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
 
       if (!url) return
@@ -296,8 +299,10 @@ export class DeviceScreenStore {
     return new Promise((resolve, reject) => {
       if (this.disposed || !this.deviceBySerialStore.session.ready) {
         reject(new Error('Device session ended'))
+
         return
       }
+
       const url = this.deviceBySerialStore.deviceQueryResult().data?.display?.url
 
       if (!url) {
@@ -320,8 +325,10 @@ export class DeviceScreenStore {
         if (this.disposed || !this.deviceBySerialStore.session.ready) {
           ws.close()
           reject(new Error('Device session ended'))
+
           return
         }
+
         this.websocket = ws
         ws.onmessage = this.messageListener.bind(this)
         ws.onerror = (): void => {}

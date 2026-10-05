@@ -1,10 +1,9 @@
-import { DeviceSession } from '@/services/device-session'
-import { GroupService } from '@/services/group-service'
-import { DeviceDisconnection } from '@/store/device-disconnection'
-import { LogsTrackerService } from '@/services/logs-tracker-service/logs-tracker-service'
-import { TransactionService } from '@/services/core/transaction-service/transaction-service'
 import { Container } from 'inversify'
 
+import { LogsTrackerService } from '@/services/logs-tracker-service/logs-tracker-service'
+import { TransactionService } from '@/services/core/transaction-service/transaction-service'
+import { GroupService } from '@/services/group-service'
+import { DeviceSession } from '@/services/device-session'
 import { InfoService } from '@/services/info-service'
 import { LogcatService } from '@/services/logcat-service'
 import { BookingService } from '@/services/booking-service'
@@ -16,6 +15,7 @@ import { KeyboardService } from '@/services/keyboard-service/keyboard-service'
 import { SaveLogsService } from '@/services/save-logs-service/save-logs-service'
 import { ApplicationInstallationService } from '@/services/application-installation/application-installation-service'
 
+import { DeviceDisconnection } from '@/store/device-disconnection'
 import { LinkOpenerStore } from '@/store/link-opener-store'
 import { DeviceConnection } from '@/store/device-connection'
 import { ShellControlStore } from '@/store/shell-control-store'
@@ -41,6 +41,7 @@ export const createDeviceContainer = (serial: string, provider?: string): Contai
 
   const session = new DeviceSession(serial, provider)
   deviceContainer.bind(CONTAINER_IDS.deviceSession).toConstantValue(session)
+
   if (session.silent) {
     deviceContainer
       .bind(CONTAINER_IDS.factoryTransactionService)
@@ -56,6 +57,7 @@ export const createDeviceContainer = (serial: string, provider?: string): Contai
   deviceContainer.bind(CONTAINER_IDS.touchService).to(TouchService)
   deviceContainer.bind(CONTAINER_IDS.logcatService).to(LogcatService)
   deviceContainer.bind(CONTAINER_IDS.scalingService).to(ScalingService)
+
   if (!session.silent) deviceContainer.bind(CONTAINER_IDS.bookingService).to(BookingService)
   deviceContainer.bind(CONTAINER_IDS.linkOpenerStore).to(LinkOpenerStore)
   deviceContainer.bind(CONTAINER_IDS.keyboardService).to(KeyboardService)

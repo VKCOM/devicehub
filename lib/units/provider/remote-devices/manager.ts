@@ -26,7 +26,10 @@ export interface RemoteDevice extends ConnectRequest {
     state: 'connecting' | 'active' | 'releasing'
 }
 
-export type LossReason = 'connection_lost' | 'offline' | 'stuck'
+export type LossReason = 'connection_lost' | 'stuck'
+
+/* Why a device that failed to recover is disconnected */
+export type RecoveryFailure = 'offline' | 'worker_failed'
 
 export class ConflictError extends Error {}
 
@@ -37,6 +40,8 @@ export interface RemoteDeviceManagerOptions {
     removeWorker: (serial: string) => Promise<void>
     /* How long a freshly connected device may take to become usable */
     connectTimeoutMs?: number
+    /* How long an established device may stay offline or without a worker before it is disconnected */
+    recoveryTimeoutMs?: number
     webhooks?: WebhookHub
 }
 
@@ -49,22 +54,31 @@ const RELEASE_REASONS: Record<string, string> = {
 
 /*
  * Devices connected on demand through the provider API (`adb connect host:port`).
- * They are never reconnected: a failed or lost connection is reported once and
- * the device is forgotten. State lives in memory only.
+ * The provider never runs `adb connect` for them again: a failed connection is
+ * reported once and the device is forgotten. An established device may still
+ * blink offline (the adb server retries TCP devices on its own) or lose its
+ * worker; it is given `recoveryTimeoutMs` to get a ready worker back before
+ * it is disconnected. State lives in memory only.
  */
 export class RemoteDeviceManager {
     readonly webhooks: WebhookHub
     private devices = new Map<string, RemoteDevice>()
     private releases = new Map<string, Promise<void>>()
+    /* Email of the user who owns a device, as reported by its worker */
+    private owners = new Map<string, string>()
+    /* Devices waiting for a ready worker, with the timer that gives up on them */
+    private recoveries = new Map<string, NodeJS.Timeout>()
     private readonly tracker: ADBObserver
     private readonly removeWorker: (serial: string) => Promise<void>
     private readonly connectTimeoutMs: number
+    private readonly recoveryTimeoutMs: number
 
     constructor(options: RemoteDeviceManagerOptions) {
         this.tracker = options.tracker
         this.removeWorker = options.removeWorker
         this.webhooks = options.webhooks ?? new WebhookHub(options.providerName)
         this.connectTimeoutMs = options.connectTimeoutMs ?? 15_000
+        this.recoveryTimeoutMs = options.recoveryTimeoutMs ?? 30_000
     }
 
     has(serial: string) {
@@ -128,19 +142,89 @@ export class RemoteDeviceManager {
     }
 
     workerReady(serial: string) {
+        if (!this.isServed(serial)) {
+            return
+        }
+
+        if (this.cancelRecovery(serial)) {
+            log.info('Remote device "%s" recovered', serial)
+        }
         this.webhooks.emit(serial, 'device.ready')
     }
 
     workerState(serial: string, message: {state: 'busy' | 'idle', email?: string, reason?: string}) {
+        if (!this.isServed(serial)) {
+            return
+        }
+
         if (message.state === 'busy') {
+            if (message.email && this.owners.get(serial) === message.email) {
+                return
+            }
+            this.owners.set(serial, message.email ?? '')
             this.webhooks.emit(serial, 'device.acquired', {email: message.email})
             return
         }
 
-        this.webhooks.emit(serial, 'device.released', {
-            email: message.email,
-            reason: (message.reason && RELEASE_REASONS[message.reason]) ?? message.reason
-        })
+        this.released(serial, (message.reason && RELEASE_REASONS[message.reason]) ?? message.reason)
+    }
+
+    /* The worker of a device died. The process manager restarts it on its own */
+    workerFailed(serial: string) {
+        this.startRecovery(serial, 'worker failed')
+    }
+
+    /* adb reports an established device in a state other than "device" */
+    deviceOffline(serial: string, state: string) {
+        this.startRecovery(serial, `adb state "${state}"`)
+    }
+
+    /*
+     * The device is not usable for now: whoever owned it has lost it. It is
+     * disconnected unless a worker gets ready again within `recoveryTimeoutMs`.
+     */
+    private startRecovery(serial: string, cause: string) {
+        if (this.devices.get(serial)?.state !== 'active') {
+            return
+        }
+
+        this.released(serial, 'device_absent')
+        if (this.recoveries.has(serial)) {
+            return
+        }
+
+        log.warn('Remote device "%s" is down [%s], waiting for it to recover', serial, cause)
+        this.recoveries.set(serial, setTimeout(() => {
+            this.recoveries.delete(serial)
+            const state = this.tracker.getDevice(serial)?.type
+            const reason: RecoveryFailure = state === 'device' ? 'worker_failed' : 'offline'
+            log.warn('Remote device "%s" did not recover [%s]', serial, reason)
+            void this.release(serial, reason === 'offline' ? {reason, state: state ?? 'absent'} : {reason})
+        }, this.recoveryTimeoutMs))
+    }
+
+    /* Returns whether the device was recovering */
+    private cancelRecovery(serial: string) {
+        const timer = this.recoveries.get(serial)
+        clearTimeout(timer)
+        return this.recoveries.delete(serial)
+    }
+
+    /* Reports the release of an owned device once, whoever notices it first */
+    private released(serial: string, reason?: string) {
+        const email = this.owners.get(serial)
+        if (email === undefined) {
+            return
+        }
+
+        this.owners.delete(serial)
+        this.webhooks.emit(serial, 'device.released', {email: email || undefined, reason})
+    }
+
+    /* An API device the provider still serves: a device being released reports nothing more */
+    private isServed(serial: string) {
+        const state = this.devices.get(serial)?.state
+        return state === 'connecting' || state === 'active'
     }
 
     /*
@@ -243,6 +327,8 @@ export class RemoteDeviceManager {
         }
 
         log.info('Releasing remote device "%s"', serial)
+        this.cancelRecovery(serial)
+        this.released(serial, 'device_absent')
         device.state = 'releasing'
         this.webhooks.emit(serial, event, data)
         this.webhooks.unsubscribe(serial)
@@ -250,6 +336,7 @@ export class RemoteDeviceManager {
         const release = this.stopAndDisconnect(device).finally(() => {
             this.devices.delete(serial)
             this.releases.delete(serial)
+            this.owners.delete(serial)
             this.tracker.setAutoReconnect(serial, true)
         })
         this.releases.set(serial, release)

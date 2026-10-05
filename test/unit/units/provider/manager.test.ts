@@ -39,9 +39,17 @@ describe('RemoteDeviceManager', () => {
         vi.spyOn(webhooks, 'emit')
         removeWorker = vi.fn(async() => {})
         manager = new RemoteDeviceManager({
-            providerName: 'p1', tracker: tracker as any, removeWorker, connectTimeoutMs: 300, webhooks
+            providerName: 'p1', tracker: tracker as any, removeWorker, connectTimeoutMs: 300, recoveryTimeoutMs: 200, webhooks
         })
     })
+
+    /* An established device; its connection events are cleared */
+    const active = async(body: Record<string, unknown> = {}) => {
+        const device = manager.connect(request(body))
+        await vi.waitFor(() => expect(device.state).toBe('active'))
+        vi.mocked(webhooks.emit).mockClear()
+        return device.serial
+    }
 
     it('connects a device and reports it once usable', async() => {
         const device = manager.connect(request({silent: true, emails: ['a@x'], idleTtl: 60}))
@@ -148,7 +156,7 @@ describe('RemoteDeviceManager', () => {
 
         expect(manager.disconnect('10.0.0.5', 5555)).toBe('10.0.0.5:5555')
         expect(manager.disconnect('10.0.0.5', 5555)).toBe('10.0.0.5:5555')
-        expect(await manager.deviceLost('10.0.0.5:5555', 'offline')).toBe(false)
+        expect(await manager.deviceLost('10.0.0.5:5555', 'stuck')).toBe(false)
 
         const shutdown = manager.shutdown()
         disconnected()
@@ -162,15 +170,15 @@ describe('RemoteDeviceManager', () => {
 
     it('handles a lost device only once it is established', async() => {
         const device = manager.connect(request())
-        expect(await manager.deviceLost('10.0.0.5:5555', 'offline')).toBe(false)
+        expect(await manager.deviceLost('10.0.0.5:5555', 'connection_lost')).toBe(false)
 
         await vi.waitFor(() => expect(device.state).toBe('active'))
-        expect(await manager.deviceLost('10.0.0.5:5555', 'offline', {state: 'offline'})).toBe(true)
+        expect(await manager.deviceLost('10.0.0.5:5555', 'connection_lost')).toBe(true)
         expect(events().at(-1)).toEqual({
-            serial: '10.0.0.5:5555', event: 'device.disconnected', data: {reason: 'offline', state: 'offline'}
+            serial: '10.0.0.5:5555', event: 'device.disconnected', data: {reason: 'connection_lost'}
         })
         expect(manager.has('10.0.0.5:5555')).toBe(false)
-        expect(await manager.deviceLost('10.0.0.5:5555', 'offline')).toBe(false)
+        expect(await manager.deviceLost('10.0.0.5:5555', 'connection_lost')).toBe(false)
     })
 
     it.each([
@@ -178,14 +186,109 @@ describe('RemoteDeviceManager', () => {
         ['timeout', 'idle_timeout'],
         ['ungroup_request', 'manual'],
         ['takeover', 'takeover']
-    ])('reports release reason %s as %s', (reason, expected) => {
-        manager.workerState('s', {state: 'idle', email: 'u@x', reason})
-        expect(events()).toEqual([{serial: 's', event: 'device.released', data: {email: 'u@x', reason: expected}}])
+    ])('reports release reason %s as %s', async(reason, expected) => {
+        const serial = await active()
+        manager.workerState(serial, {state: 'busy', email: 'u@x'})
+        manager.workerState(serial, {state: 'idle', email: 'u@x', reason})
+        expect(events()).toEqual([
+            {serial, event: 'device.acquired', data: {email: 'u@x'}},
+            {serial, event: 'device.released', data: {email: 'u@x', reason: expected}}
+        ])
     })
 
-    it('reports acquisition', () => {
+    it('reports an acquisition and a release once', async() => {
+        const serial = await active()
+        manager.workerState(serial, {state: 'idle', email: 'u@x', reason: 'ungroup_request'})
+        manager.workerState(serial, {state: 'busy', email: 'u@x'})
+        manager.workerState(serial, {state: 'busy', email: 'u@x'})
+        manager.workerState(serial, {state: 'idle', email: 'u@x', reason: 'ungroup_request'})
+        manager.workerState(serial, {state: 'idle', email: 'u@x', reason: 'ungroup_request'})
+        expect(events().map(e => e.event)).toEqual(['device.acquired', 'device.released'])
+    })
+
+    it('ignores the workers of devices it does not serve', () => {
+        manager.workerReady('s')
         manager.workerState('s', {state: 'busy', email: 'u@x'})
-        expect(events()).toEqual([{serial: 's', event: 'device.acquired', data: {email: 'u@x'}}])
+        manager.workerFailed('s')
+        manager.deviceOffline('s', 'offline')
+        expect(events()).toEqual([])
+    })
+
+    describe('recovery', () => {
+        it('keeps a device that blinked offline and got a ready worker back', async() => {
+            const serial = await active()
+            manager.workerState(serial, {state: 'busy', email: 'u@x'})
+
+            tracker.devices.get(serial)!.type = 'offline'
+            manager.deviceOffline(serial, 'offline')
+            tracker.devices.get(serial)!.type = 'device'
+            manager.workerReady(serial)
+            manager.workerState(serial, {state: 'busy', email: 'u@x'})
+
+            await new Promise(resolve => setTimeout(resolve, 300)) // past the recovery timeout
+            expect(manager.has(serial)).toBe(true)
+            expect(events()).toEqual([
+                {serial, event: 'device.acquired', data: {email: 'u@x'}},
+                {serial, event: 'device.released', data: {email: 'u@x', reason: 'device_absent'}},
+                {serial, event: 'device.ready', data: undefined},
+                {serial, event: 'device.acquired', data: {email: 'u@x'}}
+            ])
+        })
+
+        it('disconnects a device that stayed offline', async() => {
+            const serial = await active()
+            manager.workerState(serial, {state: 'busy', email: 'u@x'})
+
+            tracker.devices.get(serial)!.type = 'offline'
+            manager.deviceOffline(serial, 'offline')
+            manager.workerFailed(serial) // its worker dies as well: still one recovery
+
+            await vi.waitFor(() => expect(manager.has(serial)).toBe(false))
+            expect(events()).toEqual([
+                {serial, event: 'device.acquired', data: {email: 'u@x'}},
+                {serial, event: 'device.released', data: {email: 'u@x', reason: 'device_absent'}},
+                {serial, event: 'device.disconnected', data: {reason: 'offline', state: 'offline'}}
+            ])
+            expect(removeWorker).toHaveBeenCalledWith(serial)
+            expect(tracker.disconnect).toHaveBeenCalledWith('10.0.0.5', 5555)
+        })
+
+        it('disconnects a device whose worker keeps failing', async() => {
+            const serial = await active()
+            manager.workerFailed(serial)
+            manager.workerFailed(serial)
+
+            await vi.waitFor(() => expect(manager.has(serial)).toBe(false))
+            expect(events()).toEqual([{serial, event: 'device.disconnected', data: {reason: 'worker_failed'}}])
+        })
+
+        it('does not recover a device that is still connecting', async() => {
+            tracker.appearAs = 'offline'
+            manager.connect(request())
+            manager.workerFailed('10.0.0.5:5555')
+            manager.deviceOffline('10.0.0.5:5555', 'offline')
+
+            await vi.waitFor(() => expect(manager.has('10.0.0.5:5555')).toBe(false))
+            expect(events().map(e => e.event)).toEqual(['device.connect_failed'])
+        })
+
+        it('reports the release of an owned device before its disconnection', async() => {
+            const serial = await active()
+            manager.workerState(serial, {state: 'busy', email: 'u@x'})
+            manager.deviceOffline(serial, 'offline')
+            manager.workerState(serial, {state: 'busy', email: 'u@x'})
+
+            await manager.shutdown()
+            // Too late: the worker of a released device reports nothing
+            manager.workerState(serial, {state: 'idle', email: 'u@x', reason: 'ungroup_request'})
+
+            expect(events().map(e => e.event)).toEqual([
+                'device.acquired', 'device.released', 'device.acquired', 'device.released', 'device.disconnected'
+            ])
+            expect(events().at(-1)!.data).toEqual({reason: 'provider_shutdown'})
+            await new Promise(resolve => setTimeout(resolve, 300)) // the recovery timer is gone
+            expect(events()).toHaveLength(5)
+        })
     })
 
     it('disconnects every device on shutdown', async() => {

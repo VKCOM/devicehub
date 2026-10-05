@@ -22,7 +22,10 @@ export class TransactionService<T = unknown> {
   private timeoutId: ReturnType<typeof setTimeout> | undefined = undefined
   private timeoutDelay = 60000
 
-  constructor(@unmanaged() private connection = socket) {
+  private onDisconnect = (): void => {
+    this.abortController.abort('Device connection closed')
+  }
+constructor(@unmanaged() private connection = socket) {
     makeAutoObservable<this, 'connection'>(this, { connection: false })
 
     this.donePromise = Promise.withResolvers()
@@ -66,9 +69,7 @@ export class TransactionService<T = unknown> {
     }
   }
 
-  private onDisconnect = (): void => {
-    this.abortController.abort('Device connection closed')
-  }
+  
 
   cleanUpTransaction(): void {
     this.progressFn = null

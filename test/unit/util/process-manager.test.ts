@@ -1,4 +1,4 @@
-import {afterEach, describe, expect, it} from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import {fork, type ChildProcess} from 'node:child_process'
 import path from 'node:path'
 import {ProcessManager, ResourcePool} from '../../../lib/util/ProcessManager.ts'
@@ -16,10 +16,15 @@ describe('ProcessManager shutdown of workers', () => {
     let previousAliveAtSpawn: boolean[]
     let pool: ResourcePool<number>
     let manager: ProcessManager<object, number>
+    let errors: string[]
+    /* What the owner answers when asked whether to restart a dead worker */
+    let restart: boolean
 
     const setup = (env: Record<string, string> = {}) => {
         children = []
         previousAliveAtSpawn = []
+        errors = []
+        restart = true
         pool = new ResourcePool([7400, 7401])
         manager = new ProcessManager<object, number>({
             spawn: () => {
@@ -31,7 +36,9 @@ describe('ProcessManager shutdown of workers', () => {
                 })
                 children.push(child)
                 return child
-            }
+            },
+            onError: (_id, _context, error) => { errors.push(error.message) },
+            shouldRestart: () => restart
         }, {killTimeout: 5000, resourcePool: pool})
     }
 
@@ -41,7 +48,9 @@ describe('ProcessManager shutdown of workers', () => {
         return children[0]
     }
 
-    afterEach(() => {
+    afterEach(async() => {
+        // Forget the workers first: a manager restarts a worker killed behind its back
+        await manager.cleanup()
         children.forEach(child => child.kill('SIGKILL'))
     })
 
@@ -140,5 +149,83 @@ describe('ProcessManager shutdown of workers', () => {
 
         expect(isAlive(children[0])).toBe(false)
         await expect(started).resolves.toBe(false)
+    })
+
+    describe('a worker that dies on its own', () => {
+        const restarted = () => vi.waitFor(() => {
+            expect(children).toHaveLength(2)
+            expect(manager.get('serial')?.state).toBe('running')
+        }, {timeout: 5000})
+
+        it.each([0, 1])('is reported and restarted when it exits with code %i', async code => {
+            setup()
+            const child = await startWorker()
+
+            child.send({type: 'crash', code})
+
+            await restarted()
+            expect(errors).toEqual([`Exit code "${code}" (undefined)`])
+        })
+
+        it('is reported and restarted when it is killed by someone else', async() => {
+            setup()
+            const child = await startWorker()
+
+            child.kill('SIGKILL')
+
+            await restarted()
+            expect(errors).toEqual(['Exit code "-1" (killed with SIGKILL)'])
+        })
+
+        it('is left waiting when its owner does not want it restarted, until started again', async() => {
+            setup()
+            const child = await startWorker()
+            restart = false
+
+            child.send({type: 'crash'})
+
+            await vi.waitFor(() => expect(manager.get('serial')?.state).toBe('waiting'), {timeout: 5000})
+            expect(children).toHaveLength(1)
+            expect(errors).toEqual(['Exit code "1" (undefined)'])
+
+            expect(await manager.start('serial')).toBe(true)
+            expect(children).toHaveLength(2)
+        })
+
+        it('is not restarted once stopped while waiting for its restart', async() => {
+            setup()
+            const child = await startWorker()
+
+            child.send({type: 'crash'})
+            await vi.waitFor(() => expect(errors).toHaveLength(1))
+            await manager.stop('serial')
+
+            await new Promise(resolve => setTimeout(resolve, 2500)) // past the restart delay
+            expect(children).toHaveLength(1)
+        })
+
+        it('is not restarted twice when started again while waiting for its restart', async() => {
+            setup()
+            const child = await startWorker()
+
+            child.send({type: 'crash'})
+            await vi.waitFor(() => expect(errors).toHaveLength(1))
+            expect(await manager.start('serial', true)).toBe(true)
+
+            await new Promise(resolve => setTimeout(resolve, 2500)) // past the restart delay
+            expect(children).toHaveLength(2)
+            expect(isAlive(children[1])).toBe(true)
+        })
+
+        it('is not when it is stopped on purpose', async() => {
+            setup()
+            await startWorker()
+
+            await manager.stop('serial')
+
+            await new Promise(resolve => setTimeout(resolve, 2500)) // past the restart delay
+            expect(children).toHaveLength(1)
+            expect(errors).toEqual([])
+        })
     })
 })

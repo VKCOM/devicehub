@@ -21,6 +21,8 @@ import {FakeAdbd} from '../../../support/fake-adbd.ts'
 
 const ADB = process.env.ADB_PATH || 'adb'
 const enabled = process.env.ADB_INTEGRATION_TESTS === '1' || !!process.env.CI
+/* Longer than the 2s the process manager waits before restarting a dead worker */
+const RECOVERY_TIMEOUT_MS = 4000
 const WORKER = path.resolve(import.meta.dirname, '../../../support/fake-device-worker.mjs')
 
 const freePort = () => new Promise<number>(resolve => {
@@ -61,6 +63,8 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
     /* Whether the device's previous worker was still alive when each worker got spawned */
     let previousAliveAtSpawn: boolean[]
     let workerExitDelayMs: number
+    /* Workers spawned from now on die on startup */
+    let workerCrashes: boolean
     let running: Provider | undefined
     let adbds: FakeAdbd[]
 
@@ -175,12 +179,16 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
                 // Like a real worker, it takes a while to clean up and exit on SIGTERM
                 const child = fork(WORKER, [], {
                     stdio: 'ignore',
-                    env: {...process.env, FAKE_WORKER_EXIT_DELAY_MS: String(workerExitDelayMs)}
+                    env: {
+                        ...process.env,
+                        FAKE_WORKER_EXIT_DELAY_MS: String(workerExitDelayMs),
+                        FAKE_WORKER_CRASH: workerCrashes ? '1' : ''
+                    }
                 })
                 workers.set(serial, {child, overrides})
                 return child
             },
-            api: {host: '127.0.0.1', port: apiPort, connectTimeoutMs: 3000}
+            api: {host: '127.0.0.1', port: apiPort, connectTimeoutMs: 3000, recoveryTimeoutMs: RECOVERY_TIMEOUT_MS}
         })
     }
 
@@ -190,6 +198,7 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
         spawned = []
         previousAliveAtSpawn = []
         workerExitDelayMs = 700
+        workerCrashes = false
         adbds = []
         await startProvider()
     })
@@ -211,8 +220,9 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
             silent: true,
             silentAllowedEmail: ['a@example.test'],
             groupTimeout: 60,
-            connectUrlPattern: 'adb.example.test:15555',
-            groupId: undefined
+            connectUrl: 'adb.example.test:15555',
+            groupId: undefined,
+            hideHeader: false
         })
         expect(await adbDevices()).toContainEqual([serial, 'device'])
 
@@ -279,6 +289,7 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
             ['ungroup_request', 'manual']
         ]) {
             events.length = 0
+            report(serial, 'busy', 'u@example.test') // a release is reported only for an owned device
             report(serial, 'idle', 'u@example.test', reason)
             expect((await waitForEvent('device.released', serial)).data)
                 .toEqual({email: 'u@example.test', reason: expected})
@@ -299,6 +310,39 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
         await goneFromAdb(serial, worker.child)
         expect((await (await fetch(apiBase)).json()).devices).toEqual([])
         expect(spawned).toEqual([serial])
+    })
+
+    it('reports an owned device whose worker died as released, and keeps it once a new worker is ready', async() => {
+        const {serial, worker} = await connectReady()
+        report(serial, 'busy', 'u@example.test')
+        await waitForEvent('device.acquired', serial)
+        events.length = 0
+
+        worker.child.send({type: 'crash'})
+        expect((await waitForEvent('device.released', serial)).data)
+            .toEqual({email: 'u@example.test', reason: 'device_absent'})
+        await waitForEvent('device.ready', serial) // the process manager restarts it after 2s
+
+        await new Promise(resolve => setTimeout(resolve, RECOVERY_TIMEOUT_MS)) // past the recovery timeout
+        expect(events.filter(e => e.serial === serial).map(e => e.event)).toEqual(['device.released', 'device.ready'])
+        expect(spawned).toEqual([serial, serial])
+        expect((await (await fetch(apiBase)).json()).devices).toMatchObject([{serial, state: 'active'}])
+    })
+
+    it('disconnects a device whose worker cannot be brought back up', async() => {
+        const {serial, worker} = await connectReady()
+        report(serial, 'busy', 'u@example.test')
+        await waitForEvent('device.acquired', serial)
+        events.length = 0
+
+        workerCrashes = true
+        worker.child.send({type: 'crash'})
+
+        expect((await waitForEvent('device.disconnected', serial)).data).toEqual({reason: 'worker_failed'})
+        expect(events.filter(e => e.serial === serial).map(e => e.event))
+            .toEqual(['device.released', 'device.disconnected'])
+        await vi.waitFor(async() => expect(await adbDevices()).not.toContainEqual([serial, 'device']), {timeout: 10_000})
+        expect((await (await fetch(apiBase)).json()).devices).toEqual([])
     })
 
     it('disconnects a device through the API', async() => {
@@ -407,6 +451,33 @@ describe.skipIf(!enabled)('provider remote devices (real ADB server)', {timeout:
         await exited(worker)
         expect(await adbDevices()).toContainEqual([serial, 'offline'])
         expect(events).toEqual([]) // not an API device: no webhooks
+        await adb('disconnect', serial)
+    })
+
+    it('does not respawn the worker of a regular device while it is offline', {timeout: 60_000}, async() => {
+        const {adbd, serial, worker} = await connectRegular()
+
+        // adb loses the device and its worker dies of it, maybe before the provider notices
+        await adbd.stop()
+        worker.send({type: 'crash'})
+        await vi.waitFor(async() => expect(await adbDevices()).toContainEqual([serial, 'offline']), {timeout: 10_000})
+        // Respawned at most while adb itself still listed the device as usable
+        await new Promise(resolve => setTimeout(resolve, 4000)) // a poll cycle: the provider knows
+        await vi.waitFor(() => expect(isAlive(workers.get(serial)!.child)).toBe(false), {timeout: 15_000})
+        expect(spawned.length).toBeLessThanOrEqual(2)
+
+        const spawnedWhileOffline = spawned.length
+        await new Promise(resolve => setTimeout(resolve, 12_000)) // past every restart delay
+        expect(spawned).toHaveLength(spawnedWhileOffline)
+        expect(isAlive(workers.get(serial)!.child)).toBe(false)
+
+        // Back in adb: started again
+        await adbd.start()
+        await adb('connect', serial)
+        await vi.waitFor(() => {
+            expect(spawned).toHaveLength(spawnedWhileOffline + 1)
+            expect(isAlive(workers.get(serial)!.child)).toBe(true)
+        }, {timeout: 15_000})
         await adb('disconnect', serial)
     })
 

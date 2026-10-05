@@ -36,6 +36,8 @@ export interface Options {
         port: number
         /* How long a freshly connected remote device may take to become usable */
         connectTimeoutMs?: number
+        /* How long an established remote device may stay offline or without a ready worker */
+        recoveryTimeoutMs?: number
     } | null
 }
 
@@ -96,9 +98,22 @@ export default async (options: Options): Promise<Provider | undefined> => {
         },
         onError: (id, context, error) => {
             log.error('Device process "%s" error: %s', id, error.message)
+            // A dead worker holds no session; the process manager restarts it
+            tracker.setBusy(id, false)
+            remoteDevices.workerFailed(id)
         },
         onCleanup: (id) => {
             log.info('Device process "%s" cleaned up', id)
+        },
+        /*
+         * A worker dies when adb loses its device. Respawning it on a device that
+         * is not usable only makes it die again: it is started once adb reports
+         * the device back (see the 'update' handler). Ask adb now: the last poll
+         * may predate the loss.
+         */
+        shouldRestart: async(id) => {
+            await tracker.refresh().catch(err => log.warn('Unable to refresh adb devices: %s', err?.message))
+            return tracker.getDevice(id)?.type === 'device'
         },
         onMessage: (id, context, message: any) => {
             if (message?.type !== 'device-state') {
@@ -190,6 +205,12 @@ export default async (options: Options): Promise<Provider | undefined> => {
             await new Promise(r => setTimeout(r, BASE_DELAY))
         }
 
+        // Not usable (any more): the 'update' handler starts it once adb reports it back
+        if (tracker.getDevice(device.serial)?.type !== 'device') {
+            log.info('Device "%s" is not ready in adb, waiting for it', device.serial)
+            return stats(false)
+        }
+
         log.info('Starting work for device "%s"', device.serial)
 
         const started = await processManager.start(device.serial)
@@ -217,7 +238,8 @@ export default async (options: Options): Promise<Provider | undefined> => {
         providerName: options.name,
         tracker,
         removeWorker,
-        connectTimeoutMs: options.api?.connectTimeoutMs
+        connectTimeoutMs: options.api?.connectTimeoutMs,
+        recoveryTimeoutMs: options.api?.recoveryTimeoutMs
     })
 
     if (options.adbAutostart) {
@@ -305,11 +327,10 @@ export default async (options: Options): Promise<Provider | undefined> => {
     tracker.on('update', filterDevice(async(device, oldType) => {
         log.info('Device "%s" is now "%s" (was "%s")', device.serial, device.type, oldType)
 
-        if (device.type !== 'device' && await remoteDevices.deviceLost(device.serial, 'offline', {state: device.type})) {
-            return
-        }
-
         if (device.type !== 'device') {
+            // API devices get a while to come back, then they are disconnected
+            remoteDevices.deviceOffline(device.serial, device.type)
+
             // Device went offline - stop worker but keep it in waiting state
             log.info('Device "%s" went offline [%s]', device.serial, device.type)
 

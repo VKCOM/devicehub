@@ -5,6 +5,8 @@ import { Group, PanelHeader, Tabs, TabsItem } from '@vkontakte/vkui'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
+import { isSamePath } from '@/lib/utils/is-same-path.util'
+
 import styles from './tabs-panel.module.css'
 
 import type { TabsContent } from './types'
@@ -40,7 +42,8 @@ export const TabsPanel = <T extends boolean = false>({
     onChange?.(tabId)
   }
 
-  const selectedId = routeSync ? pathname : selectedTabId
+  // A route tab id may be encoded differently from the URL a user opened, e.g. `127.0.0.1:5555` in a link
+  const isSelected = (tabId: string) => (routeSync ? isSamePath(tabId, pathname) : tabId === selectedTabId)
 
   return (
     <>
@@ -54,7 +57,7 @@ export const TabsPanel = <T extends boolean = false>({
                 before={tab.before}
                 disabled={tab.disabled}
                 id={tab.id}
-                selected={tab.id === selectedId}
+                selected={isSelected(tab.id)}
                 status={tab.status}
                 onClick={() => onTabClick(tab.id)}
               >
@@ -65,7 +68,7 @@ export const TabsPanel = <T extends boolean = false>({
         </Tabs>
       </PanelHeader>
       {content.map((tab) => (
-        <ConditionalRender key={tab.id} conditions={[tab.id === selectedId, !tab.disabled]}>
+        <ConditionalRender key={tab.id} conditions={[isSelected(tab.id), !tab.disabled]}>
           <Group
             aria-controls={tab.ariaControls}
             aria-labelledby={tab.id}

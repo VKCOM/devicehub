@@ -122,6 +122,8 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     /* Completed poll iterations, useful to confirm the poll chain is alive */
     private pollCycle: number = 0
     private isPolling: boolean = false
+    /* The poll under way, shared by whoever asks for one meanwhile */
+    private currentPoll: Promise<void> | null = null
     private isDestroyed: boolean = false
     private isConnecting: boolean = false
     private isReconnecting: boolean = false
@@ -300,13 +302,30 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
+     * Poll adb right away, emitting the events of any change, so that
+     * `getDevice` reflects the current state rather than the last poll cycle.
+     */
+    async refresh(): Promise<void> {
+        // A poll under way may have asked adb before the change
+        await this.currentPoll
+        await this.pollDevices()
+    }
+
+    /**
      * Poll ADB devices and emit events for changes
      */
-    private async pollDevices(): Promise<void> {
-        if (this.isPolling || this.isDestroyed) {
-            return
+    private pollDevices(): Promise<void> {
+        if (this.isDestroyed) {
+            return Promise.resolve()
         }
 
+        this.currentPoll ??= this.doPollDevices().finally(() => {
+            this.currentPoll = null
+        })
+        return this.currentPoll
+    }
+
+    private async doPollDevices(): Promise<void> {
         this.isPolling = true
         this.pollCycle++
 

@@ -36,6 +36,7 @@ export class InfoService {
 
   async getSdStatus(): Promise<void> {
     const device = await this.deviceBySerialStore.fetch()
+
     if (device.manufacturer === 'Apple') return
     const sdStatusResult = await this.deviceControlStore.getSdStatus()
     const { data } = await sdStatusResult.donePromise
