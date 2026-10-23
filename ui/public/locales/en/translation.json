@@ -469,5 +469,13 @@
   "Moderator": "Moderator",
   "Make Moderator": "Make Moderator",
   "Remove Moderator": "Remove Moderator",
-  "Group privilege": "Group privilege"
+  "Group privilege": "Group privilege",
+  "Optional. If you add keys, only their owners can connect via adb connect. Without keys, anyone with the command can connect.": "Optional. If you add keys, only their owners can connect via adb connect. Without keys, anyone with the command can connect.",
+  "Lifetime": "Lifetime",
+  "No expiration": "No expiration",
+  "1 month": "1 month",
+  "2 months": "2 months",
+  "3 months": "3 months",
+  "Expires on {{date}}": "Expires on {{date}}",
+  "Never expires": "Never expires"
 }

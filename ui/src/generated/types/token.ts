@@ -8,6 +8,11 @@
 
 export interface Token {
   email?: string
+  /**
+   * Expiration time (ms since epoch), null if the token never expires
+   * @nullable
+   */
+  expiresAt?: number | null
   id?: string
   jwt?: string
   title?: string

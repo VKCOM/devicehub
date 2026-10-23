@@ -2,14 +2,26 @@ import {afterEach, beforeEach, describe, expect, it} from 'vitest'
 import net from 'node:net'
 import ADBObserver, {deviceSerial} from '../../../../lib/units/provider/ADBObserver.ts'
 
-/** Minimal ADB server: answers one host service per connection, like the real one. */
-function fakeAdbServer(reply: (command: string) => string) {
+type Reply = string | {body: string, delayMs: number}
+
+/**
+ * Minimal ADB server: answers one host service per connection, like the real
+ * one. After `host:transport:<serial>` the connection is a tunnel to the
+ * device: it answers one `shell:` command, anything else sent there is
+ * recorded as misrouted.
+ */
+function fakeAdbServer(reply: (command: string) => Reply) {
     const commands: string[] = []
+    const misrouted: string[] = []
     const server = net.createServer(socket => {
         let buffer = Buffer.alloc(0)
+        let transport = false
+        // Whatever comes after a host request on its connection is never read
+        let answering = false
         // The observer drops its socket on destroy()
         socket.on('error', () => {})
         socket.on('data', data => {
+            if (answering) return
             buffer = Buffer.concat([buffer, data])
             while (buffer.length >= 4) {
                 const length = parseInt(buffer.subarray(0, 4).toString('ascii'), 16)
@@ -18,15 +30,33 @@ function fakeAdbServer(reply: (command: string) => string) {
                 buffer = buffer.subarray(4 + length)
                 commands.push(command)
 
-                const body = Buffer.from(reply(command), 'utf-8')
-                socket.write(Buffer.concat([
-                    Buffer.from('OKAY'),
-                    Buffer.from(body.length.toString(16).padStart(4, '0')),
-                    body
-                ]))
+                if (transport) {
+                    if (command.startsWith('shell:')) {
+                        socket.end(Buffer.from('OKAY31\n'))
+                    }
+                    else {
+                        misrouted.push(command)
+                        socket.end()
+                    }
+                    return
+                }
+                if (command.startsWith('host:transport:')) {
+                    transport = true
+                    // Slow enough for other requests to queue up meanwhile
+                    setTimeout(() => socket.write('OKAY'), 50)
+                    continue
+                }
 
+                answering = true
+                const answer = reply(command)
+                const {body, delayMs} = typeof answer === 'string' ? {body: answer, delayMs: 0} : answer
+                const bytes = Buffer.from(body, 'utf-8')
                 // Like the real server: every host request closes the connection
-                socket.end()
+                setTimeout(() => socket.end(Buffer.concat([
+                    Buffer.from('OKAY'),
+                    Buffer.from(bytes.length.toString(16).padStart(4, '0')),
+                    bytes
+                ])), delayMs)
                 return
             }
         })
@@ -34,6 +64,7 @@ function fakeAdbServer(reply: (command: string) => string) {
 
     return {
         commands,
+        misrouted,
         listen: () => new Promise<number>(resolve =>
             server.listen(0, '127.0.0.1', () => resolve((server.address() as net.AddressInfo).port))
         ),
@@ -55,18 +86,26 @@ describe('ADBObserver connect/disconnect', () => {
             const connect = command.match(/^host:connect:(.+)$/)
             if (connect) {
                 if (connect[1].endsWith(':1')) return `failed to connect to '${connect[1]}': Connection refused`
+                // An unreachable host: adb gives up long after the observer does
+                if (connect[1].startsWith('10.0.0.99:')) {
+                    return {body: `failed to connect to '${connect[1]}': Operation timed out`, delayMs: 700}
+                }
                 if (connected.has(connect[1])) return `already connected to ${connect[1]}`
                 connected.add(connect[1])
                 return `connected to ${connect[1]}`
             }
             const disconnect = command.match(/^host:disconnect:(.+)$/)
             if (disconnect) {
+                if (disconnect[1].startsWith('10.0.0.99:')) {
+                    // Late, yet while the request after it still waits for its reply
+                    return {body: `disconnected ${disconnect[1]}`, delayMs: 450}
+                }
                 connected.delete(disconnect[1])
                 return `disconnected ${disconnect[1]}`
             }
             return ''
         })
-        observer = new ADBObserver({host: '127.0.0.1', port: await server.listen()})
+        observer = new ADBObserver({host: '127.0.0.1', port: await server.listen(), requestTimeoutMs: 300})
         // The provider always listens for errors; an unhandled 'error' event would throw
         observer.on('error', () => {})
         // As in the provider: polling runs concurrently with API commands
@@ -121,6 +160,70 @@ describe('ADBObserver connect/disconnect', () => {
         await observer.disconnect('10.0.0.5', 5555)
         expect(server.commands).toContain('host:disconnect:10.0.0.5:5555')
         expect(connected.has('10.0.0.5:5555')).toBe(false)
+    })
+
+    /* A reply that comes after its request timed out must not be read as the reply to another one */
+    describe('late replies', () => {
+        let lost: string[]
+        let seen: string[]
+
+        beforeEach(async() => {
+            connected.add('10.0.0.5:5555')
+            await observer.refresh()
+            lost = []
+            seen = []
+            observer.on('disconnect', device => lost.push(device.serial))
+            observer.on('connect', device => seen.push(device.serial))
+        })
+
+        it('a slow connect neither holds up polling nor garbles the device list', async() => {
+            let settled = false
+            const connecting = observer.connect('10.0.0.99', 5555, 500)
+            connecting.catch(() => {}).finally(() => { settled = true })
+
+            // Polling goes on while adb is still trying to connect
+            await observer.refresh()
+            expect(settled).toBe(false)
+
+            await expect(connecting).rejects.toThrow(/timeout/i)
+            await new Promise(resolve => setTimeout(resolve, 400)) // past adb's late reply
+            await observer.refresh()
+
+            expect(lost).toEqual([])
+            expect(seen).toEqual([])
+            expect(observer.getDevice('10.0.0.5:5555')?.type).toBe('device')
+        })
+
+        it('a timed out request leaves no reply behind for the next one', async() => {
+            await expect(observer.disconnect('10.0.0.99', 5555)).rejects.toThrow(/timeout/i)
+            // The next request goes out before adb's late reply comes
+            await observer.refresh()
+            await new Promise(resolve => setTimeout(resolve, 600)) // past adb's late reply
+            await observer.refresh()
+
+            expect(lost).toEqual([])
+            expect(seen).toEqual([])
+        })
+    })
+
+    it('forgets a device as soon as it is disconnected', async() => {
+        connected.add('10.0.0.5:5555')
+        await observer.refresh()
+
+        await observer.disconnect('10.0.0.5', 5555)
+        expect(observer.getDevice('10.0.0.5:5555')).toBeUndefined()
+    })
+
+    it('sends a device command through its transport before any other request', async() => {
+        connected.add('10.0.0.5:5555')
+        const queue = observer as any
+        const [reply] = await Promise.all([
+            queue.sendADBCommand('shell:getprop ro.build.version.sdk', '10.0.0.5:5555'),
+            queue.sendADBCommand('host:devices')
+        ])
+
+        expect(reply).toBe('31')
+        expect(server.misrouted).toEqual([])
     })
 
     it('never reconnects devices with auto reconnect disabled', async() => {

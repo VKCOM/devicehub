@@ -474,5 +474,13 @@
   "Moderator": "Модератор",
   "Make Moderator": "Сделать модератором",
   "Remove Moderator": "Убрать модератора",
-  "Group privilege": "Права в группе"
+  "Group privilege": "Права в группе",
+  "Optional. If you add keys, only their owners can connect via adb connect. Without keys, anyone with the command can connect.": "Необязательно. Если добавить ключи, подключиться через adb connect смогут только их владельцы. Без ключей — любой, у кого есть команда.",
+  "Lifetime": "Срок действия",
+  "No expiration": "Без срока",
+  "1 month": "1 месяц",
+  "2 months": "2 месяца",
+  "3 months": "3 месяца",
+  "Expires on {{date}}": "Действует до {{date}}",
+  "Never expires": "Бессрочный"
 }

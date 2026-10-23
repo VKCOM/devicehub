@@ -1,7 +1,11 @@
 import dbapi from '../../../db/api.js'
 import * as jwtutil from '../../../util/jwtutil.js'
 import logger from '../../../util/logger.js'
+import {createAccessTokenCheck} from '../../../util/access-token-check.js'
 import type {Socket} from 'socket.io'
+
+/* Shared by every namespace of the unit */
+const accessTokenExists = createAccessTokenCheck(id => dbapi.loadAccessTokenById(id).then(Boolean))
 
 interface AuthOptions {
     secret: string
@@ -21,6 +25,10 @@ export default (options: AuthOptions) => {
             }
 
             try {
+                if (token.jti && !await accessTokenExists(token.jti)) {
+                    return next(new Error('Invalid user'))
+                }
+
                 const user = await dbapi.loadUser(token.email)
                 if (user) {
                     req.user = user

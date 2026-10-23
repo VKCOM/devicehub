@@ -300,8 +300,19 @@ export class ProcessManager<TContext = any, TResources = any> {
                 const previousChild = process.childProcess
                 if (previousChild && previousChild.exitCode === null && !previousChild.killed) {
                     this.log.warn('Process "%s" still has a live child, killing it first', id)
-                    previousChild.removeAllListeners('message')
-                    await procutil.gracefullyKill(previousChild, this.killTimeout)
+                    // Its own terminate handler detaches its listeners first: an exit we
+                    // caused must not count as a crash and schedule yet another restart
+                    const terminatePrevious: (() => Promise<void>) | undefined = (process as any).terminateHandler
+                    ;(process as any).terminateHandler = undefined
+                    if (terminatePrevious) {
+                        await terminatePrevious()
+                    }
+                    else {
+                        previousChild.removeAllListeners('exit')
+                        previousChild.removeAllListeners('error')
+                        previousChild.removeAllListeners('message')
+                        await procutil.gracefullyKill(previousChild, this.killTimeout)
+                    }
                 }
 
                 // Spawn the child process

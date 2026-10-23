@@ -10,13 +10,14 @@ import {
   Icon20AddSquareOutline,
   Icon20ComputerSmartphoneOutline,
 } from '@vkontakte/icons'
-import { Button, Div, FormItem, FormStatus, Input, List, Placeholder, Textarea } from '@vkontakte/vkui'
+import { Button, Div, Footnote, FormItem, FormStatus, Input, List, Placeholder, Textarea } from '@vkontakte/vkui'
 
 import { WarningModal } from '@/components/ui/modals'
 import { CopyableBlock } from '@/components/lib/copyable-block'
 import { ConditionalRender } from '@/components/lib/conditional-render'
 import { ContentCard } from '@/components/lib/content-card'
 
+import { useMediaQuery } from '@/lib/hooks/use-media-query.hook'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
 import { KeyListItem } from '../key-list-item'
@@ -28,6 +29,8 @@ import type { FormEvent } from 'react'
 export const AdbKeysControl = observer(({ className }: { className?: string }) => {
   const { t } = useTranslation()
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
+  // Side by side with the form only on a wide screen
+  const isWide = !useMediaQuery('(max-width: 768px)')
 
   const adbKeyService = useInjection(CONTAINER_IDS.adbKeyService)
   const currentUserProfileStore = useInjection(CONTAINER_IDS.currentUserProfileStore)
@@ -57,51 +60,63 @@ export const AdbKeysControl = observer(({ className }: { className?: string }) =
       separator
       onAfterButtonClick={() => adbKeyService.setIsAddAdbKeyOpen((prev) => !prev)}
     >
+      <Footnote className={styles.hint}>
+        {t(
+          'Optional. If you add keys, only their owners can connect via adb connect. Without keys, anyone with the command can connect.'
+        )}
+      </Footnote>
       <ConditionalRender conditions={[adbKeyService.isAddAdbKeyOpen]}>
-        <CopyableBlock
-          copyableText='pbcopy < ~/.android/adbkey.pub'
-          isClosable={false}
-          title={t('Run this command to copy the key to your clipboard')}
-        />
-        <form onSubmit={onFormSubmit}>
-          <FormItem htmlFor='adbKey' top={t('Key')}>
-            <Textarea
-              before={<Icon20KeyOutline />}
-              id='adbKey'
-              spellCheck={false}
-              value={adbKeyService.deviceKey}
-              onChange={(event) => adbKeyService.setDeviceKey(event.target.value)}
+        <div className={styles.addKey}>
+          <form onSubmit={onFormSubmit}>
+            <FormItem htmlFor='adbKey' top={t('Key')}>
+              <Textarea
+                before={<Icon20KeyOutline />}
+                id='adbKey'
+                spellCheck={false}
+                value={adbKeyService.deviceKey}
+                onChange={(event) => adbKeyService.setDeviceKey(event.target.value)}
+              />
+            </FormItem>
+            <FormItem htmlFor='tokenTitle' top={t('Device')}>
+              <Input
+                before={<Icon20ComputerSmartphoneOutline />}
+                id='tokenTitle'
+                spellCheck={false}
+                value={adbKeyService.deviceTitle}
+                onChange={(event) => adbKeyService.setDeviceTitle(event.target.value)}
+              />
+            </FormItem>
+            <ConditionalRender conditions={[!!adbKeyService.errorMessage]}>
+              <Div>
+                <FormStatus mode='error' title={t('Oops!')}>
+                  {adbKeyService.errorMessage}
+                </FormStatus>
+              </Div>
+            </ConditionalRender>
+            <FormItem className={styles.submit}>
+              <Button
+                appearance='accent'
+                disabled={!adbKeyService.deviceKey || !adbKeyService.deviceTitle}
+                mode='secondary'
+                size='m'
+                type='submit'
+                stretched
+              >
+                {t('Add ADB Key')}
+              </Button>
+            </FormItem>
+          </form>
+          {/* An empty label as tall as the key one puts the block level with the key field */}
+          <FormItem className={styles.instruction} top={isWide ? '\u00a0' : undefined}>
+            <CopyableBlock
+              className={styles.instructionBlock}
+              contentClassName={styles.instructionContent}
+              copyableText='pbcopy < ~/.android/adbkey.pub'
+              isClosable={false}
+              title={t('Run this command to copy the key to your clipboard')}
             />
           </FormItem>
-          <FormItem htmlFor='tokenTitle' top={t('Device')}>
-            <Input
-              before={<Icon20ComputerSmartphoneOutline />}
-              id='tokenTitle'
-              spellCheck={false}
-              value={adbKeyService.deviceTitle}
-              onChange={(event) => adbKeyService.setDeviceTitle(event.target.value)}
-            />
-          </FormItem>
-          <ConditionalRender conditions={[!!adbKeyService.errorMessage]}>
-            <Div>
-              <FormStatus mode='error' title={t('Oops!')}>
-                {adbKeyService.errorMessage}
-              </FormStatus>
-            </Div>
-          </ConditionalRender>
-          <FormItem>
-            <Button
-              appearance='accent'
-              disabled={!adbKeyService.deviceKey || !adbKeyService.deviceTitle}
-              mode='secondary'
-              size='m'
-              type='submit'
-              stretched
-            >
-              {t('Add ADB Key')}
-            </Button>
-          </FormItem>
-        </form>
+        </div>
       </ConditionalRender>
       <List>
         {data?.adbKeys?.map((item, index) => (

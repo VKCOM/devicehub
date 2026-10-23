@@ -5,10 +5,15 @@
  * Control and manages real Smartphone devices from browser and restful apis
  * OpenAPI spec version: 1.4.7
  */
+import type { CreateAccessTokenLifetime } from './createAccessTokenLifetime'
 
 export type CreateAccessTokenParams = {
   /**
    * Access token title
    */
   title: string
+  /**
+   * Access token lifetime in months (30 days each). 0 never expires
+   */
+  lifetime?: CreateAccessTokenLifetime
 }

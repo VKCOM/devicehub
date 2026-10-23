@@ -10,7 +10,7 @@ import { queries } from '@/config/queries/query-key-store'
 import { queryClient } from '@/config/queries/query-client'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 
-import type { Token } from '@/generated/types'
+import type { CreateAccessTokenLifetime, Token } from '@/generated/types'
 import type { MobxQueryFactory } from '@/types/mobx-query-factory.type'
 
 @injectable()
@@ -71,9 +71,10 @@ export class AccessTokenService {
     socket.off('user.keys.accessToken.generated', this.onAccessTokenGenerated)
   }
 
-  generateAccessToken(title: string): void {
+  generateAccessToken(title: string, lifetime: CreateAccessTokenLifetime): void {
     socket.emit('user.keys.accessToken.generate', {
       title,
+      lifetime,
     })
   }
 

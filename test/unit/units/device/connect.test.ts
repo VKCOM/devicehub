@@ -9,7 +9,6 @@ import Packet from '../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/packet.j
 import Auth from '../../../../node_modules/@u4/adbkit/dist/adb/auth.js'
 
 vi.mock('../../../../lib/units/device/support/adb.js', () => ({default: {consume() {}}}))
-vi.mock('../../../../lib/units/base-device/support/router.js', () => ({default: {consume() {}}}))
 vi.mock('../../../../lib/units/base-device/support/transport.js', () => ({default: {consume() {}}}))
 vi.mock('../../../../lib/units/device/plugins/group.js', () => ({default: {consume() {}}}))
 vi.mock('../../../../lib/units/device/plugins/solo.js', () => ({default: {consume() {}}}))
@@ -57,7 +56,7 @@ async function setup(silent: boolean, keys?: string[]) {
         getProperties: async () => ({'ro.product.name': 'test', 'ro.product.model': 'test', 'ro.product.device': 'test'})}),
     createTcpUsbBridge: (_serial: string, options: any) => { auth = options.auth; return server }}
     const connector = {init: (options: any) => { handlers = options.handlers }, stop: vi.fn(async () => {})}
-    await connect.invoke({silent, serial: 'serial', connectPort: 7401}, client, {removeAllListeners() {}}, {}, group,
+    await connect.invoke({silent, serial: 'serial', connectPort: 7401}, client, {}, group,
         {}, () => 'localhost:7401', connector, {model: 'test'}, {name: {id: 'test'}}, {bin: 'minirev', stop: async () => {}})
     group.emit('join', {adbKeys: keys})
     await handlers.start()
@@ -105,9 +104,8 @@ describe('remote ADB authentication', () => {
         await vi.waitFor(() => expect(accepted.connection.authorized).toBe(true))
     })
 
-    it('applies an empty key list on owner reconnect and denies authentication after release', async () => {
-        const h = await setup(true, ['different'])
-        h.group.emit('keys', [])
+    it('denies authentication after release', async () => {
+        const h = await setup(true, [fingerprint])
         const accepted = h.socket()
         h.authenticate(accepted.connection)
         await vi.waitFor(() => expect(accepted.connection.authorized).toBe(true))

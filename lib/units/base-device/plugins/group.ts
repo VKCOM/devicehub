@@ -36,11 +36,9 @@ interface GroupEvents {
     autojoin: [ADBKey, Joined]
     error: [string]
     timeout: []
-    keys: [ADBKey[]]
 }
 
 export class GroupManager extends EventEmitter<GroupEvents> {
-    updateKeys(keys: ADBKey[]) { this.emit('keys', keys) }
     private currentOwner: OwnerState | null = null
 
     constructor(private inactivity: InactivityMonitor) { super() }

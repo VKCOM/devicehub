@@ -3,26 +3,40 @@ import cn from 'classnames'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useInjection } from 'inversify-react'
-import { Button, FormItem, FormLayoutGroup, Input, List, Placeholder, Spacing } from '@vkontakte/vkui'
+import { Button, Footnote, FormItem, FormLayoutGroup, Input, List, Placeholder, Spacing } from '@vkontakte/vkui'
 import { Icon20AddSquareOutline, Icon20TagOutline, Icon28InboxOutline, Icon28KeySquareOutline } from '@vkontakte/icons'
 
 import { WarningModal } from '@/components/ui/modals'
 import { CopyableBlock } from '@/components/lib/copyable-block'
 import { ConditionalRender } from '@/components/lib/conditional-render'
 import { ContentCard } from '@/components/lib/content-card'
+import { BaseSelect } from '@/components/lib/base-select'
 
+import { useMediaQuery } from '@/lib/hooks/use-media-query.hook'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { formatDateWithLocale } from '@/lib/utils/format-date-with-locale.util'
 
 import { KeyListItem } from '../key-list-item'
 
 import styles from './access-tokens-control.module.css'
 
-import type { Token } from '@/generated/types'
+import type { CreateAccessTokenLifetime, Token } from '@/generated/types'
+import type { SelectOption } from '@/components/lib/base-select'
 import type { FormEvent } from 'react'
+
+const LIFETIME_OPTIONS: SelectOption<CreateAccessTokenLifetime>[] = [
+  { name: 'No expiration', value: 0 },
+  { name: '1 month', value: 1 },
+  { name: '2 months', value: 2 },
+  { name: '3 months', value: 3 },
+]
 
 export const AccessTokensControl = observer(({ className }: { className?: string }) => {
   const { t } = useTranslation()
   const [accessTokenLabel, setAccessTokenLabel] = useState('')
+  const [lifetime, setLifetime] = useState<CreateAccessTokenLifetime>(0)
+  // The fields do not fit in one row on a narrow screen
+  const isDesktop = !useMediaQuery('(max-width: 768px)')
   const [tokenDetail, setTokenDetail] = useState<Token | null>(null)
   const [isAddNewTokenOpen, setIsAddNewTokenOpen] = useState(false)
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
@@ -34,7 +48,7 @@ export const AccessTokensControl = observer(({ className }: { className?: string
   const onFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    accessTokenService.generateAccessToken(accessTokenLabel)
+    accessTokenService.generateAccessToken(accessTokenLabel, lifetime)
   }
 
   const handleViewToken = (title: string) => {
@@ -77,13 +91,14 @@ export const AccessTokensControl = observer(({ className }: { className?: string
 
             setIsAddNewTokenOpen(false)
             setAccessTokenLabel('')
+            setLifetime(0)
           }}
         />
         <Spacing />
       </ConditionalRender>
       <ConditionalRender conditions={[isAddNewTokenOpen]}>
         <form onSubmit={onFormSubmit}>
-          <FormLayoutGroup className={className} mode='horizontal'>
+          <FormLayoutGroup mode={isDesktop ? 'horizontal' : 'vertical'}>
             <FormItem htmlFor='tokenTitle' top={t('Title')}>
               <Input
                 before={<Icon20TagOutline />}
@@ -96,16 +111,41 @@ export const AccessTokensControl = observer(({ className }: { className?: string
                 onChange={(event) => setAccessTokenLabel(event.target.value)}
               />
             </FormItem>
-            <Button
-              appearance='accent'
-              className={styles.generateTokenButton}
-              disabled={!accessTokenLabel || !!accessTokenService.generatedToken}
-              mode='secondary'
-              size='m'
-              type='submit'
-            >
-              {t('Generate')}
-            </Button>
+            <FormItem htmlFor='tokenLifetime' top={t('Lifetime')}>
+              <BaseSelect
+                id='tokenLifetime'
+                isDisabled={!!accessTokenService.generatedToken}
+                options={LIFETIME_OPTIONS.map((option) => ({ ...option, name: t(option.name) }))}
+                value={lifetime}
+                onChange={(value) => setLifetime(Number(value) as CreateAccessTokenLifetime)}
+              />
+            </FormItem>
+            <ConditionalRender conditions={[isDesktop]}>
+              <Button
+                appearance='accent'
+                className={styles.generateTokenButton}
+                disabled={!accessTokenLabel || !!accessTokenService.generatedToken}
+                mode='secondary'
+                size='m'
+                type='submit'
+              >
+                {t('Generate')}
+              </Button>
+            </ConditionalRender>
+            <ConditionalRender conditions={[!isDesktop]}>
+              <FormItem>
+                <Button
+                  appearance='accent'
+                  disabled={!accessTokenLabel || !!accessTokenService.generatedToken}
+                  mode='secondary'
+                  size='m'
+                  type='submit'
+                  stretched
+                >
+                  {t('Generate')}
+                </Button>
+              </FormItem>
+            </ConditionalRender>
           </FormLayoutGroup>
         </form>
         <Spacing />
@@ -141,6 +181,11 @@ export const AccessTokensControl = observer(({ className }: { className?: string
         onClose={handleCloseTokenDetail}
       >
         <div className={styles.tokenWrapper}>
+          <Footnote className={styles.expiration}>
+            {tokenDetail?.expiresAt
+              ? t('Expires on {{date}}', { date: formatDateWithLocale(new Date(tokenDetail.expiresAt)) })
+              : t('Never expires')}
+          </Footnote>
           <CopyableBlock
             className={styles.copyBlock}
             copyableText={tokenDetail?.id || ''}

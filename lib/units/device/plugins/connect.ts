@@ -6,7 +6,6 @@ import * as streamutil from '../../../util/streamutil.js'
 import adb from '../support/adb.js'
 import connector, {DEVICE_TYPE} from '../../base-device/support/connector.js'
 import transport from '../../base-device/support/transport.js'
-import router from '../../base-device/support/router.js'
 import group from './group.js'
 import solo from './solo.js'
 import urlformat from '../../base-device/support/urlformat.js'
@@ -14,7 +13,6 @@ import identity from './util/identity.js'
 import data from './util/data.js'
 import minirev from '../resources/minirev.js'
 import type TcpUsbServer from '@u4/adbkit/dist/adb/tcpusb/server.d.ts'
-import {AdbKeysUpdatedMessage} from '../../../wire/wire.js'
 import {attachReverse, type ReverseSession} from './adb-reverse/session.ts'
 
 interface Key {
@@ -24,7 +22,6 @@ interface Key {
 
 export default syrup.serial()
     .dependency(adb)
-    .dependency(router)
     .dependency(transport)
     .dependency(group)
     .dependency(solo)
@@ -33,7 +30,7 @@ export default syrup.serial()
     .dependency(identity)
     .dependency(data)
     .dependency(minirev)
-    .define(async(options, adb, router, transport, group, solo, urlformat, connector, identity, data, minirev) => {
+    .define(async(options, adb, transport, group, solo, urlformat, connector, identity, data, minirev) => {
         const log = logger.createLogger('device:plugins:connect')
         let activeServer: TcpUsbServer | null = null
         const activeSessions = new Set<ReverseSession>()
@@ -138,9 +135,6 @@ export default syrup.serial()
 
                 log.info('Stop connect plugin')
 
-                // TODO: Not ideal way, need WireRouter.once
-                router.removeAllListeners(AdbKeysUpdatedMessage)
-
                 const waitServerClose = new Promise<void>((resolve) => {
                     activeServer!.on('close', () => {
                         resolve()
@@ -177,7 +171,6 @@ export default syrup.serial()
             }
         }
         group.on('join', e => setAllowedKeys(e.adbKeys))
-        if (options.silent) group.on('keys', setAllowedKeys)
 
         group.on('leave', () => {
             for (const session of activeSessions) {
