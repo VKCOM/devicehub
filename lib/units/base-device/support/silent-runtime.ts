@@ -9,7 +9,6 @@ import * as wire from '../../../wire/wire.js'
 export interface SilentGroup {
     joinExclusive(owner: {email: string; name: string; group: string}, keys: string[], timeout: number): Promise<unknown>
     leaveExclusive(reason: string): Promise<unknown>
-    updateKeys?(keys: string[]): void
 }
 
 export class SilentError extends Error {
@@ -111,7 +110,6 @@ export class SilentDeviceRuntime {
         }
 
         if (this.phase === 'owned') {
-            this.group?.updateKeys?.(actor.adbKeys)
             this.inactivity.keepalive()
             return this.acquired(actor)
         }

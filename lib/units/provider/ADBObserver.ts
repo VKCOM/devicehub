@@ -33,6 +33,7 @@ interface ADBObserverOptions {
     adbAutostart?: boolean
     adbPath?: string
     idleReconnectMinutes?: number
+    requestTimeoutMs?: number
 }
 
 interface ADBEvents {
@@ -139,6 +140,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
         this.healthCheckIntervalMs = options?.healthCheckIntervalMs || this.healthCheckIntervalMs
         this.host = options?.host || this.host
         this.port = options?.port || this.port
+        this.requestTimeoutMs = options?.requestTimeoutMs || this.requestTimeoutMs
 
         this.adbAutostart = options?.adbAutostart ?? this.adbAutostart
         this.adbPath = options?.adbPath || this.adbPath
@@ -275,7 +277,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
      */
     async connect(host: string, port: number, timeoutMs = 15_000): Promise<string> {
         const serial = deviceSerial(host, port)
-        const response = await this.sendADBCommand(`host:connect:${serial}`, undefined, {timeoutMs})
+        const response = await this.hostRequest(`host:connect:${serial}`, timeoutMs)
 
         if (!/^(already )?connected to /i.test(response.trim())) {
             throw new Error(response.trim() || `Unable to connect to ${serial}`)
@@ -299,6 +301,10 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 throw err
             }
         }
+
+        // Forget the device now rather than on the next poll: until then it would
+        // look connected to whoever asks. A failed poll is reported by polling itself
+        await this.refresh().catch(() => {})
     }
 
     /**
@@ -900,6 +906,57 @@ class ADBObserver extends EventEmitter<ADBEvents> {
     }
 
     /**
+     * A host service on a connection of its own, outside the request queue.
+     * Meant for slow ones: `host:connect` to an unreachable host takes adb over
+     * a minute, which must hold up neither polling nor health checks. The ADB
+     * server serves connections concurrently.
+     */
+    private hostRequest(command: string, timeoutMs: number): Promise<string> {
+        return new Promise((resolve, reject) => {
+            let buffer = Buffer.alloc(0)
+            let settled = false
+            const settle = (err: Error | null, response = '') => {
+                if (settled) {
+                    return
+                }
+                settled = true
+                clearTimeout(timer)
+                // Also abandons a reply that is still to come
+                socket.destroy()
+                if (err) {
+                    reject(err)
+                }
+                else {
+                    resolve(response)
+                }
+            }
+
+            const timer = setTimeout(() => settle(new Error(`Request timeout after ${timeoutMs}ms: ${command}`)), timeoutMs)
+            const socket = net.createConnection({port: this.port, host: this.host, noDelay: true}, () => {
+                const body = Buffer.from(command, 'utf-8')
+                socket.write(Buffer.concat([Buffer.from(body.length.toString(16).padStart(4, '0'), 'ascii'), body]))
+            })
+
+            // OKAY or FAIL, then a length-prefixed message
+            socket.on('data', data => {
+                buffer = Buffer.concat([buffer, data])
+                if (buffer.length < 8) {
+                    return
+                }
+                const length = parseInt(buffer.subarray(4, 8).toString('ascii'), 16)
+                if (buffer.length < 8 + length) {
+                    return
+                }
+                const message = buffer.subarray(8, 8 + length).toString('utf-8')
+                const status = buffer.subarray(0, 4).toString('ascii')
+                settle(status === 'OKAY' ? null : new Error(message || 'ADB command failed'), message)
+            })
+            socket.on('error', err => settle(err))
+            socket.on('close', () => settle(new Error(`Connection closed: ${command}`)))
+        })
+    }
+
+    /**
      * Send command to ADB server.
      * Requests are queued and processed sequentially, one connection per request.
      */
@@ -918,8 +975,9 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                     needData: false,
                     resolve: () => {
                         // After transport succeeds, socket is now a tunnel to device's adbd
-                        // Device commands (shell:, logcat:, etc.) return raw streams, not length-prefixed data
-                        this.requestQueue.push({
+                        // Device commands (shell:, logcat:, etc.) return raw streams, not length-prefixed data.
+                        // It goes first: any other request queued meanwhile would be sent to the device
+                        this.requestQueue.unshift({
                             command,
                             resolve,
                             reject,
@@ -962,6 +1020,11 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                 const index = this.requestQueue.indexOf(request)
                 if (index !== -1) {
                     this.requestQueue.splice(index, 1)
+                    if (request.sent) {
+                        // ADB may still answer it on this socket: the next request
+                        // would take that late reply for its own
+                        this.closeConnectionAfterReply()
+                    }
                     reject(new Error(`Request timeout after ${timeoutMs}ms: ${command}`))
                     // Process next request in queue
                     this.processNextRequest()
@@ -1206,7 +1269,7 @@ class ADBObserver extends EventEmitter<ADBEvents> {
                             }
                         }
 
-                        await this.sendADBCommand(`host:connect:${device.serial}`)
+                        await this.hostRequest(`host:connect:${device.serial}`, 15_000)
                     }
                     else {
                         // A USB device can only be reconnected while it still has

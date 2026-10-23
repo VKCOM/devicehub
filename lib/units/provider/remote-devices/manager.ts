@@ -16,7 +16,7 @@ export interface DeviceForkOverrides {
     hideHeader: boolean
 }
 
-export interface RemoteDevice extends ConnectRequest {
+interface RemoteDeviceEntry extends ConnectRequest {
     serial: string
     /*
      * 'connecting' until adb reports the device usable. 'releasing' while it is
@@ -24,7 +24,27 @@ export interface RemoteDevice extends ConnectRequest {
      * connect` leaves it "offline"), yet it must not be served or reconnected.
      */
     state: 'connecting' | 'active' | 'releasing'
+    /* Whether the worker is ready: it is not before its first start and while the device recovers */
+    ready: boolean
+    /* Email of the user who owns the device, as reported by its worker; empty if it reported none */
+    owner?: string
 }
+
+/* A device as the API shows it */
+export interface RemoteDevice extends ConnectRequest {
+    serial: string
+    /* 'connecting' until the device is usable by a user: adb connected and its worker ready */
+    state: 'connecting' | 'active' | 'releasing'
+    acquired: boolean
+    owner: string | null
+}
+
+const view = ({ready, owner, state, ...device}: RemoteDeviceEntry): RemoteDevice => ({
+    ...device,
+    state: state === 'active' && !ready ? 'connecting' : state,
+    acquired: owner !== undefined,
+    owner: owner || null
+})
 
 export type LossReason = 'connection_lost' | 'stuck'
 
@@ -62,10 +82,8 @@ const RELEASE_REASONS: Record<string, string> = {
  */
 export class RemoteDeviceManager {
     readonly webhooks: WebhookHub
-    private devices = new Map<string, RemoteDevice>()
+    private devices = new Map<string, RemoteDeviceEntry>()
     private releases = new Map<string, Promise<void>>()
-    /* Email of the user who owns a device, as reported by its worker */
-    private owners = new Map<string, string>()
     /* Devices waiting for a ready worker, with the timer that gives up on them */
     private recoveries = new Map<string, NodeJS.Timeout>()
     private readonly tracker: ADBObserver
@@ -90,8 +108,13 @@ export class RemoteDeviceManager {
         return this.devices.get(serial)?.state === 'releasing'
     }
 
-    list() {
-        return Array.from(this.devices.values())
+    list(): RemoteDevice[] {
+        return Array.from(this.devices.values(), view)
+    }
+
+    get(serial: string): RemoteDevice | undefined {
+        const device = this.devices.get(serial)
+        return device && view(device)
     }
 
     forkOverrides(serial: string): DeviceForkOverrides | undefined {
@@ -111,13 +134,13 @@ export class RemoteDeviceManager {
     }
 
     /* Registers the device and connects it in the background */
-    connect(request: ConnectRequest): RemoteDevice {
+    connect(request: ConnectRequest): RemoteDeviceEntry {
         const serial = deviceSerial(request.host, request.port)
         if (this.devices.has(serial) || this.tracker.getDevice(serial)) {
             throw new ConflictError(`Device "${serial}" is already connected`)
         }
 
-        const device: RemoteDevice = {...request, serial, state: 'connecting'}
+        const device: RemoteDeviceEntry = {...request, serial, state: 'connecting', ready: false}
         this.devices.set(serial, device)
         this.tracker.setAutoReconnect(serial, false)
         if (device.webhook) {
@@ -142,9 +165,12 @@ export class RemoteDeviceManager {
     }
 
     workerReady(serial: string) {
-        if (!this.isServed(serial)) {
+        const device = this.served(serial)
+        if (!device) {
             return
         }
+
+        device.ready = true
 
         if (this.cancelRecovery(serial)) {
             log.info('Remote device "%s" recovered', serial)
@@ -153,15 +179,16 @@ export class RemoteDeviceManager {
     }
 
     workerState(serial: string, message: {state: 'busy' | 'idle', email?: string, reason?: string}) {
-        if (!this.isServed(serial)) {
+        const device = this.served(serial)
+        if (!device) {
             return
         }
 
         if (message.state === 'busy') {
-            if (message.email && this.owners.get(serial) === message.email) {
+            if (message.email && device.owner === message.email) {
                 return
             }
-            this.owners.set(serial, message.email ?? '')
+            device.owner = message.email ?? ''
             this.webhooks.emit(serial, 'device.acquired', {email: message.email})
             return
         }
@@ -184,7 +211,11 @@ export class RemoteDeviceManager {
      * disconnected unless a worker gets ready again within `recoveryTimeoutMs`.
      */
     private startRecovery(serial: string, cause: string) {
-        if (this.devices.get(serial)?.state !== 'active') {
+        const device = this.served(serial)
+        if (device) {
+            device.ready = false
+        }
+        if (device?.state !== 'active') {
             return
         }
 
@@ -212,19 +243,20 @@ export class RemoteDeviceManager {
 
     /* Reports the release of an owned device once, whoever notices it first */
     private released(serial: string, reason?: string) {
-        const email = this.owners.get(serial)
+        const device = this.devices.get(serial)
+        const email = device?.owner
         if (email === undefined) {
             return
         }
 
-        this.owners.delete(serial)
+        device!.owner = undefined
         this.webhooks.emit(serial, 'device.released', {email: email || undefined, reason})
     }
 
     /* An API device the provider still serves: a device being released reports nothing more */
-    private isServed(serial: string) {
-        const state = this.devices.get(serial)?.state
-        return state === 'connecting' || state === 'active'
+    private served(serial: string) {
+        const device = this.devices.get(serial)
+        return device?.state === 'connecting' || device?.state === 'active' ? device : undefined
     }
 
     /*
@@ -244,10 +276,10 @@ export class RemoteDeviceManager {
 
     /* API devices must not outlive the provider: nobody would own them */
     async shutdown() {
-        await Promise.all(this.list().map(device => this.release(device.serial, {reason: 'provider_shutdown'})))
+        await Promise.all(Array.from(this.devices.keys(), serial => this.release(serial, {reason: 'provider_shutdown'})))
     }
 
-    private async establish(device: RemoteDevice) {
+    private async establish(device: RemoteDeviceEntry) {
         // Released (and maybe registered again) while we were waiting
         const isCurrent = () => this.devices.get(device.serial) === device && device.state !== 'releasing'
 
@@ -284,7 +316,7 @@ export class RemoteDeviceManager {
         this.webhooks.emit(device.serial, 'device.connected')
     }
 
-    private async failConnect(device: RemoteDevice, err: any, isCurrent: () => boolean) {
+    private async failConnect(device: RemoteDeviceEntry, err: any, isCurrent: () => boolean) {
         if (!isCurrent()) {
             return
         }
@@ -336,14 +368,13 @@ export class RemoteDeviceManager {
         const release = this.stopAndDisconnect(device).finally(() => {
             this.devices.delete(serial)
             this.releases.delete(serial)
-            this.owners.delete(serial)
             this.tracker.setAutoReconnect(serial, true)
         })
         this.releases.set(serial, release)
         return release
     }
 
-    private async stopAndDisconnect(device: RemoteDevice) {
+    private async stopAndDisconnect(device: RemoteDeviceEntry) {
         try {
             await this.removeWorker(device.serial)
         }

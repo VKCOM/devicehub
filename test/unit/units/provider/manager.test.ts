@@ -206,6 +206,33 @@ describe('RemoteDeviceManager', () => {
         expect(events().map(e => e.event)).toEqual(['device.acquired', 'device.released'])
     })
 
+    it('shows a device as connecting until its worker is ready, then who owns it', async() => {
+        const serial = await active()
+        expect(manager.get(serial)).toMatchObject({serial, state: 'connecting', acquired: false, owner: null})
+
+        manager.workerReady(serial)
+        expect(manager.get(serial)).toMatchObject({state: 'active', acquired: false, owner: null})
+
+        manager.workerState(serial, {state: 'busy', email: 'u@x'})
+        expect(manager.list()).toEqual([expect.objectContaining({serial, state: 'active', acquired: true, owner: 'u@x'})])
+
+        manager.workerState(serial, {state: 'idle', email: 'u@x', reason: 'ungroup_request'})
+        expect(manager.get(serial)).toMatchObject({acquired: false, owner: null})
+        expect(manager.get('unknown')).toBeUndefined()
+    })
+
+    it('shows a recovering device as connecting and released', async() => {
+        const serial = await active()
+        manager.workerReady(serial)
+        manager.workerState(serial, {state: 'busy', email: 'u@x'})
+
+        manager.workerFailed(serial)
+        expect(manager.get(serial)).toMatchObject({state: 'connecting', acquired: false, owner: null})
+
+        manager.workerReady(serial)
+        expect(manager.get(serial)).toMatchObject({state: 'active'})
+    })
+
     it('ignores the workers of devices it does not serve', () => {
         manager.workerReady('s')
         manager.workerState('s', {state: 'busy', email: 'u@x'})

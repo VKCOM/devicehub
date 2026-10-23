@@ -24,6 +24,15 @@ export const createProviderApi = ({host, port, providerName, devices}: ProviderA
         res.json({devices: devices.list(), webhooks: devices.webhooks.subscriptions()})
     })
 
+    app.get(`${basePath}/:serial`, (req, res) => {
+        const device = devices.get(req.params.serial)
+        if (!device) {
+            res.status(404).json({error: 'Device is not connected through the API'})
+            return
+        }
+        res.json({device})
+    })
+
     app.post(basePath, (req, res) => {
         const {serial} = devices.connect(parseConnectRequest(req.body))
         res.status(202).json({provider: providerName, serial})

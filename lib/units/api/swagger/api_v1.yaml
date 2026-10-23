@@ -1702,6 +1702,14 @@ paths:
           required: true
           schema:
             type: string
+        - name: lifetime
+          in: query
+          description: Access token lifetime in months (30 days each). 0 never expires
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1, 2, 3]
+            default: 0
       responses:
         "200":
           description: Access token information
@@ -2153,6 +2161,14 @@ paths:
           required: true
           schema:
             type: string
+        - name: lifetime
+          in: query
+          description: Access token lifetime in months (30 days each). 0 never expires
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1, 2, 3]
+            default: 0
       responses:
         "201":
           description: Access token information
@@ -4651,6 +4667,10 @@ components:
           type: string
         jwt:
           type: string
+        expiresAt:
+          type: number
+          nullable: true
+          description: Expiration time (ms since epoch), null if the token never expires
     UserAccessTokenResponse:
       required:
       - description

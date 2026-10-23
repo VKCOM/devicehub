@@ -12,6 +12,7 @@ describe('provider API', () => {
     beforeEach(async() => {
         devices = {
             list: vi.fn(() => []),
+            get: vi.fn((serial: string) => serial === '10.0.0.5:5555' ? {serial, state: 'active', acquired: true, owner: 'u@x'} : undefined),
             webhooks: {subscriptions: () => ({})},
             connect: vi.fn((request: any) => ({serial: `${request.host}:${request.port}`})),
             disconnect: vi.fn((host: string, port: number) => host === 'known' ? `${host}:${port}` : null)
@@ -54,6 +55,15 @@ describe('provider API', () => {
     it('answers 409 to a duplicate', async() => {
         devices.connect.mockImplementationOnce(() => { throw new ConflictError('already connected') })
         expect((await post(JSON.stringify({host: '10.0.0.5', port: 5555}))).status).toBe(409)
+    })
+
+    it('shows a device by its serial', async() => {
+        const res = await fetch(`${base}/10.0.0.5:5555`)
+        expect(res.status).toBe(200)
+        expect(await res.json()).toEqual({device: {serial: '10.0.0.5:5555', state: 'active', acquired: true, owner: 'u@x'}})
+
+        expect((await fetch(`${base}/${encodeURIComponent('[::1]:5555')}`)).status).toBe(404)
+        expect(devices.get).toHaveBeenLastCalledWith('[::1]:5555')
     })
 
     it('disconnects', async() => {

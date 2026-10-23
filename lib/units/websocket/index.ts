@@ -59,7 +59,6 @@ import {
     CapabilitiesMessage,
     TemporarilyUnavailableMessage,
     UpdateRemoteConnectUrl,
-    AdbKeysUpdatedMessage,
     SizeIosDevice,
     GroupMessage,
     UngroupMessage,
@@ -581,14 +580,20 @@ export default (async (options: Options) => {
             })
 
             socket.on('user.keys.accessToken.generate', async (data: any) => {
-                const {title} = data
-                const token = generateToken(user, options.secret)
-                await AllModel.saveUserAccessToken(user.email, {
-                    title,
-                    id: token.id,
-                    jwt: token.jwt
-                })
-                socket.emit('user.keys.accessToken.generated', {title, token: token.jwt})
+                try {
+                    const {title, lifetime = 0} = data
+                    const token = generateToken(user, options.secret, lifetime)
+                    await AllModel.saveUserAccessToken(user.email, {
+                        title,
+                        id: token.id,
+                        jwt: token.jwt,
+                        expiresAt: token.expiresAt
+                    })
+                    socket.emit('user.keys.accessToken.generated', {title, token: token.jwt})
+                }
+                catch (err: any) {
+                    log.error('Failed to generate access token: %s', err?.message)
+                }
             })
 
             socket.on('user.keys.accessToken.remove', async (data: any) => {
@@ -601,16 +606,15 @@ export default (async (options: Options) => {
             socket.on('user.keys.adb.add', async (data: any) => {
                 try {
                     const key = await Adb.util.parsePublicKey(data.key)
-                    const users = await UserModel.lookupUsersByAdbKey(key.fingerprint)
-                    if (users.length) {
-                        throw new AllModel.DuplicateSecondaryIndexError()
-                    }
-                    await UserModel.insertUserAdbKey(user.email, {
+                    const added = await UserModel.insertUserAdbKey(user.email, {
                         title: data.title,
                         fingerprint: key.fingerprint
                     })
+                    if (!added) {
+                        socket.emit('user.keys.adb.error', {message: 'Key was already added'})
+                        return
+                    }
                     socket.emit('user.keys.adb.added', {title: data.title, fingerprint: key.fingerprint})
-                    transport.sendBroadcast(wireutil.pack(AdbKeysUpdatedMessage, {}))
                 }
                 catch (err: any) {
                     socket.emit('user.keys.adb.error', {message: err.message})
@@ -618,20 +622,12 @@ export default (async (options: Options) => {
             })
 
             socket.on('user.keys.adb.accept', async (data: any) => {
-                try {
-                    const users = await UserModel.lookupUsersByAdbKey(data.fingerprint)
-                    if (users.length) {
-                        throw new AllModel.DuplicateSecondaryIndexError()
-                    }
-                    await UserModel.insertUserAdbKey(user.email, {
-                        title: data.title,
-                        fingerprint: data.fingerprint
-                    })
+                const added = await UserModel.insertUserAdbKey(user.email, {
+                    title: data.title,
+                    fingerprint: data.fingerprint
+                })
+                if (added) {
                     socket.emit('user.keys.adb.added', {title: data.title, fingerprint: data.fingerprint})
-                    transport.sendBroadcast(wireutil.pack(AdbKeysUpdatedMessage, {}))
-                }
-                catch (err: any) {
-                    if (!(err instanceof AllModel.DuplicateSecondaryIndexError)) throw err
                 }
             })
 

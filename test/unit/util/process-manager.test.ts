@@ -217,6 +217,19 @@ describe('ProcessManager shutdown of workers', () => {
             expect(isAlive(children[1])).toBe(true)
         })
 
+        it('is not when it is replaced by a forced start', async() => {
+            setup()
+            const first = await startWorker()
+
+            expect(await manager.start('serial', true)).toBe(true)
+            expect(isAlive(first)).toBe(false)
+
+            await new Promise(resolve => setTimeout(resolve, 2500)) // past the restart delay
+            expect(errors).toEqual([])
+            expect(children).toHaveLength(2)
+            expect(isAlive(children[1])).toBe(true)
+        })
+
         it('is not when it is stopped on purpose', async() => {
             setup()
             await startWorker()
