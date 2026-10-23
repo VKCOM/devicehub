@@ -1,8 +1,8 @@
 import syrup from '@devicefarmer/stf-syrup'
 import wireutil from '../../../wire/util.js'
 import logger from '../../../util/logger.js'
-import _ from 'lodash'
 import transport from '../../base-device/support/transport.js'
+import {screenWsUrl} from '../../base-device/support/screen-ws-url.js'
 import {getModelName} from './util/iosutil.js'
 import wdaClient from './wda/client.js'
 import {
@@ -104,11 +104,7 @@ export default syrup.serial()
                 wireutil.global,
                 wireutil.pack(SizeIosDevice, {
                     id: options.serial,
-                    url: _.template(options.screenWsUrlPattern || '')({
-                        publicIp: options.publicIp,
-                        publicPort: options.screenPort,
-                        serial: options.serial
-                    }),
+                    url: screenWsUrl({...options, screenWsUrlPattern: options.screenWsUrlPattern || ''}),
                     ...display
                 })
             ])
