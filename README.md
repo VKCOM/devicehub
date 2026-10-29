@@ -80,6 +80,9 @@ However, we have addressed different issues and Common Vulnerabilities and Expos
 
 We welcome contributions to further enhance the security of the project.
 
+### Internal message bus
+Units talk to each other over ZeroMQ (the proxy ROUTER on 7110, the processor ROUTER on 7160). Set the same `ZMQ_SECRET` environment variable for every unit, including providers on other hosts, to enable CURVE: traffic is encrypted and only units that know the secret can connect. Without it, anyone who can reach these ports can send commands to devices, so keep them closed to untrusted networks. For the docker-compose setups, uncomment `ZMQ_SECRET` in [scripts/variables.env](scripts/variables.env) and set your own value.
+
 
 ## Building
 
