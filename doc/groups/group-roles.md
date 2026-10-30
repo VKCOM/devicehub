@@ -1,67 +1,23 @@
-# Group Roles and Capabilities in VK DeviceHub
+# Group roles and permissions
 
-Based on the codebase context, the VK DeviceHub system implements a hierarchical permission structure with four distinct roles that determine what actions users can perform within groups.
+A user's rights over a group come from two sources: the global privilege of the user account and the user's role in the group.
 
-## Role Hierarchy
+## Global privilege
 
-The VK DeviceHub group system has four primary roles with escalating privileges:
+- **`admin`** — has edit rights in every group. Admins are granted and revoked with `POST /api/v1/users/grantAdmin/{email}` and `DELETE /api/v1/users/revokeAdmin/{email}`.
+- **`user`** — an ordinary account. Its rights in a group depend on its role in that group.
 
-### 1. **System Admin**
-- **Scope**: Global system access
-- **Capabilities**: Full control over all groups and users across the entire system
+## Roles inside a group
 
-### 2. **Group Owner**
-- **Scope**: Full control over groups they own
-- **Capabilities**:
-    - Create, update, and delete their groups
-    - Add/remove users and moderators
-    - Manage group devices and settings
-    - Cannot be assigned as moderator (already has all permissions)
+- **Owner** — the user stored in `group.owner`. Has full edit rights in the group, including managing users, moderators and devices, and deleting the group.
+- **Moderator** — a user listed in `group.moderators`. Has edit rights in the group, including adding and removing other moderators. Moderators cannot delete the group.
+- **Member** — a user listed in `group.users`. Has no edit rights in the group.
 
-### 3. **Group Moderator**
-- **Scope**: Elevated permissions for specific groups where they're assigned as moderator
-- **Capabilities**:
-    - Add/remove users from the group
-    - Update group settings (with some restrictions)
-    - Manage group devices
-    - Add/remove other moderators
+The check is implemented by `hasGroupEditPermission` in `lib/util/apiutil.js`: a user may edit a group if they are an admin, the owner, or (unless the endpoint disables it) a moderator. Deleting a group uses the same check without the moderator case, so only owners and admins can delete a group.
 
-### 4. **Regular User**
-- **Scope**: Basic group participation
-- **Capabilities**:
-    - View groups they belong to
-    - Use group devices when assigned
-    - Limited to read-only operations in most contexts
+## Managing moderators
 
-## Permission Validation System
+- `PUT /api/v1/groups/{id}/moderators/{email}` — add a moderator. The user is added to the group first if needed.
+- `DELETE /api/v1/groups/{id}/moderators/{email}` — remove a moderator. The user remains a group member.
 
-The system uses a centralized permission check function that evaluates user roles hierarchically
-
-This function is used throughout the API controllers to enforce access control, with the `allowModerator` parameter allowing fine-grained control over whether moderators can perform specific actions.
-
-## Moderator Management
-
-### Adding Moderators
-The system automatically adds users to the group before granting moderator privileges
-
-### Removing Moderators
-Moderators can be removed while keeping them as regular group members
-
-### Automatic Cleanup
-When users are completely removed from groups, their moderator privileges are automatically revoked
-
-## UI Permission Controls
-
-The frontend dynamically shows different controls based on user permissions
-
-Users with edit permissions (admins, owners, or moderators) see additional controls for managing group membership and moderator assignments
-
-## API Endpoints
-
-The role management is exposed through REST endpoints:
-- `PUT /api/v1/groups/{id}/moderators/{email}` - Add moderator
-- `DELETE /api/v1/groups/{id}/moderators/{email}` - Remove moderator
-
-## Notes
-
-The permission system ensures proper access control while allowing flexible delegation of group management responsibilities. The hierarchical structure prevents privilege escalation while maintaining clear boundaries between different user roles.
+When a user is removed from a group, their moderator role is removed as well.

@@ -2,12 +2,12 @@
 A client library for accessing DeviceHub
 
 ## Usage
-First, create a client:
+First, create a client. `base_url` is the API root, including the `/api/v1` prefix:
 
 ```python
 from devicehub_client import Client
 
-client = Client(base_url="https://api.example.com")
+client = Client(base_url="https://devicehub.example.com/api/v1")
 ```
 
 If the endpoints you're going to hit require authentication, use `AuthenticatedClient` instead:
@@ -15,39 +15,34 @@ If the endpoints you're going to hit require authentication, use `AuthenticatedC
 ```python
 from devicehub_client import AuthenticatedClient
 
-client = AuthenticatedClient(base_url="https://api.example.com", token="SuperSecretToken")
+client = AuthenticatedClient(base_url="https://devicehub.example.com/api/v1", token="SuperSecretToken")
 ```
 
-Now call your endpoint and use your models:
+Now call an endpoint. For example, capture two devices for a test run (the `autotests` tag):
 
 ```python
-from devicehub_client.models import MyDataModel
-from devicehub_client.api.my_tag import get_my_data_model
-from devicehub_client.types import Response
+from devicehub_client.api.autotests import capture_devices
 
 with client as client:
-    my_data: MyDataModel = get_my_data_model.sync(client=client)
-    # or if you need more info (e.g. status_code)
-    response: Response[MyDataModel] = get_my_data_model.sync_detailed(client=client)
+    # sync_detailed also returns the status code; parsed is set on success
+    response = capture_devices.sync_detailed(client=client, timeout=600, amount=2, run="my-test-run")
+    print(response.status_code, response.parsed)
 ```
 
 Or do the same thing with an async version:
 
 ```python
-from devicehub_client.models import MyDataModel
-from devicehub_client.api.my_tag import get_my_data_model
-from devicehub_client.types import Response
+from devicehub_client.api.autotests import capture_devices
 
 async with client as client:
-    my_data: MyDataModel = await get_my_data_model.asyncio(client=client)
-    response: Response[MyDataModel] = await get_my_data_model.asyncio_detailed(client=client)
+    response = await capture_devices.asyncio_detailed(client=client, timeout=600, amount=2, run="my-test-run")
 ```
 
 By default, when you're calling an HTTPS API it will attempt to verify that SSL is working correctly. Using certificate verification is highly recommended most of the time, but sometimes you may need to authenticate to a server (especially an internal server) using a custom certificate bundle.
 
 ```python
 client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
+    base_url="https://internal_api.example.com/api/v1",
     token="SuperSecretToken",
     verify_ssl="/path/to/certificate_bundle.pem",
 )
@@ -57,8 +52,8 @@ You can also disable certificate validation altogether, but beware that **this i
 
 ```python
 client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
-    token="SuperSecretToken", 
+    base_url="https://internal_api.example.com/api/v1",
+    token="SuperSecretToken",
     verify_ssl=False
 )
 ```
@@ -71,7 +66,7 @@ Things to know:
     1. `asyncio_detailed`: Like `sync_detailed` but async instead of blocking
 
 1. All path/query params, and bodies become method arguments.
-1. If your endpoint had any tags on it, the first tag will be used as a module name for the function (my_tag above)
+1. If your endpoint had any tags on it, the first tag will be used as a module name for the function (`autotests` above)
 1. Any endpoint which did not have a tag will be in `devicehub_client.api.default`
 
 ## Advanced customizations
@@ -89,7 +84,7 @@ def log_response(response):
     print(f"Response event hook: {request.method} {request.url} - Status {response.status_code}")
 
 client = Client(
-    base_url="https://api.example.com",
+    base_url="https://devicehub.example.com/api/v1",
     httpx_args={"event_hooks": {"request": [log_request], "response": [log_response]}},
 )
 
@@ -103,10 +98,10 @@ import httpx
 from devicehub_client import Client
 
 client = Client(
-    base_url="https://api.example.com",
+    base_url="https://devicehub.example.com/api/v1",
 )
 # Note that base_url needs to be re-set, as would any shared cookies, headers, etc.
-client.set_httpx_client(httpx.Client(base_url="https://api.example.com", proxies="http://localhost:8030"))
+client.set_httpx_client(httpx.Client(base_url="https://devicehub.example.com/api/v1", proxies="http://localhost:8030"))
 ```
 
 ## Building / publishing this package

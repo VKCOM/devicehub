@@ -13,7 +13,7 @@ sequenceDiagram
     participant AD as "Android Device"
     participant iOS as "iOS Device + WDA"
 
-    CI->>DH: POST /autotests/captureDevices
+    CI->>DH: GET /api/v1/autotests
     Note over CI,DH: Запрос устройств (Android/iOS)
 
     alt Android
@@ -35,7 +35,7 @@ sequenceDiagram
     Note over AG,iOS: Запуск Appium-тестов
 
     AG-->>CI: Результаты тестов
-    CI->>DH: DELETE /autotests/freeDevices
+    CI->>DH: DELETE /api/v1/autotests?group=ID
     DH->>AD: Освободить Android-устройство
     DH->>iOS: Освободить iOS-устройство
     DH-->>CI: Подтверждение
@@ -84,7 +84,7 @@ curl -X DELETE -H "Authorization: Bearer YOUR-TOKEN-HERE" \
 from devicehub_client import AuthenticatedClient
 
 client = AuthenticatedClient(
-    base_url="https://your-devicehub.com",
+    base_url="https://your-devicehub.com/api/v1",
     token="your-access-token"
 )
 ```
@@ -189,7 +189,7 @@ def release_devices(client, group_id):
 ```python
 def run_appium_tests_with_devicehub():
     client = AuthenticatedClient(
-        base_url="https://your-devicehub.com",
+        base_url="https://your-devicehub.com/api/v1",
         token="your-access-token"
     )
 

@@ -7,7 +7,7 @@ DeviceHub provides a dedicated API for automated testing, allowing you to captur
 
 ### 1. Capture Devices for Testing
 
-Use the `/autotests/captureDevices` endpoint to allocate a group of devices for an automated test run.
+Use `GET /api/v1/autotests` to allocate a group of devices for an automated test run.
 
 **Request parameters:**
 - `amount` – number of devices to capture (required)
@@ -24,7 +24,7 @@ Use the `/autotests/captureDevices` endpoint to allocate a group of devices for 
 
 ### 2. Release Devices
 
-Use the `/autotests/freeDevices` endpoint to release the devices after the test run is complete.
+Use `DELETE /api/v1/autotests?group=<group id>` to release the devices after the test run is complete. The group ID is returned by the capture request.
 
 ## Python Client Usage Example
 
@@ -98,7 +98,7 @@ The repo already includes a Python client:
 from devicehub_client import AuthenticatedClient
 
 client = AuthenticatedClient(
-    base_url="https://your-devicehub.com",
+    base_url="https://your-devicehub.com/api/v1",
     token="your-access-token"
 )
 ```
@@ -108,7 +108,7 @@ client = AuthenticatedClient(
 An access token is required to use the API. You can generate one from the DeviceHub UI under Settings → Keys. Pass the token in the `Authorization` header:
 
 ```bash
-curl -H "Authorization: Bearer YOUR-TOKEN-HERE" https://devicehub.example.com/api/v1/autotests/captureDevices
+curl -H "Authorization: Bearer YOUR-TOKEN-HERE" "https://devicehub.example.com/api/v1/autotests?amount=2&timeout=600&run=my-run&need_amount=true"
 ```
 
 ## Limitations

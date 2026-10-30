@@ -6,7 +6,7 @@ DeviceHub предоставляет специализированное API д
 
 ### 1. Захват устройств для автотестов
 
-Используйте endpoint `/autotests/captureDevices` для создания группы устройств для тестового прогона:
+Используйте endpoint `GET /api/v1/autotests` для создания группы устройств для тестового прогона:
 
 **Параметры запроса:**
 - `amount` - количество устройств (обязательный)
@@ -23,7 +23,7 @@ DeviceHub предоставляет специализированное API д
 
 ### 2. Освобождение устройств
 
-Используйте endpoint `/autotests/freeDevices` для освобождения группы устройств после завершения тестов.
+Используйте endpoint `DELETE /api/v1/autotests?group=<id группы>` для освобождения группы устройств после завершения тестов. ID группы возвращается в ответе на запрос захвата.
 
 ## Пример использования Python клиента
 
@@ -97,7 +97,7 @@ swagger-codegen generate -i https://your-devicehub.com/api/v1/swagger.json -l ja
 from devicehub_client import AuthenticatedClient  
   
 client = AuthenticatedClient(  
-    base_url="https://your-devicehub.com",   
+    base_url="https://your-devicehub.com/api/v1",   
     token="your-access-token"  
 )  
 ```
@@ -107,7 +107,7 @@ client = AuthenticatedClient(
 Для использования API необходим access token, который можно сгенерировать в UI DeviceHub в разделе Settings → Keys. Токен передается в заголовке Authorization:
 
 ```bash  
-curl -H "Authorization: Bearer YOUR-TOKEN-HERE" https://devicehub.example.com/api/v1/autotests/captureDevices  
+curl -H "Authorization: Bearer YOUR-TOKEN-HERE" "https://devicehub.example.com/api/v1/autotests?amount=2&timeout=600&run=my-run&need_amount=true"
 ```
 
 ## Ограничения

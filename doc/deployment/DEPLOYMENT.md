@@ -6,7 +6,7 @@ DeviceHub consists of multiple independent processes communicating via [ZeroMQ](
 
 Each unit and its function will be explained later in the document.
 
-Market name(on UI) for device take from device's settings(if vendor's market name reachable by command `settings get global device_name`), if you would like to have other market name just change settings.
+The market name shown in the UI is taken from the device settings (if the vendor's market name is available via `settings get global device_name`). To show a different market name, change the device settings.
 
 DeviceHub can be deployed in several ways
 

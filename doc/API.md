@@ -340,7 +340,7 @@ clientWithPromise.then(function(api) {
 })
 ```
 
-#### DELETE /api/v1/user/devices/{serial}/remoteConnect
+#### DELETE /user/devices/{serial}/remoteConnect
 
 Disconnect a remote debugging session.
 

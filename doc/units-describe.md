@@ -5,7 +5,7 @@
 * [device](#device)
 * [groups-engine](#groups-engine)
 * [log](#log)
-* [prooxy](#prooxy)
+* [poorxy](#poorxy)
 * [processor](#processor)
 * [provider](#provider)
 * [reaper](#reaper)
@@ -60,7 +60,7 @@ It's responsible for:
 
 ==============================
 ## groups-engine
-The **groups-engine** is managing device groups, handling the lifecycle and relationships between users, devices, and groups.
+The **groups-engine** manages device groups, handling the lifecycle and relationships between users, devices, and groups.
 It's responsible for:
 - Managing the lifecycle of groups (creation, updates, deletion)
 - Handling group membership (users and devices)
@@ -72,7 +72,7 @@ It's responsible for:
 The **log** unit works by subscribing to log events from connected devices and storing them in a database
 
 ==============================
-## prooxy
+## poorxy
 The **poorxy** unit is a simple HTTP reverse proxy that sits in front of all the other HTTP-based services in DeviceHub.
 It routes incoming requests to the appropriate backend services based on URL paths.
 
@@ -90,12 +90,12 @@ Its main responsibilities include:
 - Tracking devices connected to the ADB server
 - Registering new devices with the system
 - Spawning device worker processes for each device
-- Managing communication between devices and the processor unit index.
+- Managing communication between devices and the processor unit.
 
 How Provider Works:
 When the provider unit starts, it connects to the ADB server and begins tracking devices. It sets up ZeroMQ sockets for communication with other components of the system:
 A "push" socket for sending messages to the processor
-A "sub" socket for receiving messages from other components index.
+A "sub" socket for receiving messages from other components.
 
 When a new device is detected, the provider:
 1. Filters out unwanted devices (like remote devices if not allowed)
@@ -155,7 +155,7 @@ flowchart TB
     auth[Auth Module]
     dev[Device]
     groupEngin[Groups Engine]
-    prooxy[Proxy module]
+    poorxy[Proxy module]
     reaper[Reaper module]
     storage[[Storage module]]
 %%==========relations==========
@@ -178,11 +178,11 @@ flowchart TB
     triproxy-app --> log
     log --> mn
 
-    client -->|http request| prooxy
-    prooxy --> auth
-    prooxy --> api
-    prooxy --> app
-    prooxy --> storage
+    client -->|http request| poorxy
+    poorxy --> auth
+    poorxy --> api
+    poorxy --> app
+    poorxy --> storage
 
     proc <-->|dealer| triproxy-app
     proc <-->|dealer| triproxy-device

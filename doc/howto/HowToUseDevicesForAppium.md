@@ -13,7 +13,7 @@ sequenceDiagram
     participant AD as "Android Device"
     participant iOS as "iOS Device + WDA"
     
-    CI->>DH: POST /autotests/captureDevices
+    CI->>DH: GET /api/v1/autotests
     Note over CI,DH: Request devices (Android/iOS)
     
     alt Android Device
@@ -35,7 +35,7 @@ sequenceDiagram
     Note over AG,iOS: Run Appium tests
     
     AG-->>CI: Test results
-    CI->>DH: DELETE /autotests/freeDevices
+    CI->>DH: DELETE /api/v1/autotests?group=ID
     DH->>AD: Release Android device
     DH->>iOS: Release iOS device
     DH-->>CI: Confirmation
@@ -86,7 +86,7 @@ Example use [devicehub_client](../../test/api/devicehub_client) package for acce
 from devicehub_client import AuthenticatedClient
 
 client = AuthenticatedClient(
-    base_url="https://your-devicehub.com",
+    base_url="https://your-devicehub.com/api/v1",
     token="your-access-token"
 )
 ```
@@ -196,7 +196,7 @@ def release_devices(client, group_id):
 def run_appium_tests_with_devicehub():
     # 1. Setup client
     client = AuthenticatedClient(
-        base_url="https://your-devicehub.com",
+        base_url="https://your-devicehub.com/api/v1",
         token="your-access-token"
     )
     

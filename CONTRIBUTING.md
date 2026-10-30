@@ -8,7 +8,7 @@ We welcome contributions that adhere to the guidelines outlined below.
 2. Create a feature branch for your contribution based on the `master` branch. Each branch should focus on a single contribution.
 3. Implement your contribution while following our guidelines (see below).
 4. If possible, include tests for your contribution to ensure its functionality.
-5. Before submitting, run `npm test` to check for any code styling issues.
+5. Before submitting, run `npm run lint` and `npm run typecheck` to check for code style and type issues. These are the same checks that CI runs for `lib/`.
 6. Submit a pull request against the `master` branch of our repository.
 
 ## Guidelines

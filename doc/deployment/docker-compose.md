@@ -24,8 +24,8 @@ Make sure you have the following installed:
 
 ## Environment Configuration
 
-All deployments use a centralized `.env` file.  
-Create `scripts/variables.env` with the following variables:
+All deployments read a shared environment file, `scripts/variables.env`, which is passed to Compose with `--env-file`.
+Adjust the values for your installation (the file in the repository has development defaults):
 
 ```env
 STF_SECRET=your_jwt_secret_here
@@ -42,20 +42,16 @@ MONGODB_PORT_27017_TCP=mongodb://devicehub-mongo:27017
 ### Start all services
 
 ```bash
-docker-compose -f docker-compose-prod.yaml up -d
+docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up -d
 ```
 
 ### View logs
 
 ```bash
-docker-compose -f docker-compose-prod.yaml logs -f
+docker compose -f docker-compose-prod.yaml logs -f
 ```
 
-### Scale specific service
-
-```bash
-docker-compose -f docker-compose-prod.yaml up -d --scale devicehub-processor001=3
-```
+The nginx proxy publishes ports 80 and 443. The UI is available at `https://<STF_DOMAIN>` (or `https://localhost` for a local setup).
 
 ---
 
@@ -66,8 +62,10 @@ The `docker-compose-dev.yaml` file provides a minimal setup for local developmen
 ### Start development environment
 
 ```bash
-docker-compose -f docker-compose-dev.yaml up -d
+docker compose -f docker-compose-dev.yaml up -d
 ```
+
+This starts MongoDB (`devicehub-mongo`) in replica set mode. Run the STF units themselves with `stf local` or a local `stf` command.
 
 ---
 
@@ -83,32 +81,22 @@ The `docker-compose-macos.yaml` file is tailored for macOS and includes:
 
 ## Scaling and High Availability
 
-Docker Compose supports horizontal scaling of **stateless** services.
-
-### Scale processors
+Only **stateless** services can be scaled. Every service in `docker-compose-prod.yaml` sets a fixed `container_name`, and Compose does not allow `--scale` for such services. To run several replicas, remove `container_name` from the service (or copy the service under a new name with its own `container_name`) first. Then scale it as usual:
 
 ```bash
-docker-compose up -d --scale devicehub-processor001=5
+docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up -d --scale devicehub-processor=5
 ```
 
-### Scale storage plugins
+### Services that CAN be scaled (after the change above):
 
-```bash
-docker-compose up -d --scale devicehub-storage-plugin-apk=3
-```
-
----
-
-### Services that CAN be scaled:
-
-- `devicehub-processor001` — message processing
-- `devicehub-storage-plugin-*` — storage plugins
-- `devicehub-provider` — device providers (with different names)
+- `devicehub-processor` — message processing
+- `devicehub-storage-plugin-apk`, `devicehub-storage-plugin-image` — storage plugins
 
 ### Services that SHOULD NOT be scaled:
 
 - `devicehub-reaper` — single instance only
 - `devicehub-api-groups-engine` — single instance only
+- `devicehub-provider` — each provider publishes the fixed device port range (`12010-12100`) and must have a unique `--name`; run additional providers on separate hosts or with different port ranges
 - Database and proxy services
 
 ---

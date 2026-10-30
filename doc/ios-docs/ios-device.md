@@ -2,8 +2,7 @@
 
 Use ios-provider unit to add a provider that will track and manage port forwarding to the device.
 
-Also see [lib/cli/ios-device/run-wda.sh](../../lib/cli/ios-device/run-wda.sh) on how to run a single device.
-This script is designed to set up and run WebDriverAgent on an iOS device using `idb` and `pymobiledevice3`. It also sets up port forwarding that is needed for the ios-device.
+For an example of running a single iOS device worker by hand, see [lib/cli/ios-device/start-ios.sh](../../lib/cli/ios-device/start-ios.sh). It starts `stf ios-device` with the device serial, WebDriverAgent port and ZeroMQ endpoints.
 
 ## Requirements
 
@@ -12,7 +11,7 @@ This script is designed to set up and run WebDriverAgent on an iOS device using 
 -   Installed `xcodebuild`
 -   Installed the `stf` command from this repository (clone this repository and do `npm ci` followed by `npm link`)
 -   Access to MongoDB which used by stf
-    Note: You need to create you own provisioning profile in XCode for the [WebDriverAgent project](../../WebDriverAgent)
+    Note: You need to create your own provisioning profile in Xcode for the WebDriverAgent project. Run `npm run setup-wda` to open it from `node_modules/appium-webdriveragent`.
 
 ## Usage
 
@@ -23,8 +22,6 @@ Then run
 stf ios-provider \
     --connect-sub tcp://127.0.0.1:7114 \
     --connect-push tcp://127.0.0.1:7116 \
-    --connect-app-dealer tcp://127.0.0.1:7112 \
-    --connect-dev-dealer tcp://127.0.0.1:7115 \
     --screen-ws-url-pattern 'ws://localhost:<%= publicPort %>' \
     --public-ip localhost \
     --provider localworker \

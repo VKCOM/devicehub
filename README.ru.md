@@ -16,20 +16,20 @@ VK DeviceHub - это форк проекта DeviceFarmer/stf, разработ
 ## Как запустить?
 
 1) Установите Docker
-2) Запустите `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` и будет поднята локальная инсталляция на порту 8082. См [docker-compose-prod.yaml](./docker-compose-prod.yaml).
+2) Запустите `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` и будет поднята локальная инсталляция. Nginx слушает порты 80 и 443, поэтому интерфейс доступен по адресу `https://localhost` (сертификат самоподписанный). См [docker-compose-prod.yaml](./docker-compose-prod.yaml).
 
 Осталось только добавить в ферму девайсы
 Для этого нужно запустить провайдер и иметь работающее adb соединение с устройством.
 Самый простой способ это:
 1) Добавьте эту строчку: `127.0.0.1 devicehub-mongo` в ваш файл `/etc/hosts` (или `%systemroot%\system32\drivers\etc\hosts` если вы на Windows)
 2) Убедиться что установлен питон и в нём установлен setuptools (нужен для одной из наших npm зависимостей)
-3) Установить npm версии не меньше 20.17 (рекомендуем nvm)
+3) Установить Node.js 20 (как в CI и Dockerfile; рекомендуем nvm)
 4) `npm ci` - скачать и установить зависимости
 5) `npm link --force` - Добавить исполняемый файл в текущий PATH
-6) `MONGODB_PORT_27017_TCP=mongodb://localhost:27017 stf provider --connect-sub "tcp://localhost:7250" --connect-push "tcp://localhost:7270" --storage-url "http://localhost:8082"`
+6) `MONGODB_PORT_27017_TCP=mongodb://localhost:27017 stf provider --connect-sub "tcp://localhost:7250" --connect-push "tcp://localhost:7270" --storage-url "http://localhost/"`
 
 Замечание:
-Некоторый функционал требует наличия прямого доступа до провайдера из браузера. Поэтому в случае сложных инсталляций не забудьте передать внешнедоступный url в параметр --public-url
+Некоторый функционал требует наличия прямого доступа до провайдера из браузера. Поэтому в случае сложных инсталляций не забудьте передать внешнедоступный url в параметр --public-ip
 
 Если вы хотите добавить iOS устройство, смотрите [этот документ (на английском)](doc/ios-docs/ios-device.md)
 
@@ -47,7 +47,7 @@ VK DeviceHub - это форк проекта DeviceFarmer/stf, разработ
   - Все устройства и версии iOS которые поддерживаются в WebDriverAgent от Appium поддерживаются и в DeviceHub
   - Поддерживаются простые нажатия, жесты и физические кнопки на устройстве
   - Установка приложений на iOS
-  - Поддержка расширенного дебага и взаимодействия планируется в 2025
+  - Поддержка расширенного дебага и взаимодействия планируется
 
 ### Удаленное управление и просмотр экрана
 - **Дистанционное управление**: Беспрепятственное управление любым устройством из браузера.
@@ -73,7 +73,7 @@ VK DeviceHub - это форк проекта DeviceFarmer/stf, разработ
 - **Управление группами**: Организуйте устройства, пользователей и расписания в группы для эффективного управления.
 - **Подробная документация**: Инструкции по использованию функций резервирования и разделения см. в подробной документации.
 
-**Управление групповыми запасами
+### Управление групповыми запасами
 - **Мониторинг состояния групп**: Отслеживайте состояние групп, включая активность, готовность и статус ожидания.
 - **Поиск групп**: Поиск и фильтрация групп по различным атрибутам для удобства управления.
 - **Связь с группами**: Связь с владельцами групп по электронной почте прямо из интерфейса.
@@ -179,7 +179,7 @@ If you have come up with an interesting solution for running devices without bat
 
 Ensure that your devices are set up to allow the display to turn off entirely after a short timeout, around 30 seconds or so. STF will wake it up when necessary. Otherwise, you risk reducing the lifetime of your device.
 
-Note that you may encounter a problem if your USB hubs cannot both provide enough power for charging and support a data connection at the same time (data connections require power too). This can cause a device to stop charging when being used, resulting in many charging cycles. If this happens, you will need to [get a better USB hub](#recommended-hardware).
+Note that you may encounter a problem if your USB hubs cannot both provide enough power for charging and support a data connection at the same time (data connections require power too). This can cause a device to stop charging when being used, resulting in many charging cycles. If this happens, you will need to use a better USB hub.
 
 ### Once I have the system running, can I pretty much leave it as is, or is manual intervention required?
 
@@ -191,14 +191,14 @@ However, there are some common errors that do require manual intervention:
 
 * **One device worker keeps getting respawned all the time**
   - Rebooting the device usually resolves this issue. If the device stays online long enough, you might be able to reboot it from the UI. Otherwise, SSH into the server and manually run `adb reboot`.
-  - This could indicate USB problems, and the device may need to be relocated. Simplifying your setup can reduce such issues. Refer to [troubleshooting](#troubleshooting).
+  - This could indicate USB problems, and the device may need to be relocated. Simplifying your setup can reduce such issues. Check the provider logs for the device's errors.
   - We're working on implementing periodic automatic restarts and better graceful recovery to mitigate this issue.
 
 * **A whole group of devices keeps dying at once**
-  - These devices are likely connected to the same USB hub, which could be faulty, or there may be compatibility issues. This often occurs with USB 3.0 hubs or USB extension cards. See [recommended hardware](#recommended-hardware).
+  - These devices are likely connected to the same USB hub, which could be faulty, or there may be compatibility issues. This often occurs with USB 3.0 hubs or USB extension cards. Avoid USB 3.0 hubs and USB extension cards where possible.
 
 * **A device that should be online is not showing up in the list or is showing up as disconnected**
-  - Refer to [troubleshooting](#troubleshooting) for assistance.
+  - Check the provider logs for the device's errors.
 
 ### How do I uninstall STF from my device?
 
@@ -242,4 +242,4 @@ To contribute, please read the guidelines outlined in [CONTRIBUTING.md](CONTRIBU
 
 For licensing information, please see [LICENSE](LICENSE).
 
-Copyright © 2024 V Kontakte LLC. All Rights Reserved.
+Copyright © 2024 V Kontakte LLC. Licensed under the Apache License 2.0 (see the [LICENSE](LICENSE) file for the full list of copyright holders).

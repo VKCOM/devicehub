@@ -12,7 +12,7 @@ You can watch a presentation about our product at the Heisenbug 2024 conference 
 <img src="https://raw.githubusercontent.com/VKCOM/devicehub/refs/heads/master/doc/showcase.png" alt="VK Devicehub">
 
 ## How to run
-Run `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` and a local production-like installation of DeviceHub will be launched on your computer on port 8082. See [docker-compose-prod.yaml](./docker-compose-prod.yaml) for more information.
+Run `docker compose -f docker-compose-prod.yaml --env-file scripts/variables.env up` and a local production-like installation of DeviceHub will be launched on your computer. The nginx proxy listens on ports 80 and 443, so the UI is available at `https://localhost` (the certificate is self-signed). See [docker-compose-prod.yaml](./docker-compose-prod.yaml) for more information.
 And for MacOS you can use `docker compose -f docker-compose-macos.yaml --env-file scripts/variables.env up`. You also need adb server on host. Start it with `adb start-server`
 Note: some features require direct access to the provider instance from the browser, so if you are running the provider on a different machine - make sure you pass accessible url to the --public-ip or configure location properly
 
@@ -33,7 +33,7 @@ If you also want to add an iOS device see [this document](doc/ios-docs/ios-devic
   - Simple taps and gestures and button presses are supported
   - Ability to install apps on iOS devices
   - Ability to control device without XCTest by [ESP32](doc/ios-docs/esp32.md)
-  - Extended remote debug coming in 2025
+  - Extended remote debugging is planned
 
 ### Remote Control and Screen View
 - **Remote Control**: Seamlessly control any device from your browser.
@@ -166,7 +166,7 @@ If you have come up with an interesting solution for running devices without bat
 
 Ensure that your devices are set up to allow the display to turn off entirely after a short timeout, around 30 seconds or so. STF will wake it up when necessary. Otherwise, you risk reducing the lifetime of your device.
 
-Note that you may encounter a problem if your USB hubs cannot both provide enough power for charging and support a data connection at the same time (data connections require power too). This can cause a device to stop charging when being used, resulting in many charging cycles. If this happens, you will need to [get a better USB hub](#recommended-hardware).
+Note that you may encounter a problem if your USB hubs cannot both provide enough power for charging and support a data connection at the same time (data connections require power too). This can cause a device to stop charging when being used, resulting in many charging cycles. If this happens, you will need to use a better USB hub.
 
 ### Once I have the system running, can I pretty much leave it as is, or is manual intervention required?
 
@@ -178,14 +178,14 @@ However, there are some common errors that do require manual intervention:
 
 * **One device worker keeps getting respawned all the time**
   - Rebooting the device usually resolves this issue. If the device stays online long enough, you might be able to reboot it from the UI. Otherwise, SSH into the server and manually run `adb reboot`.
-  - This could indicate USB problems, and the device may need to be relocated. Simplifying your setup can reduce such issues. Refer to [troubleshooting](#troubleshooting).
+  - This could indicate USB problems, and the device may need to be relocated. Simplifying your setup can reduce such issues. Check the provider logs for the device's errors.
   - We're working on implementing periodic automatic restarts and better graceful recovery to mitigate this issue.
 
 * **A whole group of devices keeps dying at once**
-  - These devices are likely connected to the same USB hub, which could be faulty, or there may be compatibility issues. This often occurs with USB 3.0 hubs or USB extension cards. See [recommended hardware](#recommended-hardware).
+  - These devices are likely connected to the same USB hub, which could be faulty, or there may be compatibility issues. This often occurs with USB 3.0 hubs or USB extension cards. Avoid USB 3.0 hubs and USB extension cards where possible.
 
 * **A device that should be online is not showing up in the list or is showing up as disconnected**
-  - Refer to [troubleshooting](#troubleshooting) for assistance.
+  - Check the provider logs for the device's errors.
 
 ### How do I uninstall STF from my device?
 
@@ -233,4 +233,4 @@ If you still have questions try to [![Ask DeepWiki](https://deepwiki.com/badge.s
 
 For licensing information, please see [LICENSE](LICENSE).
 
-Copyright © 2024 V Kontakte LLC. All Rights Reserved.
+Copyright © 2024 V Kontakte LLC. Licensed under the Apache License 2.0 (see the [LICENSE](LICENSE) file for the full list of copyright holders).
