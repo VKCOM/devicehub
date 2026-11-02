@@ -9,6 +9,8 @@ import { deviceErrorModalStore } from '@/store/device-error-modal-store'
 import { deviceConnectionRequired } from '@/config/inversify/decorators'
 import { authStore } from '@/store/auth-store'
 
+import { H264ScreenDecoder } from './h264-screen-decoder'
+
 import type { ElementBoundSize, StartScreenStreamingMessage } from './types'
 
 class AuthError extends Error {
@@ -53,6 +55,11 @@ export class DeviceScreenStore {
   /** MobX autorun disposer, used to re-trigger connect when display.url becomes available. */
   private urlReactionDisposer: (() => void) | null = null
 
+  /** Set while the device streams H.264 (scrcpy) instead of JPEG frames (minicap). */
+  private h264Decoder: H264ScreenDecoder | null = null
+  /** Latest decoded frame not drawn yet: older ones are dropped, not queued. */
+  private pendingFrame: VideoFrame | null = null
+
   isAspectRatioModeLetterbox = false
   isScreenLoading = false
   isScreenRotated = false
@@ -61,7 +68,10 @@ export class DeviceScreenStore {
     this.updateBounds = this.updateBounds.bind(this)
     this.messageListener = this.messageListener.bind(this)
 
-    makeAutoObservable(this)
+    makeAutoObservable<DeviceScreenStore, 'h264Decoder' | 'pendingFrame'>(this, {
+      h264Decoder: false,
+      pendingFrame: false,
+    })
   }
 
   get getCanvasWrapper(): HTMLDivElement | null {
@@ -129,6 +139,8 @@ export class DeviceScreenStore {
       this.websocket.close()
       this.websocket = null
     }
+
+    this.closeH264Decoder()
   }
 
   updateBounds(): void {
@@ -319,7 +331,7 @@ export class DeviceScreenStore {
 
       const ws = new WebSocket(url, `access_token.${authStore.jwt}`)
 
-      ws.binaryType = 'blob'
+      ws.binaryType = 'arraybuffer'
 
       ws.onopen = (): void => {
         if (this.disposed || !this.deviceBySerialStore.session.ready) {
@@ -389,6 +401,7 @@ export class DeviceScreenStore {
 
   private handleUnexpectedClose(event: CloseEvent): void {
     this.websocket = null
+    this.closeH264Decoder()
 
     runInAction(() => {
       this.setIsScreenLoading(true)
@@ -405,22 +418,74 @@ export class DeviceScreenStore {
     }
   }
 
-  private messageListener(message: MessageEvent<Blob | string>): void {
-    if (message.data instanceof Blob) {
-      createImageBitmap(message.data).then((image) => {
-        if (!this.context) {
-          throw new Error('Context is not set')
-        }
+  private renderImage(image: ImageBitmap): void {
+    if (!this.context) {
+      throw new Error('Context is not set')
+    }
 
-        if (this.isScreenStreamingJustStarted) {
-          this.updateImageArea(image.width, image.height)
+    if (this.isScreenStreamingJustStarted) {
+      this.updateImageArea(image.width, image.height)
 
-          this.setIsScreenLoading(false)
-          this.isScreenStreamingJustStarted = false
-        }
+      this.setIsScreenLoading(false)
+      this.isScreenStreamingJustStarted = false
+    }
 
-        this.context.transferFromImageBitmap(image)
-      })
+    this.context.transferFromImageBitmap(image)
+  }
+
+  /* Draws the latest decoded frame on the next animation frame */
+  private onDecodedFrame(frame: VideoFrame): void {
+    const scheduled = this.pendingFrame !== null
+
+    this.pendingFrame?.close()
+    this.pendingFrame = frame
+
+    if (scheduled) return
+
+    requestAnimationFrame(() => {
+      const latest = this.pendingFrame
+
+      this.pendingFrame = null
+
+      if (!latest) return
+
+      createImageBitmap(latest)
+        .then((image) => this.renderImage(image))
+        .finally(() => latest.close())
+    })
+  }
+
+  private startH264Decoder(): void {
+    if (this.h264Decoder) return
+
+    if (!H264ScreenDecoder.isSupported()) {
+      deviceErrorModalStore.setError(t('This browser cannot play the device screen'))
+
+      return
+    }
+
+    this.h264Decoder = new H264ScreenDecoder(
+      (frame) => this.onDecodedFrame(frame),
+      (error) => console.warn('Screen decoder error, waiting for the next key frame:', error)
+    )
+  }
+
+  private closeH264Decoder(): void {
+    this.h264Decoder?.close()
+    this.h264Decoder = null
+    this.pendingFrame?.close()
+    this.pendingFrame = null
+  }
+
+  private messageListener(message: MessageEvent<ArrayBuffer | string>): void {
+    if (message.data instanceof ArrayBuffer) {
+      if (this.h264Decoder) {
+        this.h264Decoder.push(message.data)
+
+        return
+      }
+
+      createImageBitmap(new Blob([message.data])).then((image) => this.renderImage(image))
 
       return
     }
@@ -479,6 +544,12 @@ export class DeviceScreenStore {
       }
 
       this.isScreenStreamingJustStarted = true
+
+      if (startData?.codec === 'h264') {
+        this.startH264Decoder()
+      } else {
+        this.closeH264Decoder()
+      }
 
       if (startData) {
         this.screenRotation = startData.orientation ?? this.screenRotation

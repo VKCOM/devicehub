@@ -260,6 +260,7 @@
   "The package archive file is invalid.": "The package archive file is invalid.",
   "The package being installed contains native code, but none that is compatible with the device's CPU_ABI.": "The package being installed contains native code, but none that is compatible with the device's CPU_ABI.",
   "The package is already installed.": "The package is already installed.",
+  "This browser cannot play the device screen": "This browser cannot play the device screen: it needs WebCodecs support. Use a recent Chrome, Edge, Safari or Firefox over HTTPS",
   "Tip:": "Tip:",
   "Title": "Title",
   "Total Devices": "Total Devices",
