@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {ReverseForwards} from '../../../../../lib/units/device/plugins/adb-reverse/forwards.ts'
+import {ReverseForwards} from '../../../../../../lib/units/device/plugins/adb-bridge/reverse/forwards.ts'
 
 // The user's own adb server snoops every `reverse:` request it relays to us and
 // keeps an allow-list of remote -> local specs. It then refuses (with
@@ -135,7 +135,7 @@ describe('ReverseForwards: unknown/garbage commands', () => {
     })
 
     // A locally connected device supports localabstract:/localfilesystem: remote
-    // specs, but our device-side listener (minirev) can only bind a TCP port. We
+    // specs, but our device-side listener (the helper) only binds TCP ports. We
     // must say so instead of registering a bogus devicePort 0, which would push a
     // broken listener onto the device and leave the user with a silent no-op.
     it('refuses a non-tcp remote spec rather than registering port 0', () => {

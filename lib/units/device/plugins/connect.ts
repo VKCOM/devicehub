@@ -2,7 +2,6 @@ import util from 'util'
 import syrup from '@devicefarmer/stf-syrup'
 import logger from '../../../util/logger.js'
 import lifecycle from '../../../util/lifecycle.js'
-import * as streamutil from '../../../util/streamutil.js'
 import adb from '../support/adb.js'
 import connector, {DEVICE_TYPE} from '../../base-device/support/connector.js'
 import transport from '../../base-device/support/transport.js'
@@ -11,14 +10,15 @@ import solo from './solo.js'
 import urlformat from '../../base-device/support/urlformat.js'
 import identity from './util/identity.js'
 import data from './util/data.js'
-import minirev from '../resources/minirev.js'
-import type TcpUsbServer from '@u4/adbkit/dist/adb/tcpusb/server.d.ts'
-import {attachReverse, type ReverseSession} from './adb-reverse/session.ts'
+import reverseHelper from '../resources/reverse.js'
+import type {OpenReverse} from './adb-bridge/reverse/session.ts'
+import type {ReverseDevice} from './adb-bridge/reverse/stream.ts'
+import {HelperForward, HELPER_SOCKET} from './adb-bridge/reverse/helper.ts'
+import {createProvider} from './adb-bridge/provider.ts'
+import {BridgeServer} from './adb-bridge/server.ts'
+import type {AdbPublicKey, BridgeConnection} from './adb-bridge/connection.ts'
 
-interface Key {
-    fingerprint: string
-    comment: string
-}
+type Key = Pick<AdbPublicKey, 'fingerprint' | 'comment'>
 
 export default syrup.serial()
     .dependency(adb)
@@ -29,52 +29,85 @@ export default syrup.serial()
     .dependency(connector)
     .dependency(identity)
     .dependency(data)
-    .dependency(minirev)
-    .define(async(options, adb, transport, group, solo, urlformat, connector, identity, data, minirev) => {
+    .dependency(reverseHelper)
+    .define(async(options, adb, transport, group, solo, urlformat, connector, identity, data, reverseHelper) => {
         const log = logger.createLogger('device:plugins:connect')
-        let activeServer: TcpUsbServer | null = null
-        const activeSessions = new Set<ReverseSession>()
-        // Set to true before deliberate minirev kill so the stream-end
-        // listener doesn't trigger lifecycle.fatal().
-        let stoppingMinirev = false
+        let activeServer: BridgeServer | null = null
+        const activeConnections = new Set<BridgeConnection>()
+        // The device-side reverse helper's `adb shell` stream while it runs;
+        // ending it stops the helper
+        let helper: {stop(): void} | null = null
 
-        // Launch the minirev binary on the device and wait until its abstract
-        // socket is ready to accept connections. Mirrors what the former
-        // forward plugin did in startService() + awaitServer().
-        async function startMinirev(): Promise<void> {
-            stoppingMinirev = false
-            log.info('Launching minirev service')
-            const out = await adb.getDevice(options.serial).shell(['exec', minirev.bin])
-            // Don't use lifecycle.share — it would fatal on deliberate stop().
-            // Instead watch for unexpected termination only.
-            streamutil.talk(log, 'Minirev says: "%s"', out)
-            out.on('end', () => {
-                if (!stoppingMinirev && !lifecycle.ending) {
-                    log.fatal('Minirev shell ended we shall share its fate')
-                    lifecycle.fatal()
-                }
-            })
-            out.on('error', (err: Error) => {
-                if (!stoppingMinirev && !lifecycle.ending) {
-                    log.fatal('Minirev shell error: %s', err?.message || err)
-                    lifecycle.fatal()
-                }
-            })
-        }
+        // Numbers each launch, so one that finishes after a stop is not kept
+        let helperRun = 0
+        let helperReady: Promise<void> | null = null
 
-        async function awaitMinirev(times = 5, delay = 100): Promise<void> {
-            log.info('Waiting for minirev socket')
-            try {
-                const conn = await adb.getDevice(options.serial).openLocal('localabstract:minirev')
-                conn.end()
-            } catch (err: any) {
-                if (/closed/.test(err.message) && times > 1) {
-                    await new Promise(r => setTimeout(r, delay))
-                    return awaitMinirev(times - 1, delay * 2)
-                }
-                throw err
+        // The helper serves nothing but `adb reverse`, so when it dies only the
+        // reverse forwards go (each one's control stream ends with it, see HelperForward),
+        // and the next `adb reverse` starts it again. It must not take
+        // the user's adb connection, the screen and the device down.
+        async function startHelper(): Promise<void> {
+            log.info('Starting reverse helper')
+            const run = ++helperRun
+            const out = await reverseHelper.start()
+            if (run !== helperRun) {
+                out.end()
+                out.destroy()
+                throw new Error('Remote connect stopped while the reverse helper was starting')
             }
+            let stopping = false
+            const lost = () => {
+                if (helper !== current) {
+                    return
+                }
+                helper = null
+                helperReady = null
+                if (!stopping && !lifecycle.ending) {
+                    log.error('Reverse helper exited; reverse forwards are gone until the next one')
+                }
+            }
+            const current = {
+                stop: () => {
+                    stopping = true
+                    out.end()
+                    out.destroy()
+                }
+            }
+            helper = current
+            out.on('end', lost)
+            out.on('close', lost)
         }
+
+        function ensureHelper(): Promise<void> {
+            helperReady ??= startHelper().catch(err => {
+                helperReady = null
+                throw err
+            })
+            return helperReady
+        }
+
+        function stopHelper(): void {
+            helperRun++
+            helperReady = null
+            helper?.stop()
+            helper = null
+        }
+
+        // A new stream to the helper's socket, through the provider's adb server
+        const openHelperStream = async(): Promise<ReverseDevice> =>
+            await adb.getDevice(options.serial).openLocal(`localabstract:${HELPER_SOCKET}`) as unknown as ReverseDevice
+
+        // One `adb reverse` binding: the helper listens on devicePort and every
+        // connection to it comes back as a stream of its own
+        const openReverse: OpenReverse = async(devicePort, accept, lost) => {
+            await ensureHelper()
+            return HelperForward.listen(openHelperStream, devicePort, accept, lost)
+        }
+
+        // Forward streams, the banner and the device's adbd features, through
+        // the provider's adb server
+        const provider = createProvider(adb, options.serial)
+        const {openService, banner, features} = provider
 
         const plugin = {
             serial: options.serial,
@@ -85,42 +118,27 @@ export default syrup.serial()
             start: async() => {
                 log.info('Starting connect plugin')
 
-                await startMinirev()
-                await awaitMinirev()
-
                 return new Promise((resolve, reject) => {
                     const auth = async(key: Key) => {
                         if (!plugin.auth(key)) throw new Error('ADB key is not allowed for the current owner')
                     }
 
-                    activeServer = adb.createTcpUsbBridge(plugin.serial, {auth})
+                    activeServer = new BridgeServer({auth, banner, features, openService, openReverse})
                         .on('listening', () => resolve(plugin.url))
-                        .on('error', err => {
+                        .on('error', (err: Error) => {
                             log.warn('Remote ADB bridge error: %s', err.message)
                             reject(err)
                         })
-                        .on('connection', conn => {
-                            // @ts-ignore
+                        .on('connection', (conn: BridgeConnection) => {
                             log.info('New remote ADB connection from %s', conn.remoteAddress)
                             conn.on('userActivity', () => group.keepalive())
+                            activeConnections.add(conn)
 
-                            const openMinirev = async(devicePort: number) => {
-                                const conn = await adb.getDevice(plugin.serial).openLocal('localabstract:minirev')
-                                const header = Buffer.alloc(4)
-                                header.writeUInt16LE(0, 0)
-                                header.writeUInt16LE(devicePort, 2)
-                                conn.write(header)
-                                return conn as unknown as import('./adb-reverse/session.ts').MinirevStream
-                            }
-
-                            const session: ReverseSession = attachReverse(conn as never, openMinirev, err => {
-                                log.warn('Closing remote ADB connection: %s', err instanceof Error ? err.message : String(err))
-                            })
-                            activeSessions.add(session)
-
-                            conn.on('end', () => {
-                                session.end()
-                                activeSessions.delete(session)
+                            conn.on('end', (reason?: unknown) => {
+                                if (reason) {
+                                    log.warn('Closing remote ADB connection: %s', reason instanceof Error ? reason.message : String(reason))
+                                }
+                                activeConnections.delete(conn)
                             })
                         })
 
@@ -147,12 +165,11 @@ export default syrup.serial()
 
                 activeServer = null
 
-                // Kill minirev on device so the next session can bind the
-                // abstract socket without "Address already in use".
-                stoppingMinirev = true
-                await minirev.stop().catch((err: any) => {
-                    log.warn('Failed to stop minirev: %s', err?.message || err)
-                })
+                // Every forward went with its connection; the helper has nothing
+                // left to serve until the next `adb reverse`
+                stopHelper()
+                // Nor will anybody open a stream until the next start
+                provider.release()
             },
             end: async() => {
                 if (connector.started && activeServer) {
@@ -173,10 +190,9 @@ export default syrup.serial()
         group.on('join', e => setAllowedKeys(e.adbKeys))
 
         group.on('leave', () => {
-            for (const session of activeSessions) {
-                session.end()
+            for (const conn of activeConnections) {
+                conn.reverse.end()
             }
-            activeSessions.clear()
         })
 
         connector.init({

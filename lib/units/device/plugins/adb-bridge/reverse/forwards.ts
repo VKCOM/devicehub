@@ -29,7 +29,7 @@ export type BadForwardCommand = {action: 'bad-forward', spec: string}
 export type BadKillforwardCommand = {action: 'bad-killforward', spec: string}
 /** `norebind:` asked for a remote that is already bound (INSTALL_STATUS_CANNOT_REBIND). */
 export type RebindRefusedCommand = {action: 'rebind-refused', remote: string}
-/** Well-formed request we cannot serve: minirev can only bind a TCP port on the device. */
+/** Well-formed request we cannot serve: the device-side helper only listens on TCP ports. */
 export type UnsupportedCommand   = {action: 'unsupported', remote: string}
 /** `killforward:` named a remote nobody had bound (INSTALL_STATUS_LISTENER_NOT_FOUND). */
 export type ListenerNotFoundCommand = {action: 'listener-not-found', remote: string}
@@ -114,7 +114,7 @@ export class ReverseForwards {
                 // (INSTALL_STATUS_CANNOT_REBIND); the old target stays bound.
                 return {action: 'rebind-refused', remote}
             }
-            // minirev can only bind a TCP port on the device, so a well-formed
+            // The device-side helper only listens on TCP ports, so a well-formed
             // request for anything else has to be refused explicitly rather than
             // registered against a bogus port.
             const devicePort = portFromSpec(remote)
