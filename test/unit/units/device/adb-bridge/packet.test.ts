@@ -17,7 +17,7 @@ import PacketReader from '../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb
 import {
     assemble,
     A_SYNC, A_CNXN, A_OPEN, A_OKAY, A_CLSE, A_WRTE, A_AUTH,
-} from '../../../../../lib/units/device/plugins/adb-reverse/packet.ts'
+} from '../../../../../lib/units/device/plugins/adb-bridge/packet.ts'
 
 // Every byte we put on the tcpusb socket is parsed by the user's real adb
 // server, which drops the connection on a bad magic or checksum. So the only

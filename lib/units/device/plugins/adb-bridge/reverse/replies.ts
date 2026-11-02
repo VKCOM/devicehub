@@ -1,7 +1,7 @@
 /**
  * Byte-exact replies to `reverse:` requests, as a real adbd would send them.
  *
- * We intercept `reverse:` on the tcpusb bridge and answer it ourselves, so these
+ * We intercept `reverse:` on the adb bridge and answer it ourselves, so these
  * bytes go straight into the user's `adb` client, which parses them with no
  * tolerance. Every format here is pinned to AOSP:
  *   - `SendProtocolString` (adb_io.cpp): 4 hex length chars + payload
@@ -14,13 +14,7 @@
  */
 
 import type {ReverseCommand, ReverseForwards} from './forwards.ts'
-
-/** 4 lowercase hex length chars followed by the payload (SendProtocolString). */
-export function protocolString(s: string): Buffer {
-    const payload = Buffer.from(s, 'utf8')
-    const length = payload.length.toString(16).padStart(4, '0')
-    return Buffer.concat([Buffer.from(length, 'ascii'), payload])
-}
+import {protocolString} from '../service.ts'
 
 const OKAY = Buffer.from('OKAY', 'ascii')
 
@@ -82,7 +76,7 @@ export function replyFor(command: ReverseCommand, forwards?: ReverseForwards): B
         return fail(`listener '${command.remote}' not found`)
     case 'unsupported':
         // A well-formed request we cannot serve is a bind failure, not a parse
-        // failure — minirev can only listen on a TCP port.
+        // failure — the device-side helper only listens on TCP ports.
         return fail('cannot bind listener: only tcp: specs are supported on this device')
     case 'unknown':
         // reverse_service's fallback when handle_forward_request declines the

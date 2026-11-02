@@ -1,6 +1,7 @@
 import {describe, it, expect} from 'vitest'
-import {protocolString, replyFor} from '../../../../../lib/units/device/plugins/adb-reverse/replies.ts'
-import {ReverseForwards} from '../../../../../lib/units/device/plugins/adb-reverse/forwards.ts'
+import {replyFor} from '../../../../../../lib/units/device/plugins/adb-bridge/reverse/replies.ts'
+import {protocolString} from '../../../../../../lib/units/device/plugins/adb-bridge/service.ts'
+import {ReverseForwards} from '../../../../../../lib/units/device/plugins/adb-bridge/reverse/forwards.ts'
 
 // We answer `reverse:` requests ourselves, so our bytes must be exactly what a
 // real adbd sends — the user's `adb` client parses them with no tolerance.
@@ -60,7 +61,7 @@ describe('replyFor', () => {
     })
 
     // A well-formed request we cannot serve is a bind failure, not a parse
-    // failure: minirev only listens on TCP ports.
+    // failure: the device-side helper only listens on TCP ports.
     it('answers an unsupported remote spec with a cannot-bind failure', () => {
         const reply = replyFor({action: 'unsupported', remote: 'localabstract:foo'}).toString()
 

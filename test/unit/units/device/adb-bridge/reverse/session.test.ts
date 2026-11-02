@@ -5,11 +5,10 @@ import {Duplex} from 'node:stream'
 // '@u4/adbkit' import must stay first to break the dist import cycle; see
 // packet.test.ts for the full explanation. Do not reorder.
 import '@u4/adbkit'
-import AdbkitPacket from '../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/packet.js'
-import ServiceMap from '../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/servicemap.js'
-import RollingCounter from '../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/rollingcounter.js'
-import {attachReverse, isReverseOpen, ReverseSession} from '../../../../../lib/units/device/plugins/adb-reverse/session.ts'
-import {MinirevWriter} from '../../../../../lib/units/device/plugins/adb-reverse/minirevWriter.ts'
+import AdbkitPacket from '../../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/packet.js'
+import ServiceMap from '../../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/servicemap.js'
+import RollingCounter from '../../../../../../node_modules/@u4/adbkit/dist/adb/tcpusb/rollingcounter.js'
+import {isReverseOpen, ReverseSession} from '../../../../../../lib/units/device/plugins/adb-bridge/reverse/session.ts'
 
 /**
  * Stand-in for adbkit's PacketReader: an event emitter whose only 'packet'
@@ -35,128 +34,50 @@ function fakeSocket(reader: unknown) {
         reader,
         remoteId: new RollingCounter(0xffffffff),
         services: new ServiceMap(),
-        write(chunk: Buffer) {
-            writes.push(chunk)
-            return true
+        // Encoded by adbkit, the oracle for what goes on the wire
+        send(command: number, arg0: number, arg1: number, data?: Buffer) {
+            writes.push(AdbkitPacket.assemble(command, arg0, arg1, data))
         },
     }
 }
 
 /**
- * Stand-in for the minirev stream. A real Duplex, so the production code can pipe
- * it into MinirevReader and the framing is exercised for real rather than against
- * a reimplementation of it.
+ * Stand-in for the device side of one bound forward (helper.ts): the session
+ * hands it `accept`, called for every app connection, and `lost`, called if the
+ * device-side helper dies.
  */
-class FakeMinirev extends Duplex {
-    writes: Buffer[] = []
-    ended = 0
-    _write(chunk: Buffer, _enc: unknown, cb: () => void) {
-        this.writes.push(Buffer.from(chunk))
-        cb()
+class FakeBinding {
+    closed = 0
+    constructor(
+        readonly port: number,
+        readonly accept: (device: Duplex) => void,
+        readonly lost: () => void
+    ) {}
+    close() {
+        this.closed += 1
     }
-    _read() {}
-    end(...args: unknown[]) {
-        this.ended += 1
-        // @ts-ignore -- pass through to Duplex
-        return super.end(...args)
+    /** An app on the device connects to the port. */
+    connect(): Duplex {
+        const device = new Duplex({read() {}, write(_chunk, _encoding, callback) { callback() }})
+        this.accept(device)
+        return device
     }
-    /** Simulate minirev sending us bytes. */
-    fromDevice(buf: Buffer) {
-        this.push(buf)
+}
+
+/** An OpenReverse that binds every port it is asked for, keeping what it made. */
+function devicePorts() {
+    const bindings: FakeBinding[] = []
+    const openReverse = async(port: number, accept: (device: Duplex) => void, lost: () => void) => {
+        const binding = new FakeBinding(port, accept, lost)
+        bindings.push(binding)
+        return binding
     }
+    return {bindings, openReverse, ports: () => bindings.map(b => b.port)}
 }
 
 function openPacket(name: string) {
     return {command: AdbkitPacket.A_OPEN, arg0: 31, arg1: 0, data: Buffer.from(`${name}\0`)}
 }
-
-/**
- * Oracle for the minirev framing: MinirevWriter, the TypeScript port of the
- * former forward/util/writer.js. The layout ([uint16LE connId][uint16LE length])
- * is minirev's, and minirev is a vendored binary with no source in the tree,
- * so its own client is the only specification we have.
- */
-function framedBy(connId: number, chunk: Buffer): Buffer {
-    const writer = new MinirevWriter(connId)
-    writer.write(chunk)
-    return Buffer.concat(drain(writer))
-}
-
-/**
- * Oracle for minirev's end-of-connection marker, from MinirevWriter:
- * its _flush pushes a header with length 0, which is exactly what
- * MinirevReader turns back into a FIN on the receiving side.
- */
-function finFramedBy(connId: number): Buffer {
-    const writer = new MinirevWriter(connId)
-    writer.end()
-    return Buffer.concat(drain(writer))
-}
-
-function drain(writer: {read(): Buffer | null}): Buffer[] {
-    const pieces: Buffer[] = []
-    let piece: Buffer | null
-    while ((piece = writer.read())) {
-        pieces.push(piece)
-    }
-    return pieces
-}
-
-// This is the regression test for the bug the whole feature exists to fix. Today
-// `reverse:` reaches adbkit's Service, which relays it to the *provider's* adb
-// server (service.js:92-99: client.getDevice(serial).transport()). That server
-// snoops the request, the real adbd binds a listener on the device, and every
-// reverse connection then lands on the provider host's loopback instead of the
-// user's — a broken forward and a hole onto the provider's local services
-// (ADB-REVERSE-PLAN.md §3.5).
-describe('attachReverse: taking over reverse: requests', () => {
-    it('keeps a reverse: request away from adbkit, which would relay it to the provider adb server', () => {
-        const {reader, delegated} = fakeReader()
-        const socket = fakeSocket(reader)
-
-        attachReverse(socket as never, async() => new FakeMinirev())
-        reader.emit('packet', openPacket('reverse:forward:tcp:7777;tcp:8080'))
-
-        expect(delegated).toEqual([])
-    })
-
-    // Interception must be surgical: the bridge carries every other adb service on
-    // the same socket (shell:, sync:, the A_WRTE/A_OKAY traffic of open streams).
-    // Swallowing or reordering any of it would break `adb connect` itself, which
-    // works today.
-    it('leaves every other packet to adbkit untouched', () => {
-        const {reader, delegated} = fakeReader()
-        const socket = fakeSocket(reader)
-        const shell = openPacket('shell:ls')
-        const write = {command: AdbkitPacket.A_WRTE, arg0: 31, arg1: 2, data: Buffer.from('x')}
-        const connect = {command: AdbkitPacket.A_CNXN, arg0: 0x01000000, arg1: 4096, data: Buffer.from('host::\0')}
-
-        attachReverse(socket as never, async() => new FakeMinirev())
-        reader.emit('packet', shell)
-        reader.emit('packet', write)
-        reader.emit('packet', connect)
-
-        expect(delegated).toEqual([shell, write, connect])
-    })
-
-    // A real Socket leaves exactly one listener on its reader, so keeping only
-    // the first one would look correct forever here. Anything else sharing that
-    // reader — a future adbkit version, instrumentation of our own — has to go on
-    // working, and a dropped listener is invisible until something stops arriving.
-    it('delegates to every listener that was already on the reader', () => {
-        const {reader, delegated} = fakeReader()
-        const alsoDelegated: unknown[] = []
-        reader.on('packet', (packet: unknown) => alsoDelegated.push(packet))
-        const socket = fakeSocket(reader)
-        const shell = openPacket('shell:ls')
-
-        attachReverse(socket as never, async() => new FakeMinirev())
-        reader.emit('packet', shell)
-
-        expect(delegated).toEqual([shell])
-        expect(alsoDelegated).toEqual([shell])
-    })
-})
 
 describe('isReverseOpen', () => {
     it('claims only an A_OPEN whose service name is a reverse: request', () => {
@@ -198,13 +119,12 @@ describe('ReverseSession.serve: binding a forward', () => {
     // A device runs install_listener to completion before handle_forward_request
     // answers (adb.cpp:1205-1212), so it never reports OKAY for a listener that is
     // not up. Answering first would leave the user holding a forward we cannot
-    // serve, and our A_OPEN for it would name a spec their own server never
-    // snooped -> LOG(FATAL), their adb dies (adb.cpp:500).
+    // serve, and an app connecting as soon as `adb reverse` returned would be
+    // refused.
     it('puts the listener up on the device before it answers the user', async() => {
-        const {reader} = fakeReader()
-        const socket = fakeSocket(reader)
+        const socket = fakeSocket(fakeReader().reader)
         const ports: number[] = []
-        const gate = deferred<FakeMinirev>()
+        const gate = deferred<FakeBinding>()
         const session = new ReverseSession(socket as never, (port: number) => {
             ports.push(port)
             return gate.promise
@@ -214,13 +134,16 @@ describe('ReverseSession.serve: binding a forward', () => {
 
         // The bind is the remote spec's port — what the device listens on — not the
         // local one it forwards to; mixing them up would bind the user's port here.
+        // The local spec never leaves the session: on the device or the provider
+        // it would name a port of theirs, not of the user's.
         expect(ports).toEqual([7777])
         expect(socket.writes).toEqual([])
 
-        gate.resolve(new FakeMinirev())
+        gate.resolve(new FakeBinding(7777, () => {}, () => {}))
         await served
 
         expect(socket.writes.length).toBe(3)
+        expect(socket.writes[1].subarray(24).toString()).toBe('OKAY')
     })
 
     // A listener that cannot come up is reported in the reply, not by refusing the
@@ -276,39 +199,29 @@ describe('ReverseSession.serve: binding a forward', () => {
     // install_listener, on finding an existing listener for the same local_name,
     // assigns `l->connect_to = connect_to` and returns OK without touching the
     // socket — socket_spec_listen is only reached on the path that creates a new one
-    // (adb_listeners.cpp:190-226). Tearing ours down and opening a second minirev
-    // stream would leave the device port unbound for a moment and would cut the
-    // connections already running through it, neither of which happens on a locally
-    // connected device.
-    //
-    // The two guard assertions below hold trivially today, since nothing tears a
-    // forward down yet; they are here to fail the day slice 5.5's teardown is wired
-    // to the wrong case. `unbind` must end the manager, a rebind must not — the
-    // difference is that killforward calls remove_listener while a rebind does not.
+    // (adb_listeners.cpp:190-226). Tearing ours down and binding again would leave
+    // the device port unbound for a moment and would cut the connections already
+    // running through it, neither of which happens on a locally connected device.
     it('repurposes the listener it already has when the user rebinds a forward', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const ports: number[] = []
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async(port: number) => {
-            ports.push(port)
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:9090'))
         socket.writes.length = 0
         await session.serve(openPacket('reverse:list-forward'))
 
-        expect(ports).toEqual([7777])
-        expect(conns.length).toBe(1)
-        expect(conns[0].ended).toBe(0)
+        expect(device.ports()).toEqual([7777])
+        expect(device.bindings[0].closed).toBe(0)
         // The forward now points at the new target, which is the whole purpose of
         // repurposing rather than rebuilding: the manager resolves the local spec
         // per connection, so the listener that is already up starts connecting to
         // 9090 with no gap.
         expect(socket.writes[1].subarray(24).toString()).toBe('001c(reverse) tcp:7777 tcp:9090\n')
+        socket.writes.length = 0
+        device.bindings[0].connect()
+        expect(socket.writes[0].subarray(24).toString()).toBe('tcp:9090\0')
     })
 
     // A bind that failed leaves nothing behind, so asking again has to try again.
@@ -318,19 +231,18 @@ describe('ReverseSession.serve: binding a forward', () => {
     //
     // Treating that retry as a rebind is the worst of the failure modes available
     // here: we answer OKAY, bind nothing, and the forward appears in
-    // `adb reverse --list` with no listener under it. Nothing reports an error at
-    // any point — the app on the device just finds the port closed.
+    // `adb reverse --list` with no listener under it.
     it('binds again when the user retries a forward that failed', async() => {
         const socket = fakeSocket(fakeReader().reader)
         const ports: number[] = []
         let failNext = true
-        const session = new ReverseSession(socket as never, async(port: number) => {
+        const session = new ReverseSession(socket as never, async(port: number, accept, lost) => {
             ports.push(port)
             if (failNext) {
                 failNext = false
                 throw new Error('cannot bind to 7777: Address already in use')
             }
-            return new FakeMinirev()
+            return new FakeBinding(port, accept, lost)
         })
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
@@ -339,6 +251,38 @@ describe('ReverseSession.serve: binding a forward', () => {
 
         expect(ports).toEqual([7777, 7777])
         expect(socket.writes[1].subarray(24).toString()).toBe('OKAY')
+    })
+
+    // The `adb connect` session ended while the device was still binding: the
+    // listener that comes up afterwards belongs to nobody, and left open it would
+    // keep the device port taken for good.
+    it('closes a listener that comes up after the session ended', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const gate = deferred<FakeBinding>()
+        const session = new ReverseSession(socket as never, () => gate.promise)
+
+        const served = session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+        session.end()
+        const binding = new FakeBinding(7777, () => {}, () => {})
+        gate.resolve(binding)
+        await served
+
+        expect(binding.closed).toBe(1)
+    })
+
+    // Same for a forward the user removed while it was being bound.
+    it('closes a listener whose forward was removed while it came up', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const gate = deferred<FakeBinding>()
+        const session = new ReverseSession(socket as never, () => gate.promise)
+
+        const served = session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+        await session.serve(openPacket('reverse:killforward:tcp:7777'))
+        const binding = new FakeBinding(7777, () => {}, () => {})
+        gate.resolve(binding)
+        await served
+
+        expect(binding.closed).toBe(1)
     })
 })
 
@@ -350,7 +294,7 @@ describe('ReverseSession.serve: binding a forward', () => {
 describe('ReverseSession.serve: commands answered without the device', () => {
     it('answers list-forward with OKAY, the reply bytes and a close', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const session = new ReverseSession(socket as never, async() => new FakeMinirev())
+        const session = new ReverseSession(socket as never, devicePorts().openReverse)
 
         await session.serve(openPacket('reverse:list-forward'))
 
@@ -373,7 +317,7 @@ describe('ReverseSession.serve: commands answered without the device', () => {
     // waiting to read a reason, not to see the open rejected.
     it('answers an unrecognised reverse: command with FAIL and its reason', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const session = new ReverseSession(socket as never, async() => new FakeMinirev())
+        const session = new ReverseSession(socket as never, devicePorts().openReverse)
 
         await session.serve(openPacket('reverse:nonsense'))
 
@@ -392,7 +336,7 @@ describe('ReverseSession.serve: commands answered without the device', () => {
     // server routes by it — two live streams under one id cross their traffic.
     it('takes a fresh id from the socket counter for each command', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const session = new ReverseSession(socket as never, async() => new FakeMinirev())
+        const session = new ReverseSession(socket as never, devicePorts().openReverse)
 
         await session.serve(openPacket('reverse:list-forward'))
         await session.serve(openPacket('reverse:list-forward'))
@@ -407,9 +351,8 @@ describe('ReverseSession.serve: commands answered without the device', () => {
     // The column order is AOSP's format_listeners (adb_listeners.cpp:129-144) —
     // what the listener binds on the device first, where it connects second.
     it('reports the forwards it has bound when the user lists them', async() => {
-        const {reader} = fakeReader()
-        const socket = fakeSocket(reader)
-        const session = new ReverseSession(socket as never, async() => new FakeMinirev())
+        const socket = fakeSocket(fakeReader().reader)
+        const session = new ReverseSession(socket as never, devicePorts().openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         socket.writes.length = 0
@@ -417,31 +360,57 @@ describe('ReverseSession.serve: commands answered without the device', () => {
 
         expect(socket.writes[1].subarray(24).toString()).toBe('001c(reverse) tcp:7777 tcp:8080\n')
     })
+
+    // Per-session isolation: the map decides which specs we may open on the
+    // user's machine, so one session seeing another's forwards would be one user
+    // reaching another's loopback.
+    it('lists only its own forwards', async() => {
+        const device = devicePorts()
+        const mine = fakeSocket(fakeReader().reader)
+        const theirs = fakeSocket(fakeReader().reader)
+        const session = new ReverseSession(mine as never, device.openReverse)
+        const other = new ReverseSession(theirs as never, device.openReverse)
+
+        await other.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+        await session.serve(openPacket('reverse:list-forward'))
+
+        expect(mine.writes[1].subarray(24).toString()).toBe('0000')
+    })
 })
 
-// Slice 5.5: removing a bound forward must tear down its manager and free the
-// minirev stream so the device stops listening. The user sees this as
-// `adb reverse --remove tcp:7777` or `adb reverse --remove-all`.
+// Removing a bound forward must close its listener so the device stops
+// listening. The user sees this as `adb reverse --remove tcp:7777` or
+// `adb reverse --remove-all`.
 describe('ReverseSession.serve: releasing forwards', () => {
     // killforward calls remove_listener, which closes the listening fd on the
-    // device (fact 23). The only mechanism that closes a minirev listener is
-    // conn.end(); manager.end() is responsible for calling it. If we skip
-    // manager.end() the device keeps the port open and we eventually push
-    // A_OPEN with a spec the user's server no longer knows -> LOG(FATAL).
-    it('closes the minirev stream when the user removes a forward', async() => {
+    // device. If we skipped it, the device would keep the port open and we would
+    // eventually push A_OPEN with a spec the user's server no longer knows ->
+    // LOG(FATAL).
+    it('closes the device listener when the user removes a forward', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async() => {
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         socket.writes.length = 0
         await session.serve(openPacket('reverse:killforward:tcp:7777'))
 
-        expect(conns[0].ended).toBe(1)
+        expect(device.bindings[0].closed).toBe(1)
+        expect(socket.writes[1].subarray(24).toString()).toBe('OKAY')
+    })
+
+    // ...and every connection still running through it goes too.
+    it('closes the connections of a forward the user removes', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
+        await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+        const app = device.bindings[0].connect()
+
+        await session.serve(openPacket('reverse:killforward:tcp:7777'))
+        await new Promise<void>(r => setImmediate(r))
+
+        expect(app.destroyed).toBe(true)
     })
 
     // After a forward is removed its slot in `bound` must be cleared, or the
@@ -450,29 +419,25 @@ describe('ReverseSession.serve: releasing forwards', () => {
     // `--list` whose listener is not actually up.
     it('allows a fresh bind after the forward is removed', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const ports: number[] = []
-        const session = new ReverseSession(socket as never, async(port: number) => {
-            ports.push(port)
-            return new FakeMinirev()
-        })
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         await session.serve(openPacket('reverse:killforward:tcp:7777'))
         socket.writes.length = 0
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:9090'))
 
-        // openMinirev must have been called twice.
-        expect(ports).toEqual([7777, 7777])
+        expect(device.ports()).toEqual([7777, 7777])
         expect(socket.writes[1].subarray(24).toString()).toBe('OKAY')
     })
 
     // `adb reverse --remove` on a forward that was never bound gets FAIL from
-    // adbd (adb_listeners.cpp: remove_listener returns NOT_FOUND). There is no
-    // manager to end and nothing to clean up in `bound` — but the reply must
-    // still follow the standard three-packet path.
+    // adbd (adb_listeners.cpp: remove_listener returns NOT_FOUND). There is
+    // nothing to release — but the reply must still follow the standard
+    // three-packet path.
     it('answers killforward for an unknown forward with FAIL', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const session = new ReverseSession(socket as never, async() => new FakeMinirev())
+        const session = new ReverseSession(socket as never, devicePorts().openReverse)
 
         await session.serve(openPacket('reverse:killforward:tcp:9999'))
 
@@ -482,117 +447,87 @@ describe('ReverseSession.serve: releasing forwards', () => {
         expect(payload).toBe("FAIL001dlistener 'tcp:9999' not found")
     })
 
-    // killforward-all should tear down every manager, mirroring what a
+    // killforward-all should close every listener, mirroring what a
     // locally-connected device does when it calls remove_all_listeners.
-    it('closes all minirev streams when the user removes all forwards', async() => {
+    it('closes every listener when the user removes all forwards', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async() => {
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         await session.serve(openPacket('reverse:forward:tcp:9999;tcp:3000'))
         socket.writes.length = 0
         await session.serve(openPacket('reverse:killforward-all'))
 
-        expect(conns[0].ended).toBe(1)
-        expect(conns[1].ended).toBe(1)
+        expect(device.bindings.map(b => b.closed)).toEqual([1, 1])
     })
 
     // session.end() is called when the `adb connect` session ends: the socket
     // disconnects, the device leaves its group, or the plugin stops. It must
     // release everything, so the same as killforward-all but without an answer.
-    it('session.end() closes all bound managers', async() => {
+    it('session.end() closes every listener', async() => {
         const socket = fakeSocket(fakeReader().reader)
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async() => {
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         await session.serve(openPacket('reverse:forward:tcp:9999;tcp:3000'))
         session.end()
 
-        expect(conns[0].ended).toBe(1)
-        expect(conns[1].ended).toBe(1)
+        expect(device.bindings.map(b => b.closed)).toEqual([1, 1])
+    })
+
+    // The device-side helper died: the device no longer listens, so the forward
+    // is forgotten as if removed — `--list` stays honest — and the next
+    // `adb reverse` for it binds for real rather than being taken for a rebind.
+    it('forgets a forward whose device listener was lost, and binds it again', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
+        await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+
+        device.bindings[0].lost()
+        socket.writes.length = 0
+        await session.serve(openPacket('reverse:list-forward'))
+        expect(socket.writes[1].subarray(24).toString()).toBe('0000')
+
+        await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
+        expect(device.ports()).toEqual([7777, 7777])
     })
 })
 
-// Slice 5.4: once a forward is successfully bound, minirev starts sending us
-// frames over the conn. Those must reach ReverseStreamManager.handlePacket, which
-// then opens a reverse connection on the user's side by emitting an A_OPEN.
-//
-// The real MinirevReader is used here, not a reimplementation of it: FakeMinirev
-// is a Duplex, and fromDevice() pushes raw bytes that flow through the actual
-// Transform. setImmediate is needed because the pipe is async — the 'packet' event
-// is not emitted synchronously from the push.
-describe('ReverseSession.serve: routing minirev frames after a successful bind', () => {
-    // End-to-end path: user binds a forward, then an app on the device connects to
-    // the port. The frame from minirev must trigger an A_OPEN so the user's server
-    // can create the connection on their machine.
-    //
-    // This is the first test that exercises the full path: bind -> frame -> A_OPEN.
-    // If conn is piped into ForwardReader and handlePacket is wired correctly, we
-    // should see an A_OPEN with the local spec from the forwards map (tcp:8080) and
-    // a non-zero localId.
-    it('opens a connection on the user side when minirev sends a frame after binding', async() => {
-        const {reader} = fakeReader()
-        const socket = fakeSocket(reader)
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async() => {
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+// Once a forward is bound, every app connection to the port must turn into an
+// A_OPEN at the user with the forward's local spec.
+describe('ReverseSession.serve: routing device connections after a successful bind', () => {
+    it('opens a connection on the user side when an app connects after binding', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         socket.writes.length = 0
 
-        // Simulate minirev: an app on the device connected to port 7777 under connId 1.
-        conns[0].fromDevice(framedBy(1, Buffer.from('GET / HTTP/1.1\r\n')))
-        await new Promise<void>(r => setImmediate(r))
+        device.bindings[0].connect()
 
-        // ForwardReader emitted ('packet', 1, data) -> manager.handlePacket(1, data)
-        // -> resolveLocal('tcp:7777') === 'tcp:8080' -> A_OPEN with spec 'tcp:8080\0'.
-        // The exact localId is not checked here (the counter consumed id=2 for the
-        // command stream already); manager.test.ts covers that end-to-end.
-        // What matters is that a packet went out and the spec is right.
-        expect(socket.writes.length).toBeGreaterThan(0)
         // Bytes 0-23 are the fixed-length ADB message header; data starts at 24.
         expect(socket.writes[0].subarray(24).toString()).toBe('tcp:8080\0')
     })
 
-    // Two forwards in one session: a frame on each conn must open a stream with
+    // Two forwards in one session: a connection on each must open a stream with
     // the *correct* local spec. Without this test, passing the wrong `remote` to
-    // the manager constructor (e.g. command.local instead of command.remote) would
-    // be invisible, because with only one forward both specs resolve to the same
-    // forward and the wrong one just happens to match.
-    it('routes a frame to the correct forward when two are bound', async() => {
-        const {reader} = fakeReader()
-        const socket = fakeSocket(reader)
-        const conns: FakeMinirev[] = []
-        const session = new ReverseSession(socket as never, async() => {
-            const conn = new FakeMinirev()
-            conns.push(conn)
-            return conn
-        })
+    // the manager (e.g. command.local instead of command.remote) would be
+    // invisible, because with only one forward both resolve the same.
+    it('routes a connection to the correct forward when two are bound', async() => {
+        const socket = fakeSocket(fakeReader().reader)
+        const device = devicePorts()
+        const session = new ReverseSession(socket as never, device.openReverse)
 
         await session.serve(openPacket('reverse:forward:tcp:7777;tcp:8080'))
         await session.serve(openPacket('reverse:forward:tcp:9999;tcp:3000'))
         socket.writes.length = 0
 
-        // A frame arrives on the *second* forward's conn (connId 5, arbitrary).
-        conns[1].fromDevice(framedBy(5, Buffer.from('hello')))
-        await new Promise<void>(r => setImmediate(r))
+        device.bindings[1].connect()
 
-        // The A_OPEN must carry the second forward's local spec (tcp:3000), not the
-        // first's. A mismatch here would send the user's client to the wrong port.
-        expect(socket.writes.length).toBeGreaterThan(0)
         expect(socket.writes[0].subarray(24).toString()).toBe('tcp:3000\0')
     })
 })
