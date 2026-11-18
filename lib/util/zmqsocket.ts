@@ -8,9 +8,13 @@
 //   - a DEALER receives body frames as-is and its identity is set once via
 //     ZMQ_ROUTING_ID.
 //
+// With ZMQ_SECRET set, every socket runs CURVE (lib/util/zmqcurve.ts): only
+// units that share the secret can connect to a ROUTER.
+//
 import {Router, Dealer, Context} from 'zeromq'
 import {EventEmitter} from 'events'
 import logger from './logger.js'
+import {allowCurveClient, curveKeys, zapDomain} from './zmqcurve.js'
 
 const log = logger.createLogger('util:zmqsocket')
 
@@ -29,6 +33,10 @@ const getSharedContext = () => {
 }
 
 const KEEPALIVE = Number(process.env.ZMQ_KEEPALIVE_INTERVAL || 30)
+
+// Endpoints only this host can reach
+const isLocalEndpoint = (address: string) =>
+    /^(inproc|ipc):\/\//.test(address) || /^tcp:\/\/(127\.[\d.]+|localhost|\[?::1\]?):/.test(address)
 
 const baseSocketOptions = () => ({
     linger: 2000,
@@ -118,15 +126,24 @@ export interface RouterOptions {
     // ZMQ_ROUTER_MANDATORY: fail send() with EHOSTUNREACH for unknown peers
     // instead of silently dropping.
     mandatory?: boolean
+    // Shared bus secret; enables CURVE. Defaults to ZMQ_SECRET.
+    secret?: string
 }
 
 export class RouterSocket extends BaseSocket<Router> {
     protected socket: Router
+    private keys: ReturnType<typeof curveKeys>
 
     constructor(options: RouterOptions = {}) {
         super()
+        this.keys = curveKeys(options.secret ?? process.env.ZMQ_SECRET)
         this.socket = new Router({
             ...baseSocketOptions(),
+            ...(this.keys && {
+                curveServer: true,
+                curveSecretKey: this.keys.server.secretKey,
+                zapDomain: zapDomain(this.keys),
+            }),
         })
         // Default to the resilient/diagnostic settings; callers may override.
         this.socket.handover = options.handover ?? true
@@ -134,6 +151,12 @@ export class RouterSocket extends BaseSocket<Router> {
     }
 
     async bind(address: string) {
+        if (this.keys) {
+            await allowCurveClient(this.socket.context, this.keys)
+        }
+        else if (!isLocalEndpoint(address)) {
+            log.warn('ZMQ_SECRET is not set: anyone who reaches %s can talk to the bus', address)
+        }
         await this.socket.bind(address)
         log.info('ROUTER bound on %s', address)
         this.startReceiveLoop()
@@ -151,6 +174,8 @@ export interface DealerOptions {
     // Whether to run the receive loop (an app-side DEALER receives; a pure
     // sender may skip it).
     receive?: boolean
+    // Shared bus secret; enables CURVE. Defaults to ZMQ_SECRET.
+    secret?: string
 }
 
 export class DealerSocket extends BaseSocket<Dealer> {
@@ -158,9 +183,15 @@ export class DealerSocket extends BaseSocket<Dealer> {
 
     constructor(options: DealerOptions = {}) {
         super()
+        const keys = curveKeys(options.secret ?? process.env.ZMQ_SECRET)
         this.socket = new Dealer({
             ...baseSocketOptions(),
             ...(options.routingId != null && {routingId: options.routingId}),
+            ...(keys && {
+                curveServerKey: keys.server.publicKey,
+                curvePublicKey: keys.client.publicKey,
+                curveSecretKey: keys.client.secretKey,
+            }),
         })
         if (options.probeRouter != null) {
             this.socket.probeRouter = options.probeRouter
