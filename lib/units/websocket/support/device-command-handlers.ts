@@ -61,6 +61,7 @@ import {
     FileSystemGetMessage,
     FileSystemListMessage
 } from '../../../wire/wire.js'
+import {parseLogcatFilters} from './logcatFilters.js'
 
 export interface DeviceCommandOptions {
     timeout?: number
@@ -234,10 +235,20 @@ export function registerDeviceCommands(socket: Socket, commands: DeviceCommands,
     socket.on('app.getInspectServerUrl', (serial: string, rc: string) =>
         runTx(serial, rc, GetAppInspectServerUrl, {}))
 
-    socket.on('logcat.start', (serial: string, rc: string, data: any) =>
-        runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
-    socket.on('logcat.startIos', (serial: string, rc: string, data: any) =>
-        runTx(serial, rc, LogcatStartMessage, {filters: data.filters}))
+    const startLogcat = (serial: string, rc: string, data: unknown) => {
+        const filters = parseLogcatFilters((data as {filters?: unknown} | null)?.filters)
+        if (!filters) {
+            socket.emit('tx.done', rc, {
+                source: serial,
+                success: false,
+                data: 'invalid_logcat_filters'
+            })
+            return
+        }
+        return runTx(serial, rc, LogcatStartMessage, {filters})
+    }
+    socket.on('logcat.start', startLogcat)
+    socket.on('logcat.startIos', startLogcat)
     socket.on('logcat.stop', (serial: string, rc: string) =>
         runTx(serial, rc, LogcatStopMessage, {}))
     socket.on('logcat.stopIos', (serial: string, rc: string) =>
