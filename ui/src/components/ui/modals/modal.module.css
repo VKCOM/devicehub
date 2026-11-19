@@ -1,3 +1,18 @@
 .modalActions {
   width: 100%;
 }
+
+/* NOTE: On phones the buttons share the row equally, a long translation wraps inside its button */
+@media (width <= 767px) {
+  .modalActions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.buttonLabel {
+  display: block;
+  line-height: 18px;
+  text-align: center;
+  white-space: normal;
+}

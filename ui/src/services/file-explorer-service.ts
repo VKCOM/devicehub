@@ -17,6 +17,10 @@ export class FileExplorerService {
   currentPath = '/'
   fsList: FSListMessage[] = []
   isDirectoryLoading = true
+  /* NOTE: The listing of the current path failed, e.g. a folder the shell user may not read */
+  isDirectoryError = false
+
+  private listRequestId = 0
 
   constructor(@inject(CONTAINER_IDS.deviceControlStore) private deviceControlStore: DeviceControlStore) {
     makeAutoObservable(this)
@@ -108,17 +112,34 @@ export class FileExplorerService {
     return this.currentPath === '/' ? `/${segment}` : `${this.currentPath}/${segment}`
   }
 
+  /*
+   * NOTE: The list always shows the current path: it is cleared while loading, an unreadable
+   * folder ends up empty, and a late answer for a path left behind is dropped
+   */
   private async listDirectory(): Promise<void> {
+    const requestId = ++this.listRequestId
+
+    this.fsList = []
+    this.isDirectoryLoading = true
+    this.isDirectoryError = false
+
     try {
       const fsListResult = await this.deviceControlStore.fsList(this.currentPath)
       const { content } = await fsListResult.donePromise
 
-      if (content) {
-        this.fsList = content
-        this.isDirectoryLoading = false
-      }
+      if (requestId !== this.listRequestId) return
+
+      this.setListing(content ?? [], !content)
     } catch (error) {
       console.error(error)
+
+      if (requestId === this.listRequestId) this.setListing([], true)
     }
+  }
+
+  private setListing(content: FSListMessage[], isError: boolean): void {
+    this.fsList = content
+    this.isDirectoryError = isError
+    this.isDirectoryLoading = false
   }
 }

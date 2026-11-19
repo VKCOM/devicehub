@@ -1,0 +1,574 @@
+.mobileControl {
+  /* NOTE: Material 3 emphasized motion for custom parts, VKUI components keep their own */
+  --mc-ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --mc-ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --mc-duration-enter: 380ms;
+  --mc-duration-exit: 200ms;
+  --mc-ease: var(--mc-ease-enter);
+  --mc-duration: var(--mc-duration-enter);
+  --mc-chrome: #000;
+  --mc-chrome-foreground: #e8eaed;
+  --mc-chrome-pressed: rgb(255 255 255 / 16%);
+  --mc-chrome-accent: #8dc2ff;
+  --mc-edge-glow: rgb(82 158 244 / 75%);
+
+  user-select: none;
+
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+
+  /* NOTE: clip, unlike hidden, cannot be scrolled by scrollIntoView or a focus inside */
+  overflow: hidden;
+  overflow: clip;
+  overscroll-behavior: none;
+
+  background: var(--mc-chrome);
+
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* NOTE: Zero specificity, so the color of any button class wins (strip icons were black on black) */
+:where(.mobileControl) :where(button) {
+  touch-action: manipulation;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.motionOut {
+  --mc-ease: var(--mc-ease-exit);
+  --mc-duration: var(--mc-duration-exit);
+}
+
+.stage {
+  touch-action: none;
+  position: absolute;
+  z-index: 1;
+  transition:
+    top var(--mc-duration) var(--mc-ease),
+    right var(--mc-duration) var(--mc-ease),
+    bottom var(--mc-duration) var(--mc-ease),
+    left var(--mc-duration) var(--mc-ease);
+
+  .dragging & {
+    transition: none;
+  }
+}
+
+.screenHost {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 250ms cubic-bezier(0.2, 0, 0, 1);
+
+  /* NOTE: The letterbox around the stream is a part of the black device frame */
+  > * {
+    background: transparent;
+  }
+}
+
+.streamFrame {
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.edgeGlow {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 180ms;
+
+  &.left {
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 18px;
+
+    background: linear-gradient(90deg, var(--mc-edge-glow), transparent);
+  }
+
+  &.right {
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 18px;
+
+    background: linear-gradient(270deg, var(--mc-edge-glow), transparent);
+  }
+
+  &.top {
+    top: 0;
+    right: 0;
+    left: 0;
+
+    height: 18px;
+
+    background: linear-gradient(180deg, var(--mc-edge-glow), transparent);
+  }
+
+  &.bottom {
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    height: 18px;
+
+    background: linear-gradient(0deg, var(--mc-edge-glow), transparent);
+  }
+}
+
+.edgeGlowOn {
+  opacity: 1;
+}
+
+.panSurface {
+  touch-action: none;
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+}
+
+.stageChip {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  min-height: 36px;
+  padding: 8px 14px;
+
+  font-size: 13px;
+  color: var(--mc-chrome-foreground);
+  white-space: nowrap;
+
+  background: rgb(40 42 46 / 92%);
+  border: 0;
+  border-radius: 999px;
+
+  animation: mc-chip-pop 300ms var(--mc-ease-enter);
+}
+
+.chipAction {
+  min-height: 28px;
+  padding: 0 4px;
+
+  font-weight: 600;
+  color: var(--mc-chrome-accent);
+
+  background: none;
+  border: 0;
+}
+
+/* Navigation strip */
+
+/* NOTE: Above the sheet, which slides out from under it */
+.strip {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+
+  height: calc(44px + env(safe-area-inset-bottom, 0px));
+  padding: 0 env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+
+  background: var(--mc-chrome);
+
+  transition: transform var(--mc-duration) var(--mc-ease);
+
+  .landscape & {
+    top: 0;
+    left: auto;
+
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-auto-rows: 1fr;
+
+    width: calc(44px + env(safe-area-inset-right, 0px));
+    height: auto;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) 0;
+  }
+}
+
+.stripOff {
+  pointer-events: none;
+  transform: translateY(100%);
+
+  .landscape & {
+    transform: translateX(100%);
+  }
+}
+
+.stripButton {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  min-width: 44px;
+  min-height: 44px;
+
+  color: var(--mc-chrome-foreground);
+
+  background: none;
+  border: 0;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    width: 44px;
+    height: 36px;
+
+    opacity: 0;
+    background: var(--mc-chrome-pressed);
+    border-radius: 12px;
+
+    transition: opacity 120ms;
+  }
+
+  &:active::before,
+  &[aria-pressed='true']::before {
+    opacity: 1;
+  }
+}
+
+.toolsButton {
+  color: var(--mc-chrome-accent);
+}
+
+.toolsBadge {
+  pointer-events: none;
+
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+}
+
+.alertDot {
+  position: absolute;
+  transform: translate(11px, -10px);
+
+  width: 8px;
+  height: 8px;
+
+  background: #ff5c5c;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--mc-chrome);
+}
+
+.progressRing {
+  transform: rotate(-90deg);
+  width: 38px;
+  height: 38px;
+
+  circle {
+    fill: none;
+    stroke-width: 2.5;
+  }
+}
+
+.progressTrack {
+  stroke: rgb(255 255 255 / 18%);
+}
+
+.progressValue {
+  stroke: var(--mc-chrome-accent);
+  stroke-dasharray: 100.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 150ms linear;
+}
+
+/* Floating tools button */
+
+.fab {
+  touch-action: none;
+
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+
+  display: grid;
+  place-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  color: #fff;
+
+  background: rgb(36 38 42 / 82%);
+  backdrop-filter: blur(10px);
+  border: 0;
+  border-radius: 50%;
+  box-shadow:
+    0 4px 14px rgb(0 0 0 / 40%),
+    inset 0 0 0 1px rgb(255 255 255 / 12%);
+
+  transition:
+    transform 320ms var(--mc-ease-enter),
+    opacity 400ms;
+
+  .alertDot {
+    box-shadow: 0 0 0 2px rgb(36 38 42);
+  }
+}
+
+.fabDragging {
+  transition: none;
+}
+
+.fabIdle {
+  opacity: 0.42;
+}
+
+/* Keyboard */
+
+.keyboardInput {
+  pointer-events: none;
+  resize: none;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  overflow: hidden;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+
+  /* NOTE: 16px keeps iOS from zooming the page when the input gets focus */
+  font-size: 16px;
+  color: transparent;
+
+  opacity: 0;
+  background: transparent;
+  border: 0;
+  caret-color: transparent;
+}
+
+.accessory {
+  position: absolute;
+  z-index: 6;
+  right: 0;
+  left: 0;
+  transform: translateY(calc(100% + 400px));
+
+  display: flex;
+  gap: 6px;
+  align-items: center;
+
+  height: 44px;
+  padding: 0 calc(8px + env(safe-area-inset-right, 0px)) 0 calc(8px + env(safe-area-inset-left, 0px));
+
+  background: var(--vkui--color_background_content);
+  border-top: 1px solid var(--vkui--color_separator_primary);
+
+  transition: transform var(--mc-duration-exit) var(--mc-ease-exit);
+}
+
+.accessoryOn {
+  transform: none;
+  transition: transform var(--mc-duration-enter) var(--mc-ease-enter);
+}
+
+.accessoryKey {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+
+  /* NOTE: Hide, Tab, the arrows and the settings share one width, text keys grow to their label */
+  min-width: 48px;
+  height: 36px;
+  padding: 0 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vkui--color_text_primary);
+
+  background: var(--vkui--color_background_secondary);
+  border: 0;
+  border-radius: 9px;
+}
+
+.accessoryHide {
+  color: var(--vkui--color_text_contrast_themed, #fff);
+  background: var(--vkui--color_background_accent_themed);
+}
+
+/* NOTE: The keys scroll sideways, the row settings stay outside them at the right end */
+.accessoryKeys {
+  scrollbar-width: none;
+
+  overflow-x: auto;
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  align-items: center;
+
+  min-width: 0;
+  height: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.accessorySettings {
+  color: var(--vkui--color_icon_secondary);
+}
+
+.accessoryPaste {
+  color: var(--vkui--color_text_accent);
+}
+
+/* Sheet scrim, hints */
+
+.scrim {
+  pointer-events: none;
+
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+
+  opacity: 0;
+  background: rgb(0 0 0 / 40%);
+
+  transition: opacity var(--mc-duration-enter) cubic-bezier(0.2, 0, 0, 1);
+
+  .dragging & {
+    transition: none;
+  }
+}
+
+.scrimOn {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.addToHomeScreen {
+  position: absolute;
+  z-index: 7;
+  right: 8px;
+  left: 8px;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 14px 8px 14px 14px;
+
+  color: var(--vkui--color_text_primary);
+
+  background: var(--vkui--color_background_content);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgb(0 16 61 / 18%);
+
+  animation: mc-rise 400ms var(--mc-ease-enter);
+
+  b {
+    display: block;
+    font-size: 15.5px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 3px 0 0;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--vkui--color_text_secondary);
+  }
+}
+
+.addToHomeScreenIcon {
+  display: grid;
+  place-items: center;
+
+  width: 40px;
+  height: 40px;
+
+  color: #fff;
+
+  background: var(--vkui--color_background_accent_themed);
+  border-radius: 10px;
+}
+
+.inlineIcon {
+  display: inline-block;
+  color: var(--vkui--color_icon_accent);
+  vertical-align: -3px;
+}
+
+.dismissButton {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: var(--vkui--color_icon_secondary);
+
+  background: none;
+  border: 0;
+  border-radius: 12px;
+}
+
+@keyframes mc-chip-pop {
+  from {
+    transform: translate(-50%, -8px);
+    opacity: 0;
+  }
+}
+
+@keyframes mc-rise {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+/* NOTE: No slides with reduced motion, changes are instant or a short fade */
+@media (prefers-reduced-motion: reduce) {
+  .mobileControl {
+    --mc-duration-enter: 1ms;
+    --mc-duration-exit: 1ms;
+  }
+
+  .stageChip,
+  .addToHomeScreen {
+    animation: mc-fade 150ms ease-out;
+  }
+
+  .screenHost,
+  .fab {
+    transition: opacity 150ms;
+  }
+}
+
+@keyframes mc-fade {
+  from {
+    opacity: 0;
+  }
+}

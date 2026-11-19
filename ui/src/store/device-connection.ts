@@ -12,6 +12,7 @@ import { deviceConnectionRequired } from '@/config/inversify/decorators'
 import { DeviceControlStore } from './device-control-store'
 import { DeviceBySerialStore } from './device-by-serial-store'
 import { deviceErrorModalStore } from './device-error-modal-store'
+import { deviceAccessStore } from './device-access-store'
 
 import type { Device } from '@/generated/types'
 
@@ -50,13 +51,23 @@ export class DeviceConnection {
         })
 
       if (session.silent) return
+
       await this.groupService.invite(this.serial, device.group)
 
       this.settingsService.updateLastUsedDevice(this.serial)
     } catch (error) {
-      deviceErrorModalStore.setError(t('Connection failed'))
-
       console.error(error)
+
+      // Another user owns the device: it is never taken over
+      if (error instanceof Error && error.cause === 'busy') {
+        const { data: device } = this.deviceBySerialStore.deviceQueryResult()
+
+        deviceAccessStore.setBusy(device?.owner?.name || undefined)
+
+        return
+      }
+
+      deviceErrorModalStore.setError(t('Connection failed'))
     }
   }
 
