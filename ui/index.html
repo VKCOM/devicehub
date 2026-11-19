@@ -6,12 +6,21 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="DeviceHub" />
+    <!-- NOTE: The UI is localized; Chrome's page translation rewrites the DOM under React and breaks it -->
+    <meta name="google" content="notranslate" />
     <title>DeviceHub</title>
+    <script>
+      // NOTE: The UI language before the app loads, or Chrome takes the page for English and offers a translation
+      try {
+        document.documentElement.lang = localStorage.getItem('i18nextLng') || navigator.language || 'en'
+      } catch (error) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

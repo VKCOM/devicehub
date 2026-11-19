@@ -75,7 +75,7 @@ export class DeviceBySerialStore {
         (prevDeviceState === DeviceState.AUTOMATION && prevDeviceState !== nextDeviceState)
       ) {
         const leaveReason = newData.likelyLeaveReason
-          ? DEVICE_LIKELY_LEAVE_REASON[newData.likelyLeaveReason]
+          ? DEVICE_LIKELY_LEAVE_REASON[newData.likelyLeaveReason] || newData.likelyLeaveReason
           : 'Unknown reason'
 
         deviceErrorModalStore.setError(leaveReason)

@@ -59,10 +59,15 @@ export default new (class Lifecycle {
     fatal(err?: Error | string): never {
         log.fatal(`Shutting down due to fatal error ${err || ''}`)
         this.ending = true
-        // process.exit(1)
-        Promise.all(this.cleanupsFatal.map((fn) => fn())).then(() =>
-            process.exit(1)
-        )
+        // Fatal shutdown used to run only cleanupsFatal. Device workers put
+        // their sockets and child processes in the normal cleanup list, so a
+        // fatal exit left minicap/STFService/reverse-helper processes behind
+        // on the phone. The next worker then inherited their abstract sockets.
+        // Publish the fatal presence first (while transport is alive), then
+        // release all ordinary resources before exiting.
+        Promise.allSettled(this.cleanupsFatal.map((fn) => fn()))
+            .then(() => Promise.allSettled(this.cleanups.map((fn) => fn())))
+            .then(() => process.exit(1))
     }
 
     observe(cleanupFn: LifecycleObserver) {

@@ -32,6 +32,16 @@ export class DeviceControlService {
   mediaStop = this.keyPress('media_stop')
   mediaNext = this.keyPress('media_next')
   mediaFastForward = this.keyPress('media_fast_forward')
+  tab = this.keyPress('tab')
+  escape = this.keyPress('escape')
+  enter = this.keyPress('enter')
+  del = this.keyPress('del')
+  dpadLeft = this.keyPress('dpad_left')
+  dpadRight = this.keyPress('dpad_right')
+  dpadUp = this.keyPress('dpad_up')
+  dpadDown = this.keyPress('dpad_down')
+  moveHome = this.keyPress('move_home')
+  moveEnd = this.keyPress('move_end')
 
   constructor(
     protected deviceBySerialStore: DeviceBySerialStore,

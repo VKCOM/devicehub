@@ -34,6 +34,7 @@ import type { LogsTrackerService } from '@/services/logs-tracker-service/logs-tr
 import type { ApplicationInstallationService } from '@/services/application-installation/application-installation-service'
 import type { TeamSettingsService } from '@/services/team-settings-service'
 import type { TeamItemService } from '@/services/team-item-service'
+import type { MobileControlStore } from '@/store/mobile-control-store'
 
 export const CONTAINER_IDS = {
   deviceSession: Symbol.for('DeviceSession') as interfaces.ServiceIdentifier<DeviceSession>,
@@ -71,6 +72,7 @@ export const CONTAINER_IDS = {
   teamSettingsService: Symbol.for('TeamSettingsService') as interfaces.ServiceIdentifier<TeamSettingsService>,
   deviceSettingsService: Symbol.for('DeviceSettingsService') as interfaces.ServiceIdentifier<DeviceSettingsService>,
   deviceLifecycleService: Symbol.for('DeviceLifecycleService') as interfaces.ServiceIdentifier<DeviceLifecycleService>,
+  mobileControlStore: Symbol.for('MobileControlStore') as interfaces.ServiceIdentifier<MobileControlStore>,
   factoryTransactionService: Symbol.for(
     'Factory<TransactionService>'
   ) as interfaces.ServiceIdentifier<TransactionFactory>,

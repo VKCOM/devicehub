@@ -25,6 +25,10 @@ import {
     RotateMessage,
     UnlockDeviceMessage
 } from "../../../wire/wire.js";
+import {InputQueue} from '../support/input-queue.js'
+
+/* NOTE: Text the agent can type without the ADB keyboard, a literal compiled once */
+const PRINTABLE_ASCII = /^[\x20-\x7e]*$/
 
 interface Service {
     socket: Duplex | null
@@ -100,6 +104,12 @@ export default syrup.serial()
 
         const stopAgent = () =>
             devutil.killProcsByComm('stf.agent', 'stf.agent')
+
+        // An agent/service socket can emit both `error` and `end`. Keep one
+        // recovery in flight and ignore events from the socket that a recovery
+        // is intentionally replacing.
+        let agentRestart: Promise<void> | null = null
+        let serviceRestart: Promise<void> | null = null
 
         // Runs an `am` command and returns the error line it printed, if any
         const runAm = async(command: string): Promise<string | null> => {
@@ -221,12 +231,29 @@ export default syrup.serial()
             return messageResolver.await(id, resolver)
         }
 
+        const inputQueue = new InputQueue((err: any) => log.warn('Input failed: %s', err?.message ?? err))
+
+        // NOTE: Keys wait for text that is still being typed, or a Backspace would land before it
         const keyEvent = (data: any) =>
-            runAgentCommand(apk.wire.MessageType.DO_KEYEVENT, new apk.wire.KeyEventRequest(data))
+            inputQueue.run(() =>
+                runAgentCommand(apk.wire.MessageType.DO_KEYEVENT, new apk.wire.KeyEventRequest(data))
+            )
 
         const plugin = new class extends EventEmitter {
-            type = (text: string) =>
-                devutil.executeShellCommand("am broadcast -a ADB_INPUT_TEXT --es msg '" + text + "'")
+            // NOTE: Printable ASCII goes through the agent, a socket write; other text needs the ADB
+            // keyboard broadcast, a shell call of a few hundred milliseconds. While a broadcast is on
+            // its way all text joins it, so typing stays in order and costs one shell call per burst.
+            type = (text: string) => {
+                if (!inputQueue.isBusy && PRINTABLE_ASCII.test(text)) {
+                    runAgentCommand(apk.wire.MessageType.DO_TYPE, new apk.wire.DoTypeRequest(text))
+                    return
+                }
+
+                // NOTE: Base64 needs no shell quoting, any quotes, backslashes and line breaks get through
+                inputQueue.text(text, (joined) => devutil.executeShellCommand(
+                    'am broadcast -a ADB_INPUT_B64 --es msg ' + Buffer.from(joined, 'utf8').toString('base64')
+                ))
+            }
 
             paste = async(text: string) => {
                 await this.setClipboard(text)
@@ -577,31 +604,59 @@ export default syrup.serial()
         const waitForAgentDeath = (conn: Duplex, ms = 3000) => new Promise<void>(resolve => {
             let timeout = setTimeout(resolve, ms)
             conn.once('end', async() => {
+                if (agent.socket !== conn || lifecycle.ending) {
+                    clearTimeout(timeout)
+                    resolve()
+                    return
+                }
+
                 clearTimeout(timeout)
+                agent.socket = null
                 const startTime = Date.now()
                 log.important('Agent connection ended, attempting to relaunch')
-                try {
-                    await openAgent()
-                    log.important('Agent relaunched in %sms', Date.now() - startTime)
-                    resolve()
+                if (!agentRestart) {
+                    agentRestart = openAgent()
+                        .then(() => log.important('Agent relaunched in %sms', Date.now() - startTime))
+                        .catch((err: any) => {
+                            log.fatal('Agent connection could not be relaunched: %s', err.message)
+                            lifecycle.fatal()
+                        })
+                        .finally(() => { agentRestart = null })
                 }
-                catch (err: any) {
-                    log.fatal('Agent connection could not be relaunched: %s', err.message)
-                    lifecycle.fatal()
-                }
+                await agentRestart
+                resolve()
             })
 
             conn.on('error', (err: any) => {
+                if (agent.socket !== conn || lifecycle.ending) return
                 log.fatal('Agent connection had an error: %s', err.message)
                 lifecycle.fatal()
             })
         })
 
-        const openAgent = async() => {
+        const openAgent = async(waitForDeath = true) => {
             log.info('Launching agent')
 
+            // Mark the old connection stale before killing its process. Its
+            // delayed `end` event must not start a second replacement.
+            agent.socket = null
             await stopAgent()
-            await devutil.ensureUnusedLocalSocket(agent.sock)
+
+            // `ensureUnusedLocalSocket` returns undefined when another process
+            // still owns the abstract socket. The old code ignored that value,
+            // started a second app_process and then waited forever for a socket
+            // that could never appear. Wait briefly for the killed agent to
+            // release it, then fail with the real cause.
+            const deadline = Date.now() + 5000
+            let free: string | undefined
+            while (Date.now() < deadline) {
+                free = await devutil.ensureUnusedLocalSocket(agent.sock)
+                if (free) break
+                await new Promise(resolve => setTimeout(resolve, 100))
+            }
+            if (!free) {
+                throw new Error(`STF agent socket ${agent.sock} is still in use`)
+            }
 
             // @ts-ignore
             const out = await adb.getDevice(options.serial).shell(util.format("CLASSPATH='%s' exec app_process /system/bin '%s'", apk.path, apk.main))
@@ -612,30 +667,44 @@ export default syrup.serial()
             agent.writer = new ms.DelimitingStream()
             agent.writer.pipe(agent.socket!)
 
-            return waitForAgentDeath(agent.socket!)
+            const death = waitForAgentDeath(agent.socket!)
+            if (waitForDeath) {
+                await death
+            }
         }
 
         const onServiceDeath = async() => {
+            if (lifecycle.ending || serviceRestart) return serviceRestart
+
+            serviceRestart = (async() => {
             try {
                 const startTime = Date.now()
                 log.important('Service connection ended, attempting to relaunch')
-                await openAgent() // restart agent
-                await openService()
+                // Restart the agent once, then bind the service to it. Keep
+                // the service opener from starting a second agent during this
+                // recovery path.
+                await openAgent(false)
+                await openService(false)
                 log.important('Service relaunched in %sms', Date.now() - startTime)
             }
             catch (err: any) {
                 log.fatal('[prepareForServiceDeath] Service connection could not be relaunched: %s', err?.message)
                 lifecycle.fatal()
             }
+            })().finally(() => { serviceRestart = null })
+
+            return serviceRestart
         }
 
         // The APK should be up to date at this point. If it was reinstalled, the
         // service should have been automatically stopped while it was happening.
         // So, we should be good to go.
-        const openService = async() => {
+        const openService = async(startAgent = true) => {
             log.info('Launching service')
 
-            await openAgent()
+            if (startAgent) {
+                await openAgent()
+            }
             // Some devices (e.g. Huawei) refuse to start the service while the screen
             // is off. The device turns it off again once fully operational.
             await devutil.executeShellCommand('input keyevent 224') // KEYCODE_WAKEUP

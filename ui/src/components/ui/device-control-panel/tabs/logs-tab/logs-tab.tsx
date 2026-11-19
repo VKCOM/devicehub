@@ -9,8 +9,10 @@ import { ConditionalRender } from '@/components/lib/conditional-render'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { logsTableState } from '@/store/logs-table-state'
+import { useIsMobileControl } from '@/lib/hooks/use-is-mobile-control.hook'
 
 import { LogsTable } from './logs-table'
+import { MobileLogs } from './mobile-logs'
 
 import styles from './logs-tab.module.css'
 
@@ -19,6 +21,9 @@ export const LogsTab = observer(() => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const logcatService = useInjection(CONTAINER_IDS.logcatService)
+  const isMobileControl = useIsMobileControl()
+
+  if (isMobileControl) return <MobileLogs />
 
   return (
     <Card className={styles.logsTab} mode='tint'>

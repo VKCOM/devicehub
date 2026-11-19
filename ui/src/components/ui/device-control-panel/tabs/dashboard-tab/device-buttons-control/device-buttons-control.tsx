@@ -21,7 +21,9 @@ import {
   Icon16UnlockOutline,
   Icon28VolumeOutline,
   Icon28SettingsOutline,
+  Icon28Menu,
 } from '@vkontakte/icons'
+import cn from 'classnames'
 import { observer } from 'mobx-react-lite'
 import { useInjection } from 'inversify-react'
 import { useMutation } from '@tanstack/react-query'
@@ -29,6 +31,7 @@ import { useMutation } from '@tanstack/react-query'
 import { ContentCard } from '@/components/lib/content-card'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { useIsMobileControl } from '@/lib/hooks/use-is-mobile-control.hook'
 
 import { ButtonControl } from './button-control'
 
@@ -40,6 +43,10 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
   const deviceControlStore = useInjection(CONTAINER_IDS.deviceControlStore)
   const deviceBySerialStore = useInjection(CONTAINER_IDS.deviceBySerialStore)
   const { data: device } = deviceBySerialStore.deviceQueryResult()
+  // NOTE: The phone navigation strip has no Menu key, it lives here
+  const isMobileControl = useIsMobileControl()
+  // NOTE: On a phone the buttons are an even grid of labelled buttons, touch screens show no tooltips
+  const containerClassName = cn(styles.buttonsContainer, { [styles.mobileButtons]: isMobileControl })
   const airplaneMutation = useMutation({
     mutationFn: async ({ enabled }: { enabled: boolean }) => {
       const tr = await deviceControlStore.setAirplaneMode(enabled)
@@ -55,15 +62,18 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
     >
       <FormLayoutGroup>
         <FormItem top={t('Special Keys')}>
-          <div className={styles.buttonsContainer}>
-            <ButtonControl
-              appearance='negative'
-              icon={<Icon24OnOffOutline />}
-              tooltipText={t('Power')}
-              onClick={() => {
-                deviceControlStore.power()
-              }}
-            />
+          <div className={containerClassName}>
+            {/* NOTE: Power, Camera and the volume are quick actions of the phone layout, above the tabs */}
+            {!isMobileControl && (
+              <ButtonControl
+                appearance='negative'
+                icon={<Icon24OnOffOutline />}
+                tooltipText={t('Power')}
+                onClick={() => {
+                  deviceControlStore.power()
+                }}
+              />
+            )}
             <ButtonControl
               icon={<Icon16UnlockOutline />}
               tooltipText={t('Unlock device')}
@@ -71,11 +81,20 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
                 deviceControlStore.unlockDevice()
               }}
             />
-            <ButtonControl
-              icon={<Icon24CameraOutline />}
-              tooltipText={t('Camera')}
-              onClick={() => deviceControlStore.camera()}
-            />
+            {!isMobileControl && (
+              <ButtonControl
+                icon={<Icon24CameraOutline />}
+                tooltipText={t('Camera')}
+                onClick={() => deviceControlStore.camera()}
+              />
+            )}
+            {isMobileControl && device?.platform === 'Android' && (
+              <ButtonControl
+                icon={<Icon28Menu height={24} width={24} />}
+                tooltipText={t('Menu')}
+                onClick={() => deviceControlStore.menu()}
+              />
+            )}
             {device?.platform === 'Android' && (
               <ButtonControl
                 icon={<Icon28TextOutline />}
@@ -90,29 +109,31 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
             />
           </div>
         </FormItem>
-        <FormItem top={t('Volume')}>
-          <div className={styles.buttonsContainer}>
-            <ButtonControl
-              icon={<Icon28MuteOutline />}
-              tooltipText={t('Mute')}
-              onClick={() => deviceControlStore.mute()}
-            />
-            <ButtonControl
-              icon={<Icon28VolumeOutline />}
-              tooltipText={t('Volume Down')}
-              onClick={() => deviceControlStore.volumeDown()}
-            />
-            <ButtonControl
-              icon={<Icon28VolumeAlt />}
-              tooltipText={t('Volume Up')}
-              onClick={() => deviceControlStore.volumeUp()}
-            />
-          </div>
-        </FormItem>
+        {!isMobileControl && (
+          <FormItem top={t('Volume')}>
+            <div className={containerClassName}>
+              <ButtonControl
+                icon={<Icon28MuteOutline />}
+                tooltipText={t('Mute')}
+                onClick={() => deviceControlStore.mute()}
+              />
+              <ButtonControl
+                icon={<Icon28VolumeOutline />}
+                tooltipText={t('Volume Down')}
+                onClick={() => deviceControlStore.volumeDown()}
+              />
+              <ButtonControl
+                icon={<Icon28VolumeAlt />}
+                tooltipText={t('Volume Up')}
+                onClick={() => deviceControlStore.volumeUp()}
+              />
+            </div>
+          </FormItem>
+        )}
         {device?.platform === 'Android' && (
           <>
             <FormItem top={t('Special actions')}>
-              <div className={styles.buttonsContainer}>
+              <div className={containerClassName}>
                 <ButtonControl
                   icon={<Icon24SunOutline color='#fac60a' />}
                   tooltipText={t('Set Light Theme')}
@@ -151,7 +172,7 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
                   onClick={() => deviceControlStore.openLanguageChange()}
                 />
               </div>
-              <div className={styles.buttonsContainer}>
+              <div className={containerClassName}>
                 <SelectionControl>
                   <Switch
                     checked={device?.airplaneMode}
@@ -165,7 +186,7 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
               </div>
             </FormItem>
             <FormItem top={t('Font size')}>
-              <div className={styles.buttonsContainer}>
+              <div className={cn(containerClassName, { [styles.mobileThreeColumns]: isMobileControl })}>
                 <ButtonControl
                   icon={<Icon24TextOutline />}
                   iconHeight={14}
@@ -190,35 +211,41 @@ export const DeviceButtonsControl = observer(({ className }: { className?: strin
               </div>
             </FormItem>
             <FormItem top={t('Media')}>
-              <div className={styles.buttonsContainer}>
+              <div className={cn(containerClassName, { [styles.mobileIconButtons]: isMobileControl })}>
                 <ButtonControl
                   icon={<Icon24SkipPrevious />}
                   tooltipText={t('Rewind')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaRewind()}
                 />
                 <ButtonControl
                   icon={<Icon24SkipBack />}
                   tooltipText={t('Previous')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaPrevious()}
                 />
                 <ButtonControl
                   icon={<Icon24Play />}
                   tooltipText={t('Play/Pause')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaPlayPause()}
                 />
                 <ButtonControl
                   icon={<Icon24Stop />}
                   tooltipText={t('Stop')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaStop()}
                 />
                 <ButtonControl
                   icon={<Icon24SkipForward />}
                   tooltipText={t('Next')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaNext()}
                 />
                 <ButtonControl
                   icon={<Icon24SkipNext />}
                   tooltipText={t('Fast Forward')}
+                  isIconOnly
                   onClick={() => deviceControlStore.mediaFastForward()}
                 />
               </div>

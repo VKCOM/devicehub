@@ -1,0 +1,324 @@
+.sheet {
+  will-change: transform;
+  user-select: none;
+
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  left: 0;
+
+  overflow: hidden;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+
+  color: var(--vkui--color_text_primary);
+
+  background: var(--vkui--color_background);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -6px 28px rgb(0 0 0 / 28%);
+
+  transition: transform var(--mc-duration) var(--mc-ease);
+
+  /* NOTE: The handle is dragged, see .dragging of the mobile control root */
+  [class*='dragging'] > & {
+    transition: none;
+  }
+}
+
+.sideSheet {
+  top: 0;
+  left: auto;
+
+  padding-top: env(safe-area-inset-top, 0);
+
+  border-radius: 14px 0 0 14px;
+  box-shadow: -6px 0 28px rgb(0 0 0 / 28%);
+}
+
+.sheetHead {
+  touch-action: none;
+  cursor: grab;
+  flex: none;
+  background: var(--vkui--color_background_content);
+
+  .sideSheet & {
+    touch-action: auto;
+    cursor: auto;
+  }
+}
+
+.grabber {
+  display: grid;
+  place-items: center;
+  height: 18px;
+
+  i {
+    width: 36px;
+    height: 4px;
+
+    opacity: 0.45;
+    background: var(--vkui--color_icon_secondary);
+    border-radius: 2px;
+  }
+
+  .sideSheet & {
+    height: 8px;
+
+    i {
+      display: none;
+    }
+  }
+}
+
+.headRow {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  min-height: 48px;
+  padding: 0 6px 4px 16px;
+}
+
+.deviceTitle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  b,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  b {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 12.5px;
+    color: var(--vkui--color_text_secondary);
+  }
+}
+
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: var(--vkui--color_icon_accent);
+
+  background: none;
+  border: 0;
+  border-radius: 12px;
+
+  &:active {
+    background: var(--vkui--color_background_secondary);
+  }
+}
+
+.mutedButton {
+  color: var(--vkui--color_icon_secondary);
+}
+
+.destructiveButton {
+  color: var(--vkui--color_icon_negative);
+}
+
+.pressedButton {
+  background: var(--vkui--color_background_secondary);
+}
+
+.quickActions {
+  touch-action: pan-x;
+  scrollbar-width: none;
+
+  overflow-x: auto;
+  display: flex;
+  flex: none;
+  gap: 2px;
+
+  padding: 2px 10px 8px;
+
+  background: var(--vkui--color_background_content);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.quickActionIcon {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: var(--vkui--color_icon_accent);
+
+  background: var(--vkui--color_background_secondary);
+  border-radius: 50%;
+
+  transition: transform 100ms;
+}
+
+.quickAction {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+
+  min-width: 64px;
+  padding: 4px 6px;
+
+  font-size: 11.5px;
+  line-height: 1.2;
+  hyphens: auto;
+  color: var(--vkui--color_text_primary);
+  text-align: center;
+
+  background: none;
+  border: 0;
+
+  &:active .quickActionIcon {
+    transform: scale(0.92);
+  }
+
+  &[aria-pressed='true'] .quickActionIcon {
+    color: var(--vkui--color_text_contrast_themed, #fff);
+    background: var(--vkui--color_background_accent_themed);
+  }
+}
+
+/* NOTE: Translations are longer than the English labels: the action grows to its label, the row scrolls */
+.quickActionLabel {
+  white-space: nowrap;
+}
+
+.tabs {
+  flex: none;
+  background: var(--vkui--color_background_content);
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+}
+
+.tabsScroll {
+  touch-action: pan-x;
+  width: 100%;
+}
+
+.sheetBody {
+  user-select: text;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+
+  min-height: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+
+  > * {
+    flex: none;
+  }
+
+  .sheet:not(.sideSheet) & {
+    padding-bottom: 12px;
+  }
+}
+
+.tabContent {
+  min-width: 0;
+}
+
+.alertBanner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  padding: 6px 4px 6px 14px;
+
+  background: var(--vkui--color_background_content);
+  border: 1px solid var(--vkui--color_separator_primary);
+  border-radius: 12px;
+
+  span {
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+}
+
+.alertIcon {
+  flex: none;
+  color: var(--vkui--color_icon_warning);
+}
+
+.pageHeader {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  margin: -4px 0 -4px -6px;
+
+  font-size: 17px;
+}
+
+.qualityRow {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+
+  > :first-child {
+    flex: 1;
+  }
+}
+
+.qualityValue {
+  width: 28px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.hint {
+  margin-top: 8px;
+  color: var(--vkui--color_text_secondary);
+}
+
+.pasteField {
+  padding-inline: 0;
+
+  textarea {
+    font-size: 16px;
+  }
+}
+
+.accessorySettingsList {
+  overflow-y: auto;
+  max-height: 50vh;
+  margin: 0 -16px;
+}
+
+.accessorySettingsKey {
+  display: grid;
+  place-items: center;
+
+  min-width: 52px;
+  height: 32px;
+  margin-right: 12px;
+  padding: 0 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vkui--color_text_primary);
+
+  background: var(--vkui--color_background_secondary);
+  border-radius: 8px;
+}

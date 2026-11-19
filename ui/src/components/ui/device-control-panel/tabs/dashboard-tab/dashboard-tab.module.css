@@ -47,6 +47,35 @@
   }
 }
 
+/* NOTE: The phone layout shows one column in the order of the most used controls */
+.dashboardTab.mobile {
+  grid-template:
+    'deviceButtons'
+    'appUpload'
+    'linkOpener'
+    'shell'
+    'clipboard'
+    'remoteDebug'
+    'deviceBooking' / minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+/* NOTE: Form items line up with the card title on a phone, their own inset only took the width of the buttons */
+.dashboardTab.mobile :global(.vkuiInternalFormItem) {
+  padding-inline: 0;
+}
+
+.dashboardTab.mobile.silent {
+  grid-template:
+    'deviceButtons'
+    'appUpload'
+    'linkOpener'
+    'shell'
+    'clipboard'
+    'remoteDebug' / minmax(0, 1fr);
+}
+
 .deviceButtons {
   grid-area: deviceButtons;
 }

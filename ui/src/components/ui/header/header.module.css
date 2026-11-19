@@ -8,7 +8,8 @@
   justify-content: space-between;
 
   width: 100%;
-  height: var(--vkui_internal--panel_header_height);
+  height: calc(var(--vkui_internal--panel_header_height) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) 0 env(safe-area-inset-left, 0);
 
   background: var(--vkui--color_background_content);
   border-bottom: 1px solid var(--vkui--color_image_border_alpha);
@@ -40,4 +41,33 @@
 
   height: 100%;
   padding-right: 28px;
+}
+
+/* NOTE: A phone scrolls the header sideways instead of cutting its buttons off */
+@media (width < 768px) {
+  .header {
+    scrollbar-width: none;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .leftSide,
+  .rightSide {
+    flex: none;
+  }
+
+  .leftSide {
+    padding-left: 12px;
+  }
+
+  .rightSide {
+    padding-right: 12px;
+  }
+
+  .logoLink {
+    margin-right: 8px;
+  }
 }

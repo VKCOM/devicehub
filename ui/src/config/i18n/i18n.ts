@@ -19,6 +19,11 @@ export const SUPPORTED_LANGUAGES = [
   'zh-Hant',
 ] as const
 
+/* NOTE: The page language drives hyphenation of long translated labels (hyphens: auto) and screen readers */
+i18n.on('languageChanged', (language) => {
+  document.documentElement.lang = language
+})
+
 i18n
   .use(LanguageDetector)
   .use(Backend)
