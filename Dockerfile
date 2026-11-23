@@ -13,6 +13,9 @@ COPY . .
 RUN npm ci --python="/usr/bin/python3" --loglevel http && \
     npm prune --production
 
+# Server of the scrcpy screen stream (--need-scrcpy), checked against its SHA-256
+RUN node scripts/fetch-scrcpy-server.mjs
+
 # -------- RUNTIME --------
 FROM --platform=linux/amd64 node:20-bookworm-slim
 

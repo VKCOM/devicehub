@@ -273,6 +273,7 @@
   "The system failed to install the package because of system issues.": "Не удалось установить пакет по причине системной ошибки",
   "The system failed to install the package because the user is restricted from installing apps.": "Не удалось установить пакет, так как данному пользователю запрещена установка приложений.",
   "The URI passed in is invalid.": "Невалидный URI.",
+  "This browser cannot play the device screen": "Этот браузер не может показать экран устройства: нужна поддержка WebCodecs. Используйте свежий Chrome, Edge, Safari или Firefox по HTTPS",
   "TID": "TID",
   "Time": "Время",
   "Tip:": "Подсказка:",
