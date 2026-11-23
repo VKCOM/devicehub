@@ -5,6 +5,7 @@ import cn from 'classnames'
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { useIsMobileControl } from '@/lib/hooks/use-is-mobile-control.hook'
 
 import { ClipboardControl } from './clipboard-control'
 import { AppUploadControl } from './app-upload-control'
@@ -18,12 +19,18 @@ import styles from './dashboard-tab.module.css'
 
 export const DashboardTab = observer(() => {
   const deviceBySerialStore = useInjection(CONTAINER_IDS.deviceBySerialStore)
+  const isMobileControl = useIsMobileControl()
 
   const { data: device } = deviceBySerialStore.deviceQueryResult()
 
   return (
     <div className={styles.dashboardTabContainer}>
-      <div className={cn(styles.dashboardTab, { [styles.silent]: deviceBySerialStore.session.silent })}>
+      <div
+        className={cn(styles.dashboardTab, {
+          [styles.silent]: deviceBySerialStore.session.silent,
+          [styles.mobile]: isMobileControl,
+        })}
+      >
         <DeviceButtonsControl className={styles.deviceButtons} />
         <RemoteDebugControl className={styles.remoteDebug} />
         <AppUploadControl className={styles.appUpload} />

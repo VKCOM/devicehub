@@ -3,6 +3,7 @@ import cn from 'classnames'
 import { observer } from 'mobx-react-lite'
 import { Spinner } from '@vkontakte/vkui'
 import { useInjection } from 'inversify-react'
+import { useErrorBoundary } from 'react-error-boundary'
 
 import { ConditionalRender } from '@/components/lib/conditional-render'
 
@@ -10,10 +11,13 @@ import { useScreenAutoQuality } from '@/lib/hooks/use-screen-auto-quality.hook'
 import { useScreenStreaming } from '@/lib/hooks/use-screen-streaming.hook'
 import { useCallbackWithErrorHandling } from '@/lib/hooks/use-callback-with-error-handling.hook'
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { useIsMobileControl } from '@/lib/hooks/use-is-mobile-control.hook'
+
+import { TouchTrail } from './touch-trail'
 
 import styles from '../device-screen.module.css'
 
-import type { ChangeEvent, ClipboardEvent, KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react'
+import type { ChangeEvent, ClipboardEvent, KeyboardEvent, RefObject } from 'react'
 
 interface ScreenProps {
   canvasWrapperRef: RefObject<HTMLDivElement>
@@ -26,63 +30,17 @@ export const StreamingScreen = observer(({ canvasWrapperRef }: ScreenProps) => {
   const touchService = useInjection(CONTAINER_IDS.touchService)
   const keyboardService = useInjection(CONTAINER_IDS.keyboardService)
   const deviceScreenStore = useInjection(CONTAINER_IDS.deviceScreenStore)
+  const mobileControlStore = useInjection(CONTAINER_IDS.mobileControlStore)
+  const isMobileControl = useIsMobileControl()
+
+  // NOTE: The phone layout has its own view settings, the desktop always shows touches
+  const isTouchIndicatorShown = !isMobileControl || mobileControlStore.isTouchIndicatorShown
+  const isTouchTrailShown = isMobileControl && mobileControlStore.isTouchTrailShown
+
+  const { showBoundary } = useErrorBoundary()
 
   useScreenStreaming({ canvasRef, canvasWrapperRef })
   useScreenAutoQuality()
-
-  const onMouseDown = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-
-    touchService.mouseDownListener({
-      mousePageX: event.pageX,
-      mousePageY: event.pageY,
-      eventTimestamp: event.timeStamp,
-      isAltKeyPressed: event.altKey,
-      isRightButtonPressed: event.button === 2,
-      focusInput: () => inputRef.current?.focus(),
-    })
-  })
-
-  const onMouseMove = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-
-    touchService.mouseMoveListener({
-      mousePageX: event.pageX,
-      mousePageY: event.pageY,
-      isRightButtonPressed: event.button === 2,
-      isAltKeyPressed: event.altKey,
-    })
-  })
-
-  const onMouseUp = useCallbackWithErrorHandling((event: MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-
-    touchService.mouseUpListener({
-      mousePageX: event.pageX,
-      mousePageY: event.pageY,
-      isRightButtonPressed: event.button === 2,
-    })
-
-    touchService.mouseUpBugWorkaroundListener(event)
-  })
-
-  const onTouchEnd = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
-    touchService.touchEndListener({
-      touches: event.nativeEvent.touches,
-      changedTouches: event.nativeEvent.changedTouches,
-    })
-  })
-
-  const onTouchMove = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
-    touchService.touchMoveListener({ changedTouches: event.nativeEvent.changedTouches })
-  })
-
-  const onTouchStart = useCallbackWithErrorHandling((event: TouchEvent<HTMLDivElement>) => {
-    touchService.touchStartListener({
-      touches: event.nativeEvent.touches,
-      changedTouches: event.nativeEvent.changedTouches,
-    })
-  })
 
   const onInputChange = useCallbackWithErrorHandling((event: ChangeEvent<HTMLInputElement>) => {
     keyboardService.changeListener({
@@ -129,13 +87,95 @@ export const StreamingScreen = observer(({ canvasWrapperRef }: ScreenProps) => {
   })
 
   useEffect(() => {
-    canvasWrapperRef?.current?.addEventListener('mousedown', onMouseDown)
-    canvasWrapperRef?.current?.addEventListener('mousemove', onMouseMove)
-    canvasWrapperRef?.current?.addEventListener('mouseup', onMouseUp)
-    canvasWrapperRef?.current?.addEventListener('touchend', onTouchEnd)
-    canvasWrapperRef?.current?.addEventListener('touchmove', onTouchMove)
-    canvasWrapperRef?.current?.addEventListener('touchstart', onTouchStart)
-  }, [])
+    const element = canvasWrapperRef.current
+
+    if (!element) return undefined
+
+    const handle =
+      <E extends Event>(listener: (event: E) => void) =>
+      (event: E): void => {
+        try {
+          listener(event)
+        } catch (error) {
+          showBoundary(error)
+        }
+      }
+
+    const onMouseDown = handle((event: MouseEvent) => {
+      event.preventDefault()
+
+      touchService.mouseDownListener({
+        mousePageX: event.pageX,
+        mousePageY: event.pageY,
+        eventTimestamp: event.timeStamp,
+        isAltKeyPressed: event.altKey,
+        isRightButtonPressed: event.button === 2,
+        focusInput: () => inputRef.current?.focus(),
+      })
+    })
+
+    const onMouseMove = handle((event: MouseEvent) => {
+      event.preventDefault()
+
+      touchService.mouseMoveListener({
+        mousePageX: event.pageX,
+        mousePageY: event.pageY,
+        isRightButtonPressed: event.button === 2,
+        isAltKeyPressed: event.altKey,
+      })
+    })
+
+    const onMouseUp = handle((event: MouseEvent) => {
+      event.preventDefault()
+
+      touchService.mouseUpListener({
+        mousePageX: event.pageX,
+        mousePageY: event.pageY,
+        isRightButtonPressed: event.button === 2,
+      })
+
+      touchService.mouseUpBugWorkaroundListener(event)
+    })
+
+    /* NOTE: Touches belong to the device: no scrolling, zooming, emulated mouse events or focus changes */
+    const onTouchStart = handle((event: TouchEvent) => {
+      if (event.cancelable) event.preventDefault()
+
+      touchService.touchStartListener({ touches: event.touches, changedTouches: event.changedTouches })
+    })
+
+    const onTouchMove = handle((event: TouchEvent) => {
+      if (event.cancelable) event.preventDefault()
+
+      touchService.touchMoveListener({ changedTouches: event.changedTouches })
+    })
+
+    const onTouchEnd = handle((event: TouchEvent) => {
+      if (event.cancelable) event.preventDefault()
+
+      touchService.touchEndListener({ touches: event.touches, changedTouches: event.changedTouches })
+    })
+
+    const touchOptions: AddEventListenerOptions = { passive: false }
+
+    element.addEventListener('mousedown', onMouseDown)
+    element.addEventListener('mousemove', onMouseMove)
+    element.addEventListener('mouseup', onMouseUp)
+    element.addEventListener('touchstart', onTouchStart, touchOptions)
+    element.addEventListener('touchmove', onTouchMove, touchOptions)
+    element.addEventListener('touchend', onTouchEnd, touchOptions)
+    element.addEventListener('touchcancel', onTouchEnd, touchOptions)
+
+    return () => {
+      element.removeEventListener('mousedown', onMouseDown)
+      element.removeEventListener('mousemove', onMouseMove)
+      element.removeEventListener('mouseup', onMouseUp)
+      element.removeEventListener('touchstart', onTouchStart, touchOptions)
+      element.removeEventListener('touchmove', onTouchMove, touchOptions)
+      element.removeEventListener('touchend', onTouchEnd, touchOptions)
+      element.removeEventListener('touchcancel', onTouchEnd, touchOptions)
+    }
+  }, [touchService])
 
   return (
     <>
@@ -144,19 +184,26 @@ export const StreamingScreen = observer(({ canvasWrapperRef }: ScreenProps) => {
           ref={canvasRef}
           className={cn(styles.canvas, { [styles.letterbox]: deviceScreenStore.isAspectRatioModeLetterbox })}
         />
-        {touchService.slots.map((value, index) => (
-          <span
-            key={value}
-            className={cn(styles.finger, { [styles.activeFinger]: touchService.fingers[index] })}
-            style={
-              touchService.fingers[index]
-                ? {
-                    transform: `translate3d(${touchService.fingers[index].x}px,${touchService.fingers[index].y}px,0) scale(${touchService.fingers[index].pressure + 0.5},${touchService.fingers[index].pressure + 0.5}`,
-                  }
-                : {}
-            }
-          />
-        ))}
+        {isTouchTrailShown && <TouchTrail touchService={touchService} />}
+        {isTouchIndicatorShown &&
+          touchService.slots.map((value, index) => {
+            const finger = touchService.fingers[index]
+            // NOTE: Phones report a pressure near 1 for every touch, which only made the ring larger
+            const scale = isMobileControl || !finger ? 1 : finger.pressure + 0.5
+
+            return (
+              <span
+                key={value}
+                className={cn(styles.finger, {
+                  [styles.activeFinger]: finger,
+                  [styles.mobileFinger]: isMobileControl,
+                })}
+                style={
+                  finger ? { transform: `translate3d(${finger.x}px,${finger.y}px,0) scale(${scale},${scale})` } : {}
+                }
+              />
+            )
+          })}
         <ConditionalRender conditions={[deviceScreenStore.isScreenLoading]}>
           <Spinner className={styles.spinner} size='xl' />
         </ConditionalRender>

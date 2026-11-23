@@ -28,6 +28,7 @@ import {TransactionManager} from '../../wire/transmanager.js'
 import {ClientDispatcher} from './support/clientDispatcher.js'
 import {DeviceOwnership} from './support/deviceOwnership.js'
 import {OwnershipCache} from './support/ownershipCache.js'
+import {createGroupInvite, createGroupKick} from './support/group-invite.js'
 import {
     UpdateAccessTokenMessage,
     DeleteUserMessage,
@@ -653,25 +654,30 @@ export default (async (options: Options) => {
             registerDeviceCommands(socket, {
                 send: sendOwned,
                 run: runTx,
-                acquire: async (serial, rc, data) => {
-                    try {
-                        const keys = await UserModel.getUserAdbKeys(user.email)
-                        await runTx(serial, rc, GroupMessage, {
-                            owner: {email: user.email, name: user.name, group: user.group},
-                            timeout: data.timeout || undefined,
-                            requirements: wireutil.toDeviceRequirements(data.requirements),
-                            keys: keys.map((key: {fingerprint: string}) => key.fingerprint)
-                        }, {requireOwned: false})
-                    }
-                    catch (err: any) {
-                        socket.emit('tx.done', rc, {source: serial, success: false, data: err?.message || 'fail'})
-                    }
-                },
-                release: async (serial, rc, data) => {
-                    await runTx(serial, rc, UngroupMessage, {
-                        requirements: wireutil.toDeviceRequirements(data.requirements)
-                    }, {requireOwned: false})
-                }
+                acquire: createGroupInvite({
+                    user,
+                    loadDevice: serial => dbapi.loadDeviceBySerial(serial) as Promise<{owner?: {email?: string; name?: string} | null} | null>,
+                    loadAdbKeys: email => UserModel.getUserAdbKeys(email),
+                    join: (serial, rc, message) => runTx(serial, rc, GroupMessage, {
+                        ...message,
+                        requirements: wireutil.toDeviceRequirements(message.requirements)
+                    }, {requireOwned: false}),
+                    fail: (serial, rc, data, body) => socket.emit('tx.done', rc, {
+                        source: serial,
+                        success: false,
+                        data,
+                        body: body && JSON.stringify(body)
+                    })
+                }),
+                release: createGroupKick({
+                    user,
+                    adminPrivilege: apiutil.ADMIN,
+                    loadDevice: serial => dbapi.loadDeviceBySerial(serial) as Promise<{owner?: {email?: string; name?: string} | null} | null>,
+                    ungroup: (serial, rc, requirements) => runTx(serial, rc, UngroupMessage, {
+                        requirements: wireutil.toDeviceRequirements(requirements)
+                    }, {requireOwned: false}),
+                    fail: (serial, rc, data) => socket.emit('tx.done', rc, {source: serial, success: false, data})
+                })
             }, req.internalJwt)
 
             // Legacy operations that are not part of the shared device controls.

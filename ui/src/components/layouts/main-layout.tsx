@@ -10,6 +10,7 @@ import { AlertMarquee } from '@/components/ui/alert-marquee'
 import { silentDeviceQueryKey } from '@/services/device-session'
 
 import { CONTAINER_IDS } from '@/config/inversify/container-ids'
+import { mobileControlLayoutState } from '@/store/mobile-control-layout-state'
 
 import type { SilentDevice } from '@/generated/types'
 
@@ -30,7 +31,8 @@ const useHideHeader = (): boolean => {
 
 export const MainLayout = observer(() => {
   const settingsService = useInjection(CONTAINER_IDS.settingsService)
-  const hideHeader = useHideHeader()
+  // NOTE: The phone layout of the control page is full screen, global alerts move into its tools
+  const hideHeader = useHideHeader() || mobileControlLayoutState.isActive
 
   // Keep the tree shape stable: remounting the outlet would restart the device session
   return (

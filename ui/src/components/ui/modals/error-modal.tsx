@@ -30,7 +30,7 @@ export const ErrorModal = ({ ...props }: Omit<BaseModalProps, 'actions' | 'icon'
       actions={
         <ButtonGroup className={styles.modalActions} stretched>
           <Button mode={'secondary'} size='l' stretched onClick={() => navigate(0)}>
-            {t('Try to reconnect')}
+            <span className={styles.buttonLabel}>{t('Try to reconnect')}</span>
           </Button>
           <Button
             mode='primary'
@@ -44,7 +44,7 @@ export const ErrorModal = ({ ...props }: Omit<BaseModalProps, 'actions' | 'icon'
               navigate(getDevicesRoute(), { replace: true })
             }}
           >
-            {t('Go to Device List')}
+            <span className={styles.buttonLabel}>{t('Go to Device List')}</span>
           </Button>
         </ButtonGroup>
       }

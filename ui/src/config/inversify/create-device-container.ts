@@ -23,6 +23,7 @@ import { CONTAINER_IDS } from '@/config/inversify/container-ids'
 import { DeviceControlStore } from '@/store/device-control-store'
 import { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import { DeviceScreenStore } from '@/store/device-screen-store/device-screen-store'
+import { MobileControlStore } from '@/store/mobile-control-store'
 
 /* NOTE:
   Creating a container for a specific device, isolating its dependencies, and ensuring that the
@@ -69,6 +70,7 @@ export const createDeviceContainer = (serial: string, provider?: string): Contai
   deviceContainer.bind(CONTAINER_IDS.deviceBySerialStore).to(DeviceBySerialStore)
   deviceContainer.bind(CONTAINER_IDS.fileExplorerService).to(FileExplorerService)
   deviceContainer.bind(CONTAINER_IDS.deviceLifecycleService).to(DeviceLifecycleService)
+  deviceContainer.bind(CONTAINER_IDS.mobileControlStore).to(MobileControlStore)
   deviceContainer.bind(CONTAINER_IDS.applicationInstallationService).to(ApplicationInstallationService)
 
   return deviceContainer

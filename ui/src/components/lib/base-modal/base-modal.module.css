@@ -2,3 +2,10 @@
   width: fit-content;
   min-width: 450px;
 }
+
+@media (width < 768px) {
+  .baseModal {
+    width: auto;
+    min-width: 0;
+  }
+}

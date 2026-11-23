@@ -203,7 +203,15 @@ export default syrup.serial()
             handlers: plugin
         })
 
+        // A worker can die because another plugin reports a fatal error. The
+        // regular cleanup list is skipped by fatal() only in older workers, so
+        // register the connector explicitly as a fatal cleanup too. This closes
+        // the host listener and the device-side reverse helper before the
+        // provider starts a replacement worker with the same ports.
         lifecycle.observe(() => connector.stop())
+        if (typeof lifecycle.observeFatal === 'function') {
+            lifecycle.observeFatal(() => connector.stop())
+        }
         group.on('leave', () => {
             plugin.auth = (key) => false
             return connector.stop()

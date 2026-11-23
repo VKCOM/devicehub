@@ -1,0 +1,46 @@
+.deviceAccessScreen {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) calc(env(safe-area-inset-right, 0px) + 28px)
+    calc(env(safe-area-inset-bottom, 0px) + 24px) calc(env(safe-area-inset-left, 0px) + 28px);
+
+  background: var(--vkui--color_background_content);
+
+  animation: access-screen-fade 250ms ease-out;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+
+  width: 64px;
+  height: 64px;
+
+  color: var(--vkui--color_icon_warning);
+
+  background: var(--vkui--color_background_secondary);
+  border-radius: 50%;
+}
+
+.actions {
+  width: min(300px, 100%);
+  margin-top: 8px;
+}
+
+@keyframes access-screen-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deviceAccessScreen {
+    animation-duration: 150ms;
+  }
+}

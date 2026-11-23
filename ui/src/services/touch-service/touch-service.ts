@@ -9,6 +9,9 @@ import { DeviceBySerialStore } from '@/store/device-by-serial-store'
 import { DeviceScreenStore } from '@/store/device-screen-store/device-screen-store'
 import { deviceConnectionRequired } from '@/config/inversify/decorators'
 
+import { getStreamRect, projectToEdge } from './edge-zones'
+
+import type { Point, ScreenEdge } from './edge-zones'
 import type {
   Finger,
   GetScaledCoordsArgs,
@@ -20,7 +23,6 @@ import type {
   TouchMoveListenerArgs,
   TouchStartEndListenerArgs,
 } from './types'
-import type { MouseEvent as ReactMouseEvent } from 'react'
 
 @injectable()
 @deviceConnectionRequired()
@@ -32,6 +34,10 @@ export class TouchService {
   private lastPossiblyBuggyMouseUpEvent: MouseEvent | null = null
   private isMouseDown = false
   private isTouching = false
+  private edgeZonesEnabled = false
+  private edgeBySlot: Record<number, ScreenEdge> = {}
+  /* NOTE: iOS devices accept one contact only, the first finger of a gesture */
+  private primaryIosSlot: number | null = null
 
   /* NOTE: The reverse order is important because slots and fingers are in
     opposite sort order. Anyway don't change anything here unless
@@ -39,6 +45,10 @@ export class TouchService {
   */
   slots = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
   fingers: Record<number, Finger> = {}
+  /* NOTE: Edges of the stream where a touch that started at the edge is active, for the edge glow */
+  activeEdges: ScreenEdge[] = []
+  /* NOTE: While blocked (e.g. the magnifier is on) touches stay on the client */
+  isTouchInputBlocked = false
 
   constructor(
     @inject(CONTAINER_IDS.scalingService) private scalingService: ScalingService,
@@ -56,8 +66,17 @@ export class TouchService {
     })
   }
 
-  mouseUpBugWorkaroundListener(event: ReactMouseEvent): void {
-    this.lastPossiblyBuggyMouseUpEvent = event.nativeEvent
+  mouseUpBugWorkaroundListener(event: MouseEvent): void {
+    this.lastPossiblyBuggyMouseUpEvent = event
+  }
+
+  /* NOTE: Touches that start at an edge of the stream go to the exact device edge (mobile layout) */
+  setEdgeZonesEnabled(value: boolean): void {
+    this.edgeZonesEnabled = value
+  }
+
+  setTouchInputBlocked(value: boolean): void {
+    this.isTouchInputBlocked = value
   }
 
   mouseDownListener({
@@ -248,12 +267,15 @@ export class TouchService {
   }
 
   touchStartListener({ touches, changedTouches }: TouchStartEndListenerArgs): void {
-    this.isTouching = true
+    if (this.isTouchInputBlocked) return
 
     const { data: device } = this.deviceBySerialStore.deviceQueryResult()
 
     if (!device?.display?.width || !device.display?.height || !this.deviceScreenStore.getCanvasWrapper) return
 
+    this.isTouching = true
+
+    const isIosDevice = device.manufacturer === 'Apple'
     const screenBoundingRect = this.deviceScreenStore.getCanvasWrapper.getBoundingClientRect()
 
     if (touches.length === changedTouches.length) {
@@ -286,6 +308,8 @@ export class TouchService {
       this.deviceControlStore.touchReset(this.nextSeq())
 
       this.removeAllFingers()
+      this.clearEdges()
+      this.primaryIosSlot = null
     }
 
     if (!this.slots.length) {
@@ -297,25 +321,34 @@ export class TouchService {
       const touch = changedTouches[i]
       const slot = this.slots.pop()
 
-      if (!slot) return
+      if (slot === undefined) break
+
+      const { point, edge } = this.projectTouch({ x: touch.clientX, y: touch.clientY }, screenBoundingRect)
 
       const scaled = this.getScaledCoords({
         displayWidth: device.display.width,
         displayHeight: device.display.height,
-        isIosDevice: device.manufacturer === 'Apple',
-        mousePageX: touch.pageX,
-        mousePageY: touch.pageY,
+        isIosDevice,
+        mousePageX: point.x,
+        mousePageY: point.y,
         screenBoundingRect,
       })
 
       this.slotted[touch.identifier] = slot
 
+      if (edge) {
+        this.edgeBySlot[slot] = edge
+        this.updateActiveEdges()
+      }
+
       const pressure = touch.force || 0.5
 
-      if (device.manufacturer !== 'Apple') {
+      if (!isIosDevice || this.primaryIosSlot === null) {
+        if (isIosDevice) this.primaryIosSlot = slot
+
         this.deviceControlStore.touchDown({
           seq: this.nextSeq(),
-          contact: slot,
+          contact: isIosDevice ? 0 : slot,
           x: scaled.coords.xP,
           y: scaled.coords.yP,
           pressure,
@@ -335,30 +368,35 @@ export class TouchService {
 
     if (!device?.display?.width || !device.display?.height || !this.deviceScreenStore.getCanvasWrapper) return
 
+    const isIosDevice = device.manufacturer === 'Apple'
     const screenBoundingRect = this.deviceScreenStore.getCanvasWrapper.getBoundingClientRect()
 
     for (let i = 0, l = changedTouches.length; i < l; ++i) {
       const touch = changedTouches[i]
       const slot = this.slotted[touch.identifier]
 
+      if (slot === undefined) continue
+
       const scaled = this.getScaledCoords({
         displayWidth: device.display.width,
         displayHeight: device.display.height,
-        isIosDevice: device.manufacturer === 'Apple',
-        mousePageX: touch.pageX,
-        mousePageY: touch.pageY,
+        isIosDevice,
+        mousePageX: touch.clientX,
+        mousePageY: touch.clientY,
         screenBoundingRect,
       })
 
       const pressure = touch.force || 0.5
 
-      this.deviceControlStore.touchMove({
-        seq: this.nextSeq(),
-        contact: slot,
-        x: scaled.coords.xP,
-        y: scaled.coords.yP,
-        pressure,
-      })
+      if (!isIosDevice || slot === this.primaryIosSlot) {
+        this.deviceControlStore.touchMove({
+          seq: this.nextSeq(),
+          contact: isIosDevice ? 0 : slot,
+          x: scaled.coords.xP,
+          y: scaled.coords.yP,
+          pressure,
+        })
+      }
 
       this.setFinger({ index: slot, x: scaled.x, y: scaled.y, pressure })
     }
@@ -369,7 +407,8 @@ export class TouchService {
   touchEndListener({ touches, changedTouches }: TouchStartEndListenerArgs): void {
     if (!this.isTouching) return
 
-    this.isTouching = false
+    const { data: device } = this.deviceBySerialStore.deviceQueryResult()
+    const isIosDevice = device?.manufacturer === 'Apple'
 
     let foundAny = false
 
@@ -385,20 +424,35 @@ export class TouchService {
       }
 
       delete this.slotted[touch.identifier]
+      delete this.edgeBySlot[slot]
 
       this.slots.push(slot)
 
-      this.deviceControlStore.touchUp(this.nextSeq(), slot)
+      if (!isIosDevice) {
+        this.deviceControlStore.touchUp(this.nextSeq(), slot)
+      }
+
+      if (isIosDevice && slot === this.primaryIosSlot) {
+        this.deviceControlStore.touchUp(this.nextSeq(), 0)
+        this.primaryIosSlot = null
+      }
 
       this.removeFinger(slot)
 
       foundAny = true
     }
 
+    this.updateActiveEdges()
+
     if (foundAny) {
       this.deviceControlStore.touchCommit(this.nextSeq())
+    }
 
-      if (!touches.length) {
+    /* NOTE: The gesture ends with the last finger, other fingers may still be down */
+    if (!touches.length) {
+      this.isTouching = false
+
+      if (foundAny) {
         this.stopTouching()
       }
     }
@@ -423,6 +477,35 @@ export class TouchService {
 
   private removeAllFingers(): void {
     this.fingers = {}
+  }
+
+  private clearEdges(): void {
+    this.edgeBySlot = {}
+    this.activeEdges = []
+  }
+
+  private updateActiveEdges(): void {
+    this.activeEdges = [...new Set(Object.values(this.edgeBySlot))]
+  }
+
+  private projectTouch(touch: Point, screenBoundingRect: DOMRect): { point: Point; edge: ScreenEdge | null } {
+    if (!this.edgeZonesEnabled) return { point: touch, edge: null }
+
+    const aspectRatio = this.deviceScreenStore.getStreamAspectRatio
+
+    if (!aspectRatio) return { point: touch, edge: null }
+
+    const stream = getStreamRect(
+      {
+        left: screenBoundingRect.x,
+        top: screenBoundingRect.y,
+        width: screenBoundingRect.width,
+        height: screenBoundingRect.height,
+      },
+      aspectRatio
+    )
+
+    return projectToEdge(touch, stream)
   }
 
   private startMousing(focusInput: () => void): void {
@@ -471,6 +554,7 @@ export class TouchService {
 
   private stopTouching(): void {
     this.removeAllFingers()
+    this.clearEdges()
 
     this.deviceControlStore.gestureStop(this.nextSeq())
   }

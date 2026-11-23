@@ -1,5 +1,7 @@
 .buttonsContainer {
   display: flex;
+  flex-wrap: wrap;
+  row-gap: 8px;
   align-items: center;
 
   &:not(:first-of-type) {
@@ -8,6 +10,55 @@
 
   .buttonTooltip:not(:first-of-type) {
     margin-left: 8px;
+  }
+}
+
+.mobileButtons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* NOTE: An odd last tile and the airplane switch take the whole row instead of leaving a gap */
+.mobileButtons:not(.mobileThreeColumns, .mobileIconButtons) > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.mobileThreeColumns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mobileIconButtons {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mobileButton {
+  min-width: 0;
+
+  /* NOTE: A tile: the icon above a centered label that gets the whole width and may take two lines */
+  height: auto;
+  min-height: 56px;
+  padding-block: 8px;
+  padding-inline: 8px;
+
+  > span {
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  > span > span {
+    overflow: visible;
+
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 17px;
+    text-align: center;
+    text-overflow: clip;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 }
 

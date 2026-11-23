@@ -11,6 +11,9 @@ import { authStore } from '@/store/auth-store'
 
 import type { ElementBoundSize, StartScreenStreamingMessage } from './types'
 
+/* NOTE: The stream pauses after the page stays hidden this long, to save traffic and device resources */
+const HIDDEN_STREAM_PAUSE_DELAY = 10_000
+
 class AuthError extends Error {
   constructor() {
     super('Unauthorized')
@@ -24,10 +27,15 @@ export class DeviceScreenStore {
   private websocket: WebSocket | null = null
   private backoffPromise: Promise<void> | null = null
   private disposed = false
+  /* NOTE: Bumped on every stop, so a connection opened for a stopped stream is dropped */
+  private streamGeneration = 0
 
   private context: ImageBitmapRenderingContext | null = null
   private canvasWrapper: HTMLDivElement | null = null
   private showScreen = true
+  private hiddenPauseTimer: ReturnType<typeof setTimeout> | undefined = undefined
+  /* Stops an auth failure or an exhausted retry cycle from being restarted by autorun. */
+  private reconnectBlocked = false
   private options = {
     autoScaleForRetina: true,
     density: Math.max(1, Math.min(1.5, devicePixelRatio || 1)),
@@ -60,6 +68,7 @@ export class DeviceScreenStore {
   constructor(@inject(CONTAINER_IDS.deviceBySerialStore) private deviceBySerialStore: DeviceBySerialStore) {
     this.updateBounds = this.updateBounds.bind(this)
     this.messageListener = this.messageListener.bind(this)
+    this.onVisibilityChange = this.onVisibilityChange.bind(this)
 
     makeAutoObservable(this)
   }
@@ -72,6 +81,17 @@ export class DeviceScreenStore {
     return this.screenRotation
   }
 
+  /* NOTE: Width to height of the picture as shown, i.e. of the device display turned by its rotation */
+  get getStreamAspectRatio(): number | null {
+    const { data: device } = this.deviceBySerialStore.deviceQueryResult()
+    const width = device?.display?.width
+    const height = device?.display?.height
+
+    if (!width || !height) return null
+
+    return this.isRotated() ? height / width : width / height
+  }
+
   setIsScreenLoading(value: boolean): void {
     this.isScreenLoading = value
   }
@@ -81,14 +101,15 @@ export class DeviceScreenStore {
       this.setIsScreenLoading(true)
     })
 
-    if (this.disposed) {
-      this.disposed = false
-
-      return
-    }
+    // NOTE: A remounted screen (e.g. the page switched between its phone and desktop layouts) streams again
+    this.disposed = false
+    this.reconnectBlocked = false
 
     this.context = canvas.getContext('bitmaprenderer')
     this.canvasWrapper = canvasWrapper
+    this.showScreen = true
+
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
 
     // Watch for display.url becoming available; trigger (re)connection when it appears
     // while we're not already connected. This decouples the streaming WS lifecycle
@@ -109,6 +130,8 @@ export class DeviceScreenStore {
 
       if (this.disposed) return
 
+      if (this.reconnectBlocked) return
+
       if (this.websocket && this.websocket.readyState === WebSocket.OPEN) return
 
       if (this.backoffPromise) return
@@ -119,13 +142,19 @@ export class DeviceScreenStore {
 
   stopScreenStreaming(): void {
     this.disposed = true
+    this.streamGeneration++
     this.backoffPromise = null
+
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
+    clearTimeout(this.hiddenPauseTimer)
 
     this.urlReactionDisposer?.()
     this.urlReactionDisposer = null
 
     if (this.websocket) {
-      this.websocket.onclose = null
+      // Keep the pre-open close handler attached so a cancelled connection
+      // rejects its pending backoff attempt instead of leaving it hanging.
+      if (this.websocket.readyState === WebSocket.OPEN) this.websocket.onclose = null
       this.websocket.close()
       this.websocket = null
     }
@@ -157,6 +186,30 @@ export class DeviceScreenStore {
       const canvasWrapperAspect = this.canvasWrapper.offsetWidth / this.canvasWrapper.offsetHeight
 
       this.isAspectRatioModeLetterbox = canvasWrapperAspect < canvasAspect
+    }
+  }
+
+  private onVisibilityChange(): void {
+    clearTimeout(this.hiddenPauseTimer)
+
+    if (document.visibilityState !== 'visible') {
+      this.hiddenPauseTimer = setTimeout(() => {
+        this.showScreen = false
+        this.onScreenInterestLost()
+      }, HIDDEN_STREAM_PAUSE_DELAY)
+
+      return
+    }
+
+    if (this.showScreen) return
+
+    this.showScreen = true
+    this.onScreenInterestGained()
+
+    try {
+      this.updateBounds()
+    } catch {
+      /* canvasWrapper not yet set, harmless */
     }
   }
 
@@ -317,19 +370,25 @@ export class DeviceScreenStore {
         return
       }
 
+      const generation = this.streamGeneration
       const ws = new WebSocket(url, `access_token.${authStore.jwt}`)
+      runInAction(() => {
+        this.websocket = ws
+      })
 
       ws.binaryType = 'blob'
 
       ws.onopen = (): void => {
-        if (this.disposed || !this.deviceBySerialStore.session.ready) {
+        if (this.disposed || generation !== this.streamGeneration || !this.deviceBySerialStore.session.ready) {
           ws.close()
           reject(new Error('Device session ended'))
 
           return
         }
 
-        this.websocket = ws
+        runInAction(() => {
+          this.websocket = ws
+        })
         ws.onmessage = this.messageListener.bind(this)
         ws.onerror = (): void => {}
 
@@ -342,7 +401,14 @@ export class DeviceScreenStore {
       ws.onerror = (): void => {}
 
       ws.onclose = (event: CloseEvent): void => {
+        if (this.websocket === ws) {
+          runInAction(() => {
+            if (this.websocket === ws) this.websocket = null
+          })
+        }
+
         if (event.code === 1008) {
+          this.reconnectBlocked = true
           reject(new AuthError())
 
           return
@@ -356,13 +422,17 @@ export class DeviceScreenStore {
   private connectWithBackoff(): Promise<void> {
     if (this.backoffPromise) return this.backoffPromise
 
-    this.backoffPromise = backOff(() => this.connectWebsocket(), {
+    const generation = this.streamGeneration
+
+    const promise = backOff(() => this.connectWebsocket(), {
       numOfAttempts: 8,
       startingDelay: 1000,
       maxDelay: 16000,
       jitter: 'full',
       retry: (err) => {
-        if (this.disposed || !this.deviceBySerialStore.session.ready) return false
+        if (this.disposed || generation !== this.streamGeneration || !this.deviceBySerialStore.session.ready) {
+          return false
+        }
 
         if (err instanceof AuthError) return false
 
@@ -370,9 +440,11 @@ export class DeviceScreenStore {
       },
     })
       .catch((err) => {
-        if (this.disposed || !this.deviceBySerialStore.session.ready) return
+        if (this.disposed || generation !== this.streamGeneration || !this.deviceBySerialStore.session.ready) return
 
         runInAction(() => {
+          this.reconnectBlocked = true
+
           if (err instanceof AuthError) {
             deviceErrorModalStore.setError(t('Unauthorized'))
           } else {
@@ -381,10 +453,16 @@ export class DeviceScreenStore {
         })
       })
       .finally(() => {
-        this.backoffPromise = null
+        runInAction(() => {
+          if (this.backoffPromise === promise) this.backoffPromise = null
+        })
       })
 
-    return this.backoffPromise
+    runInAction(() => {
+      this.backoffPromise = promise
+    })
+
+    return promise
   }
 
   private handleUnexpectedClose(event: CloseEvent): void {
@@ -395,6 +473,7 @@ export class DeviceScreenStore {
     })
 
     if (event.code === 1008) {
+      this.reconnectBlocked = true
       deviceErrorModalStore.setError(t('Unauthorized'))
 
       return
@@ -457,6 +536,7 @@ export class DeviceScreenStore {
         }
 
         if (authMessage.type === 'auth_error') {
+          this.reconnectBlocked = true
           console.error('WebSocket authentication failed:', authMessage.message)
 
           return

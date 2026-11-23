@@ -3,11 +3,11 @@
 
 .pageWrapper {
   height: 100%;
-  padding-top: var(--vkui_internal--panel_header_height);
+  padding-top: calc(var(--vkui_internal--panel_header_height) + env(safe-area-inset-top, 0px));
 }
 
 .marqueeOffset {
-  padding-top: calc(var(--vkui_internal--panel_header_height) + var(--marquee-height));
+  padding-top: calc(var(--vkui_internal--panel_header_height) + env(safe-area-inset-top, 0px) + var(--marquee-height));
 }
 
 .pageWrapper.headless {

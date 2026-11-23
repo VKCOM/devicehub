@@ -1,0 +1,154 @@
+.mobileFileList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pathBar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.path {
+  flex: 1;
+  min-width: 0;
+
+  input {
+    font:
+      16px ui-monospace,
+      'SF Mono',
+      Menlo,
+      'Roboto Mono',
+      monospace;
+  }
+}
+
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: var(--vkui--color_icon_accent);
+
+  background: none;
+  border: 0;
+  border-radius: 12px;
+
+  &:active {
+    background: var(--vkui--color_background_secondary);
+  }
+}
+
+.list {
+  overflow: hidden;
+  padding: 4px 0;
+  background: var(--vkui--color_background_content);
+  border-radius: 12px;
+}
+
+.item + .item {
+  background: linear-gradient(var(--vkui--color_separator_primary), var(--vkui--color_separator_primary)) 64px 0 /
+    calc(100% - 64px) 1px no-repeat;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 16px;
+
+  color: var(--vkui--color_text_primary);
+  text-align: left;
+
+  background: none;
+  border: 0;
+}
+
+.fileIcon,
+.folderIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+
+  width: 36px;
+  height: 36px;
+
+  color: var(--vkui--color_icon_secondary);
+
+  background: var(--vkui--color_background_secondary);
+  border-radius: 9px;
+}
+
+.folderIcon {
+  color: var(--vkui--color_icon_accent);
+}
+
+.name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  b {
+    overflow: hidden;
+
+    font-size: 15px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--vkui--color_text_secondary);
+  }
+}
+
+.chevron {
+  display: grid;
+  flex: none;
+  color: var(--vkui--color_icon_secondary);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+
+  padding: 0 16px 12px 64px;
+}
+
+.detail {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+
+  width: 100%;
+
+  font-size: 13.5px;
+
+  > :first-child {
+    flex: none;
+    color: var(--vkui--color_text_secondary);
+  }
+
+  > :last-child {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+.mono {
+  user-select: text;
+  font-family: ui-monospace, 'SF Mono', Menlo, 'Roboto Mono', monospace;
+}
