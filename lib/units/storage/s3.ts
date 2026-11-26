@@ -10,6 +10,8 @@ import { fromIni } from '@aws-sdk/credential-providers'
 import { S3 } from '@aws-sdk/client-s3'
 import logger from '../../util/logger.js'
 import rateLimitConfig from '../ratelimit/index.js'
+import { accessTokenAuth } from '../api/helpers/securityHandlers.js'
+import db from '../../db/index.js'
 
 // @ts-ignore
 import formidable from 'formidable'
@@ -20,6 +22,7 @@ interface S3Options {
     bucket: string
     maxFileSize: number
     port: number
+    secret: string
 }
 
 interface UploadedFile {
@@ -37,24 +40,28 @@ interface ResourceResponse {
     href: string
 }
 
-export default function (options: S3Options) {
+export const createApp = (options: S3Options, s3: S3) => {
     const log = logger.createLogger('storage:s3')
     const app = express()
-    const server = http.createServer(app)
-    const s3 = new S3({
-        // JS SDK v3 switched credential providers from classes to functions.
-        // This is the closest approximation from codemod of what your application needs.
-        // Reference: https://www.npmjs.com/package/@aws-sdk/credential-providers
-        credentials: fromIni({
-            profile: options.profile
-        }),
-        endpoint: options.endpoint
-    })
 
     app.set('strict routing', true)
     app.set('case sensitive routing', true)
     app.set('trust proxy', true)
     app.use(rateLimitConfig)
+
+    // Same check as storage-temp: every file belongs to a logged in user
+    app.use(async (req: any, res, next) => {
+        req.options = {
+            secret: options.secret
+        }
+        try {
+            await accessTokenAuth(req)
+            next()
+        } catch (err: any) {
+            res.status(err.status || 500).json({ message: err.message })
+        }
+    })
+
     app.use(bodyParser.json())
     app.use(validator())
 
@@ -161,6 +168,24 @@ export default function (options: S3Options) {
         }
     })
 
+    return app
+}
+
+export default async function (options: S3Options) {
+    const log = logger.createLogger('storage:s3')
+    await db.connect()
+
+    const s3 = new S3({
+        // JS SDK v3 switched credential providers from classes to functions.
+        // This is the closest approximation from codemod of what your application needs.
+        // Reference: https://www.npmjs.com/package/@aws-sdk/credential-providers
+        credentials: fromIni({
+            profile: options.profile
+        }),
+        endpoint: options.endpoint
+    })
+
+    const server = http.createServer(createApp(options, s3))
     server.listen(options.port)
     log.info('Listening on port %s', options.port)
 }
